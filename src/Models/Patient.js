@@ -15,7 +15,7 @@ const patientSchema = new Schema({
     required: true
   },
   Password: {
-    type: Password,
+    type: String,
     required: true,
 },
     DOB: {
@@ -30,15 +30,15 @@ const patientSchema = new Schema({
         type: Number,
         required: true,
     },
-    ecName: {
+    EmergencyContactName: {
         type: String,
         required: true,
       },
-      ecMobile: {
+      EmergencyContactMobile: {
         type: Number,
         required: true,
     },
 }, { timestamps: true });
 
-const Pateint = mongoose.model('pateint', patientSchema);
+const Patient = mongoose.model('Pateint', patientSchema);
 module.exports = Patient;

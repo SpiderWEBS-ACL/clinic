@@ -7,10 +7,10 @@ const adminSchema = new Schema({
     required: true,
   },
   Password: {
-    type: Password,
-    required: true
-  },
+    type: String,
+    required: true,
+  }
 }, { timestamps: true });
 
-const Admin = mongoose.model('admin', adminSchema);
+const Admin = mongoose.model('Admin', adminSchema);
 module.exports = Admin;

@@ -15,7 +15,7 @@ const doctorSchema = new Schema({
     required: true
   },
   Password: {
-    type: Password,
+    type: String,
     required: true,
 },
     DOB: {
@@ -36,5 +36,5 @@ const doctorSchema = new Schema({
       },
 }, { timestamps: true });
 
-const Doctor = mongoose.model('doctor', doctorSchema);
+const Doctor = mongoose.model('Doctor', doctorSchema);
 module.exports = Doctor;
