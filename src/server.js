@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require('mongoose');
-const { addAdmin } = require("./Routes/adminController");
+const { addAdmin, removeDoctor } = require("./Routes/adminController");
+const { addDoctor } = require("./Routes/doctorController");
 mongoose.set('strictQuery', false);
 require("dotenv").config();
 const MongoURI = process.env.ATLAS_MONGO_URI;
@@ -27,3 +28,7 @@ app.use(express.json());
 
 //Admin Endpoints
 app.post("/admin/add",addAdmin);
+app.delete("/admin/removeDoctor",removeDoctor);
+
+
+app.post("/doctor/add",addDoctor);

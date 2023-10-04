@@ -18,11 +18,11 @@ const doctorSchema = new Schema({
     type: String,
     required: true,
 },
-    DOB: {
+    Dob: {
         type: Date,
         required: true,
     },
-    Rate: {
+    HourlyRate: {
         type: Number,
         required: true,
     },
@@ -30,7 +30,7 @@ const doctorSchema = new Schema({
         type: String,
         required: true,
     },
-    EducationalBg: {
+    EducationalBackground: {
         type: String,
         required: true,
       },
