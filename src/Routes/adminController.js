@@ -1,6 +1,7 @@
 const adminModel = require('../Models/Admin');
 const doctorModel = require('../Models/Doctor');
 const patientModel = require('../Models/Patient');
+const doctorRegisterRequest = require('../Models/DoctorRegisterRequest');
 const { default: mongoose } = require('mongoose');
 
 const addAdmin = async (req,res) => {
@@ -59,4 +60,27 @@ const removeDoctor = async (req,res) => {
    }
  }
 
-module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin};
+ const getAllDoctrsRegistrationReqs = async (req,res) =>{
+    try{
+        const RegistrationReqs = await doctorRegisterRequest.find({});
+        res.status(200).json(RegistrationReqs);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+ }
+
+ const getDoctrRegistrationReqDetails = async (req,res) =>{
+    try {
+        const id = req.body.id;
+        const RegistrationReq = await doctorRegisterRequest.findById(id);
+        if (!RegistrationReq) {
+            return res.status(404).json({ error: 'Doctor registration request not found' });
+       }
+       res.status(200).json(RegistrationReq);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+
+}
+
+module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails};
