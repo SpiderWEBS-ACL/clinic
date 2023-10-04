@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails } = require("./Routes/adminController");
-const { addDoctor } = require("./Routes/doctorController");
+const { addDoctor, RegisterDoctor } = require("./Routes/doctorController");
 mongoose.set('strictQuery', false);
 require("dotenv").config();
 const MongoURI = process.env.ATLAS_MONGO_URI;
@@ -34,5 +34,5 @@ app.delete("/admin/removeAdmin",removeAdmin); //params?
 app.get("/admin/registrationRequests",getAllDoctrsRegistrationReqs);
 app.get("admin/registrationRequestDetails",getDoctrRegistrationReqDetails);
 
-//FIXME: For testing puposes only
-app.post("/doctor/add",addDoctor);
+//Doctor Endpoints
+app.post("/doctor/register",RegisterDoctor);
