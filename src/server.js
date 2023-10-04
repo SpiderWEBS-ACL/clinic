@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require('mongoose');
-const { addAdmin, removeDoctor, removePatient, removeAdmin } = require("./Routes/adminController");
+const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails } = require("./Routes/adminController");
 const { addDoctor } = require("./Routes/doctorController");
 mongoose.set('strictQuery', false);
 require("dotenv").config();
@@ -28,10 +28,11 @@ app.use(express.json());
 
 //Admin Endpoints
 app.post("/admin/add",addAdmin);
-app.delete("/admin/removeDoctor",removeDoctor);
-app.delete("/admin/removePatient",removePatient);
-app.delete("/admin/removeAdmin",removeAdmin);
-
+app.delete("/admin/removeDoctor",removeDoctor); //params?
+app.delete("/admin/removePatient",removePatient); //params?
+app.delete("/admin/removeAdmin",removeAdmin); //params?
+app.get("/admin/registrationRequests",getAllDoctrsRegistrationReqs);
+app.get("admin/registrationRequestDetails",getDoctrRegistrationReqDetails);
 
 //FIXME: For testing puposes only
 app.post("/doctor/add",addDoctor);
