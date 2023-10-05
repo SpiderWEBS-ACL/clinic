@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
-const { addDoctor, RegisterDoctor } = require("./Routes/doctorController");
+const { addDoctor, RegisterDoctor, searchPatientByName } = require("./Routes/doctorController");
 const { addPatient, addFamilyMembers } = require("./Routes/patientController");
 mongoose.set('strictQuery', false);
 require("dotenv").config();
@@ -40,6 +40,7 @@ app.delete("/admin/deletePackage",deletePackage)
 
 //Doctor Endpoints
 app.post("/doctor/register",RegisterDoctor);
+app.get("/doctor/searchPatient",searchPatientByName);
 
 //Patient Endpoints
 app.post("/patient/register",addPatient);
