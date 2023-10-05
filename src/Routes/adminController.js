@@ -38,7 +38,7 @@ const removeAdmin = async (req,res) => {
    }
  }
 
-////////////////////////////////PATIENT///////////////////////////////////////////////////
+/////////////////////////////////////PATIENT///////////////////////////////////////////////////
 
  const removePatient = async (req,res) => {
     try{
@@ -53,7 +53,7 @@ const removeAdmin = async (req,res) => {
    }
  }
 
- ///////////////////////////////////DOCTOR//////////////////////////////////
+ ////////////////////////////////////DOCTOR//////////////////////////////////////////////////////
 
 const removeDoctor = async (req,res) => {
     try{
@@ -123,14 +123,14 @@ const updatePackage = async (req,res) => {
 
 const deletePackage = async (req,res) => {
    try {
-      const id   = req.body.id;
+      const id = req.body.id;
       const deletedPackage = await packageModel.findByIdAndDelete(id);
       if (!deletedPackage) {
          return res.status(404).json({ error: 'Package not found' });
        }
       res.status(200).json(deletedPackage);
-   } catch (error) {
-     res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
    }
 }
 

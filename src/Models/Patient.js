@@ -38,6 +38,30 @@ const patientSchema = new Schema({
         type: Number,
         required: true,
     },
+    FamilyMembers: [{
+      Name: {
+        type: String,
+        required: true,
+      },
+      relationToPatient: {
+        type: String,
+        enum: ["Wife", "Husband", "Son", "Daughter"],
+        required: true,
+      },
+      NationalID: {
+        type: String,
+        required: true,
+      },
+      Age: {
+        type: Number,
+        required: true,
+      },
+      Gender: {
+        type: String,
+        enum: ["Male", "Female"],
+        requiired: true,
+      }
+    }]
 }, { timestamps: true });
 
 const Patient = mongoose.model('Pateint', patientSchema);
