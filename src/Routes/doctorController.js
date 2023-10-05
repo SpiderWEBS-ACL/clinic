@@ -12,4 +12,6 @@ const RegisterDoctor = async (req,res) => {
     }
 }
 
-module.exports = {RegisterDoctor};
+const 
+
+module.exports = { RegisterDoctor };
