@@ -39,6 +39,19 @@ const searchPatientByName = async (req,res) => {
     }
  }
 
+ const updateDoctor = async (req,res) => {
+    const id = req.body.id;
+    const updates = req.body;
+    try{
+        const updatedDoctor = await doctorModel.findByIdAndUpdate(id, updates);
+        if(!updatedDoctor){
+            return res.status(404).json({error: "Doctor not found "});
+        }
+        res.status(200).json(updateDoctor);
+    }catch(error) { 
+        res.status(500).json({error: error.message});
+    }
+ }
 
 
-module.exports = { RegisterDoctor, searchPatientByName, selectPatient };
+module.exports = { RegisterDoctor, searchPatientByName, selectPatient, updateDoctor };
