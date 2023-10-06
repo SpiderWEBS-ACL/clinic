@@ -24,8 +24,21 @@ const searchPatientByName = async (req,res) => {
     } catch (error) {
         res.status(500).json({ error: 'An error occurred while searching' });
     }
- }   
+ } 
+ 
+ const selectPatient = async (req, res) => {
+    const id = req.body.id;
+    try{
+        const patient = await patientModel.findById(id);
+        if(!patient){
+            return res.status(404).json({error: "Patient not found"});
+        }
+        res.status(200).json(patient);
+    }catch(error){
+        res.status(500).json({ error: error.message });
+    }
+ }
 
 
 
-module.exports = { RegisterDoctor, searchPatientByName };
+module.exports = { RegisterDoctor, searchPatientByName, selectPatient };
