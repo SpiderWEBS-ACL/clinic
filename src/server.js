@@ -1,8 +1,9 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
-const { addDoctor, RegisterDoctor, searchPatientByName, selectPatient } = require("./Routes/doctorController");
+const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, addApointment, upcomingAppointments } = require("./Routes/doctorController");
 const { addPatient, addFamilyMembers, selectDoctor } = require("./Routes/patientController");
+
 mongoose.set('strictQuery', false);
 require("dotenv").config();
 const MongoURI = process.env.ATLAS_MONGO_URI;
@@ -39,11 +40,18 @@ app.put("/admin/updatePackage",updatePackage);
 app.delete("/admin/deletePackage",deletePackage)
 
 //Doctor Endpoints
-app.post("/doctor/register",RegisterDoctor);
+app.post("/doctor/add",addDoctor);
+app.post("/doctor/register",registerDoctor);
 app.get("/doctor/searchPatient",searchPatientByName);
 app.get("/doctor/selectPatient",selectPatient);
+app.put("/doctor/update", updateDoctor);
+app.get("/doctor/upcomingAppointments",upcomingAppointments);
 
 //Patient Endpoints
 app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMembers",addFamilyMembers);
 app.get("/patient/selectDoctor", selectDoctor);
+
+//Appointment Endpoiints
+app.post("/appointment/add", addApointment);
+

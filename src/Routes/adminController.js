@@ -68,8 +68,6 @@ const removeDoctor = async (req,res) => {
    }
  }
 
-
-
 /////////////////////////////DOCTORS REGISTRATION/////////////////////////////////////////
 
  const getAllDoctrsRegistrationReqs = async (req,res) =>{
