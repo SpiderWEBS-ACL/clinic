@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
-const { addDoctor, RegisterDoctor, searchPatientByName, selectPatient, updateDoctor, viewPatients, viewPatientInfo } = require("./Routes/doctorController");
+const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, addApointment, upcomingAppointments, viewPatients, viewPatientInfo } = require("./Routes/doctorController");
 const { addPatient, addFamilyMembers, viewFamilyMembers } = require("./Routes/patientController");
 mongoose.set('strictQuery', false);
 require("dotenv").config();
@@ -39,13 +39,18 @@ app.put("/admin/updatePackage",updatePackage);
 app.delete("/admin/deletePackage",deletePackage)
 
 //Doctor Endpoints
-app.post("/doctor/register",RegisterDoctor);
+app.post("/doctor/add",addDoctor);
+app.post("/doctor/register",registerDoctor);
 app.get("/doctor/searchPatient",searchPatientByName);
 app.get("/doctor/selectPatient",selectPatient);
 app.put("/doctor/update", updateDoctor);
+app.get("/doctor/upcomingAppointments",upcomingAppointments);
 app.get("/doctor/viewPatients", viewPatients);
 app.get("/doctor/viewPatientInfo", viewPatientInfo);
 //Patient Endpoints
 app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMembers",addFamilyMembers);
+
+//Appointment Endpoiints
+app.post("/appointment/add", addApointment);
 app.get("/patient/viewFamilyMembers",viewFamilyMembers)
