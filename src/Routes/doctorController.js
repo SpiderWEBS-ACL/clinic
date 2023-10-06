@@ -83,8 +83,7 @@ const searchPatientByName = async (req,res) => {
     const currentDate = new Date();
     try{
      const appointments =  await appointmentModel.find({
-        Doctor: doctorId,
-        AppointmentDate: {$gte: currentDate } //$gte = Greater Than or Equal
+        Doctor: doctorId
     }).populate("Patient").exec()
     const patients = [];
     for (const appointment of appointments) {
@@ -97,7 +96,7 @@ const searchPatientByName = async (req,res) => {
         }
  } 
 
- const viewPatientInfo = async (req,res) => {
+ const viewPatientInfo = async (req,res) => { //health records???
     const patient = await patientModel.findById(req.body.id);
     if(!patient){
         res.status(500).json({error:"No such Patient"}) ;

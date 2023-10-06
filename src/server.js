@@ -48,6 +48,7 @@ app.put("/doctor/update", updateDoctor);
 app.get("/doctor/upcomingAppointments",upcomingAppointments);
 app.get("/doctor/viewPatients", viewPatients);
 app.get("/doctor/viewPatientInfo", viewPatientInfo);
+
 //Patient Endpoints
 app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMembers",addFamilyMembers);

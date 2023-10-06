@@ -38,7 +38,7 @@ const viewFamilyMembers = async (req, res) => {
         }
     }
     catch(error){
-        res.status(500).json({error: "no family members"})
+        res.status(500).json({error: error.message})
     }
 }
 module.exports = {addPatient, addFamilyMembers,viewFamilyMembers};
