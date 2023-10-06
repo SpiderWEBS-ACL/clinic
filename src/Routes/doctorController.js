@@ -1,12 +1,22 @@
 const doctorModel = require('../Models/Doctor');
 const patientModel = require('../Models/Patient');
-const doctorRegisterRequest = require('../Models/DoctorRegisterRequest');
+const doctorRegisterRequestModel = require('../Models/DoctorRegisterRequest');
+const appointmentModel = require('../Models/Appointment')
 const { default: mongoose } = require('mongoose');
 
-
-const RegisterDoctor = async (req,res) => {
+// FOR TESTING
+const addDoctor = async (req,res) => {
     try {
-        const newDoctor = await doctorRegisterRequest.create(req.body);
+        const newDoctor = await doctorModel.create(req.body);
+        res.status(201).json(newDoctor);
+    }catch(error){
+        res.status(400).json({ error: error.message });
+    }
+}
+
+const registerDoctor = async (req,res) => {
+    try {
+        const newDoctor = await doctorRegisterRequestModel.create(req.body);
         res.status(201).json(newDoctor);
     }catch(error){
         res.status(400).json({ error: error.message });
@@ -19,7 +29,7 @@ const searchPatientByName = async (req,res) => {
         return res.status(400).json({ error: 'Name parameter is required' });
       }
     try{
-        const patients = await patientModel.find({ Name: { $regex: Name, $options: "i"} }); //$options : "i" to make it case insensitive
+        const patients = await patientModel.find({ Name: { $regex: Name, $options: "i"} }); // $options : "i" to make it case insensitive
         res.status(200).json(patients);
     } catch (error) {
         res.status(500).json({ error: 'An error occurred while searching' });
@@ -53,5 +63,29 @@ const searchPatientByName = async (req,res) => {
     }
  }
 
+ const upcomingAppointments = async (req, res) => {
+    const doctorId = req.body.id;
+    const currentDate = new Date();
+    try{
+     const appointments =  await appointmentModel.find({
+        Doctor: doctorId,
+        AppointmentDate: {$gte: currentDate } //$gte = Greater Than or Equal
+    }).populate("Patient").exec()
+    res.status(200).json(appointments);
+}catch(error){
+        res.status(500).json({error : error.message});
+        }
+ }
 
-module.exports = { RegisterDoctor, searchPatientByName, selectPatient, updateDoctor };
+ const addApointment = async (req, res) => {
+    try{
+        const appointment = await appointmentModel.create(req.body);
+        res.status(201).json(appointment);
+    }catch(error){
+        res.status(400).json({ error: error.message });
+    }
+
+ }
+
+
+module.exports = { registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, addDoctor, addApointment };
