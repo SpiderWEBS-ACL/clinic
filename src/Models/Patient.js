@@ -61,8 +61,8 @@ const patientSchema = new Schema({
         enum: ["Male", "Female"],
         requiired: true,
       }
-    }]
+    }],
 }, { timestamps: true });
 
-const Patient = mongoose.model('Pateint', patientSchema);
+const Patient = mongoose.model('Patient', patientSchema);
 module.exports = Patient;
