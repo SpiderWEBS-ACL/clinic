@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+
 
 const appointmentSchema = new Schema({
     Doctor: { type: Schema.Types.ObjectId,
@@ -14,8 +15,9 @@ const appointmentSchema = new Schema({
     
     Status:{
       type : String ,  enum:[ "Upcoming","Attended","Cancelled"]},
-    });
+    }{ timestamps: true });
 
 
-  const Appointment = mongoose.model("Appointment",appointmentSchema);
-  module.exports = Appointment;
+const Appointment = mongoose.model("Appointment", appointmentSchema);
+module.exports = Appointment;
+
