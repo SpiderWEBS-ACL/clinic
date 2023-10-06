@@ -37,11 +37,27 @@ const selectDoctor = async (req, res) => {
     const doctor = await doctorModel.findById(docID);
     if (!doctor) {
       return res.status(404).json({ error: "Doctor Not Found" });
-    }
+    }    
     res.status(200).json(doctor);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-module.exports = { addPatient, addFamilyMembers, selectDoctor };
+const viewFamilyMembers = async (req, res) => {
+    try{
+        const patient = await patientModel.findById(req.body.id);
+        if(!patient){
+            return res.status(404).json({ error: "Patient not found"});
+        }
+        else{
+            const familyMembers = patient.FamilyMembers;
+            res.status(200).json(familyMembers)
+        }
+    }
+    catch(error){
+        res.status(500).json({error: error.message})
+    }
+}
+
+module.exports = { addPatient, addFamilyMembers, selectDoctor, viewFamilyMembers };
