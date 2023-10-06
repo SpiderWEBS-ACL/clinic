@@ -1,30 +1,47 @@
-const patientModel = require('../Models/Patient');
-const { default: mongoose } = require('mongoose');
+const patientModel = require("../Models/Patient");
+const { default: mongoose } = require("mongoose");
+const doctorModel = require("../Models/Doctor");
+const appointmentModel = require("../Models/Appointment");
 
-const addPatient = async (req,res) => {
-    try{
-        const newPatient = await patientModel.create(req.body);
-        res.status(201).json(newPatient);
-    } catch(error){
-        res.status(500).json({error : error.message} );
-    }
-}
+const addPatient = async (req, res) => {
+  try {
+    const newPatient = await patientModel.create(req.body);
+    res.status(201).json(newPatient);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 const addFamilyMembers = async (req, res) => {
-    try{
-        const id = req.body.id;
-        const newFamilyMembers = req.body.FamilyMembers;
-        const patient = await patientModel.findById(id);
-        if(!patient){
-            return res.status(404).json({ error: "Patient not found"});
-        }
-        const familyMembers = patient.FamilyMembers;
-        const allFamilyMembers = familyMembers.concat(newFamilyMembers);
-        const updatedPatient = await patientModel.findByIdAndUpdate(id,{FamilyMembers: allFamilyMembers});
-        res.status(200).json(updatedPatient);
-    } catch(error){
-        res.status(500).json({error: error.message});
+  try {
+    const id = req.body.id;
+    const newFamilyMembers = req.body.FamilyMembers;
+    const patient = await patientModel.findById(id);
+    if (!patient) {
+      return res.status(404).json({ error: "Patient not found" });
     }
-}
+    const familyMembers = patient.FamilyMembers;
+    const allFamilyMembers = familyMembers.concat(newFamilyMembers);
+    const updatedPatient = await patientModel.findByIdAndUpdate(id, {
+      FamilyMembers: allFamilyMembers,
+    });
+    res.status(200).json(updatedPatient);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-module.exports = {addPatient, addFamilyMembers};
+const selectDoctor = async (req, res) => {
+  const docID = req.body.id;
+  try {
+    const doctor = await doctorModel.findById(docID);
+    if (!doctor) {
+      return res.status(404).json({ error: "Doctor Not Found" });
+    }
+    res.status(200).json(doctor);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { addPatient, addFamilyMembers, selectDoctor };

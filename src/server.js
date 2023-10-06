@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require('mongoose');
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
 const { addDoctor, RegisterDoctor, searchPatientByName, selectPatient } = require("./Routes/doctorController");
-const { addPatient, addFamilyMembers } = require("./Routes/patientController");
+const { addPatient, addFamilyMembers, selectDoctor } = require("./Routes/patientController");
 mongoose.set('strictQuery', false);
 require("dotenv").config();
 const MongoURI = process.env.ATLAS_MONGO_URI;
@@ -46,3 +46,4 @@ app.get("/doctor/selectPatient",selectPatient);
 //Patient Endpoints
 app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMembers",addFamilyMembers);
+app.get("/patient/selectDoctor", selectDoctor);
