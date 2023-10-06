@@ -11,7 +11,10 @@ const appointmentSchema = new Schema({
           required: true 
         },
     AppointmentDate: Date,
-  });
+    
+    Status:{
+      type : String ,  enum:[ "Upcoming","Attended","Cancelled"]},
+    });
 
 
   const Appointment = mongoose.model("Appointment",appointmentSchema);

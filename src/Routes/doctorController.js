@@ -77,23 +77,21 @@ const searchPatientByName = async (req,res) => {
         }
  }
 
- const addApointment = async (req, res) => {
-    try{
-        const appointment = await appointmentModel.create(req.body);
-        res.status(201).json(appointment);
-    }catch(error){
-        res.status(400).json({ error: error.message });
-    }
 
- }
  const viewPatients = async (req,res) => {
     const doctorId = req.body.id;
+    const currentDate = new Date();
     try{
      const appointments =  await appointmentModel.find({
         Doctor: doctorId,
         AppointmentDate: {$gte: currentDate } //$gte = Greater Than or Equal
     }).populate("Patient").exec()
-    res.status(200).json(appointments.Patient);
+    const patients = [];
+    for (const appointment of appointments) {
+      const patient = appointment.Patient;
+      patients.push(patient);
+    }
+    res.status(200).json(patients);
 }catch(error){
         res.status(500).json({error : "no patients available"});
         }
@@ -105,9 +103,11 @@ const searchPatientByName = async (req,res) => {
         res.status(500).json({error:"No such Patient"}) ;
     }
     else{
-
+        res.status(200).json(patient);
     }
  }
+ 
 
 
-module.exports = { registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, addDoctor, addApointment };
+module.exports = { registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments,
+    addDoctor, viewPatients,viewPatientInfo};
