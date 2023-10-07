@@ -1,11 +1,12 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
-const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, addApointment, upcomingAppointments } = require("./Routes/doctorController");
-const { addPatient, addFamilyMembers, selectDoctor, filterDoctors } = require("./Routes/patientController");
-const doctorModel = require("./Models/Doctor");
-require('dotenv').config();
+const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor, filterDoctors } = require("./Routes/patientController");
+const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo } = require("./Routes/doctorController");
+const { addApointment, filterAppointment } = require("./Routes/appointmentController")
+
 mongoose.set('strictQuery', false);
+require('dotenv').config();
 const MongoURI = process.env.ATLAS_MONGO_URI;
 
 const app = express();
@@ -46,15 +47,21 @@ app.get("/doctor/searchPatient",searchPatientByName);
 app.get("/doctor/selectPatient",selectPatient);
 app.put("/doctor/update", updateDoctor);
 app.get("/doctor/upcomingAppointments",upcomingAppointments);
+app.get("/doctor/viewPatients", viewPatients);
+app.get("/doctor/viewPatientInfo", viewPatientInfo);
 
 //Patient Endpoints
 app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMembers",addFamilyMembers);
 app.get("/patient/selectDoctor", selectDoctor);
+app.get("/patient/viewFamilyMembers",viewFamilyMembers)
 app.get("/patient/filterDoctors", filterDoctors);
 
-//Appointment Endpoiints
+//Appointment Endpoints
 app.post("/appointment/add", addApointment);
+app.get("/appointment/filterAppointment",filterAppointment)
+app.post("/appointment/add", addApointment);
+
 
 
 
