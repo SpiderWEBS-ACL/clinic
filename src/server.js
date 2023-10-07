@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require('mongoose');
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo } = require("./Routes/doctorController");
-const { addPatient, addFamilyMembers, viewFamilyMembers } = require("./Routes/patientController");
+const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor } = require("./Routes/patientController");
 const {addApointment,filterAppointment} = require("./Routes/appointmentController")
 
 mongoose.set('strictQuery', false);
