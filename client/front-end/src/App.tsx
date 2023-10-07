@@ -1,7 +1,13 @@
-
+import React from "react";
+import AppRouter from "./AppRouter";
+import AddAdminForm from "./pages/AddAdminForm";
 
 function App() {
-  return <h1>Works!</h1>
+  return (
+    <div className="App">
+      <AppRouter />
+    </div>
+  );
 }
 
-export default App
+export default App;
