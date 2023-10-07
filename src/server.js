@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require('mongoose');
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo } = require("./Routes/doctorController");
-const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor } = require("./Routes/patientController");
+const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor ,searchForDoctor} = require("./Routes/patientController");
 const {addApointment,filterAppointment} = require("./Routes/appointmentController")
 
 mongoose.set('strictQuery', false);
@@ -54,7 +54,8 @@ app.get("/doctor/viewPatientInfo", viewPatientInfo);
 app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMembers",addFamilyMembers);
 app.get("/patient/selectDoctor", selectDoctor);
-app.get("/patient/viewFamilyMembers",viewFamilyMembers)
+app.get("/patient/viewFamilyMembers",viewFamilyMembers);
+app.get("/patient/searchForDoctor",searchForDoctor);
 
 //Appointment Endpoints
 app.post("/appointment/add", addApointment);
