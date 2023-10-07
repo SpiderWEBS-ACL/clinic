@@ -3,12 +3,16 @@ const mongoose = require('mongoose');
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, addApointment, upcomingAppointments } = require("./Routes/doctorController");
 const { addPatient, addFamilyMembers, selectDoctor } = require("./Routes/patientController");
+const Quote = require('inspirational-quotes');
+const cors = require('cors');
+
 
 mongoose.set('strictQuery', false);
 require("dotenv").config();
 const MongoURI = process.env.ATLAS_MONGO_URI;
 
 const app = express();
+app.use(cors());
 const port = process.env.PORT || "8000";
 
 // configurations
@@ -29,7 +33,7 @@ app.get("/", (req, res) => {
 app.use(express.json());
 
 //Admin Endpoints
-app.post("/admin/add",addAdmin);
+app.post("/admin/add",addAdmin); 
 app.delete("/admin/removeDoctor",removeDoctor); //params?
 app.delete("/admin/removePatient",removePatient); //params?
 app.delete("/admin/removeAdmin",removeAdmin); //params?
@@ -52,6 +56,8 @@ app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMembers",addFamilyMembers);
 app.get("/patient/selectDoctor", selectDoctor);
 
+
 //Appointment Endpoiints
 app.post("/appointment/add", addApointment);
+
 
