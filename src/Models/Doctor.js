@@ -37,7 +37,7 @@ const doctorSchema = new Schema(
     },
     Specialty: {
       type: String,
-      required: false,
+      required: true,
     },
   },
   { timestamps: true }
