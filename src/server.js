@@ -2,14 +2,14 @@ const express = require("express");
 const mongoose = require('mongoose');
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, addApointment, upcomingAppointments } = require("./Routes/doctorController");
-const { addPatient, addFamilyMembers, selectDoctor } = require("./Routes/patientController");
-
+const { addPatient, addFamilyMembers, selectDoctor, filterDoctors } = require("./Routes/patientController");
+const doctorModel = require("./Models/Doctor");
+require('dotenv').config();
 mongoose.set('strictQuery', false);
-require("dotenv").config();
 const MongoURI = process.env.ATLAS_MONGO_URI;
 
 const app = express();
-const port = process.env.PORT || "8000";
+const port = process.env.PORT ||"8000"
 
 // configurations
 // Mongo DB
@@ -51,7 +51,10 @@ app.get("/doctor/upcomingAppointments",upcomingAppointments);
 app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMembers",addFamilyMembers);
 app.get("/patient/selectDoctor", selectDoctor);
+app.get("/patient/filterDoctors", filterDoctors);
 
 //Appointment Endpoiints
 app.post("/appointment/add", addApointment);
+
+
 

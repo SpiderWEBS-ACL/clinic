@@ -44,4 +44,61 @@ const selectDoctor = async (req, res) => {
   }
 };
 
-module.exports = { addPatient, addFamilyMembers, selectDoctor };
+const filterDoctors = async (req, res) => {
+  const specialty = req.body.Specialty;
+  const dateTime = req.body.DateTime;
+
+  try {
+    var doctors;
+
+    if (specialty && dateTime) {           //filter on specialty AND availability
+      doctors = await doctorModel.aggregate([
+        {
+          $match: { Specialty: specialty },   //filter doctors by specialty
+        },
+        {
+          $lookup: {                    //join with appointments --> adds "appointments" field to doctors (array of appointments)
+            from: "appointments",
+            localField: "_id",
+            foreignField: "Doctor",
+            as: "appointments",
+          },
+        },
+        {
+          $match: {             //filter only doctors with no appointments on dateTime
+            "appointments.AppointmentDate": {$ne : new Date(dateTime)}      //$ne = not equals
+          },
+        },
+      ]);
+    } 
+
+    else if (!specialty) {            //filter on availability ONLY
+      doctors = await doctorModel.aggregate([
+        {
+          $lookup: {
+            from: "appointments",
+            localField: "_id",
+            foreignField: "Doctor",
+            as: "appointments",
+          },
+        },
+        {
+          $match: {
+            "appointments.AppointmentDate": {$ne : new Date(dateTime)} 
+          },
+        },
+      ]);
+    } 
+
+    else if (!dateTime) {             //filter on Specialty ONLY
+      doctors = await doctorModel.find({
+        Specialty: specialty,
+      });
+    }
+    res.status(200).json(doctors);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { addPatient, addFamilyMembers, selectDoctor, filterDoctors };
