@@ -1,20 +1,42 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Alert from "../components/Alert";
+import InputField from "../components/InputField";
+import { validateUsername, validatePassword } from "../utils/ValidationUtils";
 
 const AddAdminForm: React.FC = () => {
   const [Username, setUsername] = useState<string>("");
   const [Password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [alertVisible, setAlertVisibility] = useState(false);
+  const [touchedFields, setTouchedFields] = useState({
+    username: false,
+    password: false,
+  });
 
   const api = axios.create({
     baseURL: "http://127.0.0.1:8000",
   });
 
+  const handleBlur = (fieldName: string) => {
+    setTouchedFields({
+      ...touchedFields,
+      [fieldName]: true,
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAlertVisibility(true);
+
+    const isUsernameValid = validateUsername(Username);
+    const isPasswordValid = validatePassword(Password);
+
+    if (!isUsernameValid || !isPasswordValid) {
+      setError("Username and Password must meet the minimum requirements.");
+      return;
+    }
+
     const data = {
       Username,
       Password,
@@ -49,28 +71,28 @@ const AddAdminForm: React.FC = () => {
       <div>
         <h2>Add Admin Form</h2>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="Username">Username:</label>
-            <input
-              className="form-control"
-              type="text"
-              id="Username"
-              value={Username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="Password">Password:</label>
-            <input
-              className="form-control"
-              type="password"
-              id="Password"
-              value={Password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+          <InputField
+            id="Username"
+            label="Username"
+            type="text"
+            value={Username}
+            onChange={setUsername}
+            onBlur={() => handleBlur("username")}
+            isValid={validateUsername(Username)}
+            errorMessage="Username must be at least 3 characters long."
+            touched={touchedFields.username}
+          />
+          <InputField
+            id="Password"
+            label="Password"
+            type="password"
+            value={Password}
+            onChange={setPassword}
+            onBlur={() => handleBlur("password")}
+            isValid={validatePassword(Password)}
+            errorMessage="Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, and one digit."
+            touched={touchedFields.password}
+          />
           <div
             style={{
               display: "flex",

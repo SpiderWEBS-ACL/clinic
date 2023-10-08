@@ -1,0 +1,15 @@
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .input-container .form-control {
+    margin-bottom: 5px;
+  }
+  
+  .input-container .invalid-feedback {
+    color: #dc3545;
+    font-size: 0.875rem;
+  }
+  

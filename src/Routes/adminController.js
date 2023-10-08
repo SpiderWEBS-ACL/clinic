@@ -81,7 +81,7 @@ const removeDoctor = async (req,res) => {
 
  const getDoctrRegistrationReqDetails = async (req,res) =>{
     try {
-        const id = req.body.id;
+        const {id} = req.params;
         const RegistrationReq = await doctorRegisterRequestModel.findById(id);
         if (!RegistrationReq) {
             return res.status(404).json({ error: 'Doctor registration request not found' });

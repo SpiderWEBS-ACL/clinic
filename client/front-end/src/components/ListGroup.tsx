@@ -1,24 +1,22 @@
-import { MouseEvent, useState } from "react";
+import React, { MouseEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-// { items: [], heading: string }
 interface Props {
   items: string[];
+  itemsObj: any[];
   heading: string;
-  onSelectItem: (item: string) => void;
+  onSelectItem: (item: any, index:number) => void;
+  path: string;
 }
 
-function ListGroup({ items, heading, onSelectItem }: Props) {
-  //Hook
+function ListGroup({ items, heading, onSelectItem, path }: Props) {
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  //arr[0] //variable(selectedIndex)
-  //arr[1] //updater function
+  const navigate = useNavigate();
 
-  const getMessage = () => {
-    return items.length === 0 ? <p>No items found</p> : null;
-  };
-  //eventHandler
-  const handleClick = (event: MouseEvent) => {
-    console.log(event);
+  const handleItemSelect = (item: string, index: number) => {
+    setSelectedIndex(index);
+    onSelectItem(item,index);
+    navigate(path);
   };
 
   return (
@@ -29,10 +27,7 @@ function ListGroup({ items, heading, onSelectItem }: Props) {
         {items.map((item, index) => (
           <li
             key={item}
-            onClick={() => {
-              setSelectedIndex(index);
-              onSelectItem(item);
-            }}
+            onClick={() => handleItemSelect(item, index)}
             className={
               selectedIndex === index
                 ? "list-group-item active"
@@ -46,4 +41,5 @@ function ListGroup({ items, heading, onSelectItem }: Props) {
     </>
   );
 }
+
 export default ListGroup;
