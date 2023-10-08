@@ -34,7 +34,7 @@ const ViewFamilyMembers = () => {
           <th>No.</th>
             <th>Name</th>
             <th>Relation to patient</th>
-            <th>NationalID</th>
+            <th>National ID</th>
             <th>Age</th>
             <th>Gender</th>
           </tr>

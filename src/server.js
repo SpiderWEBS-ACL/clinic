@@ -56,8 +56,8 @@ app.get("/doctor/searchPatient",searchPatientByName);
 app.get("/doctor/selectPatient",selectPatient);
 app.put("/doctor/update", updateDoctor);
 app.get("/doctor/upcomingAppointments",upcomingAppointments);
-app.get("/doctor/viewPatients", viewPatients);
-app.get("/doctor/viewPatientInfo", viewPatientInfo);
+app.get("/doctor/viewPatients/:id", viewPatients);
+app.get("/doctor/viewPatientInfo/:id", viewPatientInfo);
 app.get("/doctor/filterAppointments",filterDoctorAppointments)
 
 //Patient Endpoints
