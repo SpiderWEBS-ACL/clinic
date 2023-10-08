@@ -1,16 +1,18 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
-const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo } = require("./Routes/doctorController");
-const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor ,searchForDoctor} = require("./Routes/patientController");
-const {addApointment,filterAppointment} = require("./Routes/appointmentController")
+
+const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments } = require("./Routes/patientController");
+const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments } = require("./Routes/doctorController");
+const { addApointment, filterAppointment } = require("./Routes/appointmentController")
+
 
 mongoose.set('strictQuery', false);
-require("dotenv").config();
+require('dotenv').config();
 const MongoURI = process.env.ATLAS_MONGO_URI;
 
 const app = express();
-const port = process.env.PORT || "8000";
+const port = process.env.PORT ||"8000"
 
 // configurations
 // Mongo DB
@@ -49,17 +51,22 @@ app.put("/doctor/update", updateDoctor);
 app.get("/doctor/upcomingAppointments",upcomingAppointments);
 app.get("/doctor/viewPatients", viewPatients);
 app.get("/doctor/viewPatientInfo", viewPatientInfo);
+app.get("/doctor/filterAppointments",filterDoctorAppointments)
 
 //Patient Endpoints
 app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMembers",addFamilyMembers);
 app.get("/patient/selectDoctor", selectDoctor);
-app.get("/patient/viewFamilyMembers",viewFamilyMembers);
 app.get("/patient/searchForDoctor",searchForDoctor);
+app.get("/patient/viewFamilyMembers",viewFamilyMembers)
+app.get("/patient/filterDoctors", filterDoctors);
+app.get("/patient/filterAppointments",filterPatientAppointments)
 
 //Appointment Endpoints
 app.post("/appointment/add", addApointment);
 app.get("/appointment/filterAppointment",filterAppointment)
 app.post("/appointment/add", addApointment);
+
+
 
 
