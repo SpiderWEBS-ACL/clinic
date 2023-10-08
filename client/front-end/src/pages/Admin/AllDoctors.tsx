@@ -54,7 +54,7 @@ const AllDoctors = () => {
 
   return (
     <div className="container">
-      <h2 className="text-center mt-4 mb-4">All Doctors</h2>
+      <h2 className="text-center mt-4 mb-4">Doctors</h2>
       <table className="table">
         <thead>
           <tr>
