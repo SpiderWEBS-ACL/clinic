@@ -146,5 +146,34 @@ const filterPatientAppointments = async(req,res) =>{
       res.status(500).json({ error: error.message });
   }
 }
-module.exports = { addPatient, addFamilyMembers, selectDoctor, viewFamilyMembers, filterDoctors , filterPatientAppointments};
+
+const searchForDoctor = async (req,res) => {
+  const Name = req.body.Name;
+  const Speciality = req.body.Speciality; 
+  if(Name==null && Speciality==null){
+      return res.status(400).json({ error: 'Name or Speciality parameter is required' });
+  }
+  try{
+      if(Name!=null && Speciality!=null){
+          const doctors = await doctorModel.find({ Name: {$regex: Name, $options: "i"}, Speciality: {$regex: Speciality, $options: "i"}});
+          res.status(200).json(doctors);
+      }
+      else  if(Name!=null){
+          const doctors = await doctorModel.find({ Name: {$regex: Name, $options: "i"}});
+          res.status(200).json(doctors);
+      }
+      else if(Speciality!=null) {
+          const doctors = await doctorModel.find({ Speciality: {$regex: Speciality, $options: "i"}});
+          res.status(200).json(doctors);
+      }
+      
+  }
+  catch (error) {
+        res.status(500).json({ error: 'An error occurred while searching' });
+    }
+
+  }
+
+
+module.exports = { addPatient, addFamilyMembers, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor, filterPatientAppointments};
 

@@ -1,9 +1,11 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
-const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor, filterDoctors, filterPatientAppointments } = require("./Routes/patientController");
+
+const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments } = require("./Routes/patientController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments } = require("./Routes/doctorController");
 const { addApointment, filterAppointment } = require("./Routes/appointmentController")
+
 
 mongoose.set('strictQuery', false);
 require('dotenv').config();
@@ -55,6 +57,7 @@ app.get("/doctor/filterAppointments",filterDoctorAppointments)
 app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMembers",addFamilyMembers);
 app.get("/patient/selectDoctor", selectDoctor);
+app.get("/patient/searchForDoctor",searchForDoctor);
 app.get("/patient/viewFamilyMembers",viewFamilyMembers)
 app.get("/patient/filterDoctors", filterDoctors);
 app.get("/patient/filterAppointments",filterPatientAppointments)
