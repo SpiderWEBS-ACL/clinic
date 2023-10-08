@@ -11,6 +11,7 @@ import ViewAllRegReqs from "./pages/Admin/ViewAllDoctorRegReqs";
 import RegistrationRequestDetails from "./pages/Admin/DoctorRegReqDetails";
 import AddPackage from "./pages/Admin/AddPackage";
 import PackageView from "./pages/Admin/PackageView";
+import AllDoctors from "./pages/Admin/AllDoctors";
 
 const AppRouter: React.FC = () => {
   return (
@@ -28,6 +29,7 @@ const AppRouter: React.FC = () => {
         />
         <Route path="/admin/addPackage" element={<AddPackage />} />
         <Route path="/admin/editPackage/:id" element={<PackageView />} />
+        <Route path="/admin/allDoctors" element={<AllDoctors />} />
       </Routes>
     </BrowserRouter>
   );

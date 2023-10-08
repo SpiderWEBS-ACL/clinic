@@ -30,7 +30,7 @@ const addAdmin = async (req,res) => {
 
 const removeAdmin = async (req,res) => {
     try{
-        const id = req.body.id;
+        const { id } = req.params;
         const removedAmin = await adminModel.findByIdAndDelete(id);
       if (!removedAmin) {
          return res.status(404).json({ error: 'Admin not found' });
@@ -45,7 +45,7 @@ const removeAdmin = async (req,res) => {
 
  const removePatient = async (req,res) => {
     try{
-        const id = req.body.id;
+        const { id } = req.params;
         const removedPatient = await patientModel.findByIdAndDelete(id);
       if (!removedPatient) {
          return res.status(404).json({ error: 'Patient not found' });
@@ -60,7 +60,7 @@ const removeAdmin = async (req,res) => {
 
 const removeDoctor = async (req,res) => {
     try{
-        const id = req.body.id;
+        const { id } = req.params;
         const removedDoctor = await doctorModel.findByIdAndDelete(id);
       if (!removedDoctor) {
          return res.status(404).json({ error: 'Doctor not found' });
@@ -70,6 +70,15 @@ const removeDoctor = async (req,res) => {
      res.status(500).json({ error: error.message });
    }
  }
+
+ const getAllDoctors = async (req,res) =>{
+  try{
+      const RegistrationReqs = await doctorModel.find({});
+      res.status(200).json(RegistrationReqs);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 
 /////////////////////////////DOCTORS REGISTRATION/////////////////////////////////////////
 
@@ -148,4 +157,4 @@ const deletePackage = async (req,res) => {
    }
 }
 
-module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage};
+module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors};

@@ -4,9 +4,7 @@ import { useParams } from "react-router-dom";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 
-const PackageView = () => {
-  const { id } = useParams<{ id: string }>();
-
+const AddPackage = () => {
   const [Name, setName] = useState<string>("");
   const [SubscriptionPrice, setSubscriptionPrice] = useState<
     number | undefined
@@ -29,7 +27,6 @@ const PackageView = () => {
         PharmacyDiscount,
         FamilyDiscount,
       };
-      console.log(data);
       const response = await api.post(`/admin/addPackage`, data);
       console.log("Response:", response.data);
     } catch (error) {
@@ -96,4 +93,4 @@ const PackageView = () => {
   );
 };
 
-export default PackageView;
+export default AddPackage;
