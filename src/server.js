@@ -63,7 +63,7 @@ app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMembers",addFamilyMembers);
 app.get("/patient/selectDoctor", selectDoctor);
 app.get("/patient/searchForDoctor",searchForDoctor);
-app.get("/patient/viewFamilyMembers",viewFamilyMembers)
+app.get("/patient/viewFamilyMembers/:id",viewFamilyMembers)
 app.get("/patient/filterDoctors", filterDoctors);
 app.get("/patient/filterAppointments",filterPatientAppointments)
 app.get("/patient/viewSelectedDoctor",viewDoctorDetails)
