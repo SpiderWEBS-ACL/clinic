@@ -116,8 +116,28 @@ const searchPatientByName = async (req,res) => {
         res.status(200).json(patient);
     }
  }
+ const filterDoctorAppointments = async(req,res) =>{
+    const date = req.body.Date;
+    const status = req.body.Status
+    const query = {
+        $or: [
+          { AppointmentDate: { $gte: date } }, 
+          { Status: status }
+        ]
+      };
+    try{
+            const appointments = await appointmentModel.find(query).populate("Patient").exec();
+            if(!appointments || appointments.length === 0){
+                res.status(404).json({error: "no appointments were found"});
+            }
+            else
+                res.status(200).json(appointments);
+        }catch(error){
+        res.status(500).json({ error: error.message });
+    }
+ }
  
 
 
 module.exports = { registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments,
-    addDoctor, viewPatients,viewPatientInfo};
+    addDoctor, viewPatients,viewPatientInfo, filterDoctorAppointments};
