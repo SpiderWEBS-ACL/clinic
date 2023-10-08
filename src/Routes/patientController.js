@@ -4,12 +4,27 @@ const doctorModel = require("../Models/Doctor");
 const appointmentModel = require("../Models/Appointment");
 
 const addPatient = async (req, res) => {
+  // try {
+  //   const newPatient = await patientModel.create(req.body);
+  //   res.status(201).json(newPatient);
+  // } catch (error) {
+  //   res.status(500).json({ error: error.message });
+  // }
   try {
-    const newPatient = await patientModel.create(req.body);
-    res.status(201).json(newPatient);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    const exists = await patientModel.findOne({"Username" : req.body.Username});
+    const exists2 = await patientModel.findOne({"Email" : req.body.Email});
+    if(!exists && !exists2){
+        var newPatient = await patientModel.create(req.body);
+        res.status(201).json(newPatient);
+    }
+    else if(exists){
+        res.status(400).json({error:  "Username already taken!" });
+    }else{
+        res.status(400).json({error:  "Email already registered!" });
+    }
+}catch(error){
+    res.status(400).json({ error: error.message });
+}
 };
 
 const addFamilyMembers = async (req, res) => {
@@ -47,13 +62,8 @@ const selectDoctor = async (req, res) => {
 const viewFamilyMembers = async (req, res) => {
     try{
         const patient = await patientModel.findById(req.body.id);
-        if(!patient){
-            return res.status(404).json({ error: "Patient not found"});
-        }
-        else{
-            const familyMembers = patient.FamilyMembers;
-            res.status(200).json(familyMembers)
-        }
+        const familyMembers = patient.FamilyMembers;
+        res.status(200).json(familyMembers)
     }
     catch(error){
         res.status(500).json({error: error.message})

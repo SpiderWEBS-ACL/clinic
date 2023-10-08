@@ -13,12 +13,15 @@ const { default: mongoose } = require('mongoose');
 const addAdmin = async (req,res) => {
     try {
         const exists = await adminModel.findOne({"Username" : req.body.Username});
-        if(!exists){
+        const exists2 = await adminModel.findOne({"Email" : req.body.Email});
+        if(!exists && !exists2){
             var newAdmin = await adminModel.create(req.body);
             res.status(201).json(newAdmin);
         }
-        else{
-            res.status(400).json({error:  "Username Already Taken!" });
+        else if(exists){
+            res.status(400).json({error:  "Username already taken!" });
+        }else{
+          res.status(400).json({error:  "Email already registered!" });
         }
     }catch(error){
         res.status(400).json({ error: error.message });

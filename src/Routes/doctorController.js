@@ -16,8 +16,19 @@ const addDoctor = async (req,res) => {
 
 const registerDoctor = async (req,res) => {
     try {
-        const newDoctor = await doctorRegisterRequestModel.create(req.body);
-        res.status(201).json(newDoctor);
+        const exists = await doctorModel.findOne({"Username" : req.body.Username});
+        const exists2 = await doctorRegisterRequestModel.findOne({"Username" : req.body.Username});
+        const exists3 = await doctorModel.findOne({"Email" : req.body.Email});
+        const exists4 = await doctorRegisterRequestModel.findOne({"Email" : req.body.Email});
+        if(!exists && !exists2 && !exists3 && !exists4){
+            var newDoctor = await doctorRegisterRequestModel.create(req.body);
+            res.status(201).json(newDoctor);
+        }
+        else if(exists1 || exists2){
+            res.status(400).json({error:  "Username already taken!" });
+        }else{
+            res.status(400).json({error:  "Email already registered!" });
+        }
     }catch(error){
         res.status(400).json({ error: error.message });
     }
