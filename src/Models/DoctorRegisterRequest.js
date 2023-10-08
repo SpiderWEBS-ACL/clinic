@@ -34,6 +34,8 @@ const doctorRegisterSchema = new Schema({
         type: String,
         required: true,
       },
+
+
     Specialty: {
       type: String,
       required: true,

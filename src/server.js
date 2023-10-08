@@ -1,14 +1,16 @@
 const express = require("express");
 const mongoose = require('mongoose');
+
+const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices} = require("./Routes/patientController");
+const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments } = require("./Routes/doctorController");
+const { addApointment, filterAppointment } = require("./Routes/appointmentController")
+const {addSubscription} = require("./Routes/SubscriptionController")
+const {addPrescription} = require("./Routes/prescriptionController")
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage } = require("./Routes/adminController");
-const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, addApointment, upcomingAppointments } = require("./Routes/doctorController");
-const { addPatient, addFamilyMembers, selectDoctor } = require("./Routes/patientController");
-const Quote = require('inspirational-quotes');
 const cors = require('cors');
 
-
 mongoose.set('strictQuery', false);
-require("dotenv").config();
+require('dotenv').config();
 const MongoURI = process.env.ATLAS_MONGO_URI;
 
 const app = express();
@@ -51,14 +53,36 @@ app.get("/doctor/searchPatient",searchPatientByName);
 app.get("/doctor/selectPatient",selectPatient);
 app.put("/doctor/update", updateDoctor);
 app.get("/doctor/upcomingAppointments",upcomingAppointments);
+app.get("/doctor/viewPatients", viewPatients);
+app.get("/doctor/viewPatientInfo", viewPatientInfo);
+app.get("/doctor/filterAppointments",filterDoctorAppointments)
 
 //Patient Endpoints
 app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMembers",addFamilyMembers);
 app.get("/patient/selectDoctor", selectDoctor);
-
+app.get("/patient/searchForDoctor",searchForDoctor);
+app.get("/patient/viewFamilyMembers",viewFamilyMembers)
+app.get("/patient/filterDoctors", filterDoctors);
+app.get("/patient/filterAppointments",filterPatientAppointments)
+app.get("/patient/viewSelectedDoctor",viewDoctorDetails)
+app.get("/patient/viewMyPrescriptions",viewMyPrescriptions)
+app.get("/patient/filterPrescriptions",filterPrescriptions)
+app.get("/patient/selectPrescription",selectPrescription)
+app.get("/patient/viewDoctorsWithPrices/:patientId", viewDoctorsWithPrices)
 
 //Appointment Endpoiints
 app.post("/appointment/add", addApointment);
+app.get("/appointment/filterAppointment",filterAppointment)
+app.post("/appointment/add", addApointment);
+
+//Subscription Endpoints
+app.post("/subscription/add/:patientId",addSubscription);
+
+//Prescription Endpoints
+app.post("/prescription/add",addPrescription);
+
+
+
 
 
