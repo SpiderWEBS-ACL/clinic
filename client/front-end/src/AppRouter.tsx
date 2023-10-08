@@ -8,6 +8,8 @@ import {
 import AddAdminForm from "./pages/AddAdminForm";
 import Home from "./pages/Home";
 import ViewAllRegReqs from "./pages/ViewAllDoctorRegReqs";
+import RegistrationRequestDetails from "./pages/DoctorRegReqDetails";
+import AddPackage from "./pages/AddPackage";
 
 const AppRouter: React.FC = () => {
   return (
@@ -19,6 +21,11 @@ const AppRouter: React.FC = () => {
           path="/admin/registrationRequests"
           element={<ViewAllRegReqs />}
         />
+        <Route
+          path="/admin/registrationRequests/:id"
+          element={<RegistrationRequestDetails />}
+        />
+        <Route path="/admin/addPackage" element={<AddPackage />} />
       </Routes>
     </BrowserRouter>
   );

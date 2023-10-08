@@ -38,7 +38,7 @@ app.delete("/admin/removeDoctor",removeDoctor); //params?
 app.delete("/admin/removePatient",removePatient); //params?
 app.delete("/admin/removeAdmin",removeAdmin); //params?
 app.get("/admin/registrationRequests",getAllDoctrsRegistrationReqs);
-app.get("/admin/registrationRequestDetails",getDoctrRegistrationReqDetails);
+app.get("/admin/registrationRequest/:id",getDoctrRegistrationReqDetails);
 app.post("/admin/addPackage",addPackage);
 app.put("/admin/updatePackage",updatePackage);
 app.delete("/admin/deletePackage",deletePackage)
