@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import {
-  DesktopOutlined,
+  HomeOutlined,
   FileOutlined,
-  PieChartOutlined,
-  TeamOutlined,
   UserOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Breadcrumb, Layout, Menu, theme } from "antd";
@@ -29,6 +28,7 @@ function getItem(
 }
 
 const items: MenuItem[] = [
+  getItem("Home", "Home", <HomeOutlined />),
   getItem("Admin", "Admin", <UserOutlined />, [
     getItem("All Admins", "AllAdmin"),
     getItem("Add Admin", "AddAdmin"),
@@ -39,6 +39,7 @@ const items: MenuItem[] = [
     getItem("All Packages", "AllPackages"),
     getItem("Add Package", "AddPackage"),
   ]),
+  getItem("logout", "LogOut", <LogoutOutlined />),
 ];
 
 const App: React.FC = () => {
