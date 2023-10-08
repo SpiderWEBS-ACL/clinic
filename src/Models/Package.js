@@ -4,7 +4,6 @@ const Schema = mongoose.Schema;
 const packageSchema = new Schema({
     Name : {
         type: String,
-        enum: ["Silver Package","Gold Package","Platinum Package"], //TODO: Remove if can add other options
         required: true,
     },
     SubscriptionPrice: {
