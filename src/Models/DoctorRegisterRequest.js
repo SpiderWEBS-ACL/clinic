@@ -34,10 +34,12 @@ const doctorRegisterSchema = new Schema({
         type: String,
         required: true,
       },
-      Speciality: {
-        type: String,
-        required: true,
-      },
+
+
+    Specialty: {
+      type: String,
+      required: true,
+    }
 }, { timestamps: true });
 
 const DoctorRegister = mongoose.model('DoctorRegister', doctorRegisterSchema);

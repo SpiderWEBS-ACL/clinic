@@ -1,20 +1,21 @@
 const express = require("express");
 const mongoose = require('mongoose');
 
-const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
 const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices} = require("./Routes/patientController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments } = require("./Routes/doctorController");
 const { addApointment, filterAppointment } = require("./Routes/appointmentController")
 const {addSubscription} = require("./Routes/SubscriptionController")
 const {addPrescription} = require("./Routes/prescriptionController")
-
+const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage } = require("./Routes/adminController");
+const cors = require('cors');
 
 mongoose.set('strictQuery', false);
 require('dotenv').config();
 const MongoURI = process.env.ATLAS_MONGO_URI;
 
 const app = express();
-const port = process.env.PORT ||"8000"
+app.use(cors());
+const port = process.env.PORT || "8000";
 
 // configurations
 // Mongo DB
@@ -34,14 +35,15 @@ app.get("/", (req, res) => {
 app.use(express.json());
 
 //Admin Endpoints
-app.post("/admin/add",addAdmin);
+app.post("/admin/add",addAdmin); 
 app.delete("/admin/removeDoctor",removeDoctor); //params?
 app.delete("/admin/removePatient",removePatient); //params?
 app.delete("/admin/removeAdmin",removeAdmin); //params?
 app.get("/admin/registrationRequests",getAllDoctrsRegistrationReqs);
-app.get("/admin/registrationRequestDetails",getDoctrRegistrationReqDetails);
+app.get("/admin/registrationRequest/:id",getDoctrRegistrationReqDetails);//params
+app.get("/admin/package/:id",getPackage);//params
 app.post("/admin/addPackage",addPackage);
-app.put("/admin/updatePackage",updatePackage);
+app.put("/admin/updatePackage/:id",updatePackage);
 app.delete("/admin/deletePackage",deletePackage)
 
 //Doctor Endpoints
@@ -68,7 +70,8 @@ app.get("/patient/viewMyPrescriptions",viewMyPrescriptions)
 app.get("/patient/filterPrescriptions",filterPrescriptions)
 app.get("/patient/selectPrescription",selectPrescription)
 app.get("/patient/viewDoctorsWithPrices/:patientId", viewDoctorsWithPrices)
-//Appointment Endpoints
+
+//Appointment Endpoiints
 app.post("/appointment/add", addApointment);
 app.get("/appointment/filterAppointment",filterAppointment)
 app.post("/appointment/add", addApointment);
@@ -78,6 +81,7 @@ app.post("/subscription/add/:patientId",addSubscription);
 
 //Prescription Endpoints
 app.post("/prescription/add",addPrescription);
+
 
 
 
