@@ -5,11 +5,12 @@ import {
   Route,
   BrowserRouter,
 } from "react-router-dom";
-import AddAdminForm from "./pages/AddAdminForm";
+import AddAdminForm from "./pages/Admin/AddAdminForm";
 import Home from "./pages/Home";
-import ViewAllRegReqs from "./pages/ViewAllDoctorRegReqs";
-import RegistrationRequestDetails from "./pages/DoctorRegReqDetails";
-import AddPackage from "./pages/AddPackage";
+import ViewAllRegReqs from "./pages/Admin/ViewAllDoctorRegReqs";
+import RegistrationRequestDetails from "./pages/Admin/DoctorRegReqDetails";
+import AddPackage from "./pages/Admin/AddPackage";
+import UpdatePackage from "./pages/Admin/UpdatePackage";
 
 const AppRouter: React.FC = () => {
   return (
@@ -26,6 +27,7 @@ const AppRouter: React.FC = () => {
           element={<RegistrationRequestDetails />}
         />
         <Route path="/admin/addPackage" element={<AddPackage />} />
+        <Route path="/admin/updatePackage/:id" element={<UpdatePackage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require('mongoose');
-const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
+const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage } = require("./Routes/adminController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, addApointment, upcomingAppointments } = require("./Routes/doctorController");
 const { addPatient, addFamilyMembers, selectDoctor } = require("./Routes/patientController");
 const Quote = require('inspirational-quotes');
@@ -38,9 +38,10 @@ app.delete("/admin/removeDoctor",removeDoctor); //params?
 app.delete("/admin/removePatient",removePatient); //params?
 app.delete("/admin/removeAdmin",removeAdmin); //params?
 app.get("/admin/registrationRequests",getAllDoctrsRegistrationReqs);
-app.get("/admin/registrationRequest/:id",getDoctrRegistrationReqDetails);
+app.get("/admin/registrationRequest/:id",getDoctrRegistrationReqDetails);//params
+app.get("/admin/package/:id",getPackage);//params
 app.post("/admin/addPackage",addPackage);
-app.put("/admin/updatePackage",updatePackage);
+app.put("/admin/updatePackage/:id",updatePackage);
 app.delete("/admin/deletePackage",deletePackage)
 
 //Doctor Endpoints
