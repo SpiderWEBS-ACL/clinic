@@ -71,16 +71,16 @@ const viewFamilyMembers = async (req, res) => {
 };
 
 const filterDoctors = async (req, res) => {
-  const specialty = req.body.Specialty;
+  const speciality = req.body.Speciality;
   const dateTime = req.body.DateTime;
 
   try {
     var doctors;
 
-    if (specialty && dateTime) {           //filter on specialty AND availability
+    if (speciality && dateTime) {           //filter on speciality AND availability
       doctors = await doctorModel.aggregate([
         {
-          $match: { Specialty: specialty },   //filter doctors by specialty
+          $match: { Speciality: speciality },   //filter doctors by speciality
         },
         {
           $lookup: {                    //join with appointments --> adds "appointments" field to doctors (array of appointments)
@@ -98,7 +98,7 @@ const filterDoctors = async (req, res) => {
       ]);
     } 
 
-    else if (!specialty) {            //filter on availability ONLY
+    else if (!speciality) {            //filter on availability ONLY
       doctors = await doctorModel.aggregate([
         {
           $lookup: {
@@ -116,9 +116,9 @@ const filterDoctors = async (req, res) => {
       ]);
     } 
 
-    else if (!dateTime) {             //filter on Specialty ONLY
+    else if (!dateTime) {             //filter on Speciality ONLY
       doctors = await doctorModel.find({
-        Specialty: specialty,
+        Speciality: speciality,
       });
     }
     res.status(200).json(doctors);
@@ -147,32 +147,36 @@ const filterPatientAppointments = async(req,res) =>{
   }
 }
 
-const searchForDoctor = async (req,res) => {
-  const Name = req.body.Name;
-  const Speciality = req.body.Speciality; 
-  if(Name==null && Speciality==null){
-      return res.status(400).json({ error: 'Name or Speciality parameter is required' });
+const searchForDoctor = async (req, res) => {
+  const { Name, Speciality } = req.body;
+
+  if (!Name && !Speciality) {
+    return res.status(400).json({ error: 'Name or Speciality parameter is required' });
   }
-  try{
-      if(Name!=null && Speciality!=null){
-          const doctors = await doctorModel.find({ Name: {$regex: Name, $options: "i"}, Speciality: {$regex: Speciality, $options: "i"}});
-          res.status(200).json(doctors);
-      }
-      else  if(Name!=null){
-          const doctors = await doctorModel.find({ Name: {$regex: Name, $options: "i"}});
-          res.status(200).json(doctors);
-      }
-      else if(Speciality!=null) {
-          const doctors = await doctorModel.find({ Speciality: {$regex: Speciality, $options: "i"}});
-          res.status(200).json(doctors);
-      }
-      
-  }
-  catch (error) {
-        res.status(500).json({ error: 'An error occurred while searching' });
+
+  try {
+    let query = {};
+
+    if (Name) {
+      query.Name = { $regex: Name, $options: 'i' };
     }
 
+    if (Speciality) {
+      query.Speciality = { $regex: Speciality, $options: 'i' };
+    }
+
+    const doctors = await doctorModel.find(query);
+
+    if (doctors.length === 0) {
+      return res.status(404).json({ error: 'No doctors found matching the criteria' });
+    }
+
+    res.status(200).json(doctors);
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while searching for doctors' });
   }
+};
+
 
 
 module.exports = { addPatient, addFamilyMembers, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor, filterPatientAppointments};
