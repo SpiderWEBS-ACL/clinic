@@ -44,7 +44,7 @@ app.get("/admin/registrationRequest/:id",getDoctrRegistrationReqDetails);//param
 app.get("/admin/package/:id",getPackage);//params
 app.post("/admin/addPackage",addPackage);
 app.put("/admin/updatePackage/:id",updatePackage);
-app.delete("/admin/deletePackage",deletePackage)
+app.delete("/admin/deletePackage/:id",deletePackage)
 
 //Doctor Endpoints
 app.post("/doctor/add",addDoctor);

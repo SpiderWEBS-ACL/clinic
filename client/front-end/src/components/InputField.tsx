@@ -25,7 +25,9 @@ const InputField: React.FC<InputFieldProps> = ({
 }) => {
   return (
     <div className="form-group">
-      <label htmlFor={id}>{label}:</label>
+      <label htmlFor={id}>
+        <strong>{label}:</strong>
+      </label>
       <div className="input-container">
         <input
           className={`form-control ${touched && !isValid ? "is-invalid" : ""}`}

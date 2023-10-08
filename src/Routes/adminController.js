@@ -137,7 +137,7 @@ const updatePackage = async (req,res) => {
 
 const deletePackage = async (req,res) => {
    try {
-      const id = req.body.id;
+      const {id} = req.params;
       const deletedPackage = await packageModel.findByIdAndDelete(id);
       if (!deletedPackage) {
          return res.status(404).json({ error: 'Package not found' });

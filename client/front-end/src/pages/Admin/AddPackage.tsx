@@ -1,152 +1,99 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
+import InputField from "../../components/InputField";
+import Button from "../../components/Button";
 
-interface FormData {
-  Name: string;
-  SubscriptionPrice: number;
-  DoctorDiscount: number;
-  PharmacyDiscount: number;
-  FamilyDiscount: number;
-  [key: string]: string | number;
-}
+const PackageView = () => {
+  const { id } = useParams<{ id: string }>();
 
-const AddPackage: React.FC = () => {
-  const initialFormData: FormData = {
-    Name: "",
-    SubscriptionPrice: 0,
-    DoctorDiscount: 0,
-    PharmacyDiscount: 0,
-    FamilyDiscount: 0,
-  };
+  const [Name, setName] = useState<string>("");
+  const [SubscriptionPrice, setSubscriptionPrice] = useState<
+    number | undefined
+  >();
+  const [DoctorDiscount, setDoctorDiscount] = useState<number | undefined>();
+  const [PharmacyDiscount, setPharmacyDiscount] = useState<
+    number | undefined
+  >();
+  const [FamilyDiscount, setFamilyDiscount] = useState<number | undefined>();
+  const api = axios.create({
+    baseURL: "http://localhost:8000/",
+  });
 
-  const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [formErrors, setFormErrors] = useState<Partial<FormData>>({});
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: name === "Name" ? value : parseFloat(value),
-    });
-    setFormErrors({ ...formErrors, [name]: undefined });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const errors: Partial<FormData> = {};
-    for (const key in formData) {
-      if (!formData[key]) {
-        errors[key] = "This field is required";
-      }
-    }
-    setFormErrors(errors);
-
-    if (Object.keys(errors).length > 0) {
-      return;
-    }
-
+  const handleSubmit = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:8000/admin/addPackage",
-        formData
-      );
+      const data = {
+        Name,
+        SubscriptionPrice,
+        DoctorDiscount,
+        PharmacyDiscount,
+        FamilyDiscount,
+      };
+      console.log(data);
+      const response = await api.post(`/admin/addPackage`, data);
       console.log("Response:", response.data);
-
-      // Clear the form
-      setFormData(initialFormData);
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
   return (
-    <div className="container">
-      <h2 className="text-center mt-4 mb-4">Add Package</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="Name">Name:</label>
-          <input
-            type="text"
-            id="Name"
-            name="Name"
-            className="form-control"
-            value={formData.Name}
-            onChange={handleChange}
-            required
-          />
-          {formErrors.Name && (
-            <span className="text-danger">{formErrors.Name}</span>
-          )}
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <h1 className="mb-4">Add Package</h1>
+          <form>
+            <InputField
+              id="Name"
+              label="Name"
+              type="text"
+              value={Name}
+              onChange={setName}
+            ></InputField>
+
+            <InputField
+              id="SubscriptionPrice"
+              label="Subscription Price"
+              type="number"
+              value={SubscriptionPrice}
+              onChange={setSubscriptionPrice}
+            ></InputField>
+
+            <InputField
+              id="DoctorDiscount"
+              label="Doctor Discount"
+              type="number"
+              value={DoctorDiscount || 0}
+              onChange={setDoctorDiscount}
+            ></InputField>
+
+            <InputField
+              id="PharmacyDiscount"
+              label="Pharmacy Discount"
+              type="number"
+              value={PharmacyDiscount || 0}
+              onChange={setPharmacyDiscount}
+            ></InputField>
+
+            <InputField
+              id="FamilyDiscount"
+              label="Family Discount"
+              type="number"
+              value={FamilyDiscount || 0}
+              onChange={setFamilyDiscount}
+            ></InputField>
+
+            <Button
+              style={{ marginRight: "10px", marginTop: "10px" }}
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
+          </form>
         </div>
-        <div className="form-group">
-          <label htmlFor="SubscriptionPrice">Subscription Price:</label>
-          <input
-            type="number"
-            id="SubscriptionPrice"
-            name="SubscriptionPrice"
-            className="form-control"
-            value={formData.SubscriptionPrice}
-            onChange={handleChange}
-            required
-          />
-          {formErrors.SubscriptionPrice && (
-            <span className="text-danger">{formErrors.SubscriptionPrice}</span>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="DoctorDiscount">Doctor Discount:</label>
-          <input
-            type="number"
-            id="DoctorDiscount"
-            name="DoctorDiscount"
-            className="form-control"
-            value={formData.DoctorDiscount}
-            onChange={handleChange}
-            required
-          />
-          {formErrors.DoctorDiscount && (
-            <span className="text-danger">{formErrors.DoctorDiscount}</span>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="PharmacyDiscount">Pharmacy Discount:</label>
-          <input
-            type="number"
-            id="PharmacyDiscount"
-            name="PharmacyDiscount"
-            className="form-control"
-            value={formData.PharmacyDiscount}
-            onChange={handleChange}
-            required
-          />
-          {formErrors.PharmacyDiscount && (
-            <span className="text-danger">{formErrors.PharmacyDiscount}</span>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="FamilyDiscount">Family Discount:</label>
-          <input
-            type="number"
-            id="FamilyDiscount"
-            name="FamilyDiscount"
-            className="form-control"
-            value={formData.FamilyDiscount}
-            onChange={handleChange}
-            required
-          />
-          {formErrors.FamilyDiscount && (
-            <span className="text-danger">{formErrors.FamilyDiscount}</span>
-          )}
-        </div>
-        <button className="btn btn-primary" type="submit">
-          Submit
-        </button>
-      </form>
+      </div>
     </div>
   );
 };
 
-export default AddPackage;
+export default PackageView;

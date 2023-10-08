@@ -4,16 +4,14 @@ import { useParams } from "react-router-dom";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 
-const UpdatePackage = () => {
+const PackageView = () => {
   const { id } = useParams<{ id: string }>();
 
   const [Name, setName] = useState<string>("");
   const [SubscriptionPrice, setSubscriptionPrice] = useState<number>(0);
   const [DoctorDiscount, setDoctorDiscount] = useState<number | undefined>();
-  const [PharmacyDiscount, setPharmacyDiscount] = useState<
-    number | undefined
-  >();
-  const [familyDiscount, setFamilyDiscount] = useState<number | undefined>();
+  const [PharmacyDiscount, setPharmacyDiscount] = useState<number | undefined>();
+  const [FamilyDiscount, setFamilyDiscount] = useState<number | undefined>();
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
@@ -40,21 +38,29 @@ const UpdatePackage = () => {
         SubscriptionPrice,
         DoctorDiscount,
         PharmacyDiscount,
-        familyDiscount,
+        FamilyDiscount,
       };
       const response = await api.put(`/admin/updatePackage/${id}`, data);
       console.log("Response:", response.data);
-  
     } catch (error) {
       console.error("Error:", error);
     }
   };
-  
+
+  const handleDelete = async () => {
+    try {
+      const response = await api.delete(`/admin/deletePackage/${id}`);
+      console.log("Response:", response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
         <div className="col-md-6">
-          <h1 className="mb-4">Update Package</h1>
+          <h1 className="mb-4">Edit/Delete Package</h1>
           <form>
             <InputField
               id="Name"
@@ -92,13 +98,23 @@ const UpdatePackage = () => {
               id="FamilyDiscount"
               label="Family Discount"
               type="number"
-              value={familyDiscount || 0}
+              value={FamilyDiscount || 0}
               onChange={setFamilyDiscount}
             ></InputField>
 
             <Button
-            onClick={handleSubmit}
-            >Submit</Button>
+              style={{ marginRight: "10px", marginTop: "10px" }}
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
+            <Button
+              style={{ marginRight: "10px", marginTop: "10px" }}
+              color="danger"
+              onClick={handleDelete}
+            >
+              Delete
+            </Button>
           </form>
         </div>
       </div>
@@ -106,5 +122,4 @@ const UpdatePackage = () => {
   );
 };
 
-export default UpdatePackage;
-
+export default PackageView;

@@ -10,7 +10,7 @@ import Home from "./pages/Home";
 import ViewAllRegReqs from "./pages/Admin/ViewAllDoctorRegReqs";
 import RegistrationRequestDetails from "./pages/Admin/DoctorRegReqDetails";
 import AddPackage from "./pages/Admin/AddPackage";
-import UpdatePackage from "./pages/Admin/UpdatePackage";
+import PackageView from "./pages/Admin/PackageView";
 
 const AppRouter: React.FC = () => {
   return (
@@ -27,7 +27,7 @@ const AppRouter: React.FC = () => {
           element={<RegistrationRequestDetails />}
         />
         <Route path="/admin/addPackage" element={<AddPackage />} />
-        <Route path="/admin/updatePackage/:id" element={<UpdatePackage />} />
+        <Route path="/admin/editPackage/:id" element={<PackageView />} />
       </Routes>
     </BrowserRouter>
   );
