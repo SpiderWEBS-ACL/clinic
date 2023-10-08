@@ -6,6 +6,7 @@ const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor, filterDoc
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments } = require("./Routes/doctorController");
 const { addApointment, filterAppointment } = require("./Routes/appointmentController")
 const {addSubscription} = require("./Routes/SubscriptionController")
+const {addPrescription} = require("./Routes/prescriptionController")
 
 
 mongoose.set('strictQuery', false);
@@ -74,6 +75,9 @@ app.post("/appointment/add", addApointment);
 
 //Subscription Endpoints
 app.post("/subscription/add/:patientId",addSubscription);
+
+//Prescription Endpoints
+app.post("/prescription/add",addPrescription);
 
 
 

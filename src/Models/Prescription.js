@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const prescriptionsSchema = new Schema(
+const prescriptionSchema = new Schema(
   {
     Doctor: {
       type: Schema.Types.ObjectId,
@@ -28,10 +28,14 @@ const prescriptionsSchema = new Schema(
       Date: {
         type: Date,
         default: Date.now,
-      } 
+      },
+      Filled: {
+        type: String,
+        enum: ["Filled,Unfilled"]
+      }
   },
   { timestamps: true }
 );
 
-const Prescription = mongoose.model("Prescription", prescriptionsSchema);
+const Prescription = mongoose.model("Prescription", prescriptionSchema);
 module.exports = Prescription;

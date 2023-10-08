@@ -102,8 +102,8 @@ const viewMyPrescriptions = async (req, res) => {
 const filterPrescriptions = async (req, res) => {
   try{
     
-    const { date, doctor} = req.query;
-    if(date && doctor){
+    const { date, doctor, filled} = req.query;
+    if(date && doctor && filled){
     
     const filter = {};
     if (date) {
@@ -111,6 +111,9 @@ const filterPrescriptions = async (req, res) => {
     }
     if (doctor) {
       filter.doctor = doctor;
+    }
+    if (filled) {
+      filter.filled = filled;
     }
 
     const prescriptions = await prescriptionModel.find(filter);
@@ -276,6 +279,7 @@ const viewDoctorsWithPrices = async (req, res) => {
     const doctors = await doctorModel.find();
     const doctorsWithPrices = doctors.map(doctor => {
       let sessionPrice = doctor.HourlyRate;
+
       if (healthPackage) {
         sessionPrice = doctor.HourlyRate + (0.1 * doctor.HourlyRate) - calculateDiscount(doctor, healthPackage);
         sessionPrice = sessionPrice > 0 ? sessionPrice : 0; 
