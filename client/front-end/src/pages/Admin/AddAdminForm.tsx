@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Alert from "../components/Alert";
-import InputField from "../components/InputField";
-import { validateUsername, validatePassword } from "../utils/ValidationUtils";
+import Alert from "../../components/Alert";
+import InputField from "../../components/InputField";
+import {
+  validateUsername,
+  validatePassword,
+} from "../../utils/ValidationUtils";
 
 const AddAdminForm: React.FC = () => {
   const [Username, setUsername] = useState<string>("");

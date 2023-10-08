@@ -1,6 +1,6 @@
 import React from "react";
 import AppRouter from "./AppRouter";
-import AddAdminForm from "./pages/AddAdminForm";
+import AddAdminForm from "./pages/Admin/AddAdminForm";
 
 function App() {
   return (

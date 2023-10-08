@@ -95,6 +95,19 @@ const removeDoctor = async (req,res) => {
 
 ///////////////////////////////////////PACKAGES////////////////////////////////////////////////////
 
+const getPackage = async (req,res) => {
+  try {
+    const {id} = req.params;
+    const package = await packageModel.findById(id);
+    if (!package) {
+        return res.status(404).json({ error: 'Package not found' });
+   }
+   res.status(200).json(package);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+
+}
 const addPackage = async (req,res) => {
     try{
         const newPackage = await packageModel.create(req.body);
@@ -106,7 +119,7 @@ const addPackage = async (req,res) => {
 
 const updatePackage = async (req,res) => {
     try{
-        const id  = req.body.id;
+        const { id }  = req.params;
         const updates = req.body;
         const updatedPackage = await packageModel.findByIdAndUpdate(id,updates);
         if (!updatedPackage) {
@@ -132,4 +145,4 @@ const deletePackage = async (req,res) => {
    }
 }
 
-module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage};
+module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage};

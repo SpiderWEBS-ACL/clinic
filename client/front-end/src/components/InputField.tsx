@@ -4,12 +4,12 @@ interface InputFieldProps {
   id: string;
   label: string;
   type: string;
-  value: string;
-  onChange: (value: string) => void;
-  onBlur: () => void;
-  isValid: boolean;
-  errorMessage: string;
-  touched: boolean;
+  value: any;
+  onChange: (value: any) => void;
+  onBlur?: () => void;
+  isValid?: boolean;
+  errorMessage?: string;
+  touched?: boolean;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
