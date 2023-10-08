@@ -1,10 +1,11 @@
 const express = require("express");
 const mongoose = require('mongoose');
-const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
 
-const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments } = require("./Routes/patientController");
+const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage } = require("./Routes/adminController");
+const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices} = require("./Routes/patientController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments } = require("./Routes/doctorController");
 const { addApointment, filterAppointment } = require("./Routes/appointmentController")
+const {addSubscription} = require("./Routes/SubscriptionController")
 
 
 mongoose.set('strictQuery', false);
@@ -61,11 +62,18 @@ app.get("/patient/searchForDoctor",searchForDoctor);
 app.get("/patient/viewFamilyMembers",viewFamilyMembers)
 app.get("/patient/filterDoctors", filterDoctors);
 app.get("/patient/filterAppointments",filterPatientAppointments)
-
+app.get("/patient/viewSelectedDoctor",viewDoctorDetails)
+app.get("/patient/viewMyPrescriptions",viewMyPrescriptions)
+app.get("/patient/filterPrescriptions",filterPrescriptions)
+app.get("/patient/selectPrescription",selectPrescription)
+app.get("/patient/viewDoctorsWithPrices/:patientId", viewDoctorsWithPrices)
 //Appointment Endpoints
 app.post("/appointment/add", addApointment);
 app.get("/appointment/filterAppointment",filterAppointment)
 app.post("/appointment/add", addApointment);
+
+//Subscription Endpoints
+app.post("/subscription/add/:patientId",addSubscription);
 
 
 

@@ -3,6 +3,7 @@ const { default: mongoose } = require("mongoose");
 const doctorModel = require("../Models/Doctor");
 const appointmentModel = require("../Models/Appointment");
 const prescriptionModel = require("../Models/Prescription");
+const subscriptionModel = require("../Models/Subscription");
 
 const addPatient = async (req, res) => {
   // try {
@@ -69,6 +70,8 @@ const viewDoctorDetails = async (req, res) => {
     else{
       const doctor = await doctorModel.findById(doctorID);
       const doctorInfo = {
+        Name: doctor.Name,
+        Email: doctor.Email,
         Specialty: doctor.Specialty,
         Affiliation: doctor.Affiliation,
         EducationalBackground: doctor.EducationalBackground
@@ -254,8 +257,46 @@ const searchForDoctor = async (req, res) => {
     res.status(500).json({ error: 'An error occurred while searching for doctors' });
   }
 };
+const calculateDiscount = (doctor, healthPackage) => {
+  if (!healthPackage) {
+    return 0; 
+  }
+  const packageDiscount = healthPackage.DoctorDiscount;
+  return doctor.HourlyRate * (packageDiscount / 100);}
+
+const viewDoctorsWithPrices = async (req, res) => {
+  const patientId = req.params.patientId;
+
+  try {
+    const subscription = await subscriptionModel.findOne({ Patient: patientId }).populate('Package');
+    let healthPackage = null;
+    if (subscription) {
+      healthPackage = subscription.Package;
+    }
+    const doctors = await doctorModel.find();
+    const doctorsWithPrices = doctors.map(doctor => {
+      let sessionPrice = doctor.HourlyRate;
+      if (healthPackage) {
+        sessionPrice = doctor.HourlyRate + (0.1 * doctor.HourlyRate) - calculateDiscount(doctor, healthPackage);
+        sessionPrice = sessionPrice > 0 ? sessionPrice : 0; 
+      }
+
+      return {
+        doctorName: doctor.Name,
+        speciality: doctor.Speciality,
+        sessionPrice
+      };
+    });
+
+    res.status(200).json(doctorsWithPrices);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 
 
-module.exports = { addPatient, addFamilyMembers, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor, filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription};
+module.exports = { addPatient, addFamilyMembers, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
+   filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
+  viewDoctorsWithPrices};
 
