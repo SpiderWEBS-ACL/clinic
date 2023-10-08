@@ -24,7 +24,7 @@ const registerDoctor = async (req,res) => {
             var newDoctor = await doctorRegisterRequestModel.create(req.body);
             res.status(201).json(newDoctor);
         }
-        else if(exists1 || exists2){
+        else if(exists || exists2){
             res.status(400).json({error:  "Username already taken!" });
         }else{
             res.status(400).json({error:  "Email already registered!" });
