@@ -6,7 +6,7 @@ const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDo
 const { addApointment, filterAppointment } = require("./Routes/appointmentController")
 const {addSubscription} = require("./Routes/SubscriptionController")
 const {addPrescription} = require("./Routes/prescriptionController")
-const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors } = require("./Routes/adminController");
+const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins } = require("./Routes/adminController");
 const cors = require('cors');
 
 mongoose.set('strictQuery', false);
@@ -36,6 +36,8 @@ app.use(express.json());
 
 //Admin Endpoints
 app.post("/admin/add",addAdmin);
+app.get("/admin/allAdmins",getAllAdmins);
+app.get("/admin/allPatients",getAllPatients);
 app.get("/admin/allDoctors",getAllDoctors); 
 app.delete("/admin/removeDoctor/:id",removeDoctor); //params?
 app.delete("/admin/removePatient/:id",removePatient); //params?

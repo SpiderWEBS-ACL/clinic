@@ -10,6 +10,15 @@ const { default: mongoose } = require('mongoose');
 
 ////////////////////////////////////ADMIN////////////////////////////////////////
 
+const getAllAdmins = async (req,res) =>{
+  try{
+      const admin = await adminModel.find({});
+      res.status(200).json(admin);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 const addAdmin = async (req,res) => {
     try {
         const exists = await adminModel.findOne({"Username" : req.body.Username});
@@ -43,6 +52,14 @@ const removeAdmin = async (req,res) => {
 
 /////////////////////////////////////PATIENT///////////////////////////////////////////////////
 
+ const getAllPatients = async (req,res) =>{
+  try{
+      const patient = await patientModel.find({});
+      res.status(200).json(patient);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
  const removePatient = async (req,res) => {
     try{
         const { id } = req.params;
@@ -157,4 +174,4 @@ const deletePackage = async (req,res) => {
    }
 }
 
-module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors};
+module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins};
