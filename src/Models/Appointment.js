@@ -14,7 +14,10 @@ const appointmentSchema = new Schema({
     AppointmentDate: Date,
     
     Status:{
-      type : String ,  enum:[ "Upcoming","Attended","Cancelled"]},
+      type : String ,  
+      enum:[ "Upcoming","Attended","Cancelled"],
+      default: "Upcoming"
+    } 
     },{ timestamps: true });
 
 
