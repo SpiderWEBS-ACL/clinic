@@ -145,7 +145,8 @@ const selectPrescription = async (req, res) =>{
 }
 const viewFamilyMembers = async (req, res) => {
     try{
-        const patient = await patientModel.findById(req.body.id);
+        const {id} = req.params
+        const patient = await patientModel.findById(id);
         const familyMembers = patient.FamilyMembers;
         res.status(200).json(familyMembers)
     }
