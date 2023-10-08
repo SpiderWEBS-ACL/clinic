@@ -90,11 +90,10 @@ const searchPatientByName = async (req,res) => {
 
 
  const viewPatients = async (req,res) => {
-    const doctorId = req.body.id;
-    const currentDate = new Date();
+    const {id} = req.params;
     try{
      const appointments =  await appointmentModel.find({
-        Doctor: doctorId
+        Doctor: id
     }).populate("Patient").exec()
     const patients = [];
     for (const appointment of appointments) {
@@ -108,7 +107,8 @@ const searchPatientByName = async (req,res) => {
  } 
 
  const viewPatientInfo = async (req,res) => { //health records???
-    const patient = await patientModel.findById(req.body.id);
+    const {id} = req.params
+    const patient = await patientModel.findById(id);
     if(!patient){
         res.status(500).json({error:"No such Patient"}) ;
     }
