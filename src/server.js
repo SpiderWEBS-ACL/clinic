@@ -54,7 +54,7 @@ app.delete("/admin/deletePackage/:id",deletePackage)
 app.get("/doctor/getDoctor/:id",getDoctor);
 app.post("/doctor/add",addDoctor);
 app.post("/doctor/register",registerDoctor);
-app.get("/doctor/searchPatient",searchPatientByName);
+app.get("/doctor/searchPatient/:Name",searchPatientByName);
 app.get("/doctor/selectPatient/:id",selectPatient);
 app.put("/doctor/update/:id", updateDoctor);
 app.get("/doctor/upcomingAppointments/:id",upcomingAppointments);

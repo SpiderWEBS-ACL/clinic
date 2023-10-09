@@ -35,7 +35,7 @@ const registerDoctor = async (req,res) => {
 }
 
 const searchPatientByName = async (req,res) => {
-    const Name = req.query.Name;
+    const { Name }= req.params;
     if (!Name) {
         return res.status(400).json({ error: 'Name parameter is required' });
       }
