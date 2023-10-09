@@ -48,7 +48,7 @@ const searchPatientByName = async (req,res) => {
  } 
  
  const selectPatient = async (req, res) => {
-    const { id } = req.params.id;
+    const { id } = req.params;
     try{
         const patient = await patientModel.findById(id);
         if(!patient){
@@ -61,7 +61,7 @@ const searchPatientByName = async (req,res) => {
  }
 
  const updateDoctor = async (req,res) => {
-    const { id } = req.params.id;
+    const { id } = req.params;
     const updates = req.body;
     try{
         const updatedDoctor = await doctorModel.findByIdAndUpdate(id, updates);
@@ -117,7 +117,7 @@ const searchPatientByName = async (req,res) => {
  } 
 
  const viewPatientInfo = async (req,res) => { //health records???
-    const { id } = req.params
+    const { id } = req.params;
     const patient = await patientModel.findById(id);
     if(!patient){
         res.status(500).json({error:"No such Patient"}) ;
