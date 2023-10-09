@@ -25,7 +25,9 @@ const AllDoctors = () => {
 
   const handleDelete = async (id: string) => {
     try {
+      setLoading(true);
       const response = await api.delete(`/removeDoctor/${id}`);
+      setLoading(false);
       setDeleted(!deleted);
       console.log("Response:", response.data);
     } catch (error) {
@@ -77,7 +79,7 @@ const AllDoctors = () => {
               <td>{request.Dob}</td>
               <td>{request.HourlyRate}</td>
               <td>{request.Affiliation}</td>
-              <td>{request.Speciality}</td>
+              <td>{request.Specialty}</td>
               <td>{request.EducationalBackground}</td>
               <td>
                 <button
