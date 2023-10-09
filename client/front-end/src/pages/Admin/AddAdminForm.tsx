@@ -72,7 +72,7 @@ const AddAdminForm: React.FC = () => {
       }}
     >
       <div>
-        <h2>Add Admin Form</h2>
+        <h2>Add Admin</h2>
         <form onSubmit={handleSubmit}>
           <InputField
             id="Username"
