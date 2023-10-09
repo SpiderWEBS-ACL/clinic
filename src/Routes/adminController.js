@@ -124,6 +124,15 @@ const removeDoctor = async (req,res) => {
 
 ///////////////////////////////////////PACKAGES////////////////////////////////////////////////////
 
+const getAllPackages = async (req,res) =>{
+  try{
+      const packages = await packageModel.find({});
+      res.status(200).json(packages);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 const getPackage = async (req,res) => {
   try {
     const {id} = req.params;
@@ -174,4 +183,4 @@ const deletePackage = async (req,res) => {
    }
 }
 
-module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins};
+module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages};

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Spin } from "antd";
+import { useNavigate } from "react-router-dom";
 
-const AllAdmins = () => {
-  const [doctors, setDoctors] = useState([]);
-  const [deleted, setDeleted] = useState(false);
+const AllPackages = () => {
+  const [Packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const api = axios.create({
     baseURL: "http://localhost:8000/admin",
@@ -12,25 +12,20 @@ const AllAdmins = () => {
 
   useEffect(() => {
     api
-      .get("/allAdmins")
+      .get("/allPackages")
       .then((response) => {
-        setDoctors(response.data);
+        setPackages(response.data);
         setLoading(false);
         console.log(response.data);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, [deleted]);
+  }, []);
 
-  const handleDelete = async (id: string) => {
-    try {
-      const response = await api.delete(`/removeAdmin/${id}`);
-      setDeleted(!deleted);
-      console.log("Response:", response.data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
+  const navigate = useNavigate();
+  const handleRedirect = async (id: string) => {
+    navigate("/admin/editPackage/" + id);
   };
 
   if (loading) {
@@ -51,30 +46,36 @@ const AllAdmins = () => {
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
-        <strong>Admins</strong>
+        <strong>Health Packages</strong>
       </h2>
-      <table className="table table-sm">
+      <table className="table">
         <thead>
           <tr>
-            <th>Username</th>
-            <th>Remove</th>
+            <th>Name</th>
+            <th>Price (EGP)</th>
+            <th>Doctor Discount</th>
+            <th>Pharmacy Discount</th>
+            <th>Family Discount</th>
+            <th>Edit/Delete</th>
           </tr>
         </thead>
+
         <tbody>
-          {doctors.map((request: any, index) => (
+          {Packages.map((request: any, index) => (
             <tr key={request._id}>
-              <td>{request.Username}</td>
+              <td>
+                <strong>{request.Name}</strong>
+              </td>
+              <td>{request.SubscriptionPrice}</td>
+              <td>{request.DoctorDiscount}%</td>
+              <td>{request.PharmacyDiscount}%</td>
+              <td>{request.FamilyDiscount}%</td>
               <td>
                 <button
-                  className="btn btn-sm btn-danger"
-                  style={{
-                    padding: "4px 8px",
-                    fontSize: "12px",
-                    borderRadius: "5px",
-                  }}
-                  onClick={() => handleDelete(request._id)}
+                  className="btn btn-primary"
+                  onClick={() => handleRedirect(request._id)}
                 >
-                  <span aria-hidden="true">&times;</span>
+                  edit/delete
                 </button>
               </td>
             </tr>
@@ -85,4 +86,4 @@ const AllAdmins = () => {
   );
 };
 
-export default AllAdmins;
+export default AllPackages;
