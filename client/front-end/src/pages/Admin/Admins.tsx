@@ -25,12 +25,14 @@ const AllAdmins = () => {
 
   const handleDelete = async (id: string) => {
     try {
+      setLoading(true);
       const response = await api.delete(`/removeAdmin/${id}`);
       setDeleted(!deleted);
       console.log("Response:", response.data);
     } catch (error) {
       console.error("Error:", error);
     }
+    setLoading(false);
   };
 
   if (loading) {

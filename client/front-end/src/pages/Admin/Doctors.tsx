@@ -27,12 +27,12 @@ const AllDoctors = () => {
     try {
       setLoading(true);
       const response = await api.delete(`/removeDoctor/${id}`);
-      setLoading(false);
       setDeleted(!deleted);
       console.log("Response:", response.data);
     } catch (error) {
       console.error("Error:", error);
     }
+    setLoading(false);
   };
 
   if (loading) {
