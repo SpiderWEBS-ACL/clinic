@@ -16,8 +16,19 @@ const addDoctor = async (req,res) => {
 
 const registerDoctor = async (req,res) => {
     try {
-        const newDoctor = await doctorRegisterRequestModel.create(req.body);
-        res.status(201).json(newDoctor);
+        const exists = await doctorModel.findOne({"Username" : req.body.Username});
+        const exists2 = await doctorRegisterRequestModel.findOne({"Username" : req.body.Username});
+        const exists3 = await doctorModel.findOne({"Email" : req.body.Email});
+        const exists4 = await doctorRegisterRequestModel.findOne({"Email" : req.body.Email});
+        if(!exists && !exists2 && !exists3 && !exists4){
+            var newDoctor = await doctorRegisterRequestModel.create(req.body);
+            res.status(201).json(newDoctor);
+        }
+        else if(exists || exists2){
+            res.status(400).json({error:  "Username already taken!" });
+        }else{
+            res.status(400).json({error:  "Email already registered!" });
+        }
     }catch(error){
         res.status(400).json({ error: error.message });
     }
@@ -79,11 +90,10 @@ const searchPatientByName = async (req,res) => {
 
 
  const viewPatients = async (req,res) => {
-    const doctorId = req.body.id;
-    const currentDate = new Date();
+    const {id} = req.params;
     try{
      const appointments =  await appointmentModel.find({
-        Doctor: doctorId
+        Doctor: id
     }).populate("Patient").exec()
     const patients = [];
     for (const appointment of appointments) {
@@ -97,7 +107,8 @@ const searchPatientByName = async (req,res) => {
  } 
 
  const viewPatientInfo = async (req,res) => { //health records???
-    const patient = await patientModel.findById(req.body.id);
+    const {id} = req.params
+    const patient = await patientModel.findById(id);
     if(!patient){
         res.status(500).json({error:"No such Patient"}) ;
     }
@@ -105,8 +116,28 @@ const searchPatientByName = async (req,res) => {
         res.status(200).json(patient);
     }
  }
+ const filterDoctorAppointments = async(req,res) =>{
+    const date = req.body.Date;
+    const status = req.body.Status
+    const query = {
+        $or: [
+          { AppointmentDate: { $gte: date } }, 
+          { Status: status }
+        ]
+      };
+    try{
+            const appointments = await appointmentModel.find(query).populate("Patient").exec();
+            if(!appointments || appointments.length === 0){
+                res.status(404).json({error: "no appointments were found"});
+            }
+            else
+                res.status(200).json(appointments);
+        }catch(error){
+        res.status(500).json({ error: error.message });
+    }
+ }
  
 
 
 module.exports = { registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments,
-    addDoctor, viewPatients,viewPatientInfo};
+    addDoctor, viewPatients,viewPatientInfo, filterDoctorAppointments};

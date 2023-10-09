@@ -2,14 +2,31 @@ const patientModel = require("../Models/Patient");
 const { default: mongoose } = require("mongoose");
 const doctorModel = require("../Models/Doctor");
 const appointmentModel = require("../Models/Appointment");
+const prescriptionModel = require("../Models/Prescription");
+const subscriptionModel = require("../Models/Subscription");
 
 const addPatient = async (req, res) => {
+  // try {
+  //   const newPatient = await patientModel.create(req.body);
+  //   res.status(201).json(newPatient);
+  // } catch (error) {
+  //   res.status(500).json({ error: error.message });
+  // }
   try {
-    const newPatient = await patientModel.create(req.body);
-    res.status(201).json(newPatient);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    const exists = await patientModel.findOne({"Username" : req.body.Username});
+    const exists2 = await patientModel.findOne({"Email" : req.body.Email});
+    if(!exists && !exists2){
+        var newPatient = await patientModel.create(req.body);
+        res.status(201).json(newPatient);
+    }
+    else if(exists){
+        res.status(400).json({error:  "Username already taken!" });
+    }else{
+        res.status(400).json({error:  "Email already registered!" });
+    }
+}catch(error){
+    res.status(400).json({ error: error.message });
+}
 };
 
 const addFamilyMembers = async (req, res) => {
@@ -44,16 +61,94 @@ const selectDoctor = async (req, res) => {
   }
 };
 
+const viewDoctorDetails = async (req, res) => {
+  const doctorID = req.body.id;
+  try{
+    if(!doctorID){
+      return res.status(404).json({ error: "You must select a doctor" });
+    }
+    else{
+      const doctor = await doctorModel.findById(doctorID);
+      const doctorInfo = {
+        Name: doctor.Name,
+        Email: doctor.Email,
+        Specialty: doctor.Specialty,
+        Affiliation: doctor.Affiliation,
+        EducationalBackground: doctor.EducationalBackground
+      }
+      return res.status(200).json(doctorInfo)
+    }
+  } catch (error){
+    res.status(500).json({ error: error.message });
+  }
+}
+
+const viewMyPrescriptions = async (req, res) => {
+  try {
+    const patientId = req.params.patientId;
+    const prescriptions = await prescriptionModel.findById(patientId);
+    if(!prescriptions){
+      return res.status(404).json({error: "You do not have any prescriptions yet"})
+    }
+    else{
+      return res.status(200).json(prescriptions);
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+
+}
+
+const filterPrescriptions = async (req, res) => {
+  try{
+    
+    const { date, doctor, filled} = req.query;
+    if(date && doctor && filled){
+    
+    const filter = {};
+    if (date) {
+      filter.date = { $gte: new Date(date) };
+    }
+    if (doctor) {
+      filter.doctor = doctor;
+    }
+    if (filled) {
+      filter.filled = filled;
+    }
+
+    const prescriptions = await prescriptionModel.find(filter);
+
+    return res.status(200).json(prescriptions);
+  }
+  else{
+    return res.status(404).json({error: "No prescription is found with this given details"})
+  }
+
+  } catch(error){
+    res.status(500).json({ error: error.message });
+  }
+}
+const selectPrescription = async (req, res) =>{
+  const prescID = req.body.prescID;
+  try {
+    const prescription = await prescriptionModel.findById(prescID);
+    if (!prescription) {
+      return res.status(404).json({ error: "Prescription not found" });
+    }
+    else{
+      res.status(200).json(prescription);
+
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 const viewFamilyMembers = async (req, res) => {
     try{
-        const patient = await patientModel.findById(req.body.id);
-        if(!patient){
-            return res.status(404).json({ error: "Patient not found"});
-        }
-        else{
-            const familyMembers = patient.FamilyMembers;
-            res.status(200).json(familyMembers)
-        }
+        const {id} = req.params
+        const patient = await patientModel.findById(id);
+        const familyMembers = patient.FamilyMembers;
+        res.status(200).json(familyMembers)
     }
     catch(error){
         res.status(500).json({error: error.message})
@@ -61,7 +156,7 @@ const viewFamilyMembers = async (req, res) => {
 };
 
 const filterDoctors = async (req, res) => {
-  const specialty = req.body.Specialty;
+  const speciality = req.body.Speciality;
   const dateTime = req.body.DateTime;
 
   try {
@@ -72,8 +167,6 @@ const filterDoctors = async (req, res) => {
     }
 
     else if (specialty && dateTime) {           //filter on specialty AND availability
-
-      console.log("filter on specialty AND availability");
       doctors = await doctorModel.aggregate([
         {
           $match: { Specialty: { $regex: specialty, $options: "i"} },   //filter doctors by specialty ($regex, $options: "i" --> case insensitive)
@@ -95,8 +188,6 @@ const filterDoctors = async (req, res) => {
     } 
 
     else if (dateTime) {            //filter on availability ONLY
-      console.log("filter on availability ");
-
       doctors = await doctorModel.aggregate([
         {
           $lookup: {
@@ -130,5 +221,97 @@ const filterDoctors = async (req, res) => {
   }
 };
 
-module.exports = { addPatient, addFamilyMembers, selectDoctor, viewFamilyMembers, filterDoctors };
+const filterPatientAppointments = async(req,res) =>{
+  const date = req.body.Date;
+  const status = req.body.Status
+  const query = {
+      $or: [
+        { AppointmentDate: { $gte: date } }, 
+        { Status: status }
+      ]
+    };
+  try{
+          const appointments = await appointmentModel.find(query).populate("Doctor").exec();
+          if(!appointments || appointments.length === 0){
+              res.status(404).json({error: "no appointments were found"});
+          }
+          else
+              res.status(200).json(appointments);
+      }catch(error){
+      res.status(500).json({ error: error.message });
+  }
+}
+
+const searchForDoctor = async (req, res) => {
+  const { Name, Speciality } = req.body;
+
+  if (!Name && !Speciality) {
+    return res.status(400).json({ error: 'Name or Speciality parameter is required' });
+  }
+
+  try {
+    let query = {};
+
+    if (Name) {
+      query.Name = { $regex: Name, $options: 'i' };
+    }
+
+    if (Speciality) {
+      query.Speciality = { $regex: Speciality, $options: 'i' };
+    }
+
+    const doctors = await doctorModel.find(query);
+
+    if (doctors.length === 0) {
+      return res.status(404).json({ error: 'No doctors found matching the criteria' });
+    }
+
+    res.status(200).json(doctors);
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while searching for doctors' });
+  }
+};
+const calculateDiscount = (doctor, healthPackage) => {
+  if (!healthPackage) {
+    return 0; 
+  }
+  const packageDiscount = healthPackage.DoctorDiscount;
+  return doctor.HourlyRate * (packageDiscount / 100);}
+
+const viewDoctorsWithPrices = async (req, res) => {
+  const patientId = req.params.patientId;
+
+  try {
+    const subscription = await subscriptionModel.findOne({ Patient: patientId }).populate('Package');
+    let healthPackage = null;
+    if (subscription) {
+      healthPackage = subscription.Package;
+    }
+    const doctors = await doctorModel.find();
+    const doctorsWithPrices = doctors.map(doctor => {
+      let sessionPrice = doctor.HourlyRate;
+
+      if (healthPackage) {
+        sessionPrice = doctor.HourlyRate + (0.1 * doctor.HourlyRate) - calculateDiscount(doctor, healthPackage);
+        sessionPrice = sessionPrice > 0 ? sessionPrice : 0; 
+      }
+
+      return {
+        doctorName: doctor.Name,
+        speciality: doctor.Speciality,
+        sessionPrice
+      };
+    });
+
+    res.status(200).json(doctorsWithPrices);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+module.exports = { addPatient, addFamilyMembers, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
+   filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
+  viewDoctorsWithPrices};
 
