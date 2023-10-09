@@ -14,13 +14,14 @@ import ViewFamilyMembers from "./pages/Patient/ViewFamilyMembers";
 import ViewAllPatients from "./pages/Doctor/ViewAllPatients";
 import ViewPatientInfo from "./pages/Doctor/viewPatientInfo";
 import AllPackages from "./pages/Admin/Packages";
+import EditDoctor from "./pages/Doctor/Edit";
 
 const AppRouter: React.FC = () => {
   return (
     <Routes>
       <Route path="/admin/add" element={<AddAdminForm />} />
       <Route path="admin/" element={<Home />} />
-      <Route path="/admin/registrationRequests" element={< ViewAllRegReqs/>} />
+      <Route path="/admin/registrationRequests" element={<ViewAllRegReqs />} />
       <Route
         path="/admin/registrationRequests/:id"
         element={<RegistrationRequestDetails />}
@@ -37,6 +38,7 @@ const AppRouter: React.FC = () => {
       />
       <Route path="/doctor/viewPatients/:id" element={<ViewAllPatients />} />
       <Route path="/doctor/viewPatientInfo/:id" element={<ViewPatientInfo />} />
+      <Route path="/doctor/edit/:id" element={< EditDoctor/>} />
     </Routes>
   );
 };

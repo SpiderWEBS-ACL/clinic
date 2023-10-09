@@ -3,15 +3,21 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
+import { Spin } from "antd";
+import { message } from "antd";
 
 const PackageView = () => {
   const { id } = useParams<{ id: string }>();
-
+  const [loading, setLoading] = useState(true);
   const [Name, setName] = useState<string>("");
   const [SubscriptionPrice, setSubscriptionPrice] = useState<number>(0);
   const [DoctorDiscount, setDoctorDiscount] = useState<number | undefined>();
-  const [PharmacyDiscount, setPharmacyDiscount] = useState<number | undefined>();
+  const [PharmacyDiscount, setPharmacyDiscount] = useState<
+    number | undefined
+  >();
   const [FamilyDiscount, setFamilyDiscount] = useState<number | undefined>();
+  const [Message, setMessage] = useState("");
+  const [Alert, setAlert] = useState(false);
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
@@ -29,9 +35,11 @@ const PackageView = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+    setLoading(false);
   }, [id]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     try {
       const data = {
         Name,
@@ -42,8 +50,11 @@ const PackageView = () => {
       };
       const response = await api.put(`/admin/updatePackage/${id}`, data);
       console.log("Response:", response.data);
+      message.success("Package updated successfully");
+      setAlert(true);
     } catch (error) {
       console.error("Error:", error);
+      message.error("Failed to update package");
     }
   };
 
@@ -51,17 +62,39 @@ const PackageView = () => {
     try {
       const response = await api.delete(`/admin/deletePackage/${id}`);
       console.log("Response:", response.data);
+      message.success("Package deleted successfully");
+      setName("");
+      setSubscriptionPrice(0);
+      setDoctorDiscount(undefined);
+      setPharmacyDiscount(undefined);
+      setFamilyDiscount(undefined);
     } catch (error) {
       console.error("Error:", error);
+      message.error("Failed to delete package");
     }
   };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
         <div className="col-md-6">
           <h1 className="mb-4">Edit/Delete Package</h1>
-          <form>
+          <form onSubmit={handleSubmit}>
             <InputField
               id="Name"
               label="Name"
@@ -102,20 +135,21 @@ const PackageView = () => {
               onChange={setFamilyDiscount}
             ></InputField>
 
-            <Button
+            <button
+              className="btn btn-primary"
               style={{ marginRight: "10px", marginTop: "10px" }}
-              onClick={handleSubmit}
+              type="submit"
             >
               Submit
-            </Button>
-            <Button
-              style={{ marginRight: "10px", marginTop: "10px" }}
-              color="danger"
-              onClick={handleDelete}
-            >
-              Delete
-            </Button>
+            </button>
           </form>
+          <Button
+            style={{ marginRight: "10px", marginTop: "10px" }}
+            color="danger"
+            onClick={handleDelete}
+          >
+            Delete
+          </Button>
         </div>
       </div>
     </div>
