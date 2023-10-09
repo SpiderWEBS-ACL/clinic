@@ -162,10 +162,14 @@ const filterDoctors = async (req, res) => {
   try {
     var doctors;
 
-    if (speciality && dateTime) {           //filter on speciality AND availability
+    if(!specialty && !dateTime){
+      return res.status(404).json({ error: "Please Specify Filtering Criteria"});
+    }
+
+    else if (specialty && dateTime) {           //filter on specialty AND availability
       doctors = await doctorModel.aggregate([
         {
-          $match: { Speciality: speciality },   //filter doctors by speciality
+          $match: { Specialty: { $regex: specialty, $options: "i"} },   //filter doctors by specialty ($regex, $options: "i" --> case insensitive)
         },
         {
           $lookup: {                    //join with appointments --> adds "appointments" field to doctors (array of appointments)
@@ -183,7 +187,7 @@ const filterDoctors = async (req, res) => {
       ]);
     } 
 
-    else if (!speciality) {            //filter on availability ONLY
+    else if (dateTime) {            //filter on availability ONLY
       doctors = await doctorModel.aggregate([
         {
           $lookup: {
@@ -201,16 +205,22 @@ const filterDoctors = async (req, res) => {
       ]);
     } 
 
-    else if (!dateTime) {             //filter on Speciality ONLY
+    else if (specialty) {             //filter on Specialty ONLY
       doctors = await doctorModel.find({
-        Speciality: speciality,
+        Specialty: { $regex: specialty, $options: "i"},
       });
     }
+
+    if(doctors.length == 0){     
+      return res.status(404).json({ error: "No Doctors Found"});
+    }
+    
     res.status(200).json(doctors);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 const filterPatientAppointments = async(req,res) =>{
   const date = req.body.Date;
   const status = req.body.Status
