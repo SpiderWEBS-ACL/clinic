@@ -75,7 +75,7 @@ app.get("/patient/filterPrescriptions",filterPrescriptions)
 app.get("/patient/selectPrescription",selectPrescription)
 app.get("/patient/viewDoctorsWithPrices/:patientId", viewDoctorsWithPrices)
 
-//Appointment Endpoiints
+//Appointment Endpoints
 app.post("/appointment/add", addApointment);
 app.get("/appointment/filterAppointment",filterAppointment)
 app.post("/appointment/add", addApointment);

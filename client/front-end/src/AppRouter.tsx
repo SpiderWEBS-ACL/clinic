@@ -20,7 +20,7 @@ const AppRouter: React.FC = () => {
     <Routes>
       <Route path="/admin/add" element={<AddAdminForm />} />
       <Route path="admin/" element={<Home />} />
-      <Route path="/admin/registrationRequests" element={<ViewAllRegReqs />} />
+      <Route path="/admin/registrationRequests" element={< ViewAllRegReqs/>} />
       <Route
         path="/admin/registrationRequests/:id"
         element={<RegistrationRequestDetails />}
