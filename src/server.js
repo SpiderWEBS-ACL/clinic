@@ -54,26 +54,26 @@ app.delete("/admin/deletePackage/:id",deletePackage)
 app.post("/doctor/add",addDoctor);
 app.post("/doctor/register",registerDoctor);
 app.get("/doctor/searchPatient",searchPatientByName);
-app.get("/doctor/selectPatient",selectPatient);
-app.put("/doctor/update", updateDoctor);
-app.get("/doctor/upcomingAppointments",upcomingAppointments);
+app.get("/doctor/selectPatient/:id",selectPatient);
+app.put("/doctor/update/:id", updateDoctor);
+app.get("/doctor/upcomingAppointments/:id",upcomingAppointments);
 app.get("/doctor/viewPatients/:id", viewPatients);
 app.get("/doctor/viewPatientInfo/:id", viewPatientInfo);
-app.get("/doctor/filterAppointments",filterDoctorAppointments)
+app.get("/doctor/filterAppointments/:id",filterDoctorAppointments)
 
 //Patient Endpoints
 app.post("/patient/register",addPatient);
-app.post("/patient/addFamilyMembers",addFamilyMembers);
-app.get("/patient/selectDoctor", selectDoctor);
+app.post("/patient/addFamilyMembers/:id",addFamilyMembers);
+app.get("/patient/selectDoctor/:id", selectDoctor);
 app.get("/patient/searchForDoctor",searchForDoctor);
 app.get("/patient/viewFamilyMembers/:id",viewFamilyMembers)
 app.get("/patient/filterDoctors", filterDoctors);
-app.get("/patient/filterAppointments",filterPatientAppointments)
-app.get("/patient/viewSelectedDoctor",viewDoctorDetails)
-app.get("/patient/viewMyPrescriptions",viewMyPrescriptions)
-app.get("/patient/filterPrescriptions",filterPrescriptions)
-app.get("/patient/selectPrescription",selectPrescription)
-app.get("/patient/viewDoctorsWithPrices/:patientId", viewDoctorsWithPrices)
+app.get("/patient/filterAppointments/:id",filterPatientAppointments)
+app.get("/patient/viewSelectedDoctor/:id",viewDoctorDetails)
+app.get("/patient/viewMyPrescriptions/:id",viewMyPrescriptions)
+app.get("/patient/filterPrescriptions/:id",filterPrescriptions)
+app.get("/patient/selectPrescription/:id",selectPrescription)
+app.get("/patient/viewDoctorsWithPrices/:id", viewDoctorsWithPrices)
 
 //Appointment Endpoints
 app.post("/appointment/add", addApointment);
@@ -81,7 +81,7 @@ app.get("/appointment/filterAppointment",filterAppointment)
 app.post("/appointment/add", addApointment);
 
 //Subscription Endpoints
-app.post("/subscription/add/:patientId",addSubscription);
+app.post("/subscription/add/:id",addSubscription);
 
 //Prescription Endpoints
 app.post("/prescription/add",addPrescription);

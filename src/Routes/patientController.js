@@ -6,12 +6,6 @@ const prescriptionModel = require("../Models/Prescription");
 const subscriptionModel = require("../Models/Subscription");
 
 const addPatient = async (req, res) => {
-  // try {
-  //   const newPatient = await patientModel.create(req.body);
-  //   res.status(201).json(newPatient);
-  // } catch (error) {
-  //   res.status(500).json({ error: error.message });
-  // }
   try {
     const exists = await patientModel.findOne({"Username" : req.body.Username});
     const exists2 = await patientModel.findOne({"Email" : req.body.Email});
@@ -31,7 +25,7 @@ const addPatient = async (req, res) => {
 
 const addFamilyMembers = async (req, res) => {
   try {
-    const id = req.body.id;
+    const { id } = req.params;
     const newFamilyMembers = req.body.FamilyMembers;
     const patient = await patientModel.findById(id);
     if (!patient) {
@@ -41,7 +35,8 @@ const addFamilyMembers = async (req, res) => {
     const allFamilyMembers = familyMembers.concat(newFamilyMembers);
     const updatedPatient = await patientModel.findByIdAndUpdate(id, {
       FamilyMembers: allFamilyMembers,
-    });
+    }, {new: true}
+    );
     res.status(200).json(updatedPatient);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -49,9 +44,9 @@ const addFamilyMembers = async (req, res) => {
 };
 
 const selectDoctor = async (req, res) => {
-  const docID = req.body.id;
+  const { id } = req.params;
   try {
-    const doctor = await doctorModel.findById(docID);
+    const doctor = await doctorModel.findById(id);
     if (!doctor) {
       return res.status(404).json({ error: "Doctor Not Found" });
     }    
@@ -62,13 +57,13 @@ const selectDoctor = async (req, res) => {
 };
 
 const viewDoctorDetails = async (req, res) => {
-  const doctorID = req.body.id;
+  const { id } = req.params;
   try{
-    if(!doctorID){
+    if(!id){
       return res.status(404).json({ error: "You must select a doctor" });
     }
     else{
-      const doctor = await doctorModel.findById(doctorID);
+      const doctor = await doctorModel.findById(id);
       const doctorInfo = {
         Name: doctor.Name,
         Email: doctor.Email,
@@ -85,8 +80,8 @@ const viewDoctorDetails = async (req, res) => {
 
 const viewMyPrescriptions = async (req, res) => {
   try {
-    const patientId = req.params.patientId;
-    const prescriptions = await prescriptionModel.findById(patientId);
+    const { id } = req.params;
+    const prescriptions = await prescriptionModel.find({Patient: id});
     if(!prescriptions){
       return res.status(404).json({error: "You do not have any prescriptions yet"})
     }
@@ -100,36 +95,49 @@ const viewMyPrescriptions = async (req, res) => {
 }
 
 const filterPrescriptions = async (req, res) => {
-  try{
-    
-    const { date, doctor, filled} = req.query;
-    if(date && doctor && filled){
-    
-    const filter = {};
-    if (date) {
-      filter.date = { $gte: new Date(date) };
-    }
-    if (doctor) {
-      filter.doctor = doctor;
-    }
-    if (filled) {
-      filter.filled = filled;
-    }
+  try {
+    const { Date, Doctor, Filled } = req.body;
+    const { id } = req.params;
 
-    const prescriptions = await prescriptionModel.find(filter);
+    if (Date || Doctor || Filled) {
+      const filter = {};
+      if (Date) {
+        filter.Date = { $gte: new Date(Date) };
+      }
+      if (Doctor) {
+        filter.Doctor = Doctor;
+      }
+      if (Filled) {
+        filter.Filled = Filled;
+      }
 
-    return res.status(200).json(prescriptions);
-  }
-  else{
-    return res.status(404).json({error: "No prescription is found with this given details"})
-  }
+      const patient = await patientModel.findById(id);
 
-  } catch(error){
+      if(!patient){
+        return res.status(404).json({ error: "Patient Not Found!" });
+      }
+
+      filter.Patient = patient;   //only get prescriptions of patient not all
+
+      const prescriptions = await prescriptionModel.find(filter);
+
+      if(prescriptions.length == 0){
+        return res.status(404).json({ error: "No prescriptions found with the given details" });
+      }
+
+      return res.status(200).json(prescriptions);
+    } else {
+      return res
+        .status(404)
+        .json({ error: "Please Specify Filtering Criteria" });
+    }
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}
+};
+
 const selectPrescription = async (req, res) =>{
-  const prescID = req.body.prescID;
+    const prescID = req.params.id;
   try {
     const prescription = await prescriptionModel.findById(prescID);
     if (!prescription) {
@@ -143,11 +151,22 @@ const selectPrescription = async (req, res) =>{
     res.status(500).json({ error: error.message });
   }
 }
+
 const viewFamilyMembers = async (req, res) => {
+    const { id } = req.params
     try{
-        const {id} = req.params
         const patient = await patientModel.findById(id);
+
+        if(!patient){
+          return res.status(404).json({ error: "Patient Not Found!" });
+        }
+
         const familyMembers = patient.FamilyMembers;
+
+        if(familyMembers.length == 0){
+          return res.status(404).json({ error: "You have no registered family members" });
+        }
+
         res.status(200).json(familyMembers)
     }
     catch(error){
@@ -156,16 +175,20 @@ const viewFamilyMembers = async (req, res) => {
 };
 
 const filterDoctors = async (req, res) => {
-  const speciality = req.body.Speciality;
+  const specialty = req.body.Specialty;
   const dateTime = req.body.DateTime;
 
   try {
     var doctors;
 
-    if (speciality && dateTime) {           //filter on speciality AND availability
+    if(!specialty && !dateTime){
+      return res.status(404).json({ error: "Please Specify Filtering Criteria"});
+    }
+
+    else if (specialty && dateTime) {           //filter on specialty AND availability
       doctors = await doctorModel.aggregate([
         {
-          $match: { Speciality: speciality },   //filter doctors by speciality
+          $match: { Specialty: { $regex: specialty, $options: "i"} },   //filter doctors by specialty ($regex, $options: "i" --> case insensitive)
         },
         {
           $lookup: {                    //join with appointments --> adds "appointments" field to doctors (array of appointments)
@@ -183,7 +206,7 @@ const filterDoctors = async (req, res) => {
       ]);
     } 
 
-    else if (!speciality) {            //filter on availability ONLY
+    else if (dateTime) {            //filter on availability ONLY
       doctors = await doctorModel.aggregate([
         {
           $lookup: {
@@ -201,42 +224,57 @@ const filterDoctors = async (req, res) => {
       ]);
     } 
 
-    else if (!dateTime) {             //filter on Speciality ONLY
+    else if (specialty) {             //filter on Specialty ONLY
       doctors = await doctorModel.find({
-        Speciality: speciality,
+        Specialty: { $regex: specialty, $options: "i"},
       });
     }
+
+    if(doctors.length == 0){     
+      return res.status(404).json({ error: "No Doctors Found"});
+    }
+    
     res.status(200).json(doctors);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 const filterPatientAppointments = async(req,res) =>{
+  const { id } = req.params;
   const date = req.body.Date;
-  const status = req.body.Status
+  const status = req.body.Status;
+
+  if(!date && !status){
+    return res.status(400).json({ error: "Please Specify Filtering Criteria" });
+  }
+
   const query = {
-      $or: [
-        { AppointmentDate: { $gte: date } }, 
-        { Status: status }
-      ]
-    };
+    $and:[
+      {Patient: id},
+      { $or: [
+          { AppointmentDate: { $gte: date } }, 
+          { Status: status }
+       ]}
+    ]
+  };
   try{
-          const appointments = await appointmentModel.find(query).populate("Doctor").exec();
-          if(!appointments || appointments.length === 0){
-              res.status(404).json({error: "no appointments were found"});
-          }
-          else
-              res.status(200).json(appointments);
+      const appointments = await appointmentModel.find(query).populate("Doctor").exec();
+      if(!appointments || appointments.length === 0){
+          res.status(404).json({error: "No appointments were found"});
+      }
+      else
+          res.status(200).json(appointments);
       }catch(error){
       res.status(500).json({ error: error.message });
   }
 }
 
 const searchForDoctor = async (req, res) => {
-  const { Name, Speciality } = req.body;
+  const { Name, Specialty } = req.body;
 
-  if (!Name && !Speciality) {
-    return res.status(400).json({ error: 'Name or Speciality parameter is required' });
+  if (!Name && !Specialty) {
+    return res.status(400).json({ error: 'Name or Specialty parameter is required' });
   }
 
   try {
@@ -246,8 +284,8 @@ const searchForDoctor = async (req, res) => {
       query.Name = { $regex: Name, $options: 'i' };
     }
 
-    if (Speciality) {
-      query.Speciality = { $regex: Speciality, $options: 'i' };
+    if (Specialty) {
+      query.Specialty = { $regex: Specialty, $options: 'i' };
     }
 
     const doctors = await doctorModel.find(query);
@@ -261,15 +299,19 @@ const searchForDoctor = async (req, res) => {
     res.status(500).json({ error: 'An error occurred while searching for doctors' });
   }
 };
+
+
 const calculateDiscount = (doctor, healthPackage) => {
   if (!healthPackage) {
     return 0; 
   }
   const packageDiscount = healthPackage.DoctorDiscount;
-  return doctor.HourlyRate * (packageDiscount / 100);}
+  return (doctor.HourlyRate) * (packageDiscount / 100);     
+}
+
 
 const viewDoctorsWithPrices = async (req, res) => {
-  const patientId = req.params.patientId;
+  const patientId = req.params.id;
 
   try {
     const subscription = await subscriptionModel.findOne({ Patient: patientId }).populate('Package');
@@ -279,16 +321,16 @@ const viewDoctorsWithPrices = async (req, res) => {
     }
     const doctors = await doctorModel.find();
     const doctorsWithPrices = doctors.map(doctor => {
-      let sessionPrice = doctor.HourlyRate;
+      let sessionPrice = doctor.HourlyRate + (0.1 * doctor.HourlyRate);   //doctor rate + 10% clinic markup 
 
       if (healthPackage) {
-        sessionPrice = doctor.HourlyRate + (0.1 * doctor.HourlyRate) - calculateDiscount(doctor, healthPackage);
+        sessionPrice -= calculateDiscount(doctor, healthPackage);   //if package --> discount
         sessionPrice = sessionPrice > 0 ? sessionPrice : 0; 
       }
 
       return {
         doctorName: doctor.Name,
-        speciality: doctor.Speciality,
+        specialty: doctor.Specialty,
         sessionPrice
       };
     });
