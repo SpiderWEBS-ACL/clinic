@@ -127,115 +127,111 @@ const handleRedirection = (item: any) => {
   return (
     <div className={`cont ${isSignUp ? "s--signup" : ""}`}>
       <div className="form sign-in ">
-        <h2>Welcome Back</h2>
-        <label>
-            <span>Username</span>
-            <input 
+        <h2 className='h2'>Welcome Back</h2>
+        <label className='label'>
+            <span className='span'>Username</span>
+            <input className = "input"
             value = {Username}
             onChange={handleUsernameChange}
             type="text" />
           </label>
-          <label>
-            <span>Password</span>
-            <input 
+          <label className='label'>
+            <span className='span'>Password</span>
+            <input className = "input"
             value = {Password}
             onChange={handlePasswordChange}
             type="password" />
           </label>
         <p className="forgot-pass">Forgot password?</p>
-        <button onClick={handleSignIn} type="button" className="submit">
+        <button onClick={handleSignIn} type="button" className="submit button">
           Sign In
         </button>
       </div>
       <div className="sub-cont">
         <div className="img">
           <div className={`img__text m--up ${isSignUp ? "" : ""}`}>
-            <h2>New here?</h2>
+            <h2 className='h2'>New here?</h2>
             <p>Sign up and discover a great amount of new opportunities!</p>
           </div>
           <div className={`img__text m--in ${isSignUp ? "" : "m--up"}`}>
-            <h2>One of us?</h2>
-            <p>
+            <h2 className='h2'>One of us?</h2>
+            <p className='p'>
               If you already have an account, just sign in. We've missed you!
             </p>
           </div>
           <div className="img__btn" onClick={toggleSignUp}>
-            <span className={`m--up ${isSignUp ? "m--in" : ""}`}>Sign Up</span>
-            <span className={`m--in ${isSignUp ? "" : "m--up"}`}>Sign In</span>
+            <span className={`span m--up ${isSignUp ? "m--in" : ""}`}>Sign Up</span>
+            <span className={`span m--in ${isSignUp ? "" : "m--up"}`}>Sign In</span>
           </div>
         </div>
         <div className="form sign-up">
-          <h2>Time to feel like home</h2>
-          <h6>Your Details:</h6>
-          <label>
-            <span>Name</span>
-            <input  
+          <label className='label'>
+            <span className='span'>Name</span>
+            <input  className = "input"
                 value = {Name}
                 onChange={handleNameChange} 
                 type="text" />
           </label>
-          <label>
-            <span>Username</span>
-            <input 
+          <label className='label'>
+            <span className='span'>Username</span>
+            <input className = "input"
             value = {Username}
             onChange={handleUsernameChange}
             type="text" />
           </label>
-          <label>
-            <span>Password</span>
-            <input 
+          <label className='label'>
+            <span className='span'>Password</span>
+            <input className = "input"
             value = {Password}
             onChange={handlePasswordChange}
             type="password" />
           </label>
-          <label>
-            <span>Email</span>
-            <input 
+          <label className='label'>
+            <span className='span'>Email</span>
+            <input className = "input"
             value = {Email}
             onChange={handleEmailChange}
             type="Email" />
           </label>
-          <label>
-            <span>Date of Birth</span>
-            <input 
+          <label className='label'>
+            <span className='span'>Date of Birth</span>
+            <input className = "input"
             value = {Dob !== undefined ? Dob.toISOString().split('T')[0] : ''}
             onChange={handleDobChange}
             type="date" />
           </label>
-          <label>
-            <span>Gender</span>
-            <input 
+          <label className='label'>
+            <span className='span'>Gender</span>
+            <input className = "input"
             value = {Gender}
             onChange={handleGenderChange}
             type="text" />
           </label>
-          <label>
-            <span>Mobile Number</span>
-            <input 
+          <label className='label'>
+            <span className='span'>Mobile Number</span>
+            <input className = "input"
             value = {Mobile !== undefined ? Mobile.toString() : ''}
             onChange={handleMobileChange}
             type="tel" />
           </label>
-         <br></br>
-         <br></br>
-         <h6>Emergency Contact Details:</h6>
-          <label>
-            <span>Emergency Contant Name</span>
-            <input 
+        
+          <label className='label'>
+            <span className='span'>Emergency Contant Name</span>
+            <input className = "input"
             value = {EmergencyContactName}
             onChange={handleEmerNamechange}
             type="text" />
           </label>
-          <label>
-            <span>Emergency Contant Mobile </span>
-            <input 
+          <label className='label'>
+            <span className='span'>Emergency Contant Mobile </span>
+            <input className = "input"
             value = {EmergencyContactMobile !== undefined ? EmergencyContactMobile.toString() : ''}
           
             onChange={handleEmerMobileChange}
             type="tel" />
           </label>
           
-          <button onClick={handleSignUp} type="button" className="submit">
+          <button onClick={handleSignUp} type="button" className=" button submit">
             Sign Up
           </button>
           {alertVisible && (
