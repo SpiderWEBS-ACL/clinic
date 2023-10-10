@@ -165,6 +165,7 @@ const handleRedirection = (item: any) => {
           </div>
         </div>
         <div className="form sign-up">
+        <h2 className='h2'>Time to feel like home</h2>
           <label className='label'>
             <span className='span'>Name</span>
             <input  className = "input"
