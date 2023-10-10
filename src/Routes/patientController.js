@@ -22,6 +22,23 @@ const addPatient = async (req, res) => {
     res.status(400).json({ error: error.message });
 }
 };
+const login = async(req, res) => {
+  try{
+    const usernameDoc = await patientModel.findOne({ "Username": req.body.Username });
+    
+    if (!usernameDoc) {
+      return res.status(400).json({ error: "Username not found!" });
+    }
+
+    if (usernameDoc.Password === req.body.Password) {
+      res.json({ id: usernameDoc._id });
+    } else {
+      res.status(400).json({ error: "Password doesn't match!" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 
 const addFamilyMembers = async (req, res) => {
   try {
@@ -345,5 +362,5 @@ const viewDoctorsWithPrices = async (req, res) => {
 
 module.exports = { addPatient, addFamilyMembers, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
    filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices};
+  viewDoctorsWithPrices,login};
 

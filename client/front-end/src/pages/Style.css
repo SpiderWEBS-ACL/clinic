@@ -9,6 +9,10 @@
     background: #f1ebde;
   }
   
+  .body12 {
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+    background: #f1ebde;
+  }
   .input, .button {
     border: none;
     outline: none;
