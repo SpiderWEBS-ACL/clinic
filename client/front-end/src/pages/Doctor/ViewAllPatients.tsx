@@ -22,17 +22,19 @@ const ViewAllPatients = () => {
       .get(`/doctor/viewPatients/${id}`)
       .then((response) => {
         setPatients(response.data);
+        setLoading(false);
         console.log(response.data);
       })
       .catch((error) => {
         console.error("Error:", error);
+        setLoading(false);
       });
-    setLoading(false);
   }, [id]);
+
   const navigate = useNavigate();
 
   const handleRedirection = (item: any) => {
-    navigate("/doctor/  viewPatientInfo/" + item);
+    navigate(`/doctor/viewPatientInfo/${item}`);
   };
 
   const Loading = () => {
@@ -50,25 +52,12 @@ const ViewAllPatients = () => {
         </div>
       );
     }
+    return null;
   };
-  if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
 
   const handleChange = (value: string) => {
+    setLoading(true);
     if (value === "Upcoming Appointments") {
-      setLoading(true);
       api
         .get(`/doctor/upcomingAppointments/${id}`)
         .then((response) => {
@@ -79,22 +68,24 @@ const ViewAllPatients = () => {
           }
           setPatients(myArray);
           console.log(response.data);
+          setLoading(false);
         })
         .catch((error) => {
           console.error("Error:", error);
+          setLoading(false);
         });
-      setLoading(false);
     } else {
       api
         .get(`/doctor/viewPatients/${id}`)
         .then((response) => {
           setPatients(response.data);
           console.log(response.data);
+          setLoading(false);
         })
         .catch((error) => {
           console.error("Error:", error);
+          setLoading(false);
         });
-      setLoading(false);
     }
   };
 
@@ -127,15 +118,18 @@ const ViewAllPatients = () => {
       .then((response) => {
         setPatients(response.data);
         console.log(response.data);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error:", error);
+        setLoading(false);
       });
-    setLoading(false);
   };
 
   return (
     <div className="container">
+      <Loading />
+
       <h2 className="text-center mt-4 mb-4">Patients</h2>
       <div style={rowStyle}>
         <Select
