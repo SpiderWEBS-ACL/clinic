@@ -43,7 +43,7 @@ const patientSchema = new Schema({
         type: String,
         required: true,
       },
-      relationToPatient: {
+      RelationToPatient: {
         type: String,
         enum: ["Wife", "Husband", "Son", "Daughter"],
         required: true,

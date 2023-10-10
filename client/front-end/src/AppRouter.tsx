@@ -17,11 +17,13 @@ import AllPackages from "./pages/Admin/Packages";
 import EditDoctor from "./pages/Doctor/Edit";
 import RegLog from "./pages/RegLog";
 import PatientHome from "./pages/Patient/PatientHome";
-import Register from "./pages/Doctor/Register"; 
+import Register from "./pages/Doctor/Register";
+import AddFamilyMember from "./pages/Patient/AddFamilyMember";
 
 const AppRouter: React.FC = () => {
   return (
     <Routes>
+      <Route path="/" element={<RegLog />} />
       <Route path="/admin/add" element={<AddAdminForm />} />
       <Route path="admin/" element={<Home />} />
       <Route path="/admin/registrationRequests" element={<ViewAllRegReqs />} />
@@ -41,10 +43,14 @@ const AppRouter: React.FC = () => {
       />
       <Route path="/doctor/viewPatients/:id" element={<ViewAllPatients />} />
       <Route path="/doctor/viewPatientInfo/:id" element={<ViewPatientInfo />} />
-      <Route path="/doctor/edit/:id" element={< EditDoctor/>} />
-      <Route path="/" element = {<RegLog/>}/>
-      <Route path="/patient/patientHome/:id" element= {<PatientHome/>}/>
-      <Route path='/Doctor/register'element={<Register/>}/>
+      <Route path="/doctor/edit/:id" element={<EditDoctor />} />
+      <Route path="/Doctor/register" element={<Register />} />
+
+      <Route path="/patient/patientHome/:id" element={<PatientHome />} />
+      <Route
+        path="/patient/addFamilyMember/:id"
+        element={<AddFamilyMember />}
+      />
     </Routes>
   );
 };

@@ -40,16 +40,17 @@ const login = async(req, res) => {
   }
 }
 
-const addFamilyMembers = async (req, res) => {
+const addFamilyMember = async (req, res) => {
   try {
     const { id } = req.params;
-    const newFamilyMembers = req.body.FamilyMembers;
+    const newFamilyMember = req.body;
     const patient = await patientModel.findById(id);
     if (!patient) {
       return res.status(404).json({ error: "Patient not found" });
     }
     const familyMembers = patient.FamilyMembers;
-    const allFamilyMembers = familyMembers.concat(newFamilyMembers);
+    const allFamilyMembers = familyMembers.concat([newFamilyMember]);
+    res.json(allFamilyMembers);
     const updatedPatient = await patientModel.findByIdAndUpdate(id, {
       FamilyMembers: allFamilyMembers,
     }, {new: true}
@@ -360,7 +361,7 @@ const viewDoctorsWithPrices = async (req, res) => {
 
 
 
-module.exports = { addPatient, addFamilyMembers, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
+module.exports = { addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
    filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
   viewDoctorsWithPrices,login};
 

@@ -4,11 +4,17 @@ import App from "./App";
 import "../node_modules/bootstrap/dist/css/bootstrap.css";
 import "./App.css";
 import { BrowserRouter, BrowserRouter as Router } from "react-router-dom";
+import AddAdminForm from "./pages/Admin/AddAdminForm";
+import Registered from "./pages/Patient/Global";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    {Registered ? (
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    ) : (
+      <AddAdminForm />
+    )}
   </React.StrictMode>
 );
