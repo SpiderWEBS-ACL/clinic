@@ -297,12 +297,12 @@ max-width: 100%;
 border-radius: 10px;
 border: #052c65;
 background: var(--white);
-margin: 50px auto 0;
-padding: 50px;
+margin: 10px auto 0;
+padding: 30px;
 }
 
 .wrapper .header{
-margin-bottom: 35px;
+margin-bottom: 15px;
 display: flex;
 border-radius: 10px;
 border: #052c65;
@@ -361,7 +361,7 @@ background: var(--primary);
 }
 
 .wrapper .form_wrap{
-margin-bottom: 35px;
+margin-bottom: 15px;
 }
 
 .wrapper .form_wrap h2{
