@@ -35,7 +35,7 @@ const registerDoctor = async (req,res) => {
 }
 
 const searchPatientByName = async (req,res) => {
-    const Name = req.query.Name;
+    const { Name }= req.params;
     if (!Name) {
         return res.status(400).json({ error: 'Name parameter is required' });
       }
@@ -73,6 +73,20 @@ const searchPatientByName = async (req,res) => {
         res.status(500).json({error: error.message});
     }
  }
+ const getDoctor = async (req,res) => {
+    try {
+      const {id} = req.params;
+      const Doctor = await doctorModel.findById(id);
+      if (!Doctor) {
+          return res.status(404).json({ error: 'Doctor not found' });
+     }
+     console.log(Doctor);
+     res.status(200).json(Doctor);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  
+  }
 
  const upcomingAppointments = async (req, res) => {
     const doctorId = req.params.id;
@@ -160,4 +174,4 @@ const searchPatientByName = async (req,res) => {
 
 
 module.exports = { registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments,
-    addDoctor, viewPatients,viewPatientInfo, filterDoctorAppointments};
+    addDoctor, viewPatients,viewPatientInfo, filterDoctorAppointments, getDoctor};

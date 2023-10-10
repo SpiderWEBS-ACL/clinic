@@ -14,6 +14,7 @@ import ViewFamilyMembers from "./pages/Patient/ViewFamilyMembers";
 import ViewAllPatients from "./pages/Doctor/ViewAllPatients";
 import ViewPatientInfo from "./pages/Doctor/viewPatientInfo";
 import AllPackages from "./pages/Admin/Packages";
+import EditDoctor from "./pages/Doctor/Edit";
 import RegLog from "./pages/RegLog";
 import PatientHome from "./pages/Patient/PatientHome";
 import Register from "./pages/Doctor/Register"; 
@@ -23,7 +24,7 @@ const AppRouter: React.FC = () => {
     <Routes>
       <Route path="/admin/add" element={<AddAdminForm />} />
       <Route path="admin/" element={<Home />} />
-      <Route path="/admin/registrationRequests" element={< ViewAllRegReqs/>} />
+      <Route path="/admin/registrationRequests" element={<ViewAllRegReqs />} />
       <Route
         path="/admin/registrationRequests/:id"
         element={<RegistrationRequestDetails />}
@@ -40,6 +41,7 @@ const AppRouter: React.FC = () => {
       />
       <Route path="/doctor/viewPatients/:id" element={<ViewAllPatients />} />
       <Route path="/doctor/viewPatientInfo/:id" element={<ViewPatientInfo />} />
+      <Route path="/doctor/edit/:id" element={< EditDoctor/>} />
       <Route path="/" element = {<RegLog/>}/>
       <Route path="/patient/patientHome/:id" element= {<PatientHome/>}/>
       <Route path='/Doctor/register'element={<Register/>}/>

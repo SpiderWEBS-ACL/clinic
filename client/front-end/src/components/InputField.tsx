@@ -2,7 +2,7 @@ import React from "react";
 
 interface InputFieldProps {
   id: string;
-  label: string;
+  label?: string;
   type: string;
   value: any;
   onChange: (value: any) => void;
@@ -10,6 +10,7 @@ interface InputFieldProps {
   isValid?: boolean;
   errorMessage?: string;
   touched?: boolean;
+  disabled?: boolean;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -22,6 +23,7 @@ const InputField: React.FC<InputFieldProps> = ({
   isValid,
   errorMessage,
   touched,
+  disabled,
 }) => {
   return (
     <div className="form-group">
@@ -36,6 +38,7 @@ const InputField: React.FC<InputFieldProps> = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
+          disabled={disabled}
           required
         />
         {touched && !isValid && (

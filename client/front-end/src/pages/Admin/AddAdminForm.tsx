@@ -93,7 +93,7 @@ const AddAdminForm: React.FC = () => {
             onChange={setPassword}
             onBlur={() => handleBlur("password")}
             isValid={validatePassword(Password)}
-            errorMessage="Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, and one digit."
+            errorMessage="Password must be at least 6 characters long."
             touched={touchedFields.password}
           />
           <div
