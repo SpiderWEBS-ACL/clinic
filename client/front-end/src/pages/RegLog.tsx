@@ -1,24 +1,27 @@
 import React, { useState, ChangeEvent } from 'react';import axios from "axios";
-import "./style.css"; // Import your CSS file
+import "./style.css";
 import { Int32 } from "mongodb";
+import Alert from "../components/Alert";
+import { useParams,useNavigate } from "react-router-dom";
+
 
 const RegLog: React.FC = () => {
-  const [isSignUp, setIsSignUp] = useState<boolean>(false);
-  const [Name, setName] = useState<string>("");
-  const [Email, setEmail] = useState<string>("");
-  const [Password, sePassword] = useState<string>("");
-  const [Username, setUsername] = useState<string>("");
-  const [Gender, setGender] = useState<string>();
-  const [Dob, setDob] = useState<Date>();
-  const [Mobile, setMobile] = useState<Number>();
-  const [EmergencyContactName, setEmergencyContactName] = useState<string>();
-  const [EmergencyContactMobile, setEmergencyContactMobile] = useState<Number>();
+const [alertVisible, setAlertVisibility] = useState(false);
+const [isSignUp, setIsSignUp] = useState<boolean>(false);
+const [Name, setName] = useState<string>("");
+const [Email, setEmail] = useState<string>("");
+const [Password, sePassword] = useState<string>("");
+const [Username, setUsername] = useState<string>("");
+const [Gender, setGender] = useState<string>();
+const [Dob, setDob] = useState<Date>();
+const [Mobile, setMobile] = useState<Number>();
+const [EmergencyContactName, setEmergencyContactName] = useState<string>();
+const [EmergencyContactMobile, setEmergencyContactMobile] = useState<Number>();
 
-  const api = axios.create({
+const api = axios.create({
     baseURL: "http://localhost:8000/",
-  });
-
-  const handleSignUp = async () => {
+});
+const handleSignUp = async () => {
     try {
       const data = {
         Name,
@@ -32,12 +35,37 @@ const RegLog: React.FC = () => {
         EmergencyContactMobile
 
       };
+      
+     
       const response = await api.post(`/patient/register`, data);
       console.log("Response:", response.data);
+      setAlertVisibility(true)
+      setTimeout(toggleSignUp,1500)
+     
     } catch (error) {
       console.error("Error:", error);
     }
   };
+  const handleSignIn = async () => {
+    try {
+      const data = {
+        Password,
+        Username
+      };
+   const response =await api.post(`/patient/login`,data)
+        console.log(response.data)
+        handleRedirection(response.data.id);
+     
+      ;
+}
+   catch (error) {
+    console.error("Error:", error);
+  }
+}
+const navigate = useNavigate();
+const handleRedirection = (item: any) => {
+  navigate(`/patient/PatientHome/${item}`);
+};
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
   };
@@ -50,9 +78,6 @@ const RegLog: React.FC = () => {
   };
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
-  };
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
   };
   const handleMobileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
@@ -95,6 +120,7 @@ const RegLog: React.FC = () => {
 
 
   const toggleSignUp = () => {
+    setAlertVisibility(false)
     setIsSignUp(!isSignUp);
   };
 
@@ -103,15 +129,21 @@ const RegLog: React.FC = () => {
       <div className="form sign-in ">
         <h2>Welcome Back</h2>
         <label>
-          <span>Email</span>
-          <input type="email" />
-        </label>
-        <label>
-          <span>Password</span>
-          <input type="password" />
-        </label>
+            <span>Username</span>
+            <input 
+            value = {Username}
+            onChange={handleUsernameChange}
+            type="text" />
+          </label>
+          <label>
+            <span>Password</span>
+            <input 
+            value = {Password}
+            onChange={handlePasswordChange}
+            type="password" />
+          </label>
         <p className="forgot-pass">Forgot password?</p>
-        <button type="button" className="submit">
+        <button onClick={handleSignIn} type="button" className="submit">
           Sign In
         </button>
       </div>
@@ -206,6 +238,14 @@ const RegLog: React.FC = () => {
           <button onClick={handleSignUp} type="button" className="submit">
             Sign Up
           </button>
+          {alertVisible && (
+            <Alert
+              type={ "success"}
+              onClose={() => setAlertVisibility(false)}
+            >
+            {"Admin added Successfully"}
+            </Alert>
+          )}
         </div>
       </div>
     </div>

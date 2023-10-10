@@ -16,6 +16,8 @@ import ViewPatientInfo from "./pages/Doctor/viewPatientInfo";
 import AllPackages from "./pages/Admin/Packages";
 import EditDoctor from "./pages/Doctor/Edit";
 import RegLog from "./pages/RegLog";
+import PatientHome from "./pages/Patient/PatientHome";
+import Register from "./pages/Doctor/Register"; 
 
 const AppRouter: React.FC = () => {
   return (
@@ -41,6 +43,8 @@ const AppRouter: React.FC = () => {
       <Route path="/doctor/viewPatientInfo/:id" element={<ViewPatientInfo />} />
       <Route path="/doctor/edit/:id" element={< EditDoctor/>} />
       <Route path="/" element = {<RegLog/>}/>
+      <Route path="/patient/patientHome/:id" element= {<PatientHome/>}/>
+      <Route path='/Doctor/register'element={<Register/>}/>
     </Routes>
   );
 };
