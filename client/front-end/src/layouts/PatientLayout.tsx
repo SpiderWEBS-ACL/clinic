@@ -16,23 +16,26 @@ import {
 import AppRouter from "../AppRouter";
 
 const { Header, Content, Footer, Sider } = Layout;
-
-const AdminLayout: React.FC = () => {
+const id = "652590b962e3b13a6c7834bf";
+const PatientLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const items = [
     {
       label: "Home",
-      key: "/admin/",
+      key: "/patient/patientHome/" + id,
       icon: <HomeOutlined />,
     },
     {
-      label: "Admin",
+      label: "Family",
       icon: <UserOutlined />,
       key: "parent1",
       children: [
-        { label: "Admins", key: "/admin/Admins" },
-        { label: "Add Admin", key: "/admin/add" },
+        {
+          label: "Family Members",
+          key: "/patient/viewfamilyMembers/" + id,
+        },
+        { label: "Add Family Member", key: "/patient/addFamilyMember/" + id },
       ],
     },
     {
@@ -41,23 +44,13 @@ const AdminLayout: React.FC = () => {
       icon: <UserOutlined />,
     },
     {
-      label: "Doctor",
+      label: "Doctors",
       icon: <UserOutlined />,
-      key: "parent",
-      children: [
-        {
-          label: "Doctors",
-          key: "/admin/Doctors",
-        },
-        {
-          label: "Registration Reqs",
-          key: "/admin/registrationRequests",
-        },
-      ],
+      key: "/patient/viewalldoctors",
     },
     {
-      label: "Health Packages",
-      key: "/admin/Packages",
+      label: "Prescriptions",
+      key: "/admin/Packages", //TODO: add prescriptions route
       icon: <FileOutlined />,
     },
     {
@@ -94,9 +87,9 @@ const AdminLayout: React.FC = () => {
         <Content style={{ margin: "0 16px" }}>
           <AppRouter />
         </Content>
-      </Layout> 
+      </Layout>
     </Layout>
   );
 };
 
-export default AdminLayout;
+export default PatientLayout;

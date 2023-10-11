@@ -19,6 +19,8 @@ import RegLog from "./pages/RegLog";
 import PatientHome from "./pages/Patient/PatientHome";
 import Register from "./pages/Doctor/Register";
 import AddFamilyMember from "./pages/Patient/AddFamilyMember";
+import ViewAllDoctors from "./pages/Patient/ViewAllDoctors";
+import searchForm from "./components/Antd search form";
 
 const AppRouter: React.FC = () => {
   return (
@@ -37,10 +39,6 @@ const AppRouter: React.FC = () => {
       <Route path="/admin/Patients" element={<Patients />} />
       <Route path="/admin/Admins" element={<AllAdmins />} />
       <Route path="/admin/Packages" element={<AllPackages />} />
-      <Route
-        path="/patient/viewfamilyMembers/:id"
-        element={<ViewFamilyMembers />}
-      />
       <Route path="/doctor/viewPatients/:id" element={<ViewAllPatients />} />
       <Route path="/doctor/viewPatientInfo/:id" element={<ViewPatientInfo />} />
       <Route path="/doctor/edit/:id" element={<EditDoctor />} />
@@ -51,7 +49,13 @@ const AppRouter: React.FC = () => {
         path="/patient/addFamilyMember/:id"
         element={<AddFamilyMember />}
       />
+      <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
+      <Route
+        path="/patient/viewfamilyMembers/:id"
+        element={<ViewFamilyMembers />}
+      />
     </Routes>
+
   );
 };
 

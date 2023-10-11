@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require('mongoose');
 
 
-const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login} = require("./Routes/patientController");
+const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability} = require("./Routes/patientController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor } = require("./Routes/doctorController");
 const { addApointment, filterAppointment } = require("./Routes/appointmentController")
 const {addSubscription} = require("./Routes/SubscriptionController")
@@ -69,6 +69,7 @@ app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMember/:id",addFamilyMember);
 app.get("/patient/selectDoctor/:id", selectDoctor);
 app.get("/patient/searchForDoctor",searchForDoctor);
+app.get("/patient/filterDoctorsCriteria",filterDoctorsByNameSpecialtyAvailability);
 app.get("/patient/viewFamilyMembers/:id",viewFamilyMembers)
 app.get("/patient/filterDoctors", filterDoctors);
 app.get("/patient/filterAppointments/:id",filterPatientAppointments)

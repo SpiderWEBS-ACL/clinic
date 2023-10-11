@@ -1,5 +1,6 @@
 const patientModel = require("../Models/Patient");
 const { default: mongoose } = require("mongoose");
+const express = require("express");
 const doctorModel = require("../Models/Doctor");
 const appointmentModel = require("../Models/Appointment");
 const prescriptionModel = require("../Models/Prescription");
@@ -289,7 +290,7 @@ const filterPatientAppointments = async(req,res) =>{
 }
 
 const searchForDoctor = async (req, res) => {
-  const { Name, Specialty } = req.body;
+  const { Name, Specialty } = req.query;
 
   if (!Name && !Specialty) {
     return res.status(400).json({ error: 'Name or Specialty parameter is required' });
@@ -311,6 +312,48 @@ const searchForDoctor = async (req, res) => {
     if (doctors.length === 0) {
       return res.status(404).json({ error: 'No doctors found matching the criteria' });
     }
+
+    res.status(200).json(doctors);
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while searching for doctors' });
+  }
+};
+
+const filterDoctorsByNameSpecialtyAvailability = async (req, res) => {
+
+  const  Name = req.query.Name || "";
+  const Specialty = req.query.Specialty || "";
+  const date  = req.query.date || "0001-01-01";
+  const Time = req.query.Time || "00:00:00";
+  let datee =  date+"T"+Time+".000";
+  try {
+    var query = {
+         $or: [
+            { Name: Name }, 
+            { Specialty: Specialty }
+         ]}
+      if(Name == "" && Specialty == ""){
+       query = {};
+    }
+    var doctors = await doctorModel.find(query);
+    
+    if (doctors.length === 0) {
+      return res.status(404).json({ error: 'No doctors found matching the criteria' });
+    }
+
+    const availableDoctors = await Promise.all(
+      doctors.map(async (doctor) => {
+        const appointment = await appointmentModel.findOne({
+          Doctor: doctor._id,
+          AppointmentDate: datee,
+          Status: 'Upcoming',
+        });
+        if (!appointment) {
+          return doctor;
+        }
+        return null;
+      })
+    ); 
 
     res.status(200).json(doctors);
   } catch (error) {
@@ -363,5 +406,5 @@ const viewDoctorsWithPrices = async (req, res) => {
 
 module.exports = { addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
    filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices,login};
+  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability};
 
