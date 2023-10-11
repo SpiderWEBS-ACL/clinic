@@ -114,46 +114,43 @@ const viewMyPrescriptions = async (req, res) => {
 }
 
 const filterPrescriptions = async (req, res) => {
+    
+  const  Doctor = req.query.Doctor;
+  const  Filled = req.query.Filled;
+  const  Date = req.query.Date;
+
+  const datee = Date + "T00:00:00.000Z";
+
   try {
-    const { Date, Doctor, Filled } = req.body;
-    const { id } = req.params;
+    const query = {
+         $or: [ 
+          { DoctorName: Doctor }, 
+          { Filled: Filled },
+          {Date: datee}
 
-    if (Date || Doctor || Filled) {
-      const filter = {};
-      if (Date) {
-        filter.Date = { $gte: new Date(Date) };
-      }
-      if (Doctor) {
-        filter.Doctor = Doctor;
-      }
-      if (Filled) {
-        filter.Filled = Filled;
-      }
-
-      const patient = await patientModel.findById(id);
-
-      if(!patient){
-        return res.status(404).json({ error: "Patient Not Found!" });
-      }
-
-      filter.Patient = patient;   //only get prescriptions of patient not all
-
-      const prescriptions = await prescriptionModel.find(filter);
-
-      if(prescriptions.length == 0){
-        return res.status(404).json({ error: "No prescriptions found with the given details" });
-      }
-
-      return res.status(200).json(prescriptions);
-    } else {
-      return res
-        .status(404)
-        .json({ error: "Please Specify Filtering Criteria" });
+         
+         ]}
+        
+    const presc = await prescriptionModel.find(query);
+    if (presc.length === 0) {
+      return res.status(404).json({ error: 'No doctors found matching the criteria' });
+    }
+    else{
+    res.status(200).json(presc);
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    res.status(500).json({ error: 'An error occurred while searching for this prescription'});
+  }
+
 };
+const addPrescription = async (req,res) => {
+  try {
+      const newPrescription = await prescriptionModel.create(req.body);
+      res.status(201).json(newPrescription);
+  }catch(error){
+      res.status(400).json({ error: error.message });
+  }
+}
 
 const selectPrescription = async (req, res) =>{
     const prescID = req.params.id;
@@ -406,5 +403,5 @@ const viewDoctorsWithPrices = async (req, res) => {
 
 module.exports = { addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
    filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability};
+  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription};
 

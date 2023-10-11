@@ -13,27 +13,31 @@ const prescriptionSchema = new Schema(
       ref: "Patient",
       required: true,
     },
+    DoctorName: {
+      type: String,
+      ref: "Doctor",
+      required: true
+    },
     Medication: {
-      //type: Schema.Types.ObjectId,   
-      type: String,     //until we integrate with pharmacy
-      required: true,
+        type: String,
+        required: true,
     },
     Dosage: {
-      type: String,
-      required: true,
-    },
+        type: Number,
+        required: true,
+      },
     Instructions: {
-      type: String,
-      required: true,
-    },
-    Date: {
-      type: Date,
-      default: Date.now,
-    },
-    Filled: {
-      type: String,
-      enum: ["Filled","Unfilled"],
-    },
+        type: String,
+        required: true,
+      },
+      Date: {
+        type: Date,
+        default: Date.now,
+      },
+      Filled: {
+        type: String,
+        //enum: ["Filled,Unfilled"]
+      }
   },
   { timestamps: true }
 );

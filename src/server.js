@@ -2,17 +2,16 @@ const express = require("express");
 const mongoose = require('mongoose');
 
 
-const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability} = require("./Routes/patientController");
+const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability, addPrescription} = require("./Routes/patientController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor } = require("./Routes/doctorController");
 const { addAppointment, filterAppointment,viewAllAppointments } = require("./Routes/appointmentController")
 const {addSubscription} = require("./Routes/SubscriptionController")
-const {addPrescription} = require("./Routes/prescriptionController")
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages } = require("./Routes/adminController");
 const cors = require('cors');
 
 mongoose.set('strictQuery', false);
 require('dotenv').config();
-const MongoURI = process.env.ATLAS_MONGO_URI;
+const MongoURI = "mongodb+srv://Hassan:Nn8uwR33Nl84QCiE@test.p55nhok.mongodb.net/?retryWrites=true&w=majority";
 
 const app = express();
 app.use(cors());
@@ -67,6 +66,7 @@ app.get("/doctor/filterAppointments/:id",filterDoctorAppointments)
 app.post("/patient/login",login)
 app.post("/patient/register",addPatient);
 app.post("/patient/addFamilyMember/:id",addFamilyMember);
+app.post("/patient/addPrescription",addPrescription);
 app.get("/patient/selectDoctor/:id", selectDoctor);
 app.get("/patient/searchForDoctor",searchForDoctor);
 app.get("/patient/filterDoctorsCriteria",filterDoctorsByNameSpecialtyAvailability);
@@ -75,7 +75,7 @@ app.get("/patient/filterDoctors", filterDoctors);
 app.get("/patient/filterAppointments/:id",filterPatientAppointments)
 app.get("/patient/viewSelectedDoctor/:id",viewDoctorDetails)
 app.get("/patient/viewMyPrescriptions/:id",viewMyPrescriptions)
-app.get("/patient/filterPrescriptions/:id",filterPrescriptions)
+app.get("/patient/filterPrescriptions",filterPrescriptions)
 app.get("/patient/selectPrescription/:id",selectPrescription)
 app.get("/patient/viewDoctorsWithPrices/:id", viewDoctorsWithPrices)
 
