@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login} = require("./Routes/patientController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor } = require("./Routes/doctorController");
-const { addApointment, filterAppointment } = require("./Routes/appointmentController")
+const { addAppointment, filterAppointment,viewAllAppointments } = require("./Routes/appointmentController")
 const {addSubscription} = require("./Routes/SubscriptionController")
 const {addPrescription} = require("./Routes/prescriptionController")
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages } = require("./Routes/adminController");
@@ -79,9 +79,9 @@ app.get("/patient/selectPrescription/:id",selectPrescription)
 app.get("/patient/viewDoctorsWithPrices/:id", viewDoctorsWithPrices)
 
 //Appointment Endpoints
-app.post("/appointment/add", addApointment);
+app.post("/appointment/add", addAppointment);
 app.get("/appointment/filterAppointment",filterAppointment)
-app.post("/appointment/add", addApointment);
+app.get("/appointment/view/:id", viewAllAppointments);
 
 //Subscription Endpoints
 app.post("/subscription/add/:id",addSubscription);

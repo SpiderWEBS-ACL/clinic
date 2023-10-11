@@ -19,6 +19,7 @@ import RegLog from "./pages/RegLog";
 import PatientHome from "./pages/Patient/PatientHome";
 import Register from "./pages/Doctor/Register";
 import AddFamilyMember from "./pages/Patient/AddFamilyMember";
+import ViewAppointments from "./pages/Appointments";
 
 const AppRouter: React.FC = () => {
   return (
@@ -51,6 +52,7 @@ const AppRouter: React.FC = () => {
         path="/patient/addFamilyMember/:id"
         element={<AddFamilyMember />}
       />
+      <Route path="/appointment/view/:id" element={<ViewAppointments />} />
     </Routes>
   );
 };
