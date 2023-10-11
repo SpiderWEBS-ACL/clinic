@@ -55,7 +55,7 @@ const PatientLayout: React.FC = () => {
     },
     {
       label: "Logout",
-      key: "/admin/logout",
+      key: "/",
       icon: <PoweroffOutlined />,
       danger: true,
     },
