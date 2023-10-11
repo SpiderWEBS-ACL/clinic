@@ -20,7 +20,7 @@ import PatientHome from "./pages/Patient/PatientHome";
 import Register from "./pages/Doctor/Register";
 import AddFamilyMember from "./pages/Patient/AddFamilyMember";
 import ViewAllDoctors from "./pages/Patient/ViewAllDoctors";
-import searchForm from "./components/Antd search form";
+import ViewAppointments from "./pages/Appointments";
 
 const AppRouter: React.FC = () => {
   return (
@@ -54,6 +54,7 @@ const AppRouter: React.FC = () => {
         path="/patient/viewfamilyMembers/:id"
         element={<ViewFamilyMembers />}
       />
+      <Route path="/appointment/view/:id" element={<ViewAppointments />} />
     </Routes>
 
   );

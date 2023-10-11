@@ -3,7 +3,7 @@ const doctorModel = require('../Models/Doctor');
 const patientModel = require('../Models/Patient');
 const { default: mongoose } = require('mongoose');
 
-const addApointment = async (req, res) => {
+const addAppointment = async (req, res) => {
     try{
         const appointment = await appointmentModel.create(req.body);
         res.status(201).json(appointment);
@@ -13,12 +13,15 @@ const addApointment = async (req, res) => {
  }
 
  const filterAppointment = async(req,res) =>{
-    const date = req.body.Date;
-    const status = req.body.Status
+    const {AppointmentDate} = req.params;
+    const {Status} = req.params; 
+    console.log(AppointmentDate);
+    console.log(Status);
+
     const query = {
         $or: [
-          { AppointmentDate: { $gte: date } }, 
-          { Status: status }
+          { AppointmentDate: { $gte: AppointmentDate } }, 
+          { Status: Status }
         ]
       };
     try{
@@ -32,4 +35,31 @@ const addApointment = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
  }
- module.exports = {addApointment,filterAppointment};
+ const viewAllAppointments = async(req,res) => {
+    const {id} = req.params;
+    const doctor = await doctorModel.findById(id);
+    const patient = await patientModel.findById(id);
+ 
+    try{
+        if(doctor){
+        const appointments = await appointmentModel.find({"Doctor": doctor}).populate("Doctor").populate("Patient").exec();
+            if(!appointments || appointments.length === 0){
+                res.status(404).json({error: "no appointments were found"});
+            }
+            else
+
+                res.status(200).json(appointments);
+            }
+            else if(patient){
+                const appointments = await appointmentModel.find({"Patient": patient}).populate("Doctor").populate("Patient").exec();
+                    if(!appointments || appointments.length === 0){
+                        res.status(404).json({error: "no appointments were found"});
+                    }
+                    else
+                        res.status(200).json(appointments);
+                    }
+        }catch(error){
+        res.status(500).json({ error: error.message });
+    }
+ }
+ module.exports = {addAppointment,filterAppointment,viewAllAppointments};
