@@ -171,7 +171,6 @@ const ViewAllDoctors = () => {
               <td>{request.Name}</td>
               <td>{request.Specialty}</td>
               <td>{request.HourlyRate}</td>
-
               <td className="text-end">
                 <button
                   className="btn btn-sm btn-primary"
