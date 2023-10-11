@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Spin } from "antd";
 
 const Patients = () => {
-  const [Patients, setPatients] = useState([]);
+  const [patients, setPatients] = useState([]);
   const [deleted, setDeleted] = useState(false);
+  const [loading, setLoading] = useState(true);
   const api = axios.create({
     baseURL: "http://localhost:8000/admin",
   });
@@ -13,6 +15,7 @@ const Patients = () => {
       .get("/allPatients")
       .then((response) => {
         setPatients(response.data);
+        setLoading(false);
         console.log(response.data);
       })
       .catch((error) => {
@@ -22,13 +25,30 @@ const Patients = () => {
 
   const handleDelete = async (id: string) => {
     try {
+      setLoading(true);
       const response = await api.delete(`/removePatient/${id}`);
       setDeleted(!deleted);
       console.log("Response:", response.data);
     } catch (error) {
       console.error("Error:", error);
-    }
+    } 
+    setLoading(false);
   };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="container">
@@ -51,7 +71,7 @@ const Patients = () => {
         </thead>
 
         <tbody>
-          {Patients.map((request: any, index) => (
+          {patients.map((request: any, index) => (
             <tr key={request._id}>
               <td>{request.Username}</td>
               <td>{request.Name}</td>

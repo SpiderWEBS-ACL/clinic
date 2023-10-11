@@ -21,16 +21,18 @@ const getAllAdmins = async (req,res) =>{
 
 const addAdmin = async (req,res) => {
     try {
+
+      if(!req.body.Username || !req.body.Password){
+        return res.status(400).json({ error: "Missing Parameters" });
+      }
+
         const exists = await adminModel.findOne({"Username" : req.body.Username});
-        const exists2 = await adminModel.findOne({"Email" : req.body.Email});
-        if(!exists && !exists2){
+        if(!exists){
             var newAdmin = await adminModel.create(req.body);
             res.status(201).json(newAdmin);
         }
-        else if(exists){
+        else {
             res.status(400).json({error:  "Username already taken!" });
-        }else{
-          res.status(400).json({error:  "Email already registered!" });
         }
     }catch(error){
         res.status(400).json({ error: error.message });
@@ -124,6 +126,15 @@ const removeDoctor = async (req,res) => {
 
 ///////////////////////////////////////PACKAGES////////////////////////////////////////////////////
 
+const getAllPackages = async (req,res) =>{
+  try{
+      const packages = await packageModel.find({});
+      res.status(200).json(packages);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 const getPackage = async (req,res) => {
   try {
     const {id} = req.params;
@@ -174,4 +185,4 @@ const deletePackage = async (req,res) => {
    }
 }
 
-module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins};
+module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages};

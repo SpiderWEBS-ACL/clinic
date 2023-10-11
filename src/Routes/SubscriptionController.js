@@ -6,7 +6,7 @@ const addSubscription = async (req, res) => {
       
       const { packageId } = req.body; 
       const subscription = new subscriptionModel({
-        Patient: req.params.patientId,  
+        Patient: req.params.id,  
         Package: packageId
       });
 

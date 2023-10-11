@@ -6,6 +6,9 @@ import {
   validateUsername,
   validatePassword,
 } from "../../utils/ValidationUtils";
+import { Button, Form, Input, Select } from "antd";
+
+const { Option } = Select;
 
 const AddAdminForm: React.FC = () => {
   const [Username, setUsername] = useState<string>("");
@@ -72,7 +75,7 @@ const AddAdminForm: React.FC = () => {
       }}
     >
       <div>
-        <h2>Add Admin Form</h2>
+        <h2>Add Admin</h2>
         <form onSubmit={handleSubmit}>
           <InputField
             id="Username"
@@ -93,7 +96,7 @@ const AddAdminForm: React.FC = () => {
             onChange={setPassword}
             onBlur={() => handleBlur("password")}
             isValid={validatePassword(Password)}
-            errorMessage="Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, and one digit."
+            errorMessage="Password must be at least 6 characters long."
             touched={touchedFields.password}
           />
           <div

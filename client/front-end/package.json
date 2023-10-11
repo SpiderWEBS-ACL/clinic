@@ -10,11 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ionic/react": "^7.4.3",
+    "@mui/icons-material": "^5.14.13",
+    "@mui/material": "^5.14.13",
     "antd": "^5.9.4",
     "axios": "^1.5.1",
     "bootstrap": "^5.3.2",
     "date-fns": "^2.30.0",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.9.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.16.0"
   },
