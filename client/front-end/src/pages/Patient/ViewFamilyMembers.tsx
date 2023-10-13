@@ -1,29 +1,46 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { Spin } from "antd";
 
 const ViewFamilyMembers = () => {
   const { id } = useParams<{ id: string }>();
 
   const [familyMembers, setFamilyMembers] = useState([]);
   const [hasFamilyMembers, setHasFamilyMembers] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
-
   useEffect(() => {
     api
       .get(`/patient/viewFamilyMembers/${id}`)
       .then((response) => {
         setFamilyMembers(response.data);
-        console.log(response.data);
+        setLoading(false);
         setHasFamilyMembers(response.data.length > 0);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
+    setLoading(false);
   }, [id]);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="container">

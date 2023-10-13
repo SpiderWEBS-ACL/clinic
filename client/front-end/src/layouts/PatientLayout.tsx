@@ -39,18 +39,13 @@ const PatientLayout: React.FC = () => {
       ],
     },
     {
-      label: "Patients",
-      key: "/admin/Patients",
-      icon: <UserOutlined />,
-    },
-    {
       label: "Doctors",
       icon: <UserOutlined />,
       key: "/patient/viewalldoctors",
     },
     {
       label: "Prescriptions",
-      key: "/admin/Packages", //TODO: add prescriptions route
+      key: "/patient/viewPrescriptions/"+id, //TODO: add prescriptions route
       icon: <FileOutlined />,
     },
     {

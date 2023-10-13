@@ -325,37 +325,42 @@ const filterDoctorsByNameSpecialtyAvailability = async (req, res) => {
   const Specialty = req.query.Specialty || "";
   const date  = req.query.date || "0001-01-01";
   const Time = req.query.Time || "00:00:00";
-  let datee =  date+"T"+Time+".000";
+  let datee =  date+"T"+Time+".000Z";
+  console.log(datee);
   try {
-    var query = {
-         $or: [
-            { Name: Name }, 
-            { Specialty: Specialty }
-         ]}
-      if(Name == "" && Specialty == ""){
-       query = {};
-    }
-    var doctors = await doctorModel.find(query);
+    const query = {}
+      if(Name != "")
+        query.Name = { $regex: Name, $options: 'i' };
+      if(Specialty != "")
+        query.Specialty = {$regex: Specialty, $options: 'i'};
+      
+      if(Name == "" && Specialty == ""){  
+        var doctors = await doctorModel.find({});
+    }else
+      var doctors = await doctorModel.find(query);
     
     if (doctors.length === 0) {
       return res.status(404).json({ error: 'No doctors found matching the criteria' });
     }
-
+  
     const availableDoctors = await Promise.all(
       doctors.map(async (doctor) => {
         const appointment = await appointmentModel.findOne({
-          Doctor: doctor._id,
-          AppointmentDate: datee,
-          Status: 'Upcoming',
-        });
+          $and:[
+          {Doctor: doctor._id},
+          {AppointmentDate: datee},
+          {Status: 'Upcoming'},
+      ]});
         if (!appointment) {
           return doctor;
         }
         return null;
       })
     ); 
+    const filteredAvailableDoctors = availableDoctors.filter((doctor) => doctor !== null);
 
-    res.status(200).json(doctors);
+
+    res.status(200).json(filteredAvailableDoctors);
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while searching for doctors' });
   }

@@ -21,6 +21,7 @@ import Register from "./pages/Doctor/Register";
 import AddFamilyMember from "./pages/Patient/AddFamilyMember";
 import ViewAllDoctors from "./pages/Patient/ViewAllDoctors";
 import ViewAppointments from "./pages/Appointments";
+import ViewPrescriptions from "./pages/Patient/ViewPrescriptions";
 
 const AppRouter: React.FC = () => {
   return (
@@ -51,12 +52,15 @@ const AppRouter: React.FC = () => {
       />
       <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
       <Route
+        path="/patient/viewPrescriptions/:id"
+        element={<ViewPrescriptions />}
+      />
+      <Route
         path="/patient/viewfamilyMembers/:id"
         element={<ViewFamilyMembers />}
       />
       <Route path="/appointment/view/:id" element={<ViewAppointments />} />
     </Routes>
-
   );
 };
 

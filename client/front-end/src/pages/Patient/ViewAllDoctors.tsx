@@ -9,6 +9,8 @@ import {
   TimePickerProps,
   Spin,
 } from "antd";
+const { Option } = Select;
+
 const ViewAllDoctors = () => {
   const [Doctors, setDoctors] = useState([]);
   const [AllDoctors, setAllDoctors] = useState([]);
@@ -19,6 +21,16 @@ const ViewAllDoctors = () => {
   const [Date, setDate] = useState("");
   const [Time, setTime] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const timeSlots = [];
+
+  for (let hours = 0; hours < 12; hours++) {
+    for (let minutes = 0; minutes < 60; minutes += 30) {
+      const hourStr = hours.toString().padStart(2, "0");
+      const minuteStr = minutes.toString().padStart(2, "0");
+      timeSlots.push(`${hourStr}:${minuteStr}:00`);
+    }
+  }
 
   const api = axios.create({
     baseURL: "http://localhost:8000/",
@@ -68,6 +80,10 @@ const ViewAllDoctors = () => {
   };
   const onTimeChange: TimePickerProps["onChange"] = (time, timeString) => {
     setTime(timeString);
+  };
+  const handleTimeSlotChange = (selectedTimeSlot: string) => {
+    // console.log(selectedTimeSlot);
+    setTime(selectedTimeSlot);
   };
   const handleFilter = async () => {
     setLoading(true);
@@ -135,10 +151,18 @@ const ViewAllDoctors = () => {
           <label style={{ marginRight: 8 }}>
             <strong>Time:</strong>
           </label>
-          <TimePicker
-            onChange={onTimeChange}
+          <Select
+            value={Time}
+            onChange={handleTimeSlotChange}
             style={{ width: 150, marginRight: 30 }}
-          />
+          >
+            <Option value="">Select a time slot</Option>
+            {timeSlots.map((slot) => (
+              <Option key={slot} value={slot}>
+                {slot}
+              </Option>
+            ))}
+          </Select>
           <button
             onClick={handleFilter}
             style={{ width: 100, marginRight: 20 }}
