@@ -5,7 +5,7 @@ import PatientLayout from "./layouts/PatientLayout";
 const App: React.FC = () => {
   // return <AdminLayout />;
   // return <PatientLayout />;
-  return <DoctorLayout />;
+  return <PatientLayout />;
 };
 
 export default App;

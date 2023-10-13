@@ -38,6 +38,11 @@ const DoctorLayout: React.FC = () => {
       ],
     },
     {
+      label: "My Appointments",
+      key: "/appointment/view/"+ id,
+      icon: <UserOutlined />,
+    },
+    {
       label: "Update Info",
       key: "/doctor/update/" + id,
       icon: <UserOutlined />,

@@ -2,6 +2,7 @@ const appointmentModel = require('../Models/Appointment')
 const doctorModel = require('../Models/Doctor');
 const patientModel = require('../Models/Patient');
 const { default: mongoose } = require('mongoose');
+const { upcomingAppointments } = require('./doctorController');
 
 const addAppointment = async (req, res) => {
     try{
@@ -13,28 +14,43 @@ const addAppointment = async (req, res) => {
  }
 
  const filterAppointment = async(req,res) =>{
-    const {AppointmentDate} = req.params;
-    const {Status} = req.params; 
-    console.log(AppointmentDate);
-    console.log(Status);
-
-    const query = {
-        $or: [
-          { AppointmentDate: { $gte: AppointmentDate } }, 
-          { Status: Status }
-        ]
-      };
+    const appointments = req.query.allAppointments
+    const AppointmentDate = req.query.AppointmentDate;
+    const Status = req.query.Status; 
+    if(!Status&&!AppointmentDate){
+        res.status(200).json(appointments)
+    }else{
     try{
-            const appointments = await appointmentModel.find(query).populate("Doctor").populate("Patient").exec();
-            if(!appointments || appointments.length === 0){
-                res.status(404).json({error: "no appointments were found"});
-            }
-            else
-                res.status(200).json(appointments);
-        }catch(error){
+        const appointmentsFiltered =  [];
+        if(Status&&AppointmentDate && AppointmentDate != ("")){
+            for (const appointment of appointments) {
+                if(appointment.AppointmentDate >= (AppointmentDate) && appointment.Status == Status)
+                 appointmentsFiltered.push(appointment);
+             }        
+             if(!appointments || appointments.length === 0){
+                 res.json("no appointments were found");
+             }
+             else
+                 res.status(200).json(appointmentsFiltered);
+             
+        }
+        else{
+        for (const appointment of appointments) {
+           if(appointment.AppointmentDate >= (AppointmentDate) || appointment.Status == Status)
+            appointmentsFiltered.push(appointment);
+        }        
+        if(!appointments || appointments.length === 0){
+            res.json("no appointments were found");
+        }
+        else
+            res.status(200).json(appointmentsFiltered);
+        }
+        }
+        catch(error){
         res.status(500).json({ error: error.message });
     }
  }
+};
  const viewAllAppointments = async(req,res) => {
     const {id} = req.params;
     const doctor = await doctorModel.findById(id);

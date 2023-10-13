@@ -76,22 +76,22 @@ const RegLog: React.FC = () => {
   };
   const handleMobileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
-    const parsedValue = parseFloat(inputValue); // Parse the input string to an integer
+    const parsedValue = parseFloat(inputValue); 
 
     if (!isNaN(parsedValue)) {
       setMobile(parsedValue);
     } else {
-      setMobile(undefined); // Invalid input, clear the value
+      setMobile(undefined); 
     }
   };
   const handleDobChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value; // Assuming the input format is "YYYY-MM-DD"
+    const inputValue = event.target.value; 
     const date = new Date(inputValue);
 
     if (!isNaN(date.getTime())) {
       setDob(date);
     } else {
-      setDob(undefined); // Invalid input, clear the date
+      setDob(undefined); 
     }
   };
   const handleGenderChange = (event: ChangeEvent<HTMLInputElement>) => {

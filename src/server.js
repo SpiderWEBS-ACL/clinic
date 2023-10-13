@@ -11,7 +11,7 @@ const cors = require('cors');
 
 mongoose.set('strictQuery', false);
 require('dotenv').config();
-const MongoURI = "mongodb+srv://Hassan:Nn8uwR33Nl84QCiE@test.p55nhok.mongodb.net/?retryWrites=true&w=majority";
+const MongoURI = process.env.ATLAS_MONGO_URI;
 
 const app = express();
 app.use(cors());

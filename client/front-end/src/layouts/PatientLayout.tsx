@@ -27,6 +27,11 @@ const PatientLayout: React.FC = () => {
       icon: <HomeOutlined />,
     },
     {
+      label: "My Appointments",
+      key: "/appointment/view/"+ id,
+      icon: <UserOutlined />,
+    },
+    {
       label: "Family",
       icon: <UserOutlined />,
       key: "parent1",

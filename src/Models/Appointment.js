@@ -15,7 +15,7 @@ const appointmentSchema = new Schema({
     
     Status:{
       type : String ,  
-      enum:[ "Upcoming","Attended","Cancelled"],
+      enum:[ "Upcoming","Attended","Cancelled","Not-Attended"],
       default: "Upcoming"
     } 
     },{ timestamps: true });
