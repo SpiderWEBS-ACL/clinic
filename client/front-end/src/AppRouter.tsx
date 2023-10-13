@@ -21,6 +21,7 @@ import Register from "./pages/Doctor/Register";
 import AddFamilyMember from "./pages/Patient/AddFamilyMember";
 import ViewAllDoctors from "./pages/Patient/ViewAllDoctors";
 import ViewAppointments from "./pages/Appointments";
+import Edit from "./pages/Doctor/Edit";
 
 const AppRouter: React.FC = () => {
   return (
@@ -43,6 +44,7 @@ const AppRouter: React.FC = () => {
       <Route path="/doctor/viewPatientInfo/:id" element={<ViewPatientInfo />} />
       <Route path="/doctor/edit/:id" element={<EditDoctor />} />
       <Route path="/Doctor/register" element={<Register />} />
+      <Route path="/Doctor/update/:id" element={<Edit />} />
 
       <Route path="/patient/patientHome/:id" element={<PatientHome />} />
       <Route
