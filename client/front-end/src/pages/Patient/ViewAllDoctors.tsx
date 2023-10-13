@@ -28,7 +28,7 @@ const ViewAllDoctors = () => {
     for (let minutes = 0; minutes < 60; minutes += 30) {
       const hourStr = hours.toString().padStart(2, "0");
       const minuteStr = minutes.toString().padStart(2, "0");
-      timeSlots.push(`${hourStr}:${minuteStr}:00`);
+      timeSlots.push(`${hourStr}:${minuteStr}:00.000`);
     }
   }
 

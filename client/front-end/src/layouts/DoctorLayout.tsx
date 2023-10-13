@@ -16,8 +16,8 @@ import {
 import AppRouter from "../AppRouter";
 
 const { Header, Content, Footer, Sider } = Layout;
-const id = "6526d0fefd3682ea939a2471";
-const PatientLayout: React.FC = () => {
+const id = "6523f69a0c3f5f0b8a052738";
+const DoctorLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const items = [
@@ -38,13 +38,13 @@ const PatientLayout: React.FC = () => {
       ],
     },
     {
-      label: "Edit my info",
+      label: "Update Info",
       key: "/doctor/update/" + id,
       icon: <UserOutlined />,
     },
     {
       label: "Logout",
-      key: "/",
+      key: "/admin/logout",
       icon: <PoweroffOutlined />,
       danger: true,
     },
@@ -81,4 +81,4 @@ const PatientLayout: React.FC = () => {
   );
 };
 
-export default PatientLayout;
+export default DoctorLayout;
