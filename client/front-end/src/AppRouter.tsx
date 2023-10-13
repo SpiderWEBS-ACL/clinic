@@ -22,10 +22,7 @@ import AddFamilyMember from "./pages/Patient/AddFamilyMember";
 import ViewAllDoctors from "./pages/Patient/ViewAllDoctors";
 import ViewAppointments from "./pages/Appointments";
 import ViewPrescriptions from "./pages/Patient/ViewPrescriptions";
-<<<<<<< HEAD
-=======
 import Edit from "./pages/Doctor/Edit";
->>>>>>> 6b4060abaff5619eb8996154589fd3d28b395afa
 
 const AppRouter: React.FC = () => {
   return (
