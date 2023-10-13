@@ -3,6 +3,7 @@ const adminModel = require('../Models/Admin');
 const doctorModel = require('../Models/Doctor');
 const patientModel = require('../Models/Patient');
 const packageModel = require('../Models/Package');
+const appointmentModel = require("../Models/Appointment");
 const doctorRegisterRequestModel = require('../Models/DoctorRegisterRequest');
 
 const { default: mongoose } = require('mongoose');
@@ -69,6 +70,7 @@ const removeAdmin = async (req,res) => {
       if (!removedPatient) {
          return res.status(404).json({ error: 'Patient not found' });
     }
+    await appointmentModel.deleteMany({ Patient: id });
     res.status(200).json(removedPatient);
    } catch (error) {
      res.status(500).json({ error: error.message });
@@ -84,6 +86,7 @@ const removeDoctor = async (req,res) => {
       if (!removedDoctor) {
          return res.status(404).json({ error: 'Doctor not found' });
     }
+    await appointmentModel.deleteMany({ Doctor: id });
     res.status(200).json(removedDoctor);
    } catch (error) {
      res.status(500).json({ error: error.message });

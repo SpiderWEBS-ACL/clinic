@@ -1,7 +1,6 @@
 const express = require("express");
 const mongoose = require('mongoose');
 
-
 const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability, addPrescription} = require("./Routes/patientController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor } = require("./Routes/doctorController");
 const { addAppointment, filterAppointment,viewAllAppointments } = require("./Routes/appointmentController")
@@ -23,7 +22,7 @@ mongoose.connect(MongoURI, {useNewUrlParser:true})
 .then(()=>{
   console.log("MongoDB is now connected!")
 // Starting server
- app.listen(port, () => {
+  app.listen(port, () => {
     console.log(`Listening to requests on http://localhost:${port}`);
   })
 })
@@ -40,15 +39,15 @@ app.get("/admin/allPackages",getAllPackages);
 app.get("/admin/allAdmins",getAllAdmins);
 app.get("/admin/allPatients",getAllPatients);
 app.get("/admin/allDoctors",getAllDoctors); 
-app.delete("/admin/removeDoctor/:id",removeDoctor); //params?
-app.delete("/admin/removePatient/:id",removePatient); //params?
-app.delete("/admin/removeAdmin/:id",removeAdmin); //params?
+app.delete("/admin/removeDoctor/:id",removeDoctor);
+app.delete("/admin/removePatient/:id",removePatient);
+app.delete("/admin/removeAdmin/:id",removeAdmin);
 app.get("/admin/registrationRequests",getAllDoctrsRegistrationReqs);
-app.get("/admin/registrationRequest/:id",getDoctrRegistrationReqDetails);//params
-app.get("/admin/package/:id",getPackage);//params
+app.get("/admin/registrationRequest/:id",getDoctrRegistrationReqDetails);
+app.get("/admin/package/:id",getPackage);
 app.post("/admin/addPackage",addPackage);
 app.put("/admin/updatePackage/:id",updatePackage);
-app.delete("/admin/deletePackage/:id",deletePackage)
+app.delete("/admin/deletePackage/:id",deletePackage);
 
 //Doctor Endpoints
 app.get("/doctor/getDoctor/:id",getDoctor);
