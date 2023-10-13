@@ -16,41 +16,35 @@ import {
 import AppRouter from "../AppRouter";
 
 const { Header, Content, Footer, Sider } = Layout;
-const id = "652590b962e3b13a6c7834bf";
-const PatientLayout: React.FC = () => {
+const id = "6523f69a0c3f5f0b8a052738";
+const DoctorLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const items = [
     {
       label: "Home",
-      key: "/patient/patientHome/" + id,
+      key: "/doctor/Home/" + id,
       icon: <HomeOutlined />,
     },
     {
-      label: "Family",
+      label: "Patients",
       icon: <UserOutlined />,
       key: "parent1",
       children: [
         {
-          label: "Family Members",
-          key: "/patient/viewfamilyMembers/" + id,
+          label: "View Patients",
+          key: "/doctor/viewPatients/" + id,
         },
-        { label: "Add Family Member", key: "/patient/addFamilyMember/" + id },
       ],
     },
     {
-      label: "Doctors",
+      label: "Update Info",
+      key: "/doctor/update/" + id,
       icon: <UserOutlined />,
-      key: "/patient/viewalldoctors",
-    },
-    {
-      label: "Prescriptions",
-      key: "/patient/viewPrescriptions/"+id, //TODO: add prescriptions route
-      icon: <FileOutlined />,
     },
     {
       label: "Logout",
-      key: "/",
+      key: "/admin/logout",
       icon: <PoweroffOutlined />,
       danger: true,
     },
@@ -87,4 +81,4 @@ const PatientLayout: React.FC = () => {
   );
 };
 
-export default PatientLayout;
+export default DoctorLayout;

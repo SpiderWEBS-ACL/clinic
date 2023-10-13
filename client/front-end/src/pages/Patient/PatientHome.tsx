@@ -22,14 +22,17 @@ const PatientHome = () => {
         console.error("Error:", error);
       });
   }, [id]);
-
+  var Dob = patientInfo.Dob + "";
+  console.log(Dob);
+  const dateTimeParts: string[] = Dob.split("T");
+  const datePart: string = dateTimeParts[0];
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">Patient Information</h2>
       <div className="card">
         <div className="card-body">
           <h5 className="card-title">Name: {patientInfo.Name}</h5>
-          <p className="card-text">DOB: {patientInfo.Dob}</p>
+          <p className="card-text">DOB: {datePart}</p>
           <p className="card-text">Gender: {patientInfo.Gender}</p>
           <p className="card-text">Mobile: {patientInfo.Mobile}</p>
           <p className="card-text">

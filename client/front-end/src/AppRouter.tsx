@@ -22,6 +22,10 @@ import AddFamilyMember from "./pages/Patient/AddFamilyMember";
 import ViewAllDoctors from "./pages/Patient/ViewAllDoctors";
 import ViewAppointments from "./pages/Appointments";
 import ViewPrescriptions from "./pages/Patient/ViewPrescriptions";
+<<<<<<< HEAD
+=======
+import Edit from "./pages/Doctor/Edit";
+>>>>>>> 6b4060abaff5619eb8996154589fd3d28b395afa
 
 const AppRouter: React.FC = () => {
   return (
@@ -44,6 +48,7 @@ const AppRouter: React.FC = () => {
       <Route path="/doctor/viewPatientInfo/:id" element={<ViewPatientInfo />} />
       <Route path="/doctor/edit/:id" element={<EditDoctor />} />
       <Route path="/Doctor/register" element={<Register />} />
+      <Route path="/Doctor/update/:id" element={<Edit />} />
 
       <Route path="/patient/patientHome/:id" element={<PatientHome />} />
       <Route
@@ -51,6 +56,10 @@ const AppRouter: React.FC = () => {
         element={<AddFamilyMember />}
       />
       <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
+      <Route
+        path="/patient/viewPrescriptions/:id"
+        element={<ViewPrescriptions />}
+      />
       <Route
         path="/patient/viewfamilyMembers/:id"
         element={<ViewFamilyMembers />}
@@ -62,7 +71,6 @@ const AppRouter: React.FC = () => {
 
 
     </Routes>
-
   );
 };
 
