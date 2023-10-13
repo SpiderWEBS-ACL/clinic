@@ -64,7 +64,11 @@ const RegistrationRequestDetails: React.FC = () => {
             <td>{registrationDetails.Name}</td>
             <td>{registrationDetails.Affiliation}</td>
             <td>{registrationDetails.Email}</td>
-            <td>{registrationDetails.Dob}</td>
+            <td>
+              {registrationDetails.Dob == null
+                ? registrationDetails.Dob
+                : registrationDetails.Dob.substring(0, 10)}
+            </td>
             <td>{registrationDetails.HourlyRate}</td>
             <td>{registrationDetails.Affiliation}</td>
             <td>{registrationDetails.Specialty}</td>

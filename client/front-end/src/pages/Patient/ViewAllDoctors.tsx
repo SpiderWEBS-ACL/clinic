@@ -234,7 +234,7 @@ const ViewAllDoctors = () => {
                 <td>{selectedDoctor.Username}</td>
                 <td>{selectedDoctor.Name}</td>
                 <td>{selectedDoctor.Email}</td>
-                <td>{selectedDoctor.Dob}</td>
+                <td>{selectedDoctor.Dob.split("T")[0]}</td>
                 <td>{selectedDoctor.HourlyRate}</td>
                 <td>{selectedDoctor.Affiliation}</td>
                 <td>{selectedDoctor.Specialty}</td>

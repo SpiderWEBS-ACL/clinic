@@ -76,7 +76,11 @@ const AllDoctors = () => {
               <td>{request.Username}</td>
               <td>{request.Name}</td>
               <td>{request.Email}</td>
-              <td>{request.Dob}</td>
+              <td>
+                {request.Dob == null
+                  ? request.Dob
+                  : request.Dob.substring(0, 10)}
+              </td>
               <td>{request.HourlyRate}</td>
               <td>{request.Affiliation}</td>
               <td>{request.Specialty}</td>

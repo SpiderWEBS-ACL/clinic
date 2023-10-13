@@ -31,7 +31,7 @@ const Patients = () => {
       console.log("Response:", response.data);
     } catch (error) {
       console.error("Error:", error);
-    } 
+    }
     setLoading(false);
   };
 
@@ -76,7 +76,11 @@ const Patients = () => {
               <td>{request.Username}</td>
               <td>{request.Name}</td>
               <td>{request.Email}</td>
-              <td>{request.Dob}</td>
+              <td>
+                {request.Dob == null
+                  ? request.Dob
+                  : request.Dob.substring(0, 10)}
+              </td>
               <td>{request.Gender}</td>
               <td>{request.Mobile}</td>
               <td>{request.EmergencyContactName}</td>
