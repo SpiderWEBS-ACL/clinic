@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { format } from "date-fns";
 import { Spin } from "antd";
+import Button from "../../components/Button";
 
 const RegistrationRequestDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -11,7 +12,7 @@ const RegistrationRequestDetails: React.FC = () => {
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
-
+  const navigate = useNavigate();
   useEffect(() => {
     api
       .get(`/admin/registrationRequest/${id}`)
@@ -39,6 +40,9 @@ const RegistrationRequestDetails: React.FC = () => {
       </div>
     );
   }
+  const handleBack = async () => {
+    navigate("/admin/registrationRequests");
+  };
 
   return (
     <div className="container">
@@ -104,6 +108,13 @@ const RegistrationRequestDetails: React.FC = () => {
           </tr>
         </tbody>
       </table>
+      <Button
+        style={{ marginRight: "10px", marginTop: "10px" }}
+        color="primary"
+        onClick={handleBack}
+      >
+        Back
+      </Button>
     </div>
   );
 };

@@ -72,7 +72,7 @@ const AllPackages = () => {
               <td>{request.FamilyDiscount}%</td>
               <td>
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-sm btn-primary"
                   onClick={() => handleRedirect(request._id)}
                 >
                   edit/delete

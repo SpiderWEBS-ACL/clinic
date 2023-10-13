@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import { Spin } from "antd";
 import { message } from "antd";
+import { Navigate } from "react-router-dom";
 
 const PackageView = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,6 +19,7 @@ const PackageView = () => {
   const [FamilyDiscount, setFamilyDiscount] = useState<number | undefined>();
   const [Message, setMessage] = useState("");
   const [Alert, setAlert] = useState(false);
+  const navigate = useNavigate();
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
@@ -89,6 +91,9 @@ const PackageView = () => {
     );
   }
 
+  const handleBack = async () => {
+    await navigate("/admin/Packages");
+  };
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
@@ -137,10 +142,17 @@ const PackageView = () => {
 
             <button
               className="btn btn-primary"
-              style={{ marginRight: "10px", marginTop: "10px" }}
+              style={{ marginRight: "318px", marginTop: "10px" }}
               type="submit"
             >
               Submit
+            </button>
+            <button
+              className="btn btn-primary"
+              style={{ marginRight: "10px", marginTop: "10px" }}
+              onClick={handleBack}
+            >
+              Back to All Packages
             </button>
           </form>
           <Button

@@ -95,7 +95,7 @@ const AllDoctors = () => {
               </td>
               <td>
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-sm btn-primary"
                   onClick={() => handleViewDetails(request._id)}
                 >
                   Details
