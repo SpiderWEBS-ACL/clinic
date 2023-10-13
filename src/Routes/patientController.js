@@ -5,6 +5,7 @@ const doctorModel = require("../Models/Doctor");
 const appointmentModel = require("../Models/Appointment");
 const prescriptionModel = require("../Models/Prescription");
 const subscriptionModel = require("../Models/Subscription");
+const { fileLoader } = require("ejs");
 
 const addPatient = async (req, res) => {
   try {
@@ -114,30 +115,74 @@ const viewMyPrescriptions = async (req, res) => {
 }
 
 const filterPrescriptions = async (req, res) => {
-    
   const  Doctor = req.query.Doctor;
   const  Filled = req.query.Filled;
   const  Date = req.query.Date;
-
+  const Patient = req.query.Patient;
   const datee = Date + "T00:00:00.000Z";
+  let presc;
 
   try {
-    const query = {
-         $or: [ 
-          { DoctorName: Doctor }, 
-          { Filled: Filled },
-          {Date: datee}
+    if(Doctor == "" && Date!= "" && Filled !=""){
+      const query = 
+        {
+          Date: datee , 
+          Filled: Filled ,
+          Patient: Patient
+         }
+         presc = await prescriptionModel.find(query);
 
-         
-         ]}
-        
-    const presc = await prescriptionModel.find(query);
-    if (presc.length === 0) {
-      return res.status(404).json({ error: 'No doctors found matching the criteria' });
     }
-    else{
-    res.status(200).json(presc);
+    else if(Filled == "" && Date!= "" && Doctor !=""){
+      const query = 
+      {
+        Date: datee , 
+        DoctorName: Doctor ,
+        Patient: Patient
+       }
+       presc = await prescriptionModel.find(query);
     }
+    else if(Date == ""  && Doctor!= "" && Filled !="" ){
+      const query = 
+      {
+        DoctorName: Doctor , 
+        Filled: Filled ,
+        Patient: Patient
+
+       }
+        presc = await prescriptionModel.find(query);
+    }
+    else if(Date == ""  && Doctor== "" && Filled !="" ){
+      const query = {
+        Filled: Filled,
+        Patient: Patient
+
+      }
+      presc = await prescriptionModel.find(query);
+    }
+    else if(Date != ""  && Doctor== "" && Filled =="" ){
+      const query = {
+        Date: datee,
+        Patient: Patient
+      }
+      presc = await prescriptionModel.find(query);
+    }
+
+    else if(Date == ""  && Doctor!= "" && Filled == "" ){
+      const query = {
+        DoctorName: Doctor,
+        Patient: Patient
+      }
+      presc = await prescriptionModel.find(query);
+    }
+
+
+    // if(presc.length==0){
+    //   return res.status(404).json({error: "No prescriptions found with this filter criteria"})
+    // }
+    // else{
+     return res.status(200).json(presc);
+    
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while searching for this prescription'});
   }

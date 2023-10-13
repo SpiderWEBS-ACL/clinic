@@ -1,13 +1,16 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import axios from "axios";
-import { setDate } from "date-fns";
+import { set, setDate } from "date-fns";
 import { useParams } from "react-router-dom";
 import { DatePicker, DatePickerProps, Input, Select } from "antd";
+import './error-box.css';
 
 const ViewPrescriptions = () => {
   const [prescriptions, setPrescriptions] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
+  const [showError, setError] = useState(false);
   const [selectedPrescription, setSelectedPrescription] = useState< any| null>(null);
+
   const { Option } = Select;
     const api = axios.create({
       baseURL: "http://localhost:8000/patient",
@@ -28,7 +31,6 @@ const ViewPrescriptions = () => {
   },[id]);
 
 
-  const [filteredPrescriptions, setFilteredPrescriptions] = useState([]);
   const [Doctor, setDoctor] = useState("");
   const [Date, setDate] = useState("");
   const [Filled, setFilled] = useState("");
@@ -41,7 +43,10 @@ const ViewPrescriptions = () => {
     setDoctor(event.target.value);
   };
 const handleDateChange: DatePickerProps["onChange"] = (date, dateString) => {
-  setDate(dateString);
+ 
+    setDate(dateString);
+  
+
 };
 
 
@@ -53,10 +58,20 @@ const handleDateChange: DatePickerProps["onChange"] = (date, dateString) => {
           params: {
             Doctor: Doctor,
             Filled: Filled,
-            Date: Date
+            Date: Date,
+            Patient: id
           },
         });
-       setPrescriptions(response.data);
+        const data = response.data;
+        if(data.length ==0){
+          console.log("no data")
+          setError(true);
+        }
+        else{
+          setError(false);
+          setPrescriptions(data);
+
+        }
         
 
       } catch (error) {
@@ -70,8 +85,8 @@ const handleDateChange: DatePickerProps["onChange"] = (date, dateString) => {
       try {
         const response = await api.get(`/viewMyPrescriptions/${id}`);
         setDoctor("");
-        setDate("");
         setFilled("");
+        setError(false);
         setPrescriptions(response.data);
         
 
@@ -128,8 +143,8 @@ const handleDateChange: DatePickerProps["onChange"] = (date, dateString) => {
           </label>
           <DatePicker
             onChange={handleDateChange}
-            
             style={{ width: 150, marginLeft: "8px" }}
+            allowClear
           />
            <button
             onClick={filter}
@@ -149,7 +164,11 @@ const handleDateChange: DatePickerProps["onChange"] = (date, dateString) => {
      
       
       
-
+  {showError == true? (
+    <div className="error-box">
+        <h2>Error!</h2>
+          <p>No prescriptions found with the given criteria.</p>
+        </div>) : (
       <table className="table">
         <thead>
           <tr>
@@ -178,6 +197,7 @@ const handleDateChange: DatePickerProps["onChange"] = (date, dateString) => {
           ))}
         </tbody>
       </table>
+)}
       {showPopup && selectedPrescription && (
         <div className="popup">
            <h3>Prescription Details</h3>
