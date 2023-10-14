@@ -1,10 +1,10 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import axios from "axios";
 import "./style.css";
-import { Int32 } from "mongodb";
 import Alert from "../components/Alert";
 import { useParams, useNavigate } from "react-router-dom";
 import { message } from "antd";
+import Handler from "../Handler";
 
 
 const RegLog: React.FC = () => {
@@ -24,6 +24,9 @@ const RegLog: React.FC = () => {
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
+   useEffect(() => {
+
+   })
   const handleSignUp = async () => {
     if (
       !Name ||
@@ -66,7 +69,6 @@ const RegLog: React.FC = () => {
   const handleSignIn = async () => {
     if (!Password || !Username){
       message.warning(" Please fill in all the required fields.");
-
     }
     else{
     try {
@@ -88,11 +90,14 @@ const RegLog: React.FC = () => {
   const navigate = useNavigate();
   const handleRedirection = (item: any) => {
     if(item.type == "Patient"){
-    navigate(`/patient/PatientHome/${item.id}`);}
+    navigate(`/patient/PatientHome/${item.id}`);
+  }
     else if(item.type == "Doctor"){
-      navigate(`/patient/PatientHome/${item.id}`);}
+      navigate(`/patient/PatientHome/${item.id}`);
+    }
       else if(item.type == "Admin"){
-        navigate(`/Home/${item.id}`);}
+        navigate(`/Home/${item.id}`);
+      }
   };
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);

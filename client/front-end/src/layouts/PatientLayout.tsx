@@ -19,6 +19,7 @@ const { Header, Content, Footer, Sider } = Layout;
 const id = localStorage.getItem("id");
 const PatientLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  
   const navigate = useNavigate();
   const items = [
     {

@@ -14,9 +14,12 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import "./StylePatient.css";
 const PatientHome = () => {
-  
   const { id } = useParams<{ id: string }>();
   const [patientInfo, setPatientInfo] = useState<any>({});
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [allAppointments, setAllAppointments] = useState([]);
+
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
@@ -31,27 +34,26 @@ const PatientHome = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+      api
+      .get(`/viewMyPrescriptions/${id}`).then((response) => {
+        setPrescriptions(response.data);
+      })
+      api
+      .get(`/appointment/view/${id}`).then((response) => {
+        setAllAppointments(response.data);
+      })
+       api.get(`appointment/filterAppointment`, {
+        params: { allAppointments, Status: "Upcoming"},
+      }).then((response) => {
+      setAppointments(response.data);
+      })
   }, [id]);
-  const [patientData, setPatientData] = useState({
-    name: "John Doe",
-    email: "johndoe@example.com",
-    appointments: [
-      { date: "2023-10-20", time: "09:00 AM", doctor: "Dr. Smith" },
-      { date: "2023-10-25", time: "02:30 PM", doctor: "Dr. Johnson" },
-    ],
-    medicalHistory: ["Flu", "Cold", "Annual checkup"],
-    prescriptions: [
-      {
-        medication: "Aspirin",
-        dosage: "500mg",
-        instructions: "Take with food",
-      },
-      { medication: "Antibiotics", dosage: "1 tablet every 12 hours" },
-    ],
-  });
+  window.location.reload;
+
+  
 
   return (
-    <ChakraProvider cssVarsRoot={undefined}>
+    <ChakraProvider>
       <Container
         marginTop="5"
         boxShadow="lg" // Add shadow
@@ -80,10 +82,10 @@ const PatientHome = () => {
             </Heading>
             <Divider borderColor="#052c65" borderWidth="2px" />
             <List spacing={2}>
-              {patientData.appointments.map((appointment, index) => (
+              {appointments.map((appointment: any, index) => (
                 <ListItem key={index}>
-                  Date: {appointment.date} | Time: {appointment.time} | Doctor:{" "}
-                  {appointment.doctor}
+                  Date: {appointment.AppointmentDate} | Doctor:{" "}
+                  {appointment.Doctor}
                 </ListItem>
               ))}
             </List>
@@ -94,11 +96,8 @@ const PatientHome = () => {
               Medical History
             </Heading>
             <Divider borderColor="#052c65" borderWidth="2px" />
-            <UnorderedList spacing={2}>
-              {patientData.medicalHistory.map((entry, index) => (
-                <ListItem key={index}>{entry}</ListItem>
-              ))}
-            </UnorderedList>
+            
+             No records
           </VStack>
 
           <VStack w="30%" align="start" spacing={4}>
@@ -107,11 +106,11 @@ const PatientHome = () => {
             </Heading>
             <Divider borderColor="#052c65" borderWidth="2px" />
             <List spacing={2}>
-              {patientData.prescriptions.map((prescription, index) => (
+              {prescriptions.map((prescription :any, index) => (
                 <ListItem key={index}>
-                  Medication: {prescription.medication} | Dosage:{" "}
-                  {prescription.dosage} | Instructions:{" "}
-                  {prescription.instructions}
+                  Medication: {prescription.Medication} | Dosage:{" "}
+                  {prescription.Dosage} | Instructions:{" "}
+                  {prescription.Instructions}
                 </ListItem>
               ))}
             </List>

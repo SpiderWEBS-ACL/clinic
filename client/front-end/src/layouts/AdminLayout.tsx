@@ -64,7 +64,7 @@ const AdminLayout: React.FC = () => {
       label: "Logout",
       key: "/",
       icon: <PoweroffOutlined />,
-      onclick: localStorage.clear,
+      onclick: localStorage.clear(),
       danger: true,
     },
   ];
