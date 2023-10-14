@@ -12,8 +12,9 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import "F:/REPOS/clinic/client/front-end/src/pages/style.css";
+import "./StylePatient.css";
 const PatientHome = () => {
+  
   const { id } = useParams<{ id: string }>();
   const [patientInfo, setPatientInfo] = useState<any>({});
   const api = axios.create({
@@ -50,7 +51,7 @@ const PatientHome = () => {
   });
 
   return (
-    <ChakraProvider>
+    <ChakraProvider cssVarsRoot={undefined}>
       <Container
         marginTop="5"
         boxShadow="lg" // Add shadow

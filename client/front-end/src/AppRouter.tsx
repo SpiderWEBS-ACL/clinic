@@ -23,6 +23,7 @@ import ViewAllDoctors from "./pages/Patient/ViewAllDoctors";
 import ViewAppointments from "./pages/Appointments";
 import ViewPrescriptions from "./pages/Patient/ViewPrescriptions";
 import Edit from "./pages/Doctor/Edit";
+import DoctorHome from "./pages/Doctor/DoctorHome";
 
 const AppRouter: React.FC = () => {
   return (
@@ -48,6 +49,8 @@ const AppRouter: React.FC = () => {
       <Route path="/Doctor/update/:id" element={<Edit />} />
 
       <Route path="/patient/patientHome/:id" element={<PatientHome />} />
+      <Route path="/doctor/home/:id" element={<DoctorHome />} />
+
       <Route
         path="/patient/addFamilyMember/:id"
         element={<AddFamilyMember />}
