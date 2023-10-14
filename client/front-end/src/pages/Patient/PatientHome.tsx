@@ -12,7 +12,9 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+
 import "./StylePatient.css";
+
 const PatientHome = () => {
   
   const { id } = useParams<{ id: string }>();
