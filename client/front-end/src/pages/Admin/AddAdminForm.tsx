@@ -6,7 +6,7 @@ import {
   validateUsername,
   validatePassword,
 } from "../../utils/ValidationUtils";
-import { Button, Form, Input, Select } from "antd";
+import { Button, Form, Input, Select, message } from "antd";
 
 const { Option } = Select;
 
@@ -39,7 +39,9 @@ const AddAdminForm: React.FC = () => {
     const isPasswordValid = validatePassword(Password);
 
     if (!isUsernameValid || !isPasswordValid) {
-      setError("Username and Password must meet the minimum requirements.");
+      message.error(
+        "Username and Password must meet the minimum requirements."
+      );
       return;
     }
 
@@ -51,16 +53,15 @@ const AddAdminForm: React.FC = () => {
     try {
       const response = await api.post("/admin/add", data);
       console.log("Response:", response.data);
-
-      setError(null);
+      message.success("Admin added successfully!");
     } catch (error) {
       console.error("Error:", error);
 
       if (axios.isAxiosError(error) && error.response) {
         const apiError = error.response.data.error;
-        setError(apiError);
+        message.error(apiError);
       } else {
-        setError("An error occurred");
+        message.error("An error occurred");
       }
     }
   };
@@ -114,14 +115,6 @@ const AddAdminForm: React.FC = () => {
               Submit
             </button>
           </div>
-          {alertVisible && (
-            <Alert
-              type={error ? "danger" : "success"}
-              onClose={() => setAlertVisibility(false)}
-            >
-              {error ? error : "Admin added Successfully"}
-            </Alert>
-          )}
         </form>
       </div>
     </div>

@@ -94,7 +94,7 @@ const searchPatientByName = async (req,res) => {
     try{
      const appointments =  await appointmentModel.find({
         Doctor: doctorId,
-        AppointmentDate: {$gte: currentDate } //$gte = Greater Than or Equal
+        AppointmentDate: {$gte: currentDate }, //$gte = Greater Than or Equal
     }).populate("Patient").exec()
 
     if(appointments.length == 0){
@@ -116,8 +116,10 @@ const searchPatientByName = async (req,res) => {
     }).populate("Patient").exec()
     const patients = [];
     for (const appointment of appointments) {
+        if(!patients.includes(appointment.Patient)){
       const patient = appointment.Patient;
       patients.push(patient);
+        }
     }
 
     if(patients.length == 0){

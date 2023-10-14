@@ -14,12 +14,17 @@ import {
   PoweroffOutlined,
 } from "@ant-design/icons";
 import AppRouter from "../AppRouter";
+import Handler from "../pages/Handler";
 
 const { Header, Content, Footer, Sider } = Layout;
 
 const AdminLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+  const handleLogout = async () =>{
+    localStorage.clear();
+    window.location.reload;
+  }
   const items = [
     {
       label: "Home",
@@ -64,7 +69,7 @@ const AdminLayout: React.FC = () => {
       label: "Logout",
       key: "/",
       icon: <PoweroffOutlined />,
-      onclick: localStorage.clear,
+      onclick: handleLogout(),
       danger: true,
     },
   ];

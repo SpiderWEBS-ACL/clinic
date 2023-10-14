@@ -16,7 +16,7 @@ import {
 import AppRouter from "../AppRouter";
 
 const { Header, Content, Footer, Sider } = Layout;
-const id = localStorage.getItem("id");
+const id = "652590b962e3b13a6c7834bf";
 const PatientLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();

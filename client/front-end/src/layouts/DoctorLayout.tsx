@@ -16,7 +16,8 @@ import {
 import AppRouter from "../AppRouter";
 
 const { Header, Content, Footer, Sider } = Layout;
-const id = localStorage.getItem("id");
+// const id = localStorage.getItem("id");
+const id = "6523f69a0c3f5f0b8a052738";
 const DoctorLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ const DoctorLayout: React.FC = () => {
     },
     {
       label: "My Appointments",
-      key: "/appointment/view/"+ id,
+      key: "/appointment/view/" + id,
       icon: <UserOutlined />,
     },
     {
