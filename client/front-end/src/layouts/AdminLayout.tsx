@@ -61,9 +61,19 @@ const AdminLayout: React.FC = () => {
       ],
     },
     {
-      label: "Health Packages",
+      label: "Health Package",
       key: "/admin/Packages",
       icon: <FileOutlined />,
+      children: [
+        {
+          label: "HealthPackages",
+          key: "/admin/Packages",
+        },
+        {
+          label: "Add Package",
+          key: "/admin/addPackage",
+        },
+      ],
     },
     {
       label: "Logout",

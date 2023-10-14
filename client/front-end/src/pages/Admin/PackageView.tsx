@@ -142,7 +142,7 @@ const PackageView = () => {
 
             <button
               className="btn btn-primary"
-              style={{ marginRight: "318px", marginTop: "10px" }}
+              style={{ marginRight: "317px", marginTop: "10px" }}
               type="submit"
             >
               Submit
