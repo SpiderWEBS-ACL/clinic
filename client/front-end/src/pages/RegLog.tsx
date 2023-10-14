@@ -4,6 +4,8 @@ import "./style.css";
 import { Int32 } from "mongodb";
 import Alert from "../components/Alert";
 import { useParams, useNavigate } from "react-router-dom";
+import { message } from "antd";
+
 
 const RegLog: React.FC = () => {
   const [alertVisible, setAlertVisibility] = useState(false);
@@ -23,6 +25,22 @@ const RegLog: React.FC = () => {
     baseURL: "http://localhost:8000/",
   });
   const handleSignUp = async () => {
+    if (
+      !Name ||
+      !Email ||
+      !Password ||
+      !Username ||
+      !Dob ||
+      !Gender ||
+      !Mobile ||
+      !EmergencyContactName ||
+      !EmergencyContactMobile
+    ) {
+
+     message.error('Please fill in all the required fields.');
+      return;
+    }
+  else{
     try {
       const data = {
         Name,
@@ -37,14 +55,20 @@ const RegLog: React.FC = () => {
       };
 
       const response = await api.post(`/patient/register`, data);
-      console.log("Response:", response.data);
-      setAlertVisibility(true);
+      message.success('Congrats, you are in');
       setTimeout(toggleSignUp, 1500);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error:", error);
+      message.error(`${error.response.data.error}`)
     }
+  }
   };
   const handleSignIn = async () => {
+    if (!Password || !Username){
+      message.warning(" Please fill in all the required fields.");
+
+    }
+    else{
     try {
       const data = {
         Password,
@@ -52,14 +76,23 @@ const RegLog: React.FC = () => {
       };
       const response = await api.post(`/patient/login`, data);
       console.log(response.data);
-      handleRedirection(response.data.id);
-    } catch (error) {
-      console.error("Error:", error);
+      handleRedirection(response.data);
+      localStorage.setItem("id",response.data.id)
+      localStorage.setItem("type",response.data.type)
+    } catch (error:any) {
+        console.error("Error:", error);
+        message.error(`${error.response.data.error}`)
     }
+  }
   };
   const navigate = useNavigate();
   const handleRedirection = (item: any) => {
-    navigate(`/patient/PatientHome/${item}`);
+    if(item.type == "Patient"){
+    navigate(`/patient/PatientHome/${item.id}`);}
+    else if(item.type == "Doctor"){
+      navigate(`/patient/PatientHome/${item.id}`);}
+      else if(item.type == "Admin"){
+        navigate(`/Home/${item.id}`);}
   };
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
@@ -117,7 +150,11 @@ const RegLog: React.FC = () => {
   };
 
   return (
-    <div className={`cont ${isSignUp ? "s--signup" : ""}`}>
+    <div style={{
+      boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2)', // Add shadow
+      border: '1px solid #ccc', // Add border
+    }}
+    className={`cont ${isSignUp ? "s--signup" : ""}`}>
       <div className="form sign-in ">
         <h2 className="h2">Welcome Back</h2>
         <label className="label">

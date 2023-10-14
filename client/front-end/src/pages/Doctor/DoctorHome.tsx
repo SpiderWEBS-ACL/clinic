@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import "F:/REPOS/clinic/client/front-end/src/pages/style.css";
-const PatientHome = () => {
+const DoctorHome = () => {
   const { id } = useParams<{ id: string }>();
   const [patientInfo, setPatientInfo] = useState<any>({});
   const api = axios.create({
@@ -121,4 +121,4 @@ const PatientHome = () => {
   );
 };
 
-export default PatientHome;
+export default DoctorHome;

@@ -16,7 +16,7 @@ import {
 import AppRouter from "../AppRouter";
 
 const { Header, Content, Footer, Sider } = Layout;
-const id = "652590b962e3b13a6c7834bf";
+const id = localStorage.getItem("id");
 const PatientLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ const PatientLayout: React.FC = () => {
     },
     {
       label: "My Appointments",
-      key: "/appointment/view/"+ id,
+      key: "/appointment/view/" + id,
       icon: <UserOutlined />,
     },
     {
@@ -50,12 +50,13 @@ const PatientLayout: React.FC = () => {
     },
     {
       label: "Prescriptions",
-      key: "/patient/viewPrescriptions/"+id, //TODO: add prescriptions route
+      key: "/patient/viewPrescriptions/" + id, //TODO: add prescriptions route
       icon: <FileOutlined />,
     },
     {
       label: "Logout",
       key: "/",
+      onclick: localStorage.clear(),
       icon: <PoweroffOutlined />,
       danger: true,
     },

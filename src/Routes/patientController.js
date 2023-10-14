@@ -2,6 +2,7 @@ const patientModel = require("../Models/Patient");
 const { default: mongoose } = require("mongoose");
 const express = require("express");
 const doctorModel = require("../Models/Doctor");
+const adminModel = require("../Models/Admin");
 const appointmentModel = require("../Models/Appointment");
 const prescriptionModel = require("../Models/Prescription");
 const subscriptionModel = require("../Models/Subscription");
@@ -26,17 +27,37 @@ const addPatient = async (req, res) => {
 };
 const login = async(req, res) => {
   try{
-    const usernameDoc = await patientModel.findOne({ "Username": req.body.Username });
+    const usernamePat = await patientModel.findOne({ "Username": req.body.Username });
+    const usernameDoc = await doctorModel.findOne({ "Username": req.body.Username });
+    const usernameAdm = await adminModel.findOne({ "Username": req.body.Username });
+
     
-    if (!usernameDoc) {
+    if (!usernameDoc&& !usernamePat && !usernameAdm) {
       return res.status(400).json({ error: "Username not found!" });
     }
-
-    if (usernameDoc.Password === req.body.Password) {
-      res.json({ id: usernameDoc._id });
-    } else {
-      res.status(400).json({ error: "Password doesn't match!" });
+    else if(usernamePat){
+      if (usernamePat.Password === req.body.Password) {
+        res.json({ id: usernamePat._id,type:"Patient" });
+      } else {
+        res.status(400).json({ error: "Password doesn't match!" });
+      }
     }
+    else if(usernameDoc){
+      if (usernameDoc.Password === req.body.Password) {
+        res.json({ id: usernameDoc._id,type:"Doctor" });
+      } else {
+        res.status(400).json({ error: "Password doesn't match!" });
+      }
+    }
+    else if(usernameAdm){
+      if (usernameAdm.Password === req.body.Password) {
+        res.json({ id: usernameAdm._id,type:"Admin" });
+      } else {
+        res.status(400).json({ error: "Password doesn't match!" });
+      }
+    }
+
+   
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -16,7 +16,7 @@ import {
 import AppRouter from "../AppRouter";
 
 const { Header, Content, Footer, Sider } = Layout;
-const id = "6523f69a0c3f5f0b8a052738";
+const id = localStorage.getItem("id");
 const DoctorLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
@@ -49,7 +49,8 @@ const DoctorLayout: React.FC = () => {
     },
     {
       label: "Logout",
-      key: "/admin/logout",
+      key: "/",
+      onclick: localStorage.clear,
       icon: <PoweroffOutlined />,
       danger: true,
     },
