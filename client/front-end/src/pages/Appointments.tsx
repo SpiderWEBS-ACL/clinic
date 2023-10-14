@@ -74,7 +74,7 @@ const ViewAppointments = () => {
       </h2>
 
       <span>
-        <label style={{ marginRight: 8 }}>
+        <label style={{ marginLeft: devicePixelRatio * 90, marginRight: 8 }}>
           <strong>Status:</strong>
         </label>
         <Select
@@ -97,7 +97,7 @@ const ViewAppointments = () => {
 
         <button
           onClick={handleFilter}
-          style={{ width: 80, marginRight: 40 }}
+          style={{ width: 80, marginRight: 20 }}
           className="btn btn-sm btn-primary"
         >
           filter
@@ -138,21 +138,11 @@ const ViewAppointments = () => {
         <tbody>
           {appointments.map((member: any, index) => (
             <tr key={index}>
-              <td>
-                <h6>{index + 1}</h6>
-              </td>
-              <td>
-                <h6>{member.Status}</h6>
-              </td>
-              <td>
-                <h6>{member.AppointmentDate.split("T")[0]}</h6>
-              </td>
-              <td>
-                <h6>{member.Patient.Name}</h6>
-              </td>
-              <td>
-                <h6>{member.Doctor.Name}</h6>
-              </td>
+              <td>{index + 1}</td>
+              <td>{member.Status}</td>
+              <td>{member.AppointmentDate.split("T")[0]}</td>
+              <td>{member.Patient.Name}</td>
+              <td>{member.Doctor.Name}</td>
             </tr>
           ))}
         </tbody>

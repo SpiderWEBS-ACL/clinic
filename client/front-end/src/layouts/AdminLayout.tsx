@@ -19,6 +19,7 @@ const { Header, Content, Footer, Sider } = Layout;
 
 const AdminLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const id = localStorage.getItem("id");
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.clear();

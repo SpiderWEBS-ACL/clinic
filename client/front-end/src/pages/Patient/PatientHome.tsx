@@ -6,7 +6,8 @@ import {
   List,
   ListItem,
   UnorderedList,
-  VStack,HStack,
+  VStack,
+  HStack,
   Divider,
   Flex,
 } from "@chakra-ui/react";
@@ -34,22 +35,20 @@ const PatientHome = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
-      api
-      .get(`/viewMyPrescriptions/${id}`).then((response) => {
-        setPrescriptions(response.data);
+    api.get(`/viewMyPrescriptions/${id}`).then((response) => {
+      setPrescriptions(response.data);
+    });
+    api.get(`/appointment/view/${id}`).then((response) => {
+      setAllAppointments(response.data);
+    });
+    api
+      .get(`appointment/filterAppointment`, {
+        params: { allAppointments, Status: "Upcoming" },
       })
-      api
-      .get(`/appointment/view/${id}`).then((response) => {
-        setAllAppointments(response.data);
-      })
-       api.get(`appointment/filterAppointment`, {
-        params: { allAppointments, Status: "Upcoming"},
-      }).then((response) => {
-      setAppointments(response.data);
-      })
+      .then((response) => {
+        setAppointments(response.data);
+      });
   }, [id]);
-
-  
 
   return (
     <ChakraProvider>
@@ -62,12 +61,12 @@ const PatientHome = () => {
         maxW="container.xl"
       >
         <Heading as="h1" size="xl" mt={0}>
-          My Clinic Dashboard<br></br>
+          Dashboard<br></br>
           <Divider borderColor="#052c65" borderWidth="2px" />
         </Heading>
         <HStack w="350px" align="start" spacing={2}>
           <Heading as="h5" size="md" mt={0}>
-            MR. {patientInfo.Name}
+            Mr./Ms. {patientInfo.Name}
             <Divider borderColor="#052c65" borderWidth="2px" />
           </Heading>
         </HStack>
@@ -76,10 +75,10 @@ const PatientHome = () => {
         <br></br>
         <Flex mt={8} justify="space-between">
           <VStack w="30%" align="start" spacing={4}>
-            <Heading as="h2" size="lg">
+            <Heading as="h2" size="md">
               Upcoming Appointments
             </Heading>
-            <Divider borderColor="#052c65" borderWidth="2px" />
+            <Divider borderColor="#052c65" borderWidth="1px" />
             <List spacing={2}>
               {appointments.map((appointment: any, index) => (
                 <ListItem key={index}>
@@ -91,21 +90,20 @@ const PatientHome = () => {
           </VStack>
 
           <VStack w="30%" align="start" spacing={4}>
-            <Heading as="h2" size="lg">
+            <Heading as="h2" size="md">
               Medical History
             </Heading>
-            <Divider borderColor="#052c65" borderWidth="2px" />
-            
-             No records
+            <Divider borderColor="#052c65" borderWidth="1px" />
+            No records
           </VStack>
 
           <VStack w="30%" align="start" spacing={4}>
-            <Heading as="h2" size="lg">
+            <Heading as="h2" size="md">
               Prescriptions
             </Heading>
-            <Divider borderColor="#052c65" borderWidth="2px" />
+            <Divider borderColor="#052c65" borderWidth="1px" />
             <List spacing={2}>
-              {prescriptions.map((prescription :any, index) => (
+              {prescriptions.map((prescription: any, index) => (
                 <ListItem key={index}>
                   Medication: {prescription.Medication} | Dosage:{" "}
                   {prescription.Dosage} | Instructions:{" "}

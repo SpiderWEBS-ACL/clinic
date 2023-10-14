@@ -65,11 +65,11 @@ const AppRouter: React.FC = () => {
         element={<ViewFamilyMembers />}
       />
       <Route path="/appointment/view/:id" element={<ViewAppointments />} />
-      <Route path="/patient/viewprescriptions/:id" element={<ViewPrescriptions />} />
-        <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
-
-
-
+      <Route
+        path="/patient/viewprescriptions/:id"
+        element={<ViewPrescriptions />}
+      />
+      <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
     </Routes>
   );
 };
