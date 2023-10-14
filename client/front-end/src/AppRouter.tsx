@@ -28,7 +28,7 @@ import DoctorHome from "./pages/Doctor/DoctorHome";
 const AppRouter: React.FC = () => {
   return (
     <Routes>
-      <Route path="/registerr" element={<RegLog />} />
+      <Route path="/" element={<RegLog />} />
       <Route path="/admin/add" element={<AddAdminForm />} />
       <Route path="admin/" element={<Home />} />
       <Route path="/admin/registrationRequests" element={<ViewAllRegReqs />} />
@@ -45,8 +45,8 @@ const AppRouter: React.FC = () => {
       <Route path="/doctor/viewPatients/:id" element={<ViewAllPatients />} />
       <Route path="/doctor/viewPatientInfo/:id" element={<ViewPatientInfo />} />
       <Route path="/doctor/edit/:id" element={<EditDoctor />} />
-      <Route path="/doctor/register" element={<Register />} />
-      <Route path="/doctor/update/:id" element={<Edit />} />
+      <Route path="/Doctor/register" element={<Register />} />
+      <Route path="/Doctor/update/:id" element={<Edit />} />
 
       <Route path="/patient/patientHome/:id" element={<PatientHome />} />
       <Route path="/doctor/home/:id" element={<DoctorHome />} />
