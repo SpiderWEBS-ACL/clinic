@@ -15,10 +15,30 @@ const addAppointment = async (req, res) => {
 
  const filterAppointment = async (req, res) => {
     try {
-        const appointments = req.query.allAppointments || []; // Ensure appointments is an array
-
+        const id = req.query.id; // Ensure appointments is an array
+        const doctor = await doctorModel.findById(id);
+        const patient = await patientModel.findById(id);
+        var appointments = []
         const AppointmentDate = req.query.AppointmentDate;
+        const date = new Date(AppointmentDate);
         const Status = req.query.Status;
+        try{
+            if(doctor){
+             appointments = await appointmentModel.find({"Doctor": doctor}).populate("Doctor").populate("Patient").exec();
+                if(!appointments || appointments.length === 0){
+                    res.status(404).json({error: "no appointments were found"});
+                }
+                }
+                else if(patient){
+                    appointments = await appointmentModel.find({"Patient": patient}).populate("Doctor").populate("Patient").exec();
+                        if(!appointments || appointments.length === 0){
+                            res.status(404).json({error: "no appointments were found"});
+                        }
+                        }
+            }catch(error){
+            res.status(500).json({ error: error.message });
+        }
+        
 
         if (!Status && !AppointmentDate) {
             return res.status(400).json({ error: "No filters were selected" });
@@ -28,13 +48,13 @@ const addAppointment = async (req, res) => {
             if (Status && AppointmentDate) {
                 // Filter by both date and status
                 return (
-                    appointment.AppointmentDate >= AppointmentDate &&
+                    appointment.AppointmentDate >= date &&
                     appointment.Status === Status
                 );
             } else {
                 // Filter by date or status
                 return (
-                    appointment.AppointmentDate >= AppointmentDate ||
+                    appointment.AppointmentDate >= date ||
                     appointment.Status === Status
                 );
             }
@@ -58,21 +78,21 @@ const addAppointment = async (req, res) => {
  
     try{
         if(doctor){
-        const appointments = await appointmentModel.find({"Doctor": doctor}).populate("Doctor").populate("Patient").exec();
+        const appointments = await appointmentModel.find({Doctor: doctor}).populate("Doctor").populate("Patient").exec();
             if(!appointments || appointments.length === 0){
                 res.status(404).json({error: "no appointments were found"});
             }
             else
 
-                res.status(200).json(appointments);
+                return res.status(200).json(appointments);
             }
             else if(patient){
-                const appointments = await appointmentModel.find({"Patient": patient}).populate("Doctor").populate("Patient").exec();
+                const appointments = await appointmentModel.find({Patient: patient}).populate("Doctor").populate("Patient").exec();
                     if(!appointments || appointments.length === 0){
                         res.status(404).json({error: "no appointments were found"});
                     }
                     else
-                        res.status(200).json(appointments);
+                       return res.status(200).json(appointments);
                     }
         }catch(error){
         res.status(500).json({ error: error.message });

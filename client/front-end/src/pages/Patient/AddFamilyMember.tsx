@@ -36,7 +36,6 @@ const AddFamilyMember = () => {
         Age,
         Gender,
       };
-      debugger;
       console.log(data);
       console.log("http://localhost:8000/patient/addFamilyMember/" + id);
       const response = await axios.post(

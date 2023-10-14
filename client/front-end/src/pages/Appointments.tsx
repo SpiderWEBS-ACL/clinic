@@ -20,16 +20,19 @@ const ViewAppointments = () => {
   const setTimeoutAl1 = async () => setAlertVisibility1(false);
   const clearFilters = async () => {
     setAppointments(allAppointments);
-    setDate(null);
+    setDate("");
     setStatus([]);
   };
   const handleFilter = async () => {
-    setStatus([]);
-    setDate(null);
-
+    // setStatus([]);
+    // setDate("");
     try {
       const response = await api.get(`appointment/filterAppointment`, {
-        params: { allAppointments, Status: status, AppointmentDate: date },
+        params: {
+          id: id,
+          Status: status,
+          AppointmentDate: date,
+        },
       });
       setAppointments(response.data);
       setHasAppointments(response.data.length > 0);
@@ -104,7 +107,7 @@ const ViewAppointments = () => {
           style={{ width: 80 }}
           className="btn btn-sm btn-primary"
         >
-          Clear
+          clear
         </button>
       </span>
       <br></br>

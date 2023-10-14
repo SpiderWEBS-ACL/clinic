@@ -48,7 +48,6 @@ const PatientHome = () => {
       setAppointments(response.data);
       })
   }, [id]);
-  window.location.reload;
 
   
 

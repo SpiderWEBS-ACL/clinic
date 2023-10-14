@@ -6,7 +6,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { message } from "antd";
 import Handler from "../Handler";
 
-
 const RegLog: React.FC = () => {
   const [alertVisible, setAlertVisibility] = useState(false);
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
@@ -24,9 +23,7 @@ const RegLog: React.FC = () => {
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
-   useEffect(() => {
-
-   })
+  useEffect(() => {});
   const handleSignUp = async () => {
     if (
       !Name ||
@@ -39,65 +36,60 @@ const RegLog: React.FC = () => {
       !EmergencyContactName ||
       !EmergencyContactMobile
     ) {
-
-     message.error('Please fill in all the required fields.');
+      message.error("Please fill in all the required fields.");
       return;
-    }
-  else{
-    try {
-      const data = {
-        Name,
-        Email,
-        Password,
-        Username,
-        Dob,
-        Gender,
-        Mobile,
-        EmergencyContactName,
-        EmergencyContactMobile,
-      };
+    } else {
+      try {
+        const data = {
+          Name,
+          Email,
+          Password,
+          Username,
+          Dob,
+          Gender,
+          Mobile,
+          EmergencyContactName,
+          EmergencyContactMobile,
+        };
 
-      const response = await api.post(`/patient/register`, data);
-      message.success('Congrats, you are in');
-      setTimeout(toggleSignUp, 1500);
-    } catch (error: any) {
-      console.error("Error:", error);
-      message.error(`${error.response.data.error}`)
+        const response = await api.post(`/patient/register`, data);
+        message.success("Congrats, you are in");
+        setTimeout(toggleSignUp, 1500);
+      } catch (error: any) {
+        console.error("Error:", error);
+        message.error(`${error.response.data.error}`);
+      }
     }
-  }
   };
   const handleSignIn = async () => {
-    if (!Password || !Username){
+    if (!Password || !Username) {
       message.warning(" Please fill in all the required fields.");
-    }
-    else{
-    try {
-      const data = {
-        Password,
-        Username,
-      };
-      const response = await api.post(`/patient/login`, data);
-      console.log(response.data);
-      handleRedirection(response.data);
-      localStorage.setItem("id",response.data.id)
-      localStorage.setItem("type",response.data.type)
-    } catch (error:any) {
+    } else {
+      try {
+        const data = {
+          Password,
+          Username,
+        };
+        const response = await api.post(`/patient/login`, data);
+        localStorage.setItem("id", response.data.id);
+        localStorage.setItem("type", response.data.type);
+        handleRedirection(response.data);
+        window.location.reload();
+      } catch (error: any) {
         console.error("Error:", error);
-        message.error(`${error.response.data.error}`)
+        message.error(`${error.response.data.error}`);
+      }
     }
-  }
   };
   const navigate = useNavigate();
   const handleRedirection = (item: any) => {
-    if(item.type == "Patient"){
-    navigate(`/patient/PatientHome/${item.id}`);
-  }
-    else if(item.type == "Doctor"){
+    if (item.type == "Patient") {
       navigate(`/patient/PatientHome/${item.id}`);
+    } else if (item.type == "Doctor") {
+      navigate(`/doctor/home/${item.id}`);
+    } else if (item.type == "Admin") {
+      navigate(`/admin/`);
     }
-      else if(item.type == "Admin"){
-        navigate(`/Home/${item.id}`);
-      }
   };
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
@@ -114,22 +106,22 @@ const RegLog: React.FC = () => {
   };
   const handleMobileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
-    const parsedValue = parseFloat(inputValue); 
+    const parsedValue = parseFloat(inputValue);
 
     if (!isNaN(parsedValue)) {
       setMobile(parsedValue);
     } else {
-      setMobile(undefined); 
+      setMobile(undefined);
     }
   };
   const handleDobChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value; 
+    const inputValue = event.target.value;
     const date = new Date(inputValue);
 
     if (!isNaN(date.getTime())) {
       setDob(date);
     } else {
-      setDob(undefined); 
+      setDob(undefined);
     }
   };
   const handleGenderChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -155,11 +147,13 @@ const RegLog: React.FC = () => {
   };
 
   return (
-    <div style={{
-      boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2)', // Add shadow
-      border: '1px solid #ccc', // Add border
-    }}
-    className={`cont ${isSignUp ? "s--signup" : ""}`}>
+    <div
+      style={{
+        boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2)", // Add shadow
+        border: "1px solid #ccc", // Add border
+      }}
+      className={`cont ${isSignUp ? "s--signup" : ""}`}
+    >
       <div className="form sign-in ">
         <h2 className="h2">Welcome Back</h2>
         <label className="label">

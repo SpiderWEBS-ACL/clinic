@@ -51,7 +51,6 @@ const EditDoctor = () => {
         HourlyRate,
         Affiliation,
       };
-      debugger;
       const response = await api.put(`/doctor/update/${id}`, data);
       message.success("Your info was updated successfully");
     } catch (error) {
