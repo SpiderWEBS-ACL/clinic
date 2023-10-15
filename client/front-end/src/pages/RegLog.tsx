@@ -145,6 +145,10 @@ const RegLog: React.FC = () => {
     setAlertVisibility(false);
     setIsSignUp(!isSignUp);
   };
+  const handleRegAsDoctor = () => {
+    navigate("/doctor/register");
+    window.location.reload();
+  };
 
   return (
     <div
@@ -177,6 +181,25 @@ const RegLog: React.FC = () => {
         <p className="forgot-pass">Forgot password?</p>
         <button onClick={handleSignIn} type="button" className="submit button">
           Sign In
+        </button>
+        <br></br>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <button
+          onClick={handleRegAsDoctor}
+          type="button"
+          className="submit button"
+        >
+          Register As Doctor
         </button>
       </div>
       <div className="sub-cont">
