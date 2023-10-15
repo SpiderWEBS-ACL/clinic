@@ -62,6 +62,7 @@ const AddFamilyMember = () => {
               type="text"
               value={Name}
               onChange={setName}
+              required={true}
             ></InputField>
 
             <InputField
@@ -71,6 +72,7 @@ const AddFamilyMember = () => {
               options={["Husband", "Wife", "Son", "Daughter"]}
               value={RelationToPatient}
               onChange={setRelationToPatient}
+              required={true}
             ></InputField>
 
             <InputField
@@ -79,6 +81,7 @@ const AddFamilyMember = () => {
               type="text"
               value={NationalID}
               onChange={setNationalID}
+              required={true}
             ></InputField>
 
             <InputField
@@ -87,6 +90,7 @@ const AddFamilyMember = () => {
               type="number"
               value={age}
               onChange={setage}
+              required={true}
             ></InputField>
 
             <InputField
@@ -96,6 +100,7 @@ const AddFamilyMember = () => {
               options={["Male", "Female"]}
               value={Gender}
               onChange={setGender}
+              required={true}
             ></InputField>
 
             <Button

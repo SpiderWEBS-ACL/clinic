@@ -74,6 +74,7 @@ const RegLog: React.FC = () => {
   const handleSignIn = async () => {
     if (!Password || !Username) {
       message.warning(" Please fill in all the required fields.");
+      return;
     }
     try {
       const data = {
