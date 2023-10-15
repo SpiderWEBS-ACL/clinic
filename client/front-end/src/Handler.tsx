@@ -9,5 +9,6 @@ const Handler: React.FC = () => {
     else if (userType === "Admin") return <AdminLayout />;
     else if (userType === "Doctor") return <DoctorLayout />;
     else return <RegLog/>;
+
 };
   export default Handler;

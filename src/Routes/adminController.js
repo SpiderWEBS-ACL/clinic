@@ -27,7 +27,7 @@ const addAdmin = async (req,res) => {
         return res.status(400).json({ error: "Missing Parameters" });
       }
 
-        const exists = await adminModel.findOne({"Username" : req.body.Username});
+        const exists = await adminModel.findOne({"Username" : { $regex: '^' + req.body.Username + '$', $options:'i'}});
         if(!exists){
             var newAdmin = await adminModel.create(req.body);
             res.status(201).json(newAdmin);
