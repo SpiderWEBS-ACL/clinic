@@ -10,8 +10,8 @@ const { fileLoader } = require("ejs");
 
 const addPatient = async (req, res) => {
   try {
-    const exists = await patientModel.findOne({"Username" : req.body.Username});
-    const exists2 = await patientModel.findOne({"Email" : req.body.Email});
+    const exists = await patientModel.findOne({"Username" : { $regex: '^' + req.body.Username + '$', $options:'i'}});
+    const exists2 = await patientModel.findOne({"Email" : { $regex: '^' + req.body.Email + '$', $options:'i'}});
     if(!exists && !exists2){
         var newPatient = await patientModel.create(req.body);
         res.status(201).json(newPatient);
@@ -27,9 +27,9 @@ const addPatient = async (req, res) => {
 };
 const login = async(req, res) => {
   try{
-    const usernamePat = await patientModel.findOne({ "Username": req.body.Username });
-    const usernameDoc = await doctorModel.findOne({ "Username": req.body.Username });
-    const usernameAdm = await adminModel.findOne({ "Username": req.body.Username });
+    const usernamePat = await patientModel.findOne({ "Username": { $regex: '^' + req.body.Username + '$', $options:'i'}});
+    const usernameDoc = await doctorModel.findOne({ "Username": { $regex: '^' + req.body.Username + '$', $options:'i'}});
+    const usernameAdm = await adminModel.findOne({ "Username": { $regex: '^' + req.body.Username + '$', $options:'i'} });
 
     
     if (!usernameDoc&& !usernamePat && !usernameAdm) {
@@ -263,11 +263,11 @@ const filterDoctors = async (req, res) => {
   try {
     var doctors;
 
-    if(!specialty && !dateTime){
-      return res.status(404).json({ error: "Please Specify Filtering Criteria"});
-    }
+    // if(!specialty && !dateTime){
+    //   return res.status(404).json({ error: "Please Specify Filtering Criteria"});
+    // }
 
-    else if (specialty && dateTime) {           //filter on specialty AND availability
+    if (specialty && dateTime) {           //filter on specialty AND availability
       doctors = await doctorModel.aggregate([
         {
           $match: { Specialty: { $regex: specialty, $options: "i"} },   //filter doctors by specialty ($regex, $options: "i" --> case insensitive)
@@ -402,9 +402,9 @@ const filterDoctorsByNameSpecialtyAvailability = async (req, res) => {
     }else
       var doctors = await doctorModel.find(query);
     
-    if (doctors.length === 0) {
-      return res.status(404).json({ error: 'No doctors found matching the criteria' });
-    }
+    // if (doctors.length === 0) {
+    //   return res.status(404).json({ error: 'No doctors found matching the criteria' });
+    // }
   
     const availableDoctors = await Promise.all(
       doctors.map(async (doctor) => {
