@@ -46,6 +46,7 @@ const AddPackage = () => {
               type="text"
               value={Name}
               onChange={setName}
+              required={true}
             ></InputField>
 
             <InputField
@@ -54,30 +55,34 @@ const AddPackage = () => {
               type="number"
               value={SubscriptionPrice}
               onChange={setSubscriptionPrice}
+              required={true}
             ></InputField>
 
             <InputField
               id="DoctorDiscount"
               label="Doctor Discount"
               type="number"
-              value={DoctorDiscount || 0}
+              value={DoctorDiscount}
               onChange={setDoctorDiscount}
+              required={true}
             ></InputField>
 
             <InputField
               id="PharmacyDiscount"
               label="Pharmacy Discount"
               type="number"
-              value={PharmacyDiscount || 0}
+              value={PharmacyDiscount}
               onChange={setPharmacyDiscount}
+              required={true}
             ></InputField>
 
             <InputField
               id="FamilyDiscount"
               label="Family Discount"
               type="number"
-              value={FamilyDiscount || 0}
+              value={FamilyDiscount}
               onChange={setFamilyDiscount}
+              required={true}
             ></InputField>
 
             <Button

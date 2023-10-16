@@ -16,10 +16,10 @@ const addDoctor = async (req,res) => {
 
 const registerDoctor = async (req,res) => {
     try {
-        const exists = await doctorModel.findOne({"Username" : req.body.Username});
-        const exists2 = await doctorRegisterRequestModel.findOne({"Username" : req.body.Username});
-        const exists3 = await doctorModel.findOne({"Email" : req.body.Email});
-        const exists4 = await doctorRegisterRequestModel.findOne({"Email" : req.body.Email});
+        const exists = await doctorModel.findOne({"Username" : { $regex: '^' + req.body.Username + '$', $options:'i'}});
+        const exists2 = await doctorRegisterRequestModel.findOne({"Username" : { $regex: '^' + req.body.Username + '$', $options:'i'}});
+        const exists3 = await doctorModel.findOne({"Email" : { $regex: '^' + req.body.Email + '$', $options:'i'}});
+        const exists4 = await doctorRegisterRequestModel.findOne({"Email" :{ $regex: '^' + req.body.Email + '$', $options:'i'}});
         if(!exists && !exists2 && !exists3 && !exists4){
             var newDoctor = await doctorRegisterRequestModel.create(req.body);
             res.status(201).json(newDoctor);
@@ -80,7 +80,6 @@ const searchPatientByName = async (req,res) => {
       if (!Doctor) {
           return res.status(404).json({ error: 'Doctor not found' });
      }
-     console.log(Doctor);
      res.status(200).json(Doctor);
     } catch (error) {
       res.status(500).json({ error: error.message });

@@ -122,7 +122,11 @@ const ViewPrescriptions = () => {
         />
         <button
           onClick={filter}
-          style={{ width: 100, marginRight: 20, marginLeft: 180 }}
+          style={{
+            width: 100,
+            marginRight: 20,
+            marginLeft: devicePixelRatio * 40,
+          }}
           className="btn btn-sm btn-primary"
         >
           Apply Filters
@@ -190,7 +194,9 @@ const ViewPrescriptions = () => {
                 <td>{selectedPrescription.Dosage}</td>
                 <td>{selectedPrescription.Instructions}</td>
                 <td>{selectedPrescription.Date.split("T")[0]}</td>
-                <td>{selectedPrescription.Filled == "Filled"? "Yes":"No"}</td>
+                <td>
+                  {selectedPrescription.Filled == "Filled" ? "Yes" : "No"}
+                </td>
                 <td>{selectedPrescription.DoctorName}</td>
               </tr>
             </tbody>

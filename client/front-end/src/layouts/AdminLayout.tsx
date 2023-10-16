@@ -19,7 +19,12 @@ const { Header, Content, Footer, Sider } = Layout;
 
 const AdminLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const id = localStorage.getItem("id");
   const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.reload;
+  };
   const items = [
     {
       label: "Home",
@@ -56,15 +61,24 @@ const AdminLayout: React.FC = () => {
       ],
     },
     {
-      label: "Health Packages",
+      label: "Health Package",
       key: "/admin/Packages",
       icon: <FileOutlined />,
+      children: [
+        {
+          label: "HealthPackages",
+          key: "/admin/Packages",
+        },
+        {
+          label: "Add Package",
+          key: "/admin/addPackage",
+        },
+      ],
     },
     {
       label: "Logout",
       key: "/",
       icon: <PoweroffOutlined />,
-      onclick: localStorage.clear,
       danger: true,
     },
   ];
@@ -79,11 +93,13 @@ const AdminLayout: React.FC = () => {
         <div className="demo-logo-vertical" />
         <Menu
           onClick={({ key }) => {
-            if (key === "signout") {
+            if (key === "/") {
               //TODO signout feature here
-            } else {
+              localStorage.clear();
               navigate(key);
+              window.location.reload();
             }
+            navigate(key);
           }}
           theme="dark"
           defaultSelectedKeys={["1"]}
@@ -95,7 +111,7 @@ const AdminLayout: React.FC = () => {
         <Content style={{ margin: "0 16px" }}>
           <AppRouter />
         </Content>
-      </Layout> 
+      </Layout>
     </Layout>
   );
 };

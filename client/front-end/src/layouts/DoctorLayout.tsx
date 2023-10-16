@@ -39,7 +39,7 @@ const DoctorLayout: React.FC = () => {
     },
     {
       label: "My Appointments",
-      key: "/appointment/view/"+ id,
+      key: "/appointment/view/" + id,
       icon: <UserOutlined />,
     },
     {
@@ -50,7 +50,6 @@ const DoctorLayout: React.FC = () => {
     {
       label: "Logout",
       key: "/",
-      onclick: localStorage.clear,
       icon: <PoweroffOutlined />,
       danger: true,
     },
@@ -66,11 +65,13 @@ const DoctorLayout: React.FC = () => {
         <div className="demo-logo-vertical" />
         <Menu
           onClick={({ key }) => {
-            if (key === "signout") {
+            if (key === "/") {
               //TODO signout feature here
-            } else {
+              localStorage.clear();
               navigate(key);
+              window.location.reload();
             }
+            navigate(key);
           }}
           theme="dark"
           defaultSelectedKeys={["1"]}

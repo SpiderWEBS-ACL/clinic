@@ -19,6 +19,7 @@ const { Header, Content, Footer, Sider } = Layout;
 const id = localStorage.getItem("id");
 const PatientLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+
   const navigate = useNavigate();
   const items = [
     {
@@ -56,7 +57,6 @@ const PatientLayout: React.FC = () => {
     {
       label: "Logout",
       key: "/",
-      onclick: localStorage.clear(),
       icon: <PoweroffOutlined />,
       danger: true,
     },
@@ -72,11 +72,13 @@ const PatientLayout: React.FC = () => {
         <div className="demo-logo-vertical" />
         <Menu
           onClick={({ key }) => {
-            if (key === "signout") {
+            if (key === "/") {
               //TODO signout feature here
-            } else {
+              localStorage.clear();
               navigate(key);
+              window.location.reload();
             }
+            navigate(key);
           }}
           theme="dark"
           defaultSelectedKeys={["1"]}

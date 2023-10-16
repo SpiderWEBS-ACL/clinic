@@ -45,8 +45,8 @@ const AppRouter: React.FC = () => {
       <Route path="/doctor/viewPatients/:id" element={<ViewAllPatients />} />
       <Route path="/doctor/viewPatientInfo/:id" element={<ViewPatientInfo />} />
       <Route path="/doctor/edit/:id" element={<EditDoctor />} />
-      <Route path="/Doctor/register" element={<Register />} />
-      <Route path="/Doctor/update/:id" element={<Edit />} />
+      <Route path="/doctor/register" element={<Register />} />
+      <Route path="/doctor/update/:id" element={<Edit />} />
 
       <Route path="/patient/patientHome/:id" element={<PatientHome />} />
       <Route path="/doctor/home/:id" element={<DoctorHome />} />
@@ -65,11 +65,11 @@ const AppRouter: React.FC = () => {
         element={<ViewFamilyMembers />}
       />
       <Route path="/appointment/view/:id" element={<ViewAppointments />} />
-      <Route path="/patient/viewprescriptions/:id" element={<ViewPrescriptions />} />
-        <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
-
-
-
+      <Route
+        path="/patient/viewprescriptions/:id"
+        element={<ViewPrescriptions />}
+      />
+      <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
     </Routes>
   );
 };

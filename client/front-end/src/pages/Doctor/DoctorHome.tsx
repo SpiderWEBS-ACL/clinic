@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 import {
   ChakraProvider,
   Container,
@@ -11,7 +11,8 @@ import {
   List,
   ListItem,
   UnorderedList,
-  VStack,HStack,
+  VStack,
+  HStack,
   Divider,
   Flex,
 } from "@chakra-ui/react";
@@ -25,7 +26,6 @@ const DoctorHome = () => {
   const { id } = useParams<{ id: string }>();
   const [doctorInfo, setDoctorInfo] = useState<any>({});
 
-
   useEffect(() => {
     api
       .get(`/doctor/getDoctor/${id}`)
@@ -37,7 +37,7 @@ const DoctorHome = () => {
         console.error("Error:", error);
       });
   }, [id]);
-  
+
   const [patientData, setPatientData] = useState({
     name: "John Doe",
     email: "johndoe@example.com",
@@ -56,13 +56,12 @@ const DoctorHome = () => {
     ],
   });
   const navigate = useNavigate();
-  const appoint = async () =>{
+  const appoint = async () => {
     navigate(`/appointment/view/${id}`);
-  }
-  const viewpatients = async() =>{
+  };
+  const viewpatients = async () => {
     navigate(`/doctor/viewPatients/${id}`);
-
-  }
+  };
 
   // const getDrDetails = async ()=>{
   //   try{
@@ -71,7 +70,7 @@ const DoctorHome = () => {
   //   }catch(error){`
   //     console.error(error);
   //   }
-    
+
   // };
 
   return (
@@ -85,61 +84,45 @@ const DoctorHome = () => {
         maxW="container.xl"
       >
         <Heading as="h1" size="xl" mt={0}>
-          Hello Dr {doctorInfo.Name}<br></br>
+          Welcome Dr. {doctorInfo.Name}!<br></br>
           <Divider borderColor="#052c65" borderWidth="2px" />
         </Heading>
-        <HStack w="350px" align="start" spacing={2}>
-       
-        </HStack>
+        <HStack w="350px" align="start" spacing={2}></HStack>
 
         <br></br>
         <br></br>
         <Flex mt={8} justify="space-between">
-         
-
           <VStack w="30%" align="start" spacing={4}>
-            <Heading as="h2" size="lg">
+            <Heading as="h2" size="md">
               Upcoming Appointments
             </Heading>
-            <Divider borderColor="#052c65" borderWidth="2px" />
+            <Divider borderColor="#052c65" borderWidth="1px" />
             <button
-          style={{ width: 150 }}
-          className="btn btn-sm btn-primary"
-          onClick={appoint}
-        >
-          View Details
-        </button>
+              style={{ width: 150 }}
+              className="btn btn-sm btn-primary"
+              onClick={appoint}
+            >
+              View Details
+            </button>
           </VStack>
 
           <VStack w="30%" align="start" spacing={4}>
-            <Heading as="h2" size="lg">
+            <Heading as="h2" size="md">
               View Patients
             </Heading>
-            <Divider borderColor="#052c65" borderWidth="2px" />
+            <Divider borderColor="#052c65" borderWidth="1px" />
             <button
-          style={{ width: 150 }}
-          className="btn btn-sm btn-primary"
-          onClick={viewpatients}
-        >
-          View Details
-        </button>
+              style={{ width: 150 }}
+              className="btn btn-sm btn-primary"
+              onClick={viewpatients}
+            >
+              View Details
+            </button>
           </VStack>
         </Flex>
       </Container>
-
     </ChakraProvider>
-    
   );
 };
 
 export default DoctorHome;
-
-
-
-
-
-
-
-
-
-
