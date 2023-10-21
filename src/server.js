@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require('mongoose');
-
+const jwt = require('jsonwebtoken');
 const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability, addPrescription} = require("./Routes/patientController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor } = require("./Routes/doctorController");
 const { addAppointment, filterAppointment,viewAllAppointments } = require("./Routes/appointmentController")
@@ -14,6 +14,7 @@ const MongoURI = process.env.ATLAS_MONGO_URI;
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 const port = process.env.PORT || "8000";
 
 // configurations
@@ -31,7 +32,6 @@ mongoose.connect(MongoURI, {useNewUrlParser:true})
 app.get("/", (req, res) => {
     res.status(200).send("You have everything installed!");
 });
-app.use(express.json());
 
 //Admin Endpoints
 app.post("/admin/add",addAdmin);

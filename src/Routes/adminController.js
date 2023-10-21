@@ -5,6 +5,7 @@ const patientModel = require('../Models/Patient');
 const packageModel = require('../Models/Package');
 const appointmentModel = require("../Models/Appointment");
 const doctorRegisterRequestModel = require('../Models/DoctorRegisterRequest');
+const bcrypt = require("bcrypt");
 
 const { default: mongoose } = require('mongoose');
 
@@ -29,6 +30,7 @@ const addAdmin = async (req,res) => {
 
         const exists = await adminModel.findOne({"Username" : { $regex: '^' + req.body.Username + '$', $options:'i'}});
         if(!exists){
+          req.body.Password = await bcrypt.hash(req.body.Password,10);
             var newAdmin = await adminModel.create(req.body);
             res.status(201).json(newAdmin);
         }

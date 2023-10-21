@@ -3,10 +3,12 @@ const patientModel = require('../Models/Patient');
 const doctorRegisterRequestModel = require('../Models/DoctorRegisterRequest');
 const appointmentModel = require('../Models/Appointment')
 const { default: mongoose } = require('mongoose');
+const bcrypt = require("bcrypt");
 
 // FOR TESTING
 const addDoctor = async (req,res) => {
     try {
+        req.body.Password = await bcrypt.hash(req.body.Password,10);
         const newDoctor = await doctorModel.create(req.body);
         res.status(201).json(newDoctor);
     }catch(error){
@@ -21,6 +23,7 @@ const registerDoctor = async (req,res) => {
         const exists3 = await doctorModel.findOne({"Email" : { $regex: '^' + req.body.Email + '$', $options:'i'}});
         const exists4 = await doctorRegisterRequestModel.findOne({"Email" :{ $regex: '^' + req.body.Email + '$', $options:'i'}});
         if(!exists && !exists2 && !exists3 && !exists4){
+            req.body.Password = await bcrypt.hash(req.body.Password,10);
             var newDoctor = await doctorRegisterRequestModel.create(req.body);
             res.status(201).json(newDoctor);
         }

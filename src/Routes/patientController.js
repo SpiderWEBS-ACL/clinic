@@ -1,6 +1,7 @@
 const patientModel = require("../Models/Patient");
 const { default: mongoose } = require("mongoose");
 const express = require("express");
+const bcrypt = require("bcrypt");
 const doctorModel = require("../Models/Doctor");
 const adminModel = require("../Models/Admin");
 const appointmentModel = require("../Models/Appointment");
@@ -13,6 +14,7 @@ const addPatient = async (req, res) => {
     const exists = await patientModel.findOne({"Username" : { $regex: '^' + req.body.Username + '$', $options:'i'}});
     const exists2 = await patientModel.findOne({"Email" : { $regex: '^' + req.body.Email + '$', $options:'i'}});
     if(!exists && !exists2){
+        req.body.Password = await bcrypt.hash(req.body.Password,10);
         var newPatient = await patientModel.create(req.body);
         res.status(201).json(newPatient);
     }
@@ -36,21 +38,21 @@ const login = async(req, res) => {
       return res.status(400).json({ error: "Username not found!" });
     }
     else if(usernamePat){
-      if (usernamePat.Password === req.body.Password) {
-        res.json({ id: usernamePat._id,type:"Patient" });
+      if (bcrypt.compare(usernamePat.Password,req.body.Password)) {
+        res.json({ id: usernamePat._id, type:"Patient"});
       } else {
         res.status(400).json({ error: "Password doesn't match!" });
       }
     }
     else if(usernameDoc){
-      if (usernameDoc.Password === req.body.Password) {
-        res.json({ id: usernameDoc._id,type:"Doctor" });
+      if (bcrypt.compare(usernameDoc.Password, req.body.Password)) {
+        res.json({ id: usernameDoc._id, type:"Doctor" });
       } else {
         res.status(400).json({ error: "Password doesn't match!" });
       }
     }
     else if(usernameAdm){
-      if (usernameAdm.Password === req.body.Password) {
+      if (bcrypt.compare(usernameAdm.Password, req.body.Password)) {
         res.json({ id: usernameAdm._id,type:"Admin" });
       } else {
         res.status(400).json({ error: "Password doesn't match!" });
