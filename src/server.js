@@ -7,7 +7,6 @@ const { addAppointment, filterAppointment } = require("./controllers/appointment
 const {addSubscription} = require("./controllers/SubscriptionController")
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages, getAdmin } = require("./controllers/adminController");
 const cors = require('cors');
-const { Next } = require("@nestjs/common");
 const { AdminProtect, DoctorProtect, PatientProtect } = require("./middleware/authMiddleware");
 
 mongoose.set('strictQuery', false);
@@ -42,7 +41,7 @@ app.get("/admin/allDoctors",AdminProtect,getAllDoctors);
 app.delete("/admin/removeDoctor/:id",AdminProtect,removeDoctor);
 app.delete("/admin/removePatient/:id",AdminProtect,removePatient);
 app.delete("/admin/removeAdmin/:id",AdminProtect,removeAdmin);
-app.get("/admin/registrationRequests",AdminProtect,getAllDoctrsRegistrationReqs);
+app.get("/admin/registrationRequests",AdminProtect, getAllDoctrsRegistrationReqs);
 app.get("/admin/registrationRequest/:id",AdminProtect,getDoctrRegistrationReqDetails);
 app.get("/admin/package/:id",AdminProtect,getPackage);
 app.post("/admin/addPackage",AdminProtect,addPackage);

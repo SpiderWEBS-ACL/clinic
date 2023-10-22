@@ -12,7 +12,6 @@ function generateAccessToken(id){
 const AdminProtect = async (req,res,next) => {
     let token;
     const authHeader = req.headers.authorization;
-    console.log(authHeader);
     if(authHeader){
     try{
     //Get token from header
@@ -76,7 +75,6 @@ const DoctorProtect = async (req,res,next) => {
      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
      //Get User from token
-
      req.user = await doctorModel.findById(decoded.id);
 
      next();
