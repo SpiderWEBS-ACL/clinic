@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
@@ -32,6 +32,7 @@ const RegLog: React.FC = () => {
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
+
 
   const handleSignUp = async () => {
     if (
@@ -84,6 +85,7 @@ const RegLog: React.FC = () => {
       const response = await api.post(`/patient/login`, data);
       localStorage.setItem("id", response.data.id);
       localStorage.setItem("type", response.data.type);
+      localStorage.setItem("accessToken", response.data.accessToken);
       handleRedirection(response.data);
       window.location.reload();
     } catch (error: any) {

@@ -23,7 +23,7 @@ const DoctorLayout: React.FC = () => {
   const items = [
     {
       label: "Home",
-      key: "/doctor/Home/" + id,
+      key: "/doctor/Home",
       icon: <HomeOutlined />,
     },
     {
@@ -33,18 +33,18 @@ const DoctorLayout: React.FC = () => {
       children: [
         {
           label: "View Patients",
-          key: "/doctor/viewPatients/" + id,
+          key: "/doctor/viewPatients",
         },
       ],
     },
     {
       label: "My Appointments",
-      key: "/appointment/view/" + id,
+      key: "/doctor/allAppointments",
       icon: <UserOutlined />,
     },
     {
       label: "Update Info",
-      key: "/doctor/update/" + id,
+      key: "/doctor/update",
       icon: <UserOutlined />,
     },
     {

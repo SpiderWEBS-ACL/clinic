@@ -6,6 +6,7 @@ import { Input, Select } from "antd";
 import InputField from "../../components/InputField";
 
 const ViewAllPatients = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const [name, setName] = useState("");
   const [selectedOption, setSelectedOption] = useState("All");
   const { id } = useParams<{ id: string }>();
@@ -19,8 +20,13 @@ const ViewAllPatients = () => {
   });
 
   useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
     api
-      .get(`/doctor/viewPatients/${id}`)
+      .get(`/doctor/viewPatients/`, config)
       .then((response) => {
         setPatients(response.data);
         setAllPatients(response.data);

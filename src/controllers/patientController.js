@@ -8,6 +8,9 @@ const appointmentModel = require("../Models/Appointment");
 const prescriptionModel = require("../Models/Prescription");
 const subscriptionModel = require("../Models/Subscription");
 const { fileLoader } = require("ejs");
+const jwt = require('jsonwebtoken');
+const { generateAccessToken } = require("../middleware/authMiddleware");
+require('dotenv').config();
 
 const addPatient = async (req, res) => {
   try {
@@ -27,38 +30,47 @@ const addPatient = async (req, res) => {
     res.status(400).json({ error: error.message });
 }
 };
+
+
+
 const login = async(req, res) => {
   try{
-    const usernamePat = await patientModel.findOne({ "Username": { $regex: '^' + req.body.Username + '$', $options:'i'}});
-    const usernameDoc = await doctorModel.findOne({ "Username": { $regex: '^' + req.body.Username + '$', $options:'i'}});
-    const usernameAdm = await adminModel.findOne({ "Username": { $regex: '^' + req.body.Username + '$', $options:'i'} });
-
+    const patient = await patientModel.findOne({ "Username": { $regex: '^' + req.body.Username + '$', $options:'i'}});
+    const doctor = await doctorModel.findOne({ "Username": { $regex: '^' + req.body.Username + '$', $options:'i'}});
+    const admin = await adminModel.findOne({ "Username": { $regex: '^' + req.body.Username + '$', $options:'i'} });
+    var accessToken;
+    var refreshToken;
     
-    if (!usernameDoc&& !usernamePat && !usernameAdm) {
+    if (!doctor&& !patient && !admin) {
       return res.status(400).json({ error: "Username not found!" });
     }
-    else if(usernamePat){
-      if (bcrypt.compare(usernamePat.Password,req.body.Password)) {
-        res.json({ id: usernamePat._id, type:"Patient"});
+    else if(patient){
+      if (await bcrypt.compare(req.body.Password, patient.Password)) {
+        accessToken = generateAccessToken({id: patient._id});
+        refreshToken = jwt.sign({id: patient._id}, process.env.REFRESH_TOKEN_SECRET);
+        res.json({ accessToken: accessToken, refreshToken: refreshToken, id: patient._id, type:"Patient"});
       } else {
         res.status(400).json({ error: "Password doesn't match!" });
       }
     }
-    else if(usernameDoc){
-      if (bcrypt.compare(usernameDoc.Password, req.body.Password)) {
-        res.json({ id: usernameDoc._id, type:"Doctor" });
+    else if(doctor){
+      if (await bcrypt.compare(req.body.Password, doctor.Password,)) {
+        accessToken = generateAccessToken({id: doctor._id});
+        refreshToken = jwt.sign({id: doctor._id}, process.env.REFRESH_TOKEN_SECRET);
+        res.json({ accessToken: accessToken, refreshToken: refreshToken, id: doctor._id, type:"Doctor" });
       } else {
         res.status(400).json({ error: "Password doesn't match!" });
       }
     }
-    else if(usernameAdm){
-      if (bcrypt.compare(usernameAdm.Password, req.body.Password)) {
-        res.json({ id: usernameAdm._id,type:"Admin" });
+    else if(admin){
+      if (await bcrypt.compare(req.body.Password, admin.Password)) {
+        accessToken = generateAccessToken({id: admin._id});
+        refreshToken = jwt.sign({id: admin._id}, process.env.REFRESH_TOKEN_SECRET);
+        res.json({accessToken: accessToken, refreshToken: refreshToken, id: admin._id,type:"Admin" });
       } else {
         res.status(400).json({ error: "Password doesn't match!" });
       }
     }
-
    
   } catch (error) {
     res.status(500).json({ error: error.message });

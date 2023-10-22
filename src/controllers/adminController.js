@@ -12,6 +12,15 @@ const { default: mongoose } = require('mongoose');
 
 ////////////////////////////////////ADMIN////////////////////////////////////////
 
+const getAdmin = async (req, res)=>{
+  const { _id, Username,  Password} = await adminModel.findById(req.user.id);
+  res.status(200).json({
+    id : _id,
+    Username,
+    Password
+  })
+}
+
 const getAllAdmins = async (req,res) =>{
   try{
       const admin = await adminModel.find({});
@@ -190,4 +199,4 @@ const deletePackage = async (req,res) => {
    }
 }
 
-module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages};
+module.exports = {getAdmin, addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages};
