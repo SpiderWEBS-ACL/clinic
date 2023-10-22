@@ -4,6 +4,7 @@ import { Spin } from "antd";
 import { useParams } from "react-router-dom";
 
 const AllAdmins = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const [doctors, setDoctors] = useState([]);
   const [deleted, setDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -13,8 +14,13 @@ const AllAdmins = () => {
   });
 
   useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
     api
-      .get("/allAdmins")
+      .get("/allAdmins", config)
       .then((response) => {
         setDoctors(response.data);
         setLoading(false);
@@ -26,9 +32,14 @@ const AllAdmins = () => {
   }, [deleted]);
 
   const handleDelete = async (id: string) => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
     try {
       setLoading(true);
-      const response = await api.delete(`/removeAdmin/${id}`);
+      const response = await api.delete(`/removeAdmin/${id}`, config);
       setDeleted(!deleted);
       console.log("Response:", response.data);
     } catch (error) {

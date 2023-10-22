@@ -7,6 +7,7 @@ import { Spin } from "antd";
 import { message } from "antd";
 
 const EditDoctor = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [Username, setUsername] = useState<string>("");
@@ -24,8 +25,13 @@ const EditDoctor = () => {
   });
 
   useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
     api
-      .get(`/doctor/getDoctor/${id}`)
+      .get(`/doctor/getDoctor/`, config)
       .then((response) => {
         setUsername(response.data.Username);
         setName(response.data.Name);

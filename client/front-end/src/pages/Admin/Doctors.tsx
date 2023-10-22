@@ -3,6 +3,7 @@ import axios from "axios";
 import { Spin } from "antd";
 
 const AllDoctors = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const [doctors, setDoctors] = useState([]);
   const [deleted, setDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -11,8 +12,11 @@ const AllDoctors = () => {
   });
 
   useEffect(() => {
+    const headers = {
+      Authorization: "Bearer " + accessToken,
+    };
     api
-      .get("/allDoctors")
+      .get("/allDoctors", { headers })
       .then((response) => {
         setDoctors(response.data);
         setLoading(false);
@@ -24,9 +28,12 @@ const AllDoctors = () => {
   }, [deleted]);
 
   const handleDelete = async (id: string) => {
+    const headers = {
+      Authorization: "Bearer " + accessToken,
+    };
     try {
       setLoading(true);
-      const response = await api.delete(`/removeDoctor/${id}`);
+      const response = await api.delete(`/removeDoctor/${id}`, { headers });
       setDeleted(!deleted);
       console.log("Response:", response.data);
     } catch (error) {

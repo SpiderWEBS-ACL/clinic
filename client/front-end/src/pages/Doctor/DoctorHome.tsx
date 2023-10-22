@@ -25,10 +25,16 @@ const DoctorHome = () => {
   });
   const { id } = useParams<{ id: string }>();
   const [doctorInfo, setDoctorInfo] = useState<any>({});
+  const accessToken = localStorage.getItem("accessToken");
 
   useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
     api
-      .get(`/doctor/getDoctor/${id}`)
+      .get(`/doctor/getDoctor/`, config)
       .then((response) => {
         setDoctorInfo(response.data);
         console.log(response.data);

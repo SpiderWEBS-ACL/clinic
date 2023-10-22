@@ -6,6 +6,7 @@ import { DatePicker, DatePickerProps, Input, Select } from "antd";
 import "./error-box.css";
 
 const ViewPrescriptions = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const [prescriptions, setPrescriptions] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [showError, setError] = useState(false);
@@ -20,8 +21,13 @@ const ViewPrescriptions = () => {
   const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
     api
-      .get(`/viewMyPrescriptions/${id}`)
+      .get(`/viewMyPrescriptions`, config)
       .then((response) => {
         setPrescriptions(response.data);
       })

@@ -5,11 +5,21 @@ const patientModel = require('../Models/Patient');
 const packageModel = require('../Models/Package');
 const appointmentModel = require("../Models/Appointment");
 const doctorRegisterRequestModel = require('../Models/DoctorRegisterRequest');
+const bcrypt = require("bcrypt");
 
 const { default: mongoose } = require('mongoose');
 
 
 ////////////////////////////////////ADMIN////////////////////////////////////////
+
+const getAdmin = async (req, res)=>{
+  const { _id, Username,  Password} = await adminModel.findById(req.user.id);
+  res.status(200).json({
+    id : _id,
+    Username,
+    Password
+  })
+}
 
 const getAllAdmins = async (req,res) =>{
   try{
@@ -29,6 +39,7 @@ const addAdmin = async (req,res) => {
 
         const exists = await adminModel.findOne({"Username" : { $regex: '^' + req.body.Username + '$', $options:'i'}});
         if(!exists){
+          req.body.Password = await bcrypt.hash(req.body.Password,10);
             var newAdmin = await adminModel.create(req.body);
             res.status(201).json(newAdmin);
         }
@@ -93,7 +104,7 @@ const removeDoctor = async (req,res) => {
    }
  }
 
- const getAllDoctors = async (req,res) =>{
+const getAllDoctors = async (req,res) =>{
   try{
       const RegistrationReqs = await doctorModel.find({});
       res.status(200).json(RegistrationReqs);
@@ -188,4 +199,4 @@ const deletePackage = async (req,res) => {
    }
 }
 
-module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages};
+module.exports = {getAdmin, addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages};

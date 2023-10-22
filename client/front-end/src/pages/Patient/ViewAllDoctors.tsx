@@ -12,6 +12,7 @@ import {
 const { Option } = Select;
 
 const ViewAllDoctors = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const [Doctors, setDoctors] = useState([]);
   const [AllDoctors, setAllDoctors] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -36,8 +37,13 @@ const ViewAllDoctors = () => {
     baseURL: "http://localhost:8000/",
   });
   useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
     api
-      .get("admin/allDoctors")
+      .get("patient/allDoctors", config)
       .then((response) => {
         setDoctors(response.data);
         setAllDoctors(response.data);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
@@ -84,6 +84,7 @@ const RegLog: React.FC = () => {
       const response = await api.post(`/patient/login`, data);
       localStorage.setItem("id", response.data.id);
       localStorage.setItem("type", response.data.type);
+      localStorage.setItem("accessToken", response.data.accessToken);
       handleRedirection(response.data);
       window.location.reload();
     } catch (error: any) {
@@ -96,9 +97,9 @@ const RegLog: React.FC = () => {
 
   const handleRedirection = (item: any) => {
     if (item.type == "Patient") {
-      navigate(`/patient/PatientHome/${item.id}`);
+      navigate(`/patient/Home`);
     } else if (item.type == "Doctor") {
-      navigate(`/doctor/home/${item.id}`);
+      navigate(`/doctor/home`);
     } else if (item.type == "Admin") {
       navigate(`/admin/`);
     }

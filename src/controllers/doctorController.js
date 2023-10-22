@@ -3,10 +3,12 @@ const patientModel = require('../Models/Patient');
 const doctorRegisterRequestModel = require('../Models/DoctorRegisterRequest');
 const appointmentModel = require('../Models/Appointment')
 const { default: mongoose } = require('mongoose');
+const bcrypt = require("bcrypt");
 
 // FOR TESTING
 const addDoctor = async (req,res) => {
     try {
+        req.body.Password = await bcrypt.hash(req.body.Password,10);
         const newDoctor = await doctorModel.create(req.body);
         res.status(201).json(newDoctor);
     }catch(error){
@@ -21,6 +23,7 @@ const registerDoctor = async (req,res) => {
         const exists3 = await doctorModel.findOne({"Email" : { $regex: '^' + req.body.Email + '$', $options:'i'}});
         const exists4 = await doctorRegisterRequestModel.findOne({"Email" :{ $regex: '^' + req.body.Email + '$', $options:'i'}});
         if(!exists && !exists2 && !exists3 && !exists4){
+            req.body.Password = await bcrypt.hash(req.body.Password,10);
             var newDoctor = await doctorRegisterRequestModel.create(req.body);
             res.status(201).json(newDoctor);
         }
@@ -61,7 +64,7 @@ const searchPatientByName = async (req,res) => {
  }
 
  const updateDoctor = async (req,res) => {
-    const { id } = req.params;
+    const  id  = req.user.id;
     const updates = req.body;
     try{
         const updatedDoctor = await doctorModel.findByIdAndUpdate(id, updates);
@@ -75,7 +78,7 @@ const searchPatientByName = async (req,res) => {
  }
  const getDoctor = async (req,res) => {
     try {
-      const {id} = req.params;
+      const id = req.user.id;
       const Doctor = await doctorModel.findById(id);
       if (!Doctor) {
           return res.status(404).json({ error: 'Doctor not found' });
@@ -88,7 +91,7 @@ const searchPatientByName = async (req,res) => {
   }
 
  const upcomingAppointments = async (req, res) => {
-    const doctorId = req.params.id;
+    const doctorId = req.user.id;
     const currentDate = new Date();
     try{
      const appointments =  await appointmentModel.find({
@@ -108,7 +111,7 @@ const searchPatientByName = async (req,res) => {
 
 
  const viewPatients = async (req,res) => {
-    const { id } = req.params;
+    const  id  = req.user.id;
     try{
      const appointments =  await appointmentModel.find({
         Doctor: id
@@ -141,7 +144,7 @@ const searchPatientByName = async (req,res) => {
  }
 
  const filterDoctorAppointments = async(req,res) =>{
-    const { id } = req.params;
+    const  id  = req.user.id;
     const date = req.body.Date;
     const status = req.body.Status;
 
@@ -170,7 +173,24 @@ const searchPatientByName = async (req,res) => {
     }
  }
  
+ const viewAllDoctorAppointments = async(req,res) => {
+    const id = req.user.id;
+    const doctor = await doctorModel.findById(id);
+    try{
+        if(doctor){
+        const appointments = await appointmentModel.find({Doctor: doctor}).populate("Doctor").populate("Patient").exec();
+            if(!appointments || appointments.length === 0){
+                res.status(404).json({error: "no appointments were found"});
+            }
+            else
+
+                return res.status(200).json(appointments);
+            }
+        }catch(error){
+        res.status(500).json({ error: error.message });
+    }
+ }
 
 
 module.exports = { registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments,
-    addDoctor, viewPatients,viewPatientInfo, filterDoctorAppointments, getDoctor};
+    addDoctor, viewPatients,viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments};

@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 
 const ViewPatientInfo = () => {
   const { id } = useParams<{ id: string }>();
+  const accessToken = localStorage.getItem("accessToken");
 
   const [patientInfo, setPatientInfo] = useState<any>({});
 
@@ -16,8 +17,13 @@ const ViewPatientInfo = () => {
   }, [id]);
 
   const getPatientInfo = async () => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
     await api
-      .get(`/doctor/viewPatientInfo/${id}`)
+      .get(`/doctor/viewPatientInfo/${id}`, config)
       .then((response) => {
         setPatientInfo(response.data);
         console.log(response.data);

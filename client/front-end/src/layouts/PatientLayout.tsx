@@ -24,12 +24,12 @@ const PatientLayout: React.FC = () => {
   const items = [
     {
       label: "Home",
-      key: "/patient/patientHome/" + id,
+      key: "/patient/Home",
       icon: <HomeOutlined />,
     },
     {
       label: "My Appointments",
-      key: "/appointment/view/" + id,
+      key: "/patient/allAppointments",
       icon: <UserOutlined />,
     },
     {
@@ -39,9 +39,9 @@ const PatientLayout: React.FC = () => {
       children: [
         {
           label: "Family Members",
-          key: "/patient/viewfamilyMembers/" + id,
+          key: "/patient/viewfamilyMembers",
         },
-        { label: "Add Family Member", key: "/patient/addFamilyMember/" + id },
+        { label: "Add Family Member", key: "/patient/addFamilyMember" },
       ],
     },
     {
@@ -51,7 +51,7 @@ const PatientLayout: React.FC = () => {
     },
     {
       label: "Prescriptions",
-      key: "/patient/viewPrescriptions/" + id, //TODO: add prescriptions route
+      key: "/patient/viewPrescriptions",
       icon: <FileOutlined />,
     },
     {

@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { format } from "date-fns";
 import { Spin } from "antd";
 import Button from "../../components/Button";
 
-const RegistrationRequestDetails: React.FC = () => {
+const RegistrationRequestDetails = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const { id } = useParams<{ id: string }>();
   const [registrationDetails, setRegistrationDetails] = useState<any>("");
   const [loading, setLoading] = useState(true);
   const api = axios.create({
-    baseURL: "http://localhost:8000/",
+    baseURL: "http://localhost:8000",
   });
   const navigate = useNavigate();
+
   useEffect(() => {
+    const headers = {
+      Authorization: "Bearer " + accessToken,
+    };
     api
-      .get(`/admin/registrationRequest/${id}`)
+      .get("/admin/registrationRequest/" + id, { headers })
       .then((response) => {
         setRegistrationDetails(response.data);
         setLoading(false);

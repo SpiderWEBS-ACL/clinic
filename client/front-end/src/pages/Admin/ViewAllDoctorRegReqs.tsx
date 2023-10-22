@@ -4,6 +4,7 @@ import { Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 
 const AllDoctors = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const api = axios.create({
@@ -11,8 +12,11 @@ const AllDoctors = () => {
   });
 
   useEffect(() => {
+    const headers = {
+      Authorization: "Bearer " + accessToken,
+    };
     api
-      .get("/registrationRequests")
+      .get("/registrationRequests", { headers })
       .then((response) => {
         setDoctors(response.data);
         setLoading(false);

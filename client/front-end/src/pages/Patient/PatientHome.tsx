@@ -15,6 +15,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import "./StylePatient.css";
 const PatientHome = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const { id } = useParams<{ id: string }>();
   const [patientInfo, setPatientInfo] = useState<any>({});
   const [prescriptions, setPrescriptions] = useState([]);
@@ -26,27 +27,19 @@ const PatientHome = () => {
   });
 
   useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
     api
-      .get(`/doctor/viewPatientInfo/${id}`)
+      .get(`/patient/getPatient`, config)
       .then((response) => {
         setPatientInfo(response.data);
         console.log(response.data);
       })
       .catch((error) => {
         console.error("Error:", error);
-      });
-    api.get(`/viewMyPrescriptions/${id}`).then((response) => {
-      setPrescriptions(response.data);
-    });
-    api.get(`/appointment/view/${id}`).then((response) => {
-      setAllAppointments(response.data);
-    });
-    api
-      .get(`appointment/filterAppointment`, {
-        params: { allAppointments, Status: "Upcoming" },
-      })
-      .then((response) => {
-        setAppointments(response.data);
       });
   }, [id]);
 
