@@ -104,7 +104,7 @@ const removeDoctor = async (req,res) => {
    }
  }
 
- const getAllDoctors = async (req,res) =>{
+const getAllDoctors = async (req,res) =>{
   try{
       const RegistrationReqs = await doctorModel.find({});
       res.status(200).json(RegistrationReqs);

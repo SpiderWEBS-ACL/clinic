@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { Spin } from "antd";
 
 const ViewFamilyMembers = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const { id } = useParams<{ id: string }>();
 
   const [familyMembers, setFamilyMembers] = useState([]);
@@ -14,8 +15,13 @@ const ViewFamilyMembers = () => {
     baseURL: "http://localhost:8000/",
   });
   useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
     api
-      .get(`/patient/viewFamilyMembers/${id}`)
+      .get(`/patient/viewFamilyMembers`, config)
       .then((response) => {
         setFamilyMembers(response.data);
         setLoading(false);

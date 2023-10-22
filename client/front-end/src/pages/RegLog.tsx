@@ -33,7 +33,6 @@ const RegLog: React.FC = () => {
     baseURL: "http://localhost:8000/",
   });
 
-
   const handleSignUp = async () => {
     if (
       !Name ||
@@ -98,9 +97,9 @@ const RegLog: React.FC = () => {
 
   const handleRedirection = (item: any) => {
     if (item.type == "Patient") {
-      navigate(`/patient/PatientHome/${item.id}`);
+      navigate(`/patient/Home`);
     } else if (item.type == "Doctor") {
-      navigate(`/doctor/home/${item.id}`);
+      navigate(`/doctor/home`);
     } else if (item.type == "Admin") {
       navigate(`/admin/`);
     }

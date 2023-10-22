@@ -12,6 +12,7 @@ const jwt = require('jsonwebtoken');
 const { generateAccessToken } = require("../middleware/authMiddleware");
 require('dotenv').config();
 
+
 const addPatient = async (req, res) => {
   try {
     const exists = await patientModel.findOne({"Username" : { $regex: '^' + req.body.Username + '$', $options:'i'}});
@@ -33,6 +34,19 @@ const addPatient = async (req, res) => {
 
 
 
+const getPatient = async (req,res) => {
+  try {
+    const id = req.user.id;
+    const Patient = await patientModel.findById(id);
+    if (!Patient) {
+        return res.status(404).json({ error: 'Patient not found' });
+   }
+   res.status(200).json(Patient);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+
+}
 const login = async(req, res) => {
   try{
     const patient = await patientModel.findOne({ "Username": { $regex: '^' + req.body.Username + '$', $options:'i'}});
@@ -79,7 +93,7 @@ const login = async(req, res) => {
 
 const addFamilyMember = async (req, res) => {
   try {
-    const { id } = req.params;
+    const  id  = req.user.id;
     const newFamilyMember = req.body;
     const patient = await patientModel.findById(id);
     if (!patient) {
@@ -135,7 +149,7 @@ const viewDoctorDetails = async (req, res) => {
 
 const viewMyPrescriptions = async (req, res) => {
   try {
-    const { id } = req.params;
+    const  id  = req.user.id;
     const prescriptions = await prescriptionModel.find({Patient: id});
     if(!prescriptions){
       return res.status(404).json({error: "You do not have any prescriptions yet"})
@@ -249,7 +263,7 @@ const selectPrescription = async (req, res) =>{
 }
 
 const viewFamilyMembers = async (req, res) => {
-    const { id } = req.params;
+    const  id  = req.user.id;
     try{
         const patient = await patientModel.findById(id);
 
@@ -337,7 +351,7 @@ const filterDoctors = async (req, res) => {
 };
 
 const filterPatientAppointments = async(req,res) =>{
-  const { id } = req.params;
+  const  id = req.user.id;
   const date = req.body.Date;
   const status = req.body.Status;
 
@@ -454,7 +468,7 @@ const calculateDiscount = (doctor, healthPackage) => {
 
 
 const viewDoctorsWithPrices = async (req, res) => {
-  const patientId = req.params.id;
+  const patientId = req.user.id;
 
   try {
     const subscription = await subscriptionModel.findOne({ Patient: patientId }).populate('Package');
@@ -484,9 +498,36 @@ const viewDoctorsWithPrices = async (req, res) => {
   }
 };
 
+const viewAllPatientAppointments = async(req,res) => {
+  const id  = req.user.id;
+  const patient = await patientModel.findById(id);
+
+  try{
+          if(patient){
+              const appointments = await appointmentModel.find({Patient: patient}).populate("Doctor").populate("Patient").exec();
+                  if(!appointments || appointments.length === 0){
+                      res.status(404).json({error: "no appointments were found"});
+                  }
+                  else
+                      return res.status(200).json(appointments);
+                  }
+      }catch(error){
+      res.status(500).json({ error: error.message });
+  }
+}
+
+const getAllDoctorsPatient = async (req,res) =>{
+  try{
+      const Doctors = await doctorModel.find({});
+      res.status(200).json(Doctors);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 
 
-module.exports = { addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
+
+module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
    filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
   viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription};
 

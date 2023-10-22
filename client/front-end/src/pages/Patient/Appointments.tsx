@@ -5,8 +5,7 @@ import Alert from "../../components/Alert";
 import { DatePicker, DatePickerProps, Input, Select, TimePicker } from "antd";
 import { message } from "antd";
 
-const ViewDoctorAppointments = () => {
-  const accessToken = localStorage.getItem("accessToken");
+const ViewPatientAppointments = () => {
   const { Option } = Select;
   const { id } = useParams();
   const [alertVisible, setAlertVisibility] = useState(false);
@@ -16,7 +15,7 @@ const ViewDoctorAppointments = () => {
   const [hasAppointments, setHasAppointments] = useState(false);
   const [status, setStatus] = useState([]);
   const [date, setDate] = useState("");
-
+  const accessToken = localStorage.getItem("accessToken");
   const setTimeoutAl = async () => setAlertVisibility(false);
   const setTimeoutAl1 = async () => setAlertVisibility1(false);
   const clearFilters = async () => {
@@ -55,7 +54,7 @@ const ViewDoctorAppointments = () => {
       },
     };
     try {
-      api.get(`/patient/allAppointments/`, config).then((response) => {
+      api.get(`/patient/allAppointments`, config).then((response) => {
         setAppointments(response.data);
         setAllAppointments(response.data);
         setHasAppointments(response.data.length > 0);
@@ -137,7 +136,7 @@ const ViewDoctorAppointments = () => {
             <th>status</th>
             <th>Appointment Date</th>
             <th>Appointment Time</th>
-            <th>Patient</th>
+            <th>Doctor</th>
           </tr>
         </thead>
 
@@ -148,7 +147,7 @@ const ViewDoctorAppointments = () => {
               <td>{member.Status}</td>
               <td>{member.AppointmentDate.split("T")[0]}</td>
               <td>{member.AppointmentDate.split("T")[1].split(".")[0]}</td>
-              <td>{member.Patient.Name}</td>
+              <td>{member.Doctor.Name}</td>
             </tr>
           ))}
         </tbody>
@@ -157,4 +156,4 @@ const ViewDoctorAppointments = () => {
   );
 };
 
-export default ViewDoctorAppointments;
+export default ViewPatientAppointments;

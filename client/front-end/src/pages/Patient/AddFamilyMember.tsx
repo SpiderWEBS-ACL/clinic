@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import InputField from "../../components/InputField";
@@ -6,6 +6,7 @@ import Button from "../../components/Button";
 import { message } from "antd";
 
 const AddFamilyMember = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const { id } = useParams<{ id: string }>();
   const [Name, setName] = useState<string>(" ");
   const Relation = {
@@ -26,7 +27,8 @@ const AddFamilyMember = () => {
     baseURL: "http://127.0.0.1:8000/",
   });
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
     const Age = parseInt(age + "");
     try {
       const data = {
@@ -36,14 +38,19 @@ const AddFamilyMember = () => {
         Age,
         Gender,
       };
-      console.log(data);
-      console.log("http://localhost:8000/patient/addFamilyMember/" + id);
-      const response = await axios.post(
-        "http://localhost:8000/patient/addFamilyMember/" + id,
-        data
-      );
-      message.success("Family member added successfully!");
-      console.log("Response:", response.data);
+      const headers = {
+        Authorization: "Bearer " + accessToken,
+      };
+      if (Name != " " && NationalID != " " && Age != 0) {
+        const response = await axios.post(
+          "http://localhost:8000/patient/addFamilyMember/",
+          data,
+          { headers }
+        );
+        message.success("Family member added successfully!");
+      } else {
+        message.warning("Please fill all the required fields");
+      }
     } catch (error) {
       console.error("Error:", error);
       message.error("Failed to add family member. Please try again.");
@@ -103,12 +110,13 @@ const AddFamilyMember = () => {
               required={true}
             ></InputField>
 
-            <Button
+            <button
+              className="btn btn-primary"
               style={{ marginRight: "10px", marginTop: "10px" }}
-              onClick={handleSubmit}
+              onClick={(e: FormEvent) => handleSubmit(e)}
             >
               Add
-            </Button>
+            </button>
           </form>
         </div>
       </div>

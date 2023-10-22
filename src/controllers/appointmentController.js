@@ -71,31 +71,4 @@ const addAppointment = async (req, res) => {
 };
 
 
- const viewAllAppointments = async(req,res) => {
-    const {id} = req.params;
-    const doctor = await doctorModel.findById(id);
-    const patient = await patientModel.findById(id);
- 
-    try{
-        if(doctor){
-        const appointments = await appointmentModel.find({Doctor: doctor}).populate("Doctor").populate("Patient").exec();
-            if(!appointments || appointments.length === 0){
-                res.status(404).json({error: "no appointments were found"});
-            }
-            else
-
-                return res.status(200).json(appointments);
-            }
-            else if(patient){
-                const appointments = await appointmentModel.find({Patient: patient}).populate("Doctor").populate("Patient").exec();
-                    if(!appointments || appointments.length === 0){
-                        res.status(404).json({error: "no appointments were found"});
-                    }
-                    else
-                       return res.status(200).json(appointments);
-                    }
-        }catch(error){
-        res.status(500).json({ error: error.message });
-    }
- }
- module.exports = {addAppointment,filterAppointment,viewAllAppointments};
+module.exports = {addAppointment,filterAppointment};
