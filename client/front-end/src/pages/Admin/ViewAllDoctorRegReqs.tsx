@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Spin } from "antd";
+import { Spin, message } from "antd";
 import { useNavigate } from "react-router-dom";
 
 const AllDoctors = () => {
@@ -48,6 +48,35 @@ const AllDoctors = () => {
     );
   }
 
+  const headers = {
+    Authorization: "Bearer " + accessToken,
+  };
+  const handleAccept = (id: string) => {
+    setLoading(true);
+    try {
+      api
+        .get("/acceptRequest/" + id, { headers })
+        .then(message.success("Registration Request Accepted!"));
+    } catch (error) {
+      message.error("An Error has occurred");
+    }
+    setLoading(false);
+  };
+
+  const handleReject = async (id: string) => {
+    setLoading(true);
+    const headers = {
+      Authorization: "Bearer " + accessToken,
+    };
+    api
+      .delete("/rejectRequest/" + id, { headers })
+      .then(message.success("Registration Request Rejected!"))
+      .catch((error) => {
+        message.error("An Error has occurred");
+      });
+    setLoading(false);
+  };
+
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
@@ -77,6 +106,7 @@ const AllDoctors = () => {
                     fontSize: "12px",
                     borderRadius: "5px",
                   }}
+                  onClick={() => handleAccept(request._id)}
                 >
                   <span aria-hidden="true" style={{ color: "white" }}>
                     &#10003;
@@ -92,6 +122,7 @@ const AllDoctors = () => {
                     fontSize: "12px",
                     borderRadius: "5px",
                   }}
+                  onClick={() => handleReject(request._id)}
                   //TODO onClick in sprint 2 this is just a view
                 >
                   <span aria-hidden="true">&times;</span>

@@ -5,8 +5,8 @@ const adminModel = require('../Models/Admin');
 const { Next } = require('@nestjs/common');
 
 
-function generateAccessToken(id){
-    return jwt.sign(id, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'})
+function generateAccessToken(user){
+    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'})
   }
 
 const AdminProtect = async (req,res,next) => {

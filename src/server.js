@@ -5,7 +5,7 @@ const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoct
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments } = require("./controllers/doctorController");
 const { addAppointment, filterAppointment } = require("./controllers/appointmentController")
 const {addSubscription} = require("./controllers/SubscriptionController")
-const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages, getAdmin } = require("./controllers/adminController");
+const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages, getAdmin, acceptRegistrationRequest, rejectRegistrationRequest } = require("./controllers/adminController");
 const cors = require('cors');
 const { AdminProtect, DoctorProtect, PatientProtect } = require("./middleware/authMiddleware");
 
@@ -47,6 +47,8 @@ app.get("/admin/package/:id",AdminProtect,getPackage);
 app.post("/admin/addPackage",AdminProtect,addPackage);
 app.put("/admin/updatePackage/:id",AdminProtect,updatePackage);
 app.delete("/admin/deletePackage/:id",AdminProtect,deletePackage);
+app.get("/admin/acceptRequest/:id",AdminProtect,acceptRegistrationRequest);
+app.delete("/admin/rejectRequest/:id",AdminProtect,rejectRegistrationRequest);
 
 //Doctor Endpoints
 

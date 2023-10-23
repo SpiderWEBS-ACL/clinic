@@ -9,6 +9,7 @@ import {
   validateUsername,
 } from "../utils/ValidationUtils";
 import InputField2 from "../components/InputField2";
+import Cookies from "js-cookie";
 
 const RegLog: React.FC = () => {
   const [alertVisible, setAlertVisibility] = useState(false);
@@ -85,6 +86,7 @@ const RegLog: React.FC = () => {
       localStorage.setItem("id", response.data.id);
       localStorage.setItem("type", response.data.type);
       localStorage.setItem("accessToken", response.data.accessToken);
+      Cookies.set("accessToken", response.data.accessToken);
       handleRedirection(response.data);
       window.location.reload();
     } catch (error: any) {

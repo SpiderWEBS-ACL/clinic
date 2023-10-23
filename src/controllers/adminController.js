@@ -138,6 +138,32 @@ const getAllDoctors = async (req,res) =>{
 
 }
 
+const acceptRegistrationRequest = async (req,res) => {
+  try {
+    const {id} = req.params;
+    const {Username, Name, Email, Password, Dob, HourlyRate, Affiliation, EducationalBackground, Specialty} = await doctorRegisterRequestModel.findById(id);
+    const newDoctor = await doctorModel.create({Username: Username,Name: Name,Email:Email,Password:Password,Dob:Dob,HourlyRate:HourlyRate,Affiliation:Affiliation,EducationalBackground:EducationalBackground,Specialty:Specialty });
+    if (!newDoctor) {
+      return res.status(404).json({ error: 'Error accepting registration request' });
+ }
+ await doctorRegisterRequestModel.findByIdAndDelete(id);
+ res.status(200).json(newDoctor);
+  }catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+const rejectRegistrationRequest = async (req,res) => {
+  try {
+    const {id} = req.params;
+    const RegistrationReq = await doctorRegisterRequestModel.findByIdAndDelete(id);
+    if (!RegistrationReq) {
+      return res.status(404).json({ error: 'Doctor registration request not found' });
+ }
+ res.status(200).json(RegistrationReq);
+  }catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 ///////////////////////////////////////PACKAGES////////////////////////////////////////////////////
 
 const getAllPackages = async (req,res) =>{
@@ -199,4 +225,4 @@ const deletePackage = async (req,res) => {
    }
 }
 
-module.exports = {getAdmin, addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages};
+module.exports = { acceptRegistrationRequest, rejectRegistrationRequest,getAdmin, addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages};
