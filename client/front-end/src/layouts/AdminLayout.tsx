@@ -28,7 +28,7 @@ const AdminLayout: React.FC = () => {
   const items = [
     {
       label: "Home",
-      key: "/admin/",
+      key: "/admin/Home",
       icon: <HomeOutlined />,
     },
     {

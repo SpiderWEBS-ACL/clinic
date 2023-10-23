@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { Spin } from "antd";
+import { Spin, message } from "antd";
 import Button from "../../components/Button";
 
 const RegistrationRequestDetails = () => {
@@ -13,6 +13,34 @@ const RegistrationRequestDetails = () => {
     baseURL: "http://localhost:8000",
   });
   const navigate = useNavigate();
+
+  const headers = {
+    Authorization: "Bearer " + accessToken,
+  };
+  const handleAccept = (id: string) => {
+    setLoading(true);
+    try {
+      api
+        .get("admin/acceptRequest/" + id, { headers })
+        .then(message.success("Registration Request Accepted!"));
+    } catch (error) {
+      message.error("An Error has occurred");
+    }
+    navigate("/admin/registrationRequests");
+    setLoading(false);
+  };
+
+  const handleReject = async (id: string) => {
+    setLoading(true);
+    api
+      .delete("admin/rejectRequest/" + id, { headers })
+      .then(message.success("Registration Request Rejected!"))
+      .catch((error) => {
+        message.error("An Error has occurred");
+      });
+    navigate("/admin/registrationRequests");
+    setLoading(false);
+  };
 
   useEffect(() => {
     const headers = {
@@ -89,6 +117,7 @@ const RegistrationRequestDetails = () => {
                   fontSize: "12px",
                   borderRadius: "5px",
                 }}
+                onClick={() => handleAccept(registrationDetails._id)}
               >
                 <span aria-hidden="true" style={{ color: "white" }}>
                   &#10003;
@@ -104,6 +133,7 @@ const RegistrationRequestDetails = () => {
                   fontSize: "12px",
                   borderRadius: "5px",
                 }}
+                onClick={() => handleReject(registrationDetails._id)}
                 //TODO onClick in sprint 2 this is just a view
               >
                 <span aria-hidden="true">&times;</span>

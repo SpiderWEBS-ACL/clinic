@@ -60,7 +60,11 @@ const login = async(req, res) => {
     }
     else if(patient){
       if (await bcrypt.compare(req.body.Password, patient.Password)) {
-        accessToken = generateAccessToken({id: patient._id});
+        const user = {
+          id: patient._id,
+          role: "Patient"
+        }
+        accessToken = generateAccessToken(user);
         refreshToken = jwt.sign({id: patient._id}, process.env.REFRESH_TOKEN_SECRET);
         res.json({ accessToken: accessToken, refreshToken: refreshToken, id: patient._id, type:"Patient"});
       } else {
@@ -69,7 +73,11 @@ const login = async(req, res) => {
     }
     else if(doctor){
       if (await bcrypt.compare(req.body.Password, doctor.Password,)) {
-        accessToken = generateAccessToken({id: doctor._id});
+        const user = {
+          id: doctor._id,
+          role: "Doctor"
+        }
+        accessToken = generateAccessToken(user);
         refreshToken = jwt.sign({id: doctor._id}, process.env.REFRESH_TOKEN_SECRET);
         res.json({ accessToken: accessToken, refreshToken: refreshToken, id: doctor._id, type:"Doctor" });
       } else {
@@ -78,7 +86,11 @@ const login = async(req, res) => {
     }
     else if(admin){
       if (await bcrypt.compare(req.body.Password, admin.Password)) {
-        accessToken = generateAccessToken({id: admin._id});
+        const user = {
+          id: admin._id,
+          role: "Admin"
+        }
+        accessToken = generateAccessToken(user);
         refreshToken = jwt.sign({id: admin._id}, process.env.REFRESH_TOKEN_SECRET);
         res.json({accessToken: accessToken, refreshToken: refreshToken, id: admin._id,type:"Admin" });
       } else {
