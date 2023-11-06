@@ -1,20 +1,53 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import { format } from "date-fns";
-import { Spin } from "antd";
+import { useNavigate, useParams } from "react-router-dom";
+import { Spin, message } from "antd";
+import Button from "../../components/Button";
 
-const RegistrationRequestDetails: React.FC = () => {
+const RegistrationRequestDetails = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const { id } = useParams<{ id: string }>();
   const [registrationDetails, setRegistrationDetails] = useState<any>("");
   const [loading, setLoading] = useState(true);
   const api = axios.create({
-    baseURL: "http://localhost:8000/",
+    baseURL: "http://localhost:8000",
   });
+  const navigate = useNavigate();
+
+  const headers = {
+    Authorization: "Bearer " + accessToken,
+  };
+  const handleAccept = (id: string) => {
+    setLoading(true);
+    try {
+      api
+        .get("admin/acceptRequest/" + id, { headers })
+        .then(message.success("Registration Request Accepted!"));
+    } catch (error) {
+      message.error("An Error has occurred");
+    }
+    navigate("/admin/registrationRequests");
+    setLoading(false);
+  };
+
+  const handleReject = async (id: string) => {
+    setLoading(true);
+    api
+      .delete("admin/rejectRequest/" + id, { headers })
+      .then(message.success("Registration Request Rejected!"))
+      .catch((error) => {
+        message.error("An Error has occurred");
+      });
+    navigate("/admin/registrationRequests");
+    setLoading(false);
+  };
 
   useEffect(() => {
+    const headers = {
+      Authorization: "Bearer " + accessToken,
+    };
     api
-      .get(`/admin/registrationRequest/${id}`)
+      .get("/admin/registrationRequest/" + id, { headers })
       .then((response) => {
         setRegistrationDetails(response.data);
         setLoading(false);
@@ -39,6 +72,9 @@ const RegistrationRequestDetails: React.FC = () => {
       </div>
     );
   }
+  const handleBack = async () => {
+    navigate("/admin/registrationRequests");
+  };
 
   return (
     <div className="container">
@@ -64,7 +100,11 @@ const RegistrationRequestDetails: React.FC = () => {
             <td>{registrationDetails.Name}</td>
             <td>{registrationDetails.Affiliation}</td>
             <td>{registrationDetails.Email}</td>
-            <td>{registrationDetails.Dob}</td>
+            <td>
+              {registrationDetails.Dob == null
+                ? registrationDetails.Dob
+                : registrationDetails.Dob.substring(0, 10)}
+            </td>
             <td>{registrationDetails.HourlyRate}</td>
             <td>{registrationDetails.Affiliation}</td>
             <td>{registrationDetails.Specialty}</td>
@@ -77,6 +117,7 @@ const RegistrationRequestDetails: React.FC = () => {
                   fontSize: "12px",
                   borderRadius: "5px",
                 }}
+                onClick={() => handleAccept(registrationDetails._id)}
               >
                 <span aria-hidden="true" style={{ color: "white" }}>
                   &#10003;
@@ -92,6 +133,7 @@ const RegistrationRequestDetails: React.FC = () => {
                   fontSize: "12px",
                   borderRadius: "5px",
                 }}
+                onClick={() => handleReject(registrationDetails._id)}
                 //TODO onClick in sprint 2 this is just a view
               >
                 <span aria-hidden="true">&times;</span>
@@ -100,6 +142,13 @@ const RegistrationRequestDetails: React.FC = () => {
           </tr>
         </tbody>
       </table>
+      <Button
+        style={{ marginRight: "10px", marginTop: "10px" }}
+        color="primary"
+        onClick={handleBack}
+      >
+        Back
+      </Button>
     </div>
   );
 };

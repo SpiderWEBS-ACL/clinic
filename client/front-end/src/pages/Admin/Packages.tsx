@@ -4,6 +4,7 @@ import { Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 
 const AllPackages = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const [Packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const api = axios.create({
@@ -11,8 +12,11 @@ const AllPackages = () => {
   });
 
   useEffect(() => {
+    const headers = {
+      Authorization: "Bearer " + accessToken,
+    };
     api
-      .get("/allPackages")
+      .get("/allPackages", { headers })
       .then((response) => {
         setPackages(response.data);
         setLoading(false);
@@ -72,7 +76,7 @@ const AllPackages = () => {
               <td>{request.FamilyDiscount}%</td>
               <td>
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-sm btn-primary"
                   onClick={() => handleRedirect(request._id)}
                 >
                   edit/delete

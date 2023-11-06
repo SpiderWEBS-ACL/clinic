@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
+import { message } from "antd";
 
 const AddPackage = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const [Name, setName] = useState<string>("");
   const [SubscriptionPrice, setSubscriptionPrice] = useState<
     number | undefined
@@ -18,7 +20,8 @@ const AddPackage = () => {
     baseURL: "http://localhost:8000/",
   });
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
     try {
       const data = {
         Name,
@@ -27,10 +30,15 @@ const AddPackage = () => {
         PharmacyDiscount,
         FamilyDiscount,
       };
-      const response = await api.post(`/admin/addPackage`, data);
+      const headers = {
+        Authorization: `Bearer ${accessToken}`,
+      };
+      const response = await api.post(`/admin/addPackage`, data, { headers });
       console.log("Response:", response.data);
+      message.success("Package added Successfully");
     } catch (error) {
       console.error("Error:", error);
+      message.success("Something happened please try again!");
     }
   };
 
@@ -46,6 +54,7 @@ const AddPackage = () => {
               type="text"
               value={Name}
               onChange={setName}
+              required={true}
             ></InputField>
 
             <InputField
@@ -54,38 +63,43 @@ const AddPackage = () => {
               type="number"
               value={SubscriptionPrice}
               onChange={setSubscriptionPrice}
+              required={true}
             ></InputField>
 
             <InputField
               id="DoctorDiscount"
               label="Doctor Discount"
               type="number"
-              value={DoctorDiscount || 0}
+              value={DoctorDiscount}
               onChange={setDoctorDiscount}
+              required={true}
             ></InputField>
 
             <InputField
               id="PharmacyDiscount"
               label="Pharmacy Discount"
               type="number"
-              value={PharmacyDiscount || 0}
+              value={PharmacyDiscount}
               onChange={setPharmacyDiscount}
+              required={true}
             ></InputField>
 
             <InputField
               id="FamilyDiscount"
               label="Family Discount"
               type="number"
-              value={FamilyDiscount || 0}
+              value={FamilyDiscount}
               onChange={setFamilyDiscount}
+              required={true}
             ></InputField>
 
-            <Button
+            <button
+              className="btn btn-primary"
               style={{ marginRight: "10px", marginTop: "10px" }}
               onClick={handleSubmit}
             >
               Submit
-            </Button>
+            </button>
           </form>
         </div>
       </div>

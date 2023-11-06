@@ -3,6 +3,7 @@ import axios from "axios";
 import { Spin } from "antd";
 
 const Patients = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const [patients, setPatients] = useState([]);
   const [deleted, setDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -11,8 +12,11 @@ const Patients = () => {
   });
 
   useEffect(() => {
+    const headers = {
+      Authorization: "Bearer " + accessToken,
+    };
     api
-      .get("/allPatients")
+      .get("/allPatients", { headers })
       .then((response) => {
         setPatients(response.data);
         setLoading(false);
@@ -24,14 +28,17 @@ const Patients = () => {
   }, [deleted]);
 
   const handleDelete = async (id: string) => {
+    const headers = {
+      Authorization: "Bearer " + accessToken,
+    };
     try {
       setLoading(true);
-      const response = await api.delete(`/removePatient/${id}`);
+      const response = await api.delete(`/removePatient/${id}`, { headers });
       setDeleted(!deleted);
       console.log("Response:", response.data);
     } catch (error) {
       console.error("Error:", error);
-    } 
+    }
     setLoading(false);
   };
 
@@ -76,7 +83,11 @@ const Patients = () => {
               <td>{request.Username}</td>
               <td>{request.Name}</td>
               <td>{request.Email}</td>
-              <td>{request.Dob}</td>
+              <td>
+                {request.Dob == null
+                  ? request.Dob
+                  : request.Dob.substring(0, 10)}
+              </td>
               <td>{request.Gender}</td>
               <td>{request.Mobile}</td>
               <td>{request.EmergencyContactName}</td>

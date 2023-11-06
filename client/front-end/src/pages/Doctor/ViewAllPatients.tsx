@@ -6,11 +6,13 @@ import { Input, Select } from "antd";
 import InputField from "../../components/InputField";
 
 const ViewAllPatients = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const [name, setName] = useState("");
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOption, setSelectedOption] = useState("All");
   const { id } = useParams<{ id: string }>();
 
   const [patients, setPatients] = useState<any[]>([]);
+  const [AllPatients, setAllPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const api = axios.create({
@@ -18,10 +20,16 @@ const ViewAllPatients = () => {
   });
 
   useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
     api
-      .get(`/doctor/viewPatients/${id}`)
+      .get(`/doctor/viewPatients/`, config)
       .then((response) => {
         setPatients(response.data);
+        setAllPatients(response.data);
         setLoading(false);
         console.log(response.data);
       })
@@ -57,7 +65,7 @@ const ViewAllPatients = () => {
 
   const handleChange = (value: string) => {
     setLoading(true);
-    if (value === "Upcoming Appointments") {
+    if (value === "Upcoming") {
       api
         .get(`/doctor/upcomingAppointments/${id}`)
         .then((response) => {
@@ -125,45 +133,64 @@ const ViewAllPatients = () => {
         setLoading(false);
       });
   };
+  const handleClearFilters = async () => {
+    setName("");
+    setSelectedOption("All");
+    setPatients(AllPatients);
+  };
 
   return (
     <div className="container">
       <Loading />
-
-      <h2 className="text-center mt-4 mb-4">Patients</h2>
+      <h2 className="text-center mt-4 mb-4">
+        <strong>Patients</strong>
+      </h2>
       <div style={rowStyle}>
-        <Select
-          defaultValue="All"
-          style={{ width: 205 }}
-          onChange={handleChange}
-          options={[
-            { value: "All", label: "All" },
-            {
-              value: "Upcoming Appointments",
-              label: "Upcoming Appointments",
-            },
-          ]}
-        />
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Search Name"
-          style={inputStyle}
-          value={name}
-          onChange={handleInputChange}
-        />
-        <button
-          style={buttonStyle}
-          className="btn btn-primary"
-          type="button"
-          onClick={handleSearch}
-        >
-          Search
-        </button>
+        <span>
+          <label style={{ marginRight: 8, marginLeft: 250 }}>
+            <strong>Appointments:</strong>
+          </label>
+          <Select
+            defaultValue="All"
+            value={selectedOption}
+            style={{ width: 150 }}
+            onChange={handleChange}
+            options={[
+              { value: "All", label: "All" },
+              {
+                value: "Upcoming",
+                label: "Upcoming",
+              },
+            ]}
+          />
+          <label style={{ marginRight: 8, marginLeft: 10 }}>
+            <strong>Name:</strong>
+          </label>
+          <Input
+            type="text"
+            placeholder="Search"
+            value={name}
+            onChange={handleInputChange}
+            style={{ width: 150, marginRight: 30 }}
+          />
+          <button
+            style={{ width: 80, marginRight: 10 }}
+            className="btn btn-sm btn-primary"
+            type="button"
+            onClick={handleSearch}
+          >
+            Search
+          </button>
+          <button
+            onClick={handleClearFilters}
+            style={{ width: 100 }}
+            className="btn btn-sm btn-primary"
+          >
+            Clear filters
+          </button>
+        </span>
       </div>
       <br />
-      <br />
-
       <table className="table">
         <thead>
           <tr>
@@ -176,15 +203,11 @@ const ViewAllPatients = () => {
         <tbody>
           {patients.map((member: any, index) => (
             <tr key={index}>
-              <td>
-                <h4>{index + 1}</h4>
-              </td>
-              <td>
-                <h4>{member.Name}</h4>
-              </td>
+              <td>{index + 1}</td>
+              <td>{member.Name}</td>
               <td>
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-sm btn-primary"
                   onClick={() => handleRedirection(member._id)}
                 >
                   Details

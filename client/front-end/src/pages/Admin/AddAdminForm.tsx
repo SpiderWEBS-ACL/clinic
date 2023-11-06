@@ -6,8 +6,12 @@ import {
   validateUsername,
   validatePassword,
 } from "../../utils/ValidationUtils";
+import { Button, Form, Input, Select } from "antd";
+
+const { Option } = Select;
 
 const AddAdminForm: React.FC = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const [Username, setUsername] = useState<string>("");
   const [Password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -44,9 +48,12 @@ const AddAdminForm: React.FC = () => {
       Username,
       Password,
     };
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+    };
 
     try {
-      const response = await api.post("/admin/add", data);
+      const response = await api.post("/admin/add", data, { headers });
       console.log("Response:", response.data);
 
       setError(null);

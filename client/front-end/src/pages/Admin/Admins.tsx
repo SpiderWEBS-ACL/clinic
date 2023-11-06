@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Spin } from "antd";
+import { useParams } from "react-router-dom";
 
 const AllAdmins = () => {
+  const accessToken = localStorage.getItem("accessToken");
   const [doctors, setDoctors] = useState([]);
   const [deleted, setDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
+  const id = localStorage.getItem("id");
   const api = axios.create({
     baseURL: "http://localhost:8000/admin",
   });
 
   useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
     api
-      .get("/allAdmins")
+      .get("/allAdmins", config)
       .then((response) => {
         setDoctors(response.data);
         setLoading(false);
@@ -24,9 +32,14 @@ const AllAdmins = () => {
   }, [deleted]);
 
   const handleDelete = async (id: string) => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
     try {
       setLoading(true);
-      const response = await api.delete(`/removeAdmin/${id}`);
+      const response = await api.delete(`/removeAdmin/${id}`, config);
       setDeleted(!deleted);
       console.log("Response:", response.data);
     } catch (error) {
@@ -65,9 +78,14 @@ const AllAdmins = () => {
         <tbody>
           {doctors.map((request: any, index) => (
             <tr key={request._id}>
-              <td>{request.Username}</td>
+              <td>
+                {request._id == id
+                  ? request.Username + " (You)"
+                  : request.Username}
+              </td>
               <td>
                 <button
+                  disabled={id == request._id ? true : false}
                   className="btn btn-sm btn-danger"
                   style={{
                     padding: "4px 8px",

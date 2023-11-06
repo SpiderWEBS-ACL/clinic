@@ -1,14 +1,13 @@
 const express = require("express");
 const mongoose = require('mongoose');
-
-
-const { addPatient, addFamilyMembers, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login} = require("./Routes/patientController");
-const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor } = require("./Routes/doctorController");
-const { addApointment, filterAppointment } = require("./Routes/appointmentController")
-const {addSubscription} = require("./Routes/SubscriptionController")
-const {addPrescription} = require("./Routes/prescriptionController")
-const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages } = require("./Routes/adminController");
+const jwt = require('jsonwebtoken');
+const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient} = require("./controllers/patientController");
+const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments } = require("./controllers/doctorController");
+const { addAppointment, filterAppointment } = require("./controllers/appointmentController")
+const {addSubscription} = require("./controllers/SubscriptionController")
+const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages, getAdmin, acceptRegistrationRequest, rejectRegistrationRequest } = require("./controllers/adminController");
 const cors = require('cors');
+const { AdminProtect, DoctorProtect, PatientProtect } = require("./middleware/authMiddleware");
 
 mongoose.set('strictQuery', false);
 require('dotenv').config();
@@ -16,6 +15,7 @@ const MongoURI = process.env.ATLAS_MONGO_URI;
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 const port = process.env.PORT || "8000";
 
 // configurations
@@ -24,64 +24,78 @@ mongoose.connect(MongoURI, {useNewUrlParser:true})
 .then(()=>{
   console.log("MongoDB is now connected!")
 // Starting server
- app.listen(port, () => {
+  app.listen(port, () => {
     console.log(`Listening to requests on http://localhost:${port}`);
   })
 })
 .catch(err => console.log(err));
 
-app.get("/", (req, res) => {
-    res.status(200).send("You have everything installed!");
-});
-app.use(express.json());
 
 //Admin Endpoints
-app.post("/admin/add",addAdmin);
-app.get("/admin/allPackages",getAllPackages);
-app.get("/admin/allAdmins",getAllAdmins);
-app.get("/admin/allPatients",getAllPatients);
-app.get("/admin/allDoctors",getAllDoctors); 
-app.delete("/admin/removeDoctor/:id",removeDoctor); //params?
-app.delete("/admin/removePatient/:id",removePatient); //params?
-app.delete("/admin/removeAdmin/:id",removeAdmin); //params?
-app.get("/admin/registrationRequests",getAllDoctrsRegistrationReqs);
-app.get("/admin/registrationRequest/:id",getDoctrRegistrationReqDetails);//params
-app.get("/admin/package/:id",getPackage);//params
-app.post("/admin/addPackage",addPackage);
-app.put("/admin/updatePackage/:id",updatePackage);
-app.delete("/admin/deletePackage/:id",deletePackage)
+app.get("/admin/me", AdminProtect,getAdmin);
+app.post("/admin/add",AdminProtect, addAdmin);
+app.get("/admin/allPackages",AdminProtect,getAllPackages);
+app.get("/admin/allAdmins",AdminProtect,getAllAdmins);
+app.get("/admin/allPatients",AdminProtect,getAllPatients);
+app.get("/admin/allDoctors",AdminProtect,getAllDoctors); 
+app.delete("/admin/removeDoctor/:id",AdminProtect,removeDoctor);
+app.delete("/admin/removePatient/:id",AdminProtect,removePatient);
+app.delete("/admin/removeAdmin/:id",AdminProtect,removeAdmin);
+app.get("/admin/registrationRequests",AdminProtect, getAllDoctrsRegistrationReqs);
+app.get("/admin/registrationRequest/:id",AdminProtect,getDoctrRegistrationReqDetails);
+app.get("/admin/package/:id",AdminProtect,getPackage);
+app.post("/admin/addPackage",AdminProtect,addPackage);
+app.put("/admin/updatePackage/:id",AdminProtect,updatePackage);
+app.delete("/admin/deletePackage/:id",AdminProtect,deletePackage);
+app.get("/admin/acceptRequest/:id",AdminProtect,acceptRegistrationRequest);
+app.delete("/admin/rejectRequest/:id",AdminProtect,rejectRegistrationRequest);
 
 //Doctor Endpoints
-app.get("/doctor/getDoctor/:id",getDoctor);
-app.post("/doctor/add",addDoctor);
-app.post("/doctor/register",registerDoctor);
-app.get("/doctor/searchPatient/:Name",searchPatientByName);
-app.get("/doctor/selectPatient/:id",selectPatient);
-app.put("/doctor/update/:id", updateDoctor);
-app.get("/doctor/upcomingAppointments/:id",upcomingAppointments);
-app.get("/doctor/viewPatients/:id", viewPatients);
-app.get("/doctor/viewPatientInfo/:id", viewPatientInfo);
-app.get("/doctor/filterAppointments/:id",filterDoctorAppointments)
 
+//Public endpoints
+
+app.post("/doctor/add", addDoctor);
+app.post("/doctor/register", registerDoctor);
+
+//Private endpoints
+
+app.get("/doctor/getDoctor/", DoctorProtect, getDoctor); //TODO: fix in frontend was taking id
+app.get("/doctor/searchPatient/:Name", DoctorProtect, searchPatientByName);
+app.get("/doctor/selectPatient/:id", DoctorProtect, selectPatient);
+app.put("/doctor/update/",DoctorProtect, updateDoctor); //TODO: fix in frontend was taking id
+app.get("/doctor/upcomingAppointments/",DoctorProtect, upcomingAppointments); //TODO: fix in frontend was taking id
+app.get("/doctor/viewPatients/",DoctorProtect, viewPatients); //TODO: fix in frontend was taking id
+app.get("/doctor/viewPatientInfo/:id",DoctorProtect, viewPatientInfo);
+app.get("/doctor/filterAppointments/",DoctorProtect, filterDoctorAppointments) //TODO: fix in frontend was taking id
+app.get("/doctor/allAppointments/", DoctorProtect, viewAllDoctorAppointments);
 //Patient Endpoints
-app.post("/patient/login",login)
-app.post("/patient/register",addPatient);
-app.post("/patient/addFamilyMembers/:id",addFamilyMembers);
-app.get("/patient/selectDoctor/:id", selectDoctor);
-app.get("/patient/searchForDoctor",searchForDoctor);
-app.get("/patient/viewFamilyMembers/:id",viewFamilyMembers)
-app.get("/patient/filterDoctors", filterDoctors);
-app.get("/patient/filterAppointments/:id",filterPatientAppointments)
-app.get("/patient/viewSelectedDoctor/:id",viewDoctorDetails)
-app.get("/patient/viewMyPrescriptions/:id",viewMyPrescriptions)
-app.get("/patient/filterPrescriptions/:id",filterPrescriptions)
-app.get("/patient/selectPrescription/:id",selectPrescription)
-app.get("/patient/viewDoctorsWithPrices/:id", viewDoctorsWithPrices)
 
+//Public Endpoints
+
+app.post("/patient/login", login)
+app.post("/patient/register",addPatient);
+
+//Private Endpoints
+
+app.get("/patient/getPatient/", PatientProtect, getPatient);
+app.post("/patient/addFamilyMember",PatientProtect,addFamilyMember);//TODO: fix in frontend was taking id
+app.post("/patient/addPrescription",PatientProtect,addPrescription);
+app.get("/patient/selectDoctor/:id",PatientProtect, selectDoctor);
+app.get("/patient/searchForDoctor",PatientProtect,searchForDoctor);
+app.get("/patient/filterDoctorsCriteria",PatientProtect,filterDoctorsByNameSpecialtyAvailability);
+app.get("/patient/viewFamilyMembers",PatientProtect,viewFamilyMembers)
+app.get("/patient/filterDoctors", PatientProtect,filterDoctors);
+app.get("/patient/filterAppointments",PatientProtect,filterPatientAppointments)
+app.get("/patient/viewSelectedDoctor/:id",PatientProtect,viewDoctorDetails)
+app.get("/patient/viewMyPrescriptions",PatientProtect,viewMyPrescriptions)
+app.get("/patient/filterPrescriptions",PatientProtect,filterPrescriptions)
+app.get("/patient/selectPrescription/:id",PatientProtect,selectPrescription)
+app.get("/patient/viewDoctorsWithPrices",PatientProtect, viewDoctorsWithPrices)
+app.get("/patient/allAppointments",PatientProtect, viewAllPatientAppointments);
+app.get("/patient/allDoctors",PatientProtect, getAllDoctorsPatient);
 //Appointment Endpoints
-app.post("/appointment/add", addApointment);
+app.post("/appointment/add", addAppointment);
 app.get("/appointment/filterAppointment",filterAppointment)
-app.post("/appointment/add", addApointment);
 
 //Subscription Endpoints
 app.post("/subscription/add/:id",addSubscription);

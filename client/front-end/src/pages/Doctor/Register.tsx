@@ -1,180 +1,436 @@
-import React, {useState,ChangeEvent} from 'react';
-import { IonIcon } from '@ionic/react';
+import React, { useState, ChangeEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import {
+  IoChevronBackCircle,
+  IoChevronForwardCircle,
+  IoCheckmarkDoneCircleSharp,
+  IoAlertCircle,
+  IoClose,
+} from "react-icons/io5";
+import { DatePicker, DatePickerProps, message, Button } from "antd";
+import InputField from "../../components/InputField";
+import {
+  validatePassword,
+  validateUsername,
+} from "../../utils/ValidationUtils";
 
 const steps = [
-    {id: 1, title:'Personal Info', fields: ['Name','Date of Birth', 'Email']},
-    {id: 2, title:'Logging Info', fields: ['Username', 'Password', 'Confirm Password']},
-    {id: 3, title:'Professional Info', fields: ['Hourly Rate', 'Affiliation', 'Educational Background']},
+  { id: 1, title: "Account Info", fields: ["Username", "Password", "Email"] },
+  {
+    id: 2,
+    title: "Personal Info",
+    fields: ["Name", "Date of Birth", "Specialty"],
+  },
+  {
+    id: 3,
+    title: "Professional Info",
+    fields: ["Hourly Rate", "Affiliation", "Educational Background"],
+  },
 ];
 
-function Register(){
-    const [activeForm, setActiveForm] = useState(1);
-    const [modalActive, setModalActive] = useState(false);
-    const [Name, setName] = useState<string>("");
-    const [Email, setEmail] = useState<string>("");
-    const [Password, sePassword] = useState<string>("");
-    const [Username, setUsername] = useState<string>("");
-    const [HourlyRate, setHourlyRate] = useState<Number>();
-    const [Dob, setDob] = useState<Date>();
-    const [Affiliation, setAffiliation] = useState<string>("");
-    const [Education, setEducation] = useState<string>("");
+function RegisterDoctor() {
+  const [activeForm, setActiveForm] = useState(1);
+  const [modalActive, setModalActive] = useState(false);
+  const [Name, setName] = useState<string>("");
+  const [Email, setEmail] = useState<string>("");
+  const [Password, setPassword] = useState<string>("");
+  const [Username, setUsername] = useState<string>("");
+  const [HourlyRate, setHourlyRate] = useState<number>();
+  const [Dob, setDob] = useState<string>("");
+  const [Affiliation, setAffiliation] = useState<string>("");
+  const [EducationalBackground, setEducation] = useState<string>("");
+  const [Specialty, setSpecialty] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [touchedFields, setTouchedFields] = useState({
+    username: false,
+    password: false,
+  });
 
+  const api = axios.create({
+    baseURL: "http://localhost:8000",
+  });
 
-    const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setName(event.target.value);
-      };
-      
-      const handleUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setUsername(event.target.value);
-      };
-      const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
-        sePassword(event.target.value);
-      };
-      const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setEmail(event.target.value);
-      };
-      const handleHourRateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const inputValue = event.target.value;
-        const parsedValue = parseFloat(inputValue); // Parse the input string to an integer
-    
-        if (!isNaN(parsedValue)) {
-            setHourlyRate(parsedValue);
-        } else {
-            setHourlyRate(undefined); // Invalid input, clear the value
-        }
-      };
-      const handleDobChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const inputValue = event.target.value; // Assuming the input format is "YYYY-MM-DD"
-        const date = new Date(inputValue);
- 
-        if (!isNaN(date.getTime())) {
-            setDob(date);
-          } else {
-            setDob(undefined); // Invalid input, clear the date
-          }
-        };
-        const handleAffiliationChange = (event: ChangeEvent<HTMLInputElement>) => {
-            setAffiliation(event.target.value);
-        };
-        const handleEducationchange = (event: ChangeEvent<HTMLInputElement>) => {
-            setEducation(event.target.value);
-        };
+  const navigate = useNavigate();
 
-    
-    const handleNext = () => {
-      if (activeForm < steps.length) {
-        setActiveForm(activeForm + 1);
+  const handleSignUp = async (event: React.FormEvent) => {
+    event.preventDefault;
+
+    if (activeForm == 3) {
+      if (!HourlyRate || !Affiliation || !EducationalBackground) {
+        message.error("Please Fill In All Requirements");
+        return;
       }
-    };
-  
-    const handleBack = () => {
-      if (activeForm > 1) {
-        setActiveForm(activeForm - 1);
-      }
-    };
-  
-    const handleDone = () => {
+    }
+
+    try {
+      const data = {
+        Name,
+        Email,
+        Password,
+        Username,
+        Dob,
+        HourlyRate,
+        Affiliation,
+        EducationalBackground,
+        Specialty,
+      };
+
+      const response = await api.post(`/doctor/register`, data);
+      console.log("Response:", response.data);
+      setError(null);
       setModalActive(true);
-    };
-  
-    const closeModal = () => {
-      setModalActive(false);
-    };
- 
-   
-    return (
-    <div className="wrapper">
-        <div className="header">
-              <h1>Apply to become a doctor</h1>
-      </div>
+      setTimeout(closeModal, 1500);
+    } catch (error) {
+      console.error("Error:", error);
+      if (axios.isAxiosError(error) && error.response) {
+        const apiError = error.response.data.error;
+        setError(apiError);
+      } else {
+        setError("An error occurred");
+      }
+      setModalActive(true);
+    }
+  };
 
+  const handleBlur = (fieldName: string) => {
+    setTouchedFields({
+      ...touchedFields,
+      [fieldName]: true,
+    });
+  };
+
+  const onDateChange: DatePickerProps["onChange"] = (date, dateString) => {
+    setDob(dateString);
+  };
+
+  const handleNext = () => {
+    if (activeForm == 1) {
+      if (!Username || !Password || !Email) {
+        message.error("Please Fill In All Requirements");
+        return;
+      }
+
+      const isUsernameValid = validateUsername(Username);
+      const isPasswordValid = validatePassword(Password);
+
+      if (!isUsernameValid || !isPasswordValid) {
+        message.error(
+          "Username and Password must meet the minimum requirements."
+        );
+        return;
+      }
+    }
+
+    if (activeForm == 2) {
+      if (!Name || !Dob) {
+        message.error("Please Fill In All Requirements");
+        return;
+      }
+    }
+
+    if (activeForm < steps.length) {
+      setActiveForm(activeForm + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (activeForm > 1) {
+      setActiveForm(activeForm - 1);
+    }
+  };
+
+  const closeModal = () => {
+    setModalActive(false);
+    navigate("/");
+    window.location.reload();
+  };
+
+  return (
+    <div
+      className="wrapper"
+      style={{
+        boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2)", // Add shadow
+        border: "1px solid #ccc", // Add border
+      }}
+    >
+      <div className="header" style={{ marginBottom: -30 }}>
+        <h1>
+          <strong>Apply to become a Doctor</strong>
+        </h1>
+      </div>
 
       <div className="wrapper">
         <div className="header">
+          <ul>
+            <li
+              key={1}
+              className={`form_${1}_progessbar ${
+                activeForm >= 1 ? "active" : ""
+              }`}
+            >
+              <div>
+                <p>{1}</p>
+              </div>
+            </li>
+          </ul>
 
           <ul>
-            {steps.map((step) => (
-              <li key={step.id} className={`form_${step.id}_progessbar ${activeForm >= step.id ? 'active' : ''}`}>
-                <div>
-                  <p>{step.id}</p>
-                </div>
-              </li>
-            ))}
+            <li
+              key={2}
+              className={`form_${2}_progessbar ${
+                activeForm >= 2 ? "active" : ""
+              }`}
+            >
+              <div>
+                <p>{2}</p>
+              </div>
+            </li>
+          </ul>
+
+          <ul>
+            <li
+              key={3}
+              className={`form_${3}_progessbar ${
+                activeForm >= 3 ? "active" : ""
+              }`}
+            >
+              <div>
+                <p>{3}</p>
+              </div>
+            </li>
           </ul>
         </div>
+
         <div className="form_wrap">
-          {steps.map((step) => (
-            <div key={step.id} className={`form_${step.id} data_info`} style={{ display: activeForm === step.id ? 'block' : 'none' }}>
-              <h2>{step.title}</h2>
-              <form>
-                <div className="form_container">
-                
-    <div key= "1" className="input_wrap">
-      <label htmlFor="Name">Name</label>
-      <input
-        className="input"
-        value = {Name}
-        onChange={handleNameChange}
-        type="text"/>
-                    </div>
-
-
-                    <div key= "2" className="input_wrap">
-      <label htmlFor="Name">Date of Birth</label>
-      <input
-        className="input"
-        value = {Dob !== undefined ? Dob.toISOString().split('T')[0] : ''}
-        onChange={handleDobChange}
-        type="text"/>
-                    </div>
-
-
-                    <div key= "3 " className="input_wrap">
-      <label htmlFor="Name">Email</label>
-      <input
-        className="input"
-        value = {Email}
-        onChange={handleEmailChange}
-        type="text"/>
-                    </div>
-                    
+          <div
+            key={1}
+            className={`form_2 data_info`}
+            style={{ display: activeForm === 1 ? "block" : "none" }}
+          >
+            <h2>{"Account Info"}</h2>
+            <form>
+              <div className="form_container">
+                <div key="1" className="input_wrap">
+                  <InputField
+                    id="Username"
+                    label="Username"
+                    type="text"
+                    value={Username}
+                    onChange={setUsername}
+                    onBlur={() => handleBlur("username")}
+                    isValid={validateUsername(Username)}
+                    errorMessage="Username must be at least 3 characters long."
+                    touched={touchedFields.username}
+                    required={true}
+                  />
                 </div>
-              </form>
-            </div>
-          ))}
+
+                <div key="2" className="input_wrap">
+                  <InputField
+                    id="Password"
+                    label="Password"
+                    type="password"
+                    value={Password}
+                    onChange={setPassword}
+                    onBlur={() => handleBlur("password")}
+                    isValid={validatePassword(Password)}
+                    errorMessage="Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, and one digit."
+                    touched={touchedFields.password}
+                    required={true}
+                  />
+                </div>
+
+                <div key="3 " className="input_wrap">
+                  <InputField
+                    id="Email"
+                    label="Email"
+                    type="text"
+                    value={Email}
+                    onChange={setEmail}
+                    required={true}
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
-        <div className="btns_wrap">
+
+        <div className="form_wrap">
+          <div
+            key={2}
+            className={`form_1 data_info`}
+            style={{ display: activeForm === 2 ? "block" : "none" }}
+          >
+            <h2>{"Personal Info"}</h2>
+            <form>
+              <div className="form_container">
+                <div key="1" className="input_wrap">
+                  <InputField
+                    id="Name"
+                    label="Name"
+                    type="text"
+                    value={Name}
+                    onChange={setName}
+                    required={true}
+                  />
+                </div>
+
+                <div key="2" className="input_wrap">
+                  <label htmlFor="Dob">
+                    <strong>Date of Birth:</strong>
+                  </label>
+                  <DatePicker
+                    onChange={onDateChange}
+                    style={{
+                      width: 350,
+                      height: 35,
+                      marginRight: 30,
+                    }}
+                  />
+                </div>
+
+                <div key="3" className="input_wrap">
+                  <InputField
+                    id="Specialty"
+                    label="Specialty"
+                    type="text"
+                    value={Specialty}
+                    onChange={setSpecialty}
+                    required={true}
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div className="form_wrap">
+          <div
+            key={3}
+            className={`form_3 data_info`}
+            style={{ display: activeForm === 3 ? "block" : "none" }}
+          >
+            <h2>{"Professional Info"}</h2>
+            <form>
+              <div className="form_container">
+                <div key="1" className="input_wrap">
+                  <InputField
+                    id="HourRate"
+                    label="Hourly Rate"
+                    type="number"
+                    value={HourlyRate}
+                    onChange={setHourlyRate}
+                    required={true}
+                  />
+                </div>
+
+                <div key="2" className="input_wrap">
+                  <InputField
+                    id="Affiliation"
+                    label="Affilliation"
+                    type="text"
+                    value={Affiliation}
+                    onChange={setAffiliation}
+                    required={true}
+                  />
+                </div>
+
+                <div key="3 " className="input_wrap">
+                  <InputField
+                    id="Education"
+                    label="Educational Background"
+                    type="text"
+                    value={EducationalBackground}
+                    onChange={setEducation}
+                    required={true}
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div className="btns_wrap" style={{ marginTop: 20 }}>
           <div className={`common_btns form_${activeForm}_btns`}>
             {activeForm !== 1 && (
-              <button type="button" className="btn_back" onClick={handleBack}>
-                <span className="icon"><IonIcon name="arrow-back-sharp"></IonIcon></span>
+              <Button
+                className="btn_back"
+                onClick={handleBack}
+                style={{
+                  width: 90,
+                  height: 35,
+                  textAlign: "left",
+                  backgroundColor: "crimson",
+                }}
+              >
+                <span className="icon">
+                  <IoChevronBackCircle />
+                </span>
                 Back
-              </button>
+              </Button>
             )}
             {activeForm !== steps.length ? (
-              <button type="button" className="btn_next" onClick={handleNext}>
-                Next <span className="icon"><IonIcon name="arrow-forward-sharp"></IonIcon></span>
-              </button>
+              <Button
+                className="btn_next"
+                onClick={handleNext}
+                style={{ width: 90, height: 35, textAlign: "right" }}
+              >
+                Next
+                <span className="icon">
+                  <IoChevronForwardCircle />
+                </span>
+              </Button>
             ) : (
-              <button type="button" className="btn_done" onClick={handleDone}>
-                Done
-                
-              </button>
+              <Button
+                className="btn_next"
+                onClick={handleSignUp}
+                style={{
+                  width: 90,
+                  height: 35,
+                  textAlign: "right",
+                  backgroundColor: "green",
+                }}
+              >
+                Submit
+                <span className="icon">
+                  <IoCheckmarkDoneCircleSharp />
+                </span>
+              </Button>
             )}
           </div>
         </div>
-        <div className={`modal_wrapper ${modalActive ? 'active' : ''}`}>
-          <div className="shadow" onClick={closeModal}></div>
-          <div className="success_wrap">
-            <span className="modal_icon"><IonIcon name="checkmark-sharp"></IonIcon></span>
-            <p>You have successfully completed the process.</p>
-            <IonIcon name="close-outline" onClick={closeModal}></IonIcon>
+        <div
+          className={`modal_wrapper ${modalActive ? "active" : ""}`}
+          style={{ color: error ? "red" : "green" }}
+        >
+          <div className="shadow"></div>
+          <div className="success_wrap" style={{ position: "absolute" }}>
+            <div style={{ position: "absolute", top: 10, right: 20 }}>
+              <IoClose
+                name="close-outline"
+                style={{ fontSize: 20, color: "black" }}
+                onClick={closeModal}
+              ></IoClose>
+            </div>
+
+            <span
+              className="modal_icon"
+              style={{ backgroundColor: "transparent", marginBottom: 10 }}
+            >
+              {!error && (
+                <IoCheckmarkDoneCircleSharp style={{ color: "green" }} />
+              )}
+              {error && <IoAlertCircle style={{ color: "red" }} />}
+            </span>
+            <h6>
+              {error ? error : "Registration Request Submitted Successfully."}
+            </h6>
           </div>
-          
         </div>
       </div>
-      </div>
-    );
-  }
-  
-export default Register;
+    </div>
+  );
+}
+
+export default RegisterDoctor;

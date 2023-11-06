@@ -11,6 +11,9 @@ interface InputFieldProps {
   errorMessage?: string;
   touched?: boolean;
   disabled?: boolean;
+  options?: string[];
+  required?: boolean;
+  style?: React.CSSProperties;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -24,23 +27,61 @@ const InputField: React.FC<InputFieldProps> = ({
   errorMessage,
   touched,
   disabled,
+  options,
+  required,
+  style
 }) => {
+  const renderInput = () => {
+    if (type === "select" && options) {
+      return (
+        <div>
+          {" "}
+          {/* Wrap select and arrow in a container */}
+          <select
+            className={`form-control ${
+              touched && !isValid ? "is-invalid" : ""
+            }`}
+            id={id}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onBlur={onBlur}
+            disabled={disabled}
+            required={required}
+            style={style}
+          >
+            <option value="" disabled selected>Select</option>            
+            {options.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select> 
+        </div>
+      );
+    } else {
+      return (
+        <input
+          className={`form-control ${touched && !isValid ? "is-invalid" : ""}`}
+          type={type === "select" ? "text" : type}
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
+          disabled={disabled}
+          required={required}
+          style={style}
+        />
+      );
+    }
+  };
+
   return (
     <div className="form-group">
       <label htmlFor={id}>
         <strong>{label}:</strong>
       </label>
       <div className="input-container">
-        <input
-          className={`form-control ${touched && !isValid ? "is-invalid" : ""}`}
-          type={type}
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onBlur={onBlur}
-          disabled={disabled}
-          required
-        />
+        {renderInput()}
         {touched && !isValid && (
           <div className="invalid-feedback">{errorMessage}</div>
         )}

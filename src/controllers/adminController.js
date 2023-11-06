@@ -3,12 +3,23 @@ const adminModel = require('../Models/Admin');
 const doctorModel = require('../Models/Doctor');
 const patientModel = require('../Models/Patient');
 const packageModel = require('../Models/Package');
+const appointmentModel = require("../Models/Appointment");
 const doctorRegisterRequestModel = require('../Models/DoctorRegisterRequest');
+const bcrypt = require("bcrypt");
 
 const { default: mongoose } = require('mongoose');
 
 
 ////////////////////////////////////ADMIN////////////////////////////////////////
+
+const getAdmin = async (req, res)=>{
+  const { _id, Username,  Password} = await adminModel.findById(req.user.id);
+  res.status(200).json({
+    id : _id,
+    Username,
+    Password
+  })
+}
 
 const getAllAdmins = async (req,res) =>{
   try{
@@ -26,8 +37,9 @@ const addAdmin = async (req,res) => {
         return res.status(400).json({ error: "Missing Parameters" });
       }
 
-        const exists = await adminModel.findOne({"Username" : req.body.Username});
+        const exists = await adminModel.findOne({"Username" : { $regex: '^' + req.body.Username + '$', $options:'i'}});
         if(!exists){
+          req.body.Password = await bcrypt.hash(req.body.Password,10);
             var newAdmin = await adminModel.create(req.body);
             res.status(201).json(newAdmin);
         }
@@ -69,6 +81,7 @@ const removeAdmin = async (req,res) => {
       if (!removedPatient) {
          return res.status(404).json({ error: 'Patient not found' });
     }
+    await appointmentModel.deleteMany({ Patient: id });
     res.status(200).json(removedPatient);
    } catch (error) {
      res.status(500).json({ error: error.message });
@@ -84,13 +97,14 @@ const removeDoctor = async (req,res) => {
       if (!removedDoctor) {
          return res.status(404).json({ error: 'Doctor not found' });
     }
+    await appointmentModel.deleteMany({ Doctor: id });
     res.status(200).json(removedDoctor);
    } catch (error) {
      res.status(500).json({ error: error.message });
    }
  }
 
- const getAllDoctors = async (req,res) =>{
+const getAllDoctors = async (req,res) =>{
   try{
       const RegistrationReqs = await doctorModel.find({});
       res.status(200).json(RegistrationReqs);
@@ -124,6 +138,32 @@ const removeDoctor = async (req,res) => {
 
 }
 
+const acceptRegistrationRequest = async (req,res) => {
+  try {
+    const {id} = req.params;
+    const {Username, Name, Email, Password, Dob, HourlyRate, Affiliation, EducationalBackground, Specialty} = await doctorRegisterRequestModel.findById(id);
+    const newDoctor = await doctorModel.create({Username: Username,Name: Name,Email:Email,Password:Password,Dob:Dob,HourlyRate:HourlyRate,Affiliation:Affiliation,EducationalBackground:EducationalBackground,Specialty:Specialty });
+    if (!newDoctor) {
+      return res.status(404).json({ error: 'Error accepting registration request' });
+ }
+ await doctorRegisterRequestModel.findByIdAndDelete(id);
+ res.status(200).json(newDoctor);
+  }catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+const rejectRegistrationRequest = async (req,res) => {
+  try {
+    const {id} = req.params;
+    const RegistrationReq = await doctorRegisterRequestModel.findByIdAndDelete(id);
+    if (!RegistrationReq) {
+      return res.status(404).json({ error: 'Doctor registration request not found' });
+ }
+ res.status(200).json(RegistrationReq);
+  }catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 ///////////////////////////////////////PACKAGES////////////////////////////////////////////////////
 
 const getAllPackages = async (req,res) =>{
@@ -185,4 +225,4 @@ const deletePackage = async (req,res) => {
    }
 }
 
-module.exports = {addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages};
+module.exports = { acceptRegistrationRequest, rejectRegistrationRequest,getAdmin, addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages};

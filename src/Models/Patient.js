@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const patientSchema = new Schema({
@@ -43,7 +43,7 @@ const patientSchema = new Schema({
         type: String,
         required: true,
       },
-      relationToPatient: {
+      RelationToPatient: {
         type: String,
         enum: ["Wife", "Husband", "Son", "Daughter"],
         required: true,

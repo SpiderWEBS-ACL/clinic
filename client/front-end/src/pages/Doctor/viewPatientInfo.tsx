@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 
 const ViewPatientInfo = () => {
   const { id } = useParams<{ id: string }>();
+  const accessToken = localStorage.getItem("accessToken");
 
   const [patientInfo, setPatientInfo] = useState<any>({});
 
@@ -12,8 +13,17 @@ const ViewPatientInfo = () => {
   });
 
   useEffect(() => {
-    api
-      .get(`/doctor/viewPatientInfo/${id}`)
+    getPatientInfo();
+  }, [id]);
+
+  const getPatientInfo = async () => {
+    const config = {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    };
+    await api
+      .get(`/doctor/viewPatientInfo/${id}`, config)
       .then((response) => {
         setPatientInfo(response.data);
         console.log(response.data);
@@ -21,7 +31,7 @@ const ViewPatientInfo = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, [id]);
+  };
 
   return (
     <div className="container">
@@ -29,7 +39,12 @@ const ViewPatientInfo = () => {
       <div className="card">
         <div className="card-body">
           <h5 className="card-title">Name: {patientInfo.Name}</h5>
-          <p className="card-text">DOB: {patientInfo.Dob}</p>
+          <p className="card-text">
+            DOB:{" "}
+            {patientInfo.Dob == null
+              ? patientInfo.Dob
+              : patientInfo.Dob.substring(0, 10)}
+          </p>
           <p className="card-text">Gender: {patientInfo.Gender}</p>
           <p className="card-text">Mobile: {patientInfo.Mobile}</p>
           <p className="card-text">
