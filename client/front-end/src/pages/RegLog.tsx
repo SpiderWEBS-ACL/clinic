@@ -165,7 +165,6 @@ const RegLog: React.FC = () => {
           required={true}
           onBlur={() => handleBlur("password")}
         />
-
         <p className="forgot-pass">Forgot password?</p>
         <button onClick={handleSignIn} type="button" className="submit button">
           Sign In
@@ -193,7 +192,6 @@ const RegLog: React.FC = () => {
           <div className={`img__text m--in ${isSignUp ? "" : "m--up"}`}>
             <h2 className="h2">One of us?</h2>
             <p className="p">
-
               If you already have an account, just sign in. We've missed you!
             </p>
           </div>
@@ -333,7 +331,6 @@ const RegLog: React.FC = () => {
             type="button"
             className=" button submit"
           >
-
             Sign Up
           </button>
         </div>
