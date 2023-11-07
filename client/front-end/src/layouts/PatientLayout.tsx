@@ -55,6 +55,11 @@ const PatientLayout: React.FC = () => {
       icon: <FileOutlined />,
     },
     {
+      label: "Packages",
+      key: "/patient/packages",
+      icon: <FileOutlined />,
+    },
+    {
       label: "Logout",
       key: "/",
       icon: <PoweroffOutlined />,

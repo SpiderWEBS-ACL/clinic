@@ -34,6 +34,10 @@ import ViewPatientAppointments from "./pages/Patient/Appointments";
 import jwt_decode from "jwt-decode";
 import Cookies from "js-cookie";
 import NotFound from "./pages/NotFound";
+import AddAvailableTimeSolts from "./pages/Doctor/AddAvailableTimeSolts";
+import Calendar from "./pages/Doctor/AddAvailableTimeSolts";
+import CheckoutButton from "./pages/CheckoutButton";
+import AllPackagesPatient from "./pages/Patient/Packages";
 
 export interface JwtPayload {
   id: string;
@@ -90,6 +94,8 @@ const AppRouter: React.FC = () => {
         />
         <Route path="/appointment/view/:id" element={<ViewAppointments />} />
         <Route path="/doctor/home/" element={<DoctorHome />} />
+        <Route path="/doctor/timeSlots" element={<Calendar />} />
+        <Route path="/checkout" element={<CheckoutButton />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
@@ -120,6 +126,8 @@ const AppRouter: React.FC = () => {
           element={<ViewPrescriptions />}
         />
         <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
+        <Route path="/patient/packages" element={<AllPackagesPatient />} />
+        <Route path="/checkout" element={<CheckoutButton />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
