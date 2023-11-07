@@ -7,6 +7,7 @@ const adminModel = require("../Models/Admin");
 const appointmentModel = require("../Models/Appointment");
 const prescriptionModel = require("../Models/Prescription");
 const subscriptionModel = require("../Models/Subscription");
+const packageModel = require("../Models/Package")
 const { fileLoader } = require("ejs");
 const jwt = require('jsonwebtoken');
 const { generateAccessToken } = require("../middleware/authMiddleware");
@@ -537,9 +538,19 @@ const getAllDoctorsPatient = async (req,res) =>{
   }
 }
 
+const getAllPackagesPatient = async (req,res) =>{
+  try{
+      const packages = await packageModel.find({});
+      res.status(200).json(packages);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+
 
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
    filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription};
+  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, getAllPackagesPatient};
 

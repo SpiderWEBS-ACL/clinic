@@ -19,13 +19,14 @@ import {
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import "./StyleDoctor.css";
+import Cookies from "js-cookie";
 const DoctorHome = () => {
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
   const { id } = useParams<{ id: string }>();
   const [doctorInfo, setDoctorInfo] = useState<any>({});
-  const accessToken = localStorage.getItem("accessToken");
+  const accessToken = Cookies.get("accessToken");
 
   useEffect(() => {
     const config = {
@@ -63,10 +64,10 @@ const DoctorHome = () => {
   });
   const navigate = useNavigate();
   const appoint = async () => {
-    navigate(`/appointment/view/${id}`);
+    navigate(`/doctor/allAppointments`);
   };
   const viewpatients = async () => {
-    navigate(`/doctor/viewPatients/${id}`);
+    navigate(`/doctor/viewPatients`);
   };
 
   // const getDrDetails = async ()=>{

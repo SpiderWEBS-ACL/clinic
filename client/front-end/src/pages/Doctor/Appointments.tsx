@@ -4,9 +4,10 @@ import { useParams } from "react-router-dom";
 import Alert from "../../components/Alert";
 import { DatePicker, DatePickerProps, Input, Select, TimePicker } from "antd";
 import { message } from "antd";
+import Cookies from "js-cookie";
 
 const ViewDoctorAppointments = () => {
-  const accessToken = localStorage.getItem("accessToken");
+  const accessToken = Cookies.get("accessToken");
   const { Option } = Select;
   const { id } = useParams();
   const [alertVisible, setAlertVisibility] = useState(false);

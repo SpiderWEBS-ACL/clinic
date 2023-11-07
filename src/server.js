@@ -1,16 +1,18 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient} = require("./controllers/patientController");
+const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient, getAllPackagesPatient} = require("./controllers/patientController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments } = require("./controllers/doctorController");
 const { addAppointment, filterAppointment } = require("./controllers/appointmentController")
-const {addSubscription} = require("./controllers/SubscriptionController")
+const {addSubscription, subscribeWithStripe} = require("./controllers/SubscriptionController")
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages, getAdmin, acceptRegistrationRequest, rejectRegistrationRequest } = require("./controllers/adminController");
 const cors = require('cors');
 const { AdminProtect, DoctorProtect, PatientProtect } = require("./middleware/authMiddleware");
+require('dotenv').config();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const packageModel = require("./Models/Package");
 
 mongoose.set('strictQuery', false);
-require('dotenv').config();
 const MongoURI = process.env.ATLAS_MONGO_URI;
 
 const app = express();
@@ -32,7 +34,7 @@ mongoose.connect(MongoURI, {useNewUrlParser:true})
 
 
 //Admin Endpoints
-app.get("/admin/me", AdminProtect,getAdmin);
+app.get("/admin/me", AdminProtect, getAdmin);
 app.post("/admin/add",AdminProtect, addAdmin);
 app.get("/admin/allPackages",AdminProtect,getAllPackages);
 app.get("/admin/allAdmins",AdminProtect,getAllAdmins);
@@ -93,15 +95,74 @@ app.get("/patient/selectPrescription/:id",PatientProtect,selectPrescription)
 app.get("/patient/viewDoctorsWithPrices",PatientProtect, viewDoctorsWithPrices)
 app.get("/patient/allAppointments",PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors",PatientProtect, getAllDoctorsPatient);
+app.get("/patient/allPackages",PatientProtect,getAllPackagesPatient);
 //Appointment Endpoints
 app.post("/appointment/add", addAppointment);
 app.get("/appointment/filterAppointment",filterAppointment)
 
 //Subscription Endpoints
+app.post("/subscription/subscribe/:id",subscribeWithStripe);
 app.post("/subscription/add/:id",addSubscription);
 
 //Prescription Endpoints
 app.post("/prescription/add",addPrescription);
+
+
+// app.post('/subscribe', async (req, res) => {
+//   const id = req.body.id;
+//   const { SubscriptionPrice } = await packageModel.findById(id);
+//   try {
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount: SubscriptionPrice,
+//       currency: "usd",
+//     });
+//     res.json({ clientSecret: paymentIntent.client_secret });
+//   } catch (error) {
+//     res.status(500).send({ error: error.message });
+//   }
+// });
+
+app.post('/subscribe', async (req, res) => {
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: SubscriptionPrice,
+      currency: "usd",
+    });
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+const storeItems = new Map([
+  [1, {priceInCents: 10000, name: "Item 1"}],
+  [2, {priceInCents: 20000, name: "Item 2"}]
+]);
+
+
+app.post('/create-checkout-session', async (req, res) => {
+  try{
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment', //or subscription
+      line_items: req.body.items.map(item => {
+        const storeItem = storeItems.get(item.id)
+        return{
+          price_data: {
+            currency: 'usd',
+            product_data: {name : storeItem.name},
+            unit_amount: storeItem.priceInCents,
+          },
+          quantity: item.quantity
+        }
+      }),
+      success_url: `${process.env.SERVER_URL}/success`,
+      cancel_url: `${process.env.SERVER_URL}/cancel` //TODO: back to shopping cart page
+    })
+    res.json({url: session.url})
+  }catch(error){
+    res.status(500).json({error: error.message});
+  }
+});
 
 
 
