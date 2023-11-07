@@ -4,8 +4,9 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const fs = require('fs');
 
-const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, viewHealthRecords} = require("./controllers/patientController");
-const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments } = require("./controllers/doctorController");
+
+const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, viewHealthRecords, subscribeToHealthPackage} = require("./controllers/patientController");
+const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments , viewHealthRecordsDoctor, addHealthRecordForPatient} = require("./controllers/doctorController");
 const { addAppointment, filterAppointment } = require("./controllers/appointmentController")
 const {addSubscription} = require("./controllers/SubscriptionController")
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages, getAdmin, acceptRegistrationRequest, rejectRegistrationRequest } = require("./controllers/adminController");
@@ -23,7 +24,7 @@ const port = process.env.PORT || "8000";
 
 // configurations
 // Mongo DB
-mongoose.connect("mongodb+srv://mohamedmahran220:mncat1001@aclproj.5pk08is.mongodb.net/", {useNewUrlParser:true})
+mongoose.connect(MongoURI, {useNewUrlParser:true})
 .then(()=>{
   console.log("MongoDB is now connected!")
 // Starting server
@@ -71,6 +72,9 @@ app.get("/doctor/viewPatients/",DoctorProtect, viewPatients); //TODO: fix in fro
 app.get("/doctor/viewPatientInfo/:id",DoctorProtect, viewPatientInfo);
 app.get("/doctor/filterAppointments/",DoctorProtect, filterDoctorAppointments) //TODO: fix in frontend was taking id
 app.get("/doctor/allAppointments/", DoctorProtect, viewAllDoctorAppointments);
+app.get("/doctor/viewHealthRecords/:id", DoctorProtect, viewHealthRecordsDoctor);
+app.post("/doctor/addHealthRecordForPatient/:id", DoctorProtect, addHealthRecordForPatient);
+
 //Patient Endpoints
 
 //Public Endpoints
@@ -87,12 +91,13 @@ app.get("/patient/selectDoctor/:id",PatientProtect, selectDoctor);
 app.get("/patient/searchForDoctor",PatientProtect,searchForDoctor);
 app.get("/patient/filterDoctorsCriteria",PatientProtect,filterDoctorsByNameSpecialtyAvailability);
 app.get("/patient/viewFamilyMembers",PatientProtect,viewFamilyMembers)
-app.get("/patient/viewHealthRecords",PatientProtect,viewHealthRecords)
+app.get("/patient/viewHealthRecords/:id",PatientProtect,viewHealthRecords);
 app.get("/patient/filterDoctors", PatientProtect,filterDoctors);
 app.get("/patient/filterAppointments",PatientProtect,filterPatientAppointments)
-app.post("/patient/uploadMedicalDocuments/:id",uploadMedicalDocuments);
-app.delete("/patient/removeMedicalDocument/:id",deleteMedicalDocuments);
-app.get("/patient/viewMyMedicalDocument/:id",viewMedicalDocuments)
+app.post("/patient/uploadMedicalDocuments/:id",PatientProtect, uploadMedicalDocuments);
+app.delete("/patient/removeMedicalDocument/:id",PatientProtect, deleteMedicalDocuments);
+app.post("/patient/subscribeToHealthPackage/:id",PatientProtect, subscribeToHealthPackage);
+app.get("/patient/viewMyMedicalDocument/:id",PatientProtect, viewMedicalDocuments)
 app.get("/patient/viewSelectedDoctor/:id",PatientProtect,viewDoctorDetails)
 app.get("/patient/viewMyPrescriptions",PatientProtect,viewMyPrescriptions)
 app.get("/patient/filterPrescriptions",PatientProtect,filterPrescriptions)

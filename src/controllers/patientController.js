@@ -112,8 +112,13 @@ const addFamilyMember = async (req, res) => {
     const  id  = req.user.id;
     const newFamilyMember = req.body;
     const patient = await patientModel.findById(id);
+    const checkMember = await patientModel.find({Email: req.body.Email});
+
     if (!patient) {
       return res.status(404).json({ error: "Patient not found" });
+    }
+    if(checkMember){
+      newFamilyMember.MemberID = checkMember;
     }
     const familyMembers = patient.FamilyMembers;
     const allFamilyMembers = familyMembers.concat([newFamilyMember]);
@@ -553,14 +558,23 @@ const uploadMedicalDocuments = async (req, res) => {
       console.error(err);
       res.status(500).send('Server Error');
     } else {
+      let newFiles=[];
       const { id } = req.params; // assuming id holds patient's id
-
-      const newFiles = req.files.map((file) => ({
+      if(id){
+        newFiles = req.files.map((file) => ({
         filename: file.filename,
         originalname: file.originalname,
         filedata: file.buffer,
         Patient: id,
       }));
+    }
+    else{
+      newFiles = req.files.map((file) => ({
+        filename: file.filename,
+        originalname: file.originalname,
+        filedata: file.buffer
+      }));
+    }
 
       try {
         const savedFiles = await fileModel.create(newFiles);
@@ -628,9 +642,9 @@ const viewMedicalDocuments = async (req, res) => {
 const viewHealthRecords = async(req,res) =>{
   const { id } = req.params;
   try{
-    const currPatient = await patientModel.find({ Patient: id });
-    if (currPatient && currPatient.length > 0 && currPatient[0].HealthRecords) {
-          res.status(200).json(currPatient[0].HealthRecords);
+    const currPatient = await patientModel.findById({id});
+    if (currPatient && currPatient.length > 0 && currPatient.HealthRecords) {
+          res.status(200).json(currPatient.HealthRecords);
     }
     else{
       res.status(404).json({ error: 'Health records not found' });
@@ -640,11 +654,40 @@ const viewHealthRecords = async(req,res) =>{
     res.status(500).json({error: error.message});
   }
 }
+const subscribeToHealthPackage = async(req,res) => {
+  const { id } = req.params;
+  const packageId = req.body;
+  try{
+    const currPatient = patientModel.findById({ id });
+    if(!currPatient){
+      res.status(404).json({error: 'No patient found!'});
+    }
+    if(currPatient.FamilyMembers.length>0){
+      for (const familyMember of currPatient.FamilyMembers) {
+          if(familyMember.MemberID){
+            const newSubscription = new subscriptionModel({
+              Patient: familyMember.MemberID,
+              Package: packageId,
+            });
+            await newSubscription.save();
+            
+          }
+      }
+    }
+    const newSubscription = new subscriptionModel({
+      Patient: id,
+      Package: packageId,
+    });
+    await newSubscription.save();
 
+  }catch(error){
+    res.status(500).json({error: error.message});
+  }
+}
 
 
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
    filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords};
+  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage};
 

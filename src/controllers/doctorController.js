@@ -4,6 +4,7 @@ const doctorRegisterRequestModel = require('../Models/DoctorRegisterRequest');
 const appointmentModel = require('../Models/Appointment')
 const { default: mongoose } = require('mongoose');
 const bcrypt = require("bcrypt");
+const { PatientProtect } = require('../middleware/authMiddleware');
 
 // FOR TESTING
 const addDoctor = async (req,res) => {
@@ -191,29 +192,80 @@ const searchPatientByName = async (req,res) => {
     }
  }
  const addHealthRecordForPatient = async(req,res) =>{
+    const { id } = req.params;
+    const description = req.body.description;
+    const patientId = req.body.patientId;
+    const type = req.body.description;
 
+    try{
+        const currPatient = patientModel.findById(patientId);
+        if(!currPatient){
+            return res.status(404).json({error: 'Patient not found!'});
+        }
+        const healthRecord = {
+            Doctor: id,
+            Description: description,
+            Type: type
+        };
+        currPatient.HealthRecords.push(healthRecord);
+        await currPatient.save();
+        res.status(200).json({ message: 'Health record added successfully' });
+
+        
+
+    } catch(error){
+        return res.status(500).json({error: error.message});
+    }
  }
-const viewHealthRecords = async(req,res) =>{
-  const { id } = req.params;
-  const patientId = req.body.patientId;
-  try{
-    const doctor = await doctorModel.findById(id);
-    const currPatient = await patientModel.find({ Patient: id });
-    const appointments = await appointmentModel.find({Doctor: doctor}).populate("Doctor").populate("Patient").exec();
-//atleast 1 appointment to view
-    if (currPatient && currPatient.length > 0 && currPatient[0].HealthRecords) {
-
-          res.status(200).json(currPatient[0].HealthRecords);
+ const viewHealthRecordsDoctor = async (req, res) => {
+    const { id } = req.params;
+    const patientId = req.body.patientId;
+  
+    try {
+      const doctor = await doctorModel.findById({ id }) ;
+      const currPatient = await patientModel.findById(patientId); 
+  
+      if (!doctor || !currPatient) {
+        return res.status(404).json({ error: 'Doctor or patient not found' });
+      }
+  
+      const appointments = await appointmentModel
+        .find({ Doctor: doctor, Patient: currPatient }) 
+        .populate("Doctor")
+        .populate("Patient")
+        .exec();
+  
+      if (appointments.length > 0) {
+        return res.status(200).json(currPatient.HealthRecords);
+      } else {
+        return res.status(404).json({ error: 'Health records not found' });
+      }
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
     }
-    else{
-      res.status(404).json({ error: 'Health records not found' });
+  };
+const scheduleFollowUp = async(req,res) =>{
+    const { id } = req.params;
+    const patientId = req.body.patientId;
+    try{
+        const doctor = doctorModel.findById(id);
+        const currPatient = await patientModel.findById(patientId); 
+        const appointments = await appointmentModel
+        .find({ Doctor: doctor, Patient: currPatient}) 
+        .populate("Doctor")
+        .populate("Patient")
+        .exec();
+        for (const appointment of appointments) {
+            const appointmentFollowUp = await appointmentModel.create(req.body);
+            appointment.FollowUp.Check = true;
+            appointment.FollowUp.AppointmentFollowUp = appointmentFollowUp;
+            await appointment.save();
+          }
+        res.status(200).json(appointments.FollowUp);
+    }catch(error){
+        return res.status(500).json({error: error.message});
     }
-
-  } catch(error) {
-    res.status(500).json({error: error.message});
-  }
 }
 
-
 module.exports = { registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments,
-    addDoctor, viewPatients,viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments};
+    addDoctor, viewPatients,viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments, viewHealthRecordsDoctor, addHealthRecordForPatient};
