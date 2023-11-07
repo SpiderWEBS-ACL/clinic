@@ -5,9 +5,13 @@ const bcrypt = require("bcrypt");
 const doctorModel = require("../Models/Doctor");
 const adminModel = require("../Models/Admin");
 const appointmentModel = require("../Models/Appointment");
+const fileModel = require("../Models/File");
+
 const prescriptionModel = require("../Models/Prescription");
 const subscriptionModel = require("../Models/Subscription");
 const { fileLoader } = require("ejs");
+const multer = require('multer');
+const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const { generateAccessToken } = require("../middleware/authMiddleware");
 require('dotenv').config();
@@ -536,10 +540,111 @@ const getAllDoctorsPatient = async (req,res) =>{
     res.status(500).json({ error: error.message });
   }
 }
+const storage = multer.diskStorage({
+  fileName: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+const uploadMedicalDocuments = async (req, res) => {
+  upload.array('files')(req, res, async (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    } else {
+      const { id } = req.params; // assuming id holds patient's id
+
+      const newFiles = req.files.map((file) => ({
+        filename: file.filename,
+        originalname: file.originalname,
+        filedata: file.buffer,
+        Patient: id,
+      }));
+
+      try {
+        const savedFiles = await fileModel.create(newFiles);
+        res.status(201).json(savedFiles);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+      }
+    }
+  });
+};
+const deleteMedicalDocuments = async (req, res) => {
+  const { id } = req.params;
+  try {
+    let currFiles = [];
+
+    if (id) {
+      currFiles = await fileModel.find({ Patient: id });
+
+      if (currFiles.length === 0) {
+        return res.status(404).json({ error: 'Files not found' });
+      }
+
+      await fileModel.deleteMany({ Patient: id });
+
+    } else {
+      currFiles = await fileModel.find({ _id: id });
+
+      if (currFiles.length === 0) {
+        return res.status(404).json({ error: 'File not found' });
+      }
+
+      await fileModel.findByIdAndDelete(id);
+    }
+
+ 
+
+    res.status(200).json({ message: 'Files deleted' });
+    console.log('Files deleted');
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const viewMedicalDocuments = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    let files = [];
+
+    if (id) {
+      files = await fileModel.find({ Patient: id });
+    } else {
+      files = await fileModel.find();
+    }
+
+    if (files.length === 0) {
+      return res.status(404).json({ error: 'No files found' });
+    }
+
+    res.status(200).json(files);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const viewHealthRecords = async(req,res) =>{
+  const { id } = req.params;
+  try{
+    const currPatient = await patientModel.find({ Patient: id });
+    if (currPatient && currPatient.length > 0 && currPatient[0].HealthRecords) {
+          res.status(200).json(currPatient[0].HealthRecords);
+    }
+    else{
+      res.status(404).json({ error: 'Health records not found' });
+    }
+
+  } catch(error) {
+    res.status(500).json({error: error.message});
+  }
+}
+
 
 
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
-   filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription};
+   filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
+  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords};
 

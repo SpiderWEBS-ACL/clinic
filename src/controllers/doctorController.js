@@ -190,6 +190,29 @@ const searchPatientByName = async (req,res) => {
         res.status(500).json({ error: error.message });
     }
  }
+ const addHealthRecordForPatient = async(req,res) =>{
+
+ }
+const viewHealthRecords = async(req,res) =>{
+  const { id } = req.params;
+  const patientId = req.body.patientId;
+  try{
+    const doctor = await doctorModel.findById(id);
+    const currPatient = await patientModel.find({ Patient: id });
+    const appointments = await appointmentModel.find({Doctor: doctor}).populate("Doctor").populate("Patient").exec();
+//atleast 1 appointment to view
+    if (currPatient && currPatient.length > 0 && currPatient[0].HealthRecords) {
+
+          res.status(200).json(currPatient[0].HealthRecords);
+    }
+    else{
+      res.status(404).json({ error: 'Health records not found' });
+    }
+
+  } catch(error) {
+    res.status(500).json({error: error.message});
+  }
+}
 
 
 module.exports = { registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments,
