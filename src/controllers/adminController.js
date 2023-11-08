@@ -33,19 +33,24 @@ const getAllAdmins = async (req,res) =>{
 const addAdmin = async (req,res) => {
     try {
 
-      if(!req.body.Username || !req.body.Password){
+      if(!req.body.Username || !req.body.Password || !req.body.Email){
         return res.status(400).json({ error: "Missing Parameters" });
       }
 
-        const exists = await adminModel.findOne({"Username" : { $regex: '^' + req.body.Username + '$', $options:'i'}});
-        if(!exists){
+      const exists = await adminModel.findOne({"Username" : { $regex: '^' + req.body.Username + '$', $options:'i'} });
+      const exists2 = await adminModel.findOne({"Email" : { $regex: '^' + req.body.Email + '$', $options:'i'} });
+
+      if(!exists && !exists2){
           req.body.Password = await bcrypt.hash(req.body.Password,10);
-            var newAdmin = await adminModel.create(req.body);
-            res.status(201).json(newAdmin);
-        }
-        else {
-            res.status(400).json({error:  "Username already taken!" });
-        }
+          var newAdmin = await adminModel.create(req.body);
+          res.status(201).json(newAdmin);
+      }
+      else if(exists){
+          res.status(400).json({error:  "Username already taken!" });
+      }
+      else{
+        res.status(400).json({error:  "Email already taken!" });
+      }
     }catch(error){
         res.status(400).json({ error: error.message });
     }

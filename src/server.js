@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient, getAllPackagesPatient} = require("./controllers/patientController");
+const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient, getAllPackagesPatient} = require("./controllers/patientController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments } = require("./controllers/doctorController");
 const { addAppointment, filterAppointment } = require("./controllers/appointmentController")
 const {addSubscription, subscribeWithStripe} = require("./controllers/SubscriptionController")
@@ -11,6 +11,7 @@ const { AdminProtect, DoctorProtect, PatientProtect } = require("./middleware/au
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const packageModel = require("./Models/Package");
+const { login, forgotPassword, verifyOTP, resetPassword } = require("./controllers/loginController");
 
 mongoose.set('strictQuery', false);
 const MongoURI = process.env.ATLAS_MONGO_URI;
@@ -32,6 +33,12 @@ mongoose.connect(MongoURI, {useNewUrlParser:true})
 })
 .catch(err => console.log(err));
 
+
+//login Endpoints
+app.post('/login', login);
+app.post('/forgotPassword', forgotPassword);
+app.post('/verifyOTP', verifyOTP);
+app.post('/resetPassword', resetPassword);
 
 //Admin Endpoints
 app.get("/admin/me", AdminProtect, getAdmin);
@@ -74,7 +81,7 @@ app.get("/doctor/allAppointments/", DoctorProtect, viewAllDoctorAppointments);
 
 //Public Endpoints
 
-app.post("/patient/login", login)
+// app.post("/patient/login", login)
 app.post("/patient/register",addPatient);
 
 //Private Endpoints
