@@ -123,7 +123,7 @@ function RegisterDoctor() {
     }
 
     if (activeForm == 2) {
-      if (!Name || !Dob) {
+      if (!Name || !Dob || !Specialty) {
         message.error("Please Fill In All Requirements");
         return;
       }
@@ -245,7 +245,7 @@ function RegisterDoctor() {
                   <InputField
                     id="Email"
                     label="Email"
-                    type="text"
+                    type="email"
                     value={Email}
                     onChange={setEmail}
                     required={true}

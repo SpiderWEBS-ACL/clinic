@@ -48,61 +48,6 @@ const getPatient = async (req,res) => {
   }
 
 }
-const login = async(req, res) => {
-  try{
-    const patient = await patientModel.findOne({ "Username": { $regex: '^' + req.body.Username + '$', $options:'i'}});
-    const doctor = await doctorModel.findOne({ "Username": { $regex: '^' + req.body.Username + '$', $options:'i'}});
-    const admin = await adminModel.findOne({ "Username": { $regex: '^' + req.body.Username + '$', $options:'i'} });
-    var accessToken;
-    var refreshToken;
-    
-    if (!doctor&& !patient && !admin) {
-      return res.status(400).json({ error: "Username not found!" });
-    }
-    else if(patient){
-      if (await bcrypt.compare(req.body.Password, patient.Password)) {
-        const user = {
-          id: patient._id,
-          role: "Patient"
-        }
-        accessToken = generateAccessToken(user);
-        refreshToken = jwt.sign({id: patient._id}, process.env.REFRESH_TOKEN_SECRET);
-        res.json({ accessToken: accessToken, refreshToken: refreshToken, id: patient._id, type:"Patient"});
-      } else {
-        res.status(400).json({ error: "Password doesn't match!" });
-      }
-    }
-    else if(doctor){
-      if (await bcrypt.compare(req.body.Password, doctor.Password,)) {
-        const user = {
-          id: doctor._id,
-          role: "Doctor"
-        }
-        accessToken = generateAccessToken(user);
-        refreshToken = jwt.sign({id: doctor._id}, process.env.REFRESH_TOKEN_SECRET);
-        res.json({ accessToken: accessToken, refreshToken: refreshToken, id: doctor._id, type:"Doctor" });
-      } else {
-        res.status(400).json({ error: "Password doesn't match!" });
-      }
-    }
-    else if(admin){
-      if (await bcrypt.compare(req.body.Password, admin.Password)) {
-        const user = {
-          id: admin._id,
-          role: "Admin"
-        }
-        accessToken = generateAccessToken(user);
-        refreshToken = jwt.sign({id: admin._id}, process.env.REFRESH_TOKEN_SECRET);
-        res.json({accessToken: accessToken, refreshToken: refreshToken, id: admin._id,type:"Admin" });
-      } else {
-        res.status(400).json({ error: "Password doesn't match!" });
-      }
-    }
-   
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
 
 const addFamilyMember = async (req, res) => {
   try {
@@ -552,5 +497,5 @@ const getAllPackagesPatient = async (req,res) =>{
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
    filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, getAllPackagesPatient};
+  viewDoctorsWithPrices,filterDoctorsByNameSpecialtyAvailability, addPrescription, getAllPackagesPatient};
 
