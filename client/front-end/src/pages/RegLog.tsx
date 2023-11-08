@@ -103,7 +103,7 @@ const RegLog: React.FC = () => {
     } else if (item.type == "Doctor") {
       navigate(`/doctor/home`);
     } else if (item.type == "Admin") {
-      navigate(`/admin/`);
+      navigate(`/admin/Home`);
     }
   };
 
