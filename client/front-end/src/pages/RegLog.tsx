@@ -82,7 +82,7 @@ const RegLog: React.FC = () => {
         Password,
         Username,
       };
-      const response = await api.post(`/patient/login`, data);
+      const response = await api.post(`/login`, data);
       localStorage.setItem("id", response.data.id);
       localStorage.setItem("type", response.data.type);
       localStorage.setItem("accessToken", response.data.accessToken);
@@ -103,7 +103,7 @@ const RegLog: React.FC = () => {
     } else if (item.type == "Doctor") {
       navigate(`/doctor/home`);
     } else if (item.type == "Admin") {
-      navigate(`/admin/`);
+      navigate(`/admin/Home`);
     }
   };
 

@@ -14,6 +14,7 @@ const AddAdminForm: React.FC = () => {
   const accessToken = localStorage.getItem("accessToken");
   const [Username, setUsername] = useState<string>("");
   const [Password, setPassword] = useState<string>("");
+  const [Email, setEmail] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [alertVisible, setAlertVisibility] = useState(false);
   const [touchedFields, setTouchedFields] = useState({
@@ -36,6 +37,11 @@ const AddAdminForm: React.FC = () => {
     e.preventDefault();
     setAlertVisibility(true);
 
+    if(!(Username && Password && Email)){
+      setError("Please fill in all required fields");
+      return;
+    }
+
     const isUsernameValid = validateUsername(Username);
     const isPasswordValid = validatePassword(Password);
 
@@ -47,6 +53,7 @@ const AddAdminForm: React.FC = () => {
     const data = {
       Username,
       Password,
+      Email
     };
     const headers = {
       Authorization: `Bearer ${accessToken}`,
@@ -102,6 +109,14 @@ const AddAdminForm: React.FC = () => {
             isValid={validatePassword(Password)}
             errorMessage="Password must be at least 6 characters long."
             touched={touchedFields.password}
+          />
+          <InputField
+            id="Email"
+            label="Email"
+            type="email"
+            value={Email}
+            onChange={setEmail}
+            required={true}
           />
           <div
             style={{
