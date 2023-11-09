@@ -539,9 +539,7 @@ const getAllPackagesPatient = async (req, res) => {
         message = "Appointment with Dr. " + doctor.Name
       else
         message = "Appointment with Dr. " + doctor.Name + " after "+ doctorDiscount+"% package discount" 
-      console.log(doctorDiscount);
       const hourlyRate =  (1 - (doctorDiscount/100)) * originalHourlyRate * duration;
-      console.log(hourlyRate)
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         mode: 'payment',
@@ -555,12 +553,38 @@ const getAllPackagesPatient = async (req, res) => {
           quantity: 1
         }],
         success_url: `${process.env.SERVER_URL}/patient/success`,
-        cancel_url: `${process.env.SERVER_URL}/patient/cancel`
+        cancel_url: `${process.env.SERVER_URL}/patient/viewAllDoctors`
       })
       res.json({url: session.url})
     }catch(error){
       res.status(400).json({ error: error.message });
     }
+  }
+
+  const payAppointmentWithWallet  = async(req,res) => {
+    try{
+    let message = "";
+    const patientId = req.user.id;
+    const {WalletBalance} = await patientModel.findById(patientId);
+      const doctorId = req.body.id;
+      const duration = 1; //for testing
+      const doctor = await  doctorModel.findById(doctorId);
+      const originalHourlyRate =await getHourlyRate(doctorId);
+      const doctorDiscount = await getDoctorDiscount(patientId);
+      const hourlyRate =  Math.round((1 - (doctorDiscount/100)) * originalHourlyRate * duration);
+      if(WalletBalance >= hourlyRate){
+        const updatedPatient = await patientModel.findByIdAndUpdate(patientId, {WalletBalance: WalletBalance - hourlyRate});
+        message = "Appointment Booked Successfully!"
+        res.status(200).json(message);
+      }else{
+        message = "Insufficient funds in wallet!"
+        res.status(400).json(message);
+      }
+    }catch(error){
+      res.status(401).json({error : error});
+    }
+
+
   }
 
   const checkDoctorAvailablity = async (req, res) => {
@@ -599,7 +623,29 @@ const getSubscribedPackage = async (req,res) => {
   return res.status(200).json(subscription.Package);
 }
 
+const getBalance = async(req,res) => {
+  try{
+  const id = req.user.id;
+  const { WalletBalance } = await patientModel.findById(id);
+  res.status(200).json(WalletBalance);
+  }catch(error){
+    res.status(401).json({error: error});
+  }
+}
+
+const doctorDiscount = async (req, res) => {
+  try{
+  const patientId = req.user.id;
+  const doctorDiscount = await getDoctorDiscount(patientId);
+  res.status(200).json(doctorDiscount);
+  }catch(error){
+    res.status(401).json({error: error})
+  }
+
+
+}
+
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor,viewFamilyMembers, filterDoctors , searchForDoctor,
    filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices,filterDoctorsByNameSpecialtyAvailability, addPrescription, getAllPackagesPatient,payAppointmentWithStripe, checkDoctorAvailablity, getDoctorTimeSlots, getSubscribedPackage ,changePasswordPatient};
+  viewDoctorsWithPrices,filterDoctorsByNameSpecialtyAvailability, addPrescription, getAllPackagesPatient,payAppointmentWithStripe, checkDoctorAvailablity, getDoctorTimeSlots, getSubscribedPackage ,changePasswordPatient, getBalance, doctorDiscount, payAppointmentWithWallet};
 

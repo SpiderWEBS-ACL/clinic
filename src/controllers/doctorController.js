@@ -248,6 +248,11 @@ const filterDoctorAppointments = async (req, res) => {
   }
 };
 
+const getBalance = async(req,res) => {
+    const id = req.user.id;
+    
+}
+
 
 module.exports = { registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments,
     addDoctor, viewPatients,viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments, AddAvailableTimeSlots ,changePasswordDoctor,};

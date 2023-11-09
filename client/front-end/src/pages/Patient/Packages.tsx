@@ -6,6 +6,11 @@ import Cookies from "js-cookie";
 import { JwtPayload } from "../../AppRouter";
 import jwt_decode from "jwt-decode";
 import { config } from "../../Middleware/authMiddleware";
+import {
+  CheckCircleFilled,
+  CheckCircleOutlined,
+  CheckCircleTwoTone,
+} from "@ant-design/icons";
 
 const AllPackagesPatient = () => {
   const [Packages, setPackages] = useState([]);
@@ -121,16 +126,19 @@ const AllPackagesPatient = () => {
               <td>
                 <button
                   className={
-                    request._id == SubscribedPackageId
+                    request._id == SubscribedPackageId ||
+                    SubscribedPackageId === ""
                       ? "btn btn-sm btn-success"
                       : "btn btn-sm btn-secondary"
                   }
                   disabled={SubscribedPackageId != ""}
                   onClick={() => handleSubscribe(request._id)}
                 >
-                  {request._id == SubscribedPackageId
-                    ? "Subscribed"
-                    : "Subscribe "}
+                  {request._id == SubscribedPackageId ? (
+                    <CheckCircleOutlined />
+                  ) : (
+                    "Subscribe "
+                  )}
                 </button>
                 <button
                   style={{ marginLeft: "1rem" }}

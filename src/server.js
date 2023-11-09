@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient, getAllPackagesPatient, checkDoctorAvailablity, getDoctorTimeSlots, payAppointmentWithStripe, getSubscribedPackage, changePasswordPatient} = require("./controllers/patientController");
+const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient, getAllPackagesPatient, checkDoctorAvailablity, getDoctorTimeSlots, payAppointmentWithStripe, getSubscribedPackage, changePasswordPatient, getBalance, doctorDiscount, payAppointmentWithWallet} = require("./controllers/patientController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments, AddAvailableTimeSlots , changePasswordDoctor, } = require("./controllers/doctorController");
 const { addAppointment, filterAppointment } = require("./controllers/appointmentController")
 const {addSubscription, subscribeWithStripe, deleteOneSubscription} = require("./controllers/SubscriptionController")
@@ -116,6 +116,7 @@ app.get("/patient/allPackages",PatientProtect,getAllPackagesPatient);
 app.post("/patient/checkDoctor",PatientProtect,checkDoctorAvailablity);
 app.get("/patient/doctorTimeSlots/:id",PatientProtect,getDoctorTimeSlots);
 app.post("/patient/payAppointmentStripe",PatientProtect,payAppointmentWithStripe);
+app.post("/patient/payAppointmentWallet",PatientProtect,payAppointmentWithWallet);
 app.get("/patient/subscribedPackage",PatientProtect,getSubscribedPackage);
 app.put("/patient/changePassword", PatientProtect, changePasswordPatient);
 app.post("/patient/addFamilyMember", PatientProtect, addFamilyMember); //TODO: fix in frontend was taking id
@@ -134,6 +135,8 @@ app.get("/patient/viewDoctorsWithPrices", PatientProtect, viewDoctorsWithPrices)
 app.get("/patient/allAppointments", PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors", PatientProtect, getAllDoctorsPatient);
 app.get("/patient/allPackages", PatientProtect, getAllPackagesPatient);
+app.get("/patient/getBalance", PatientProtect, getBalance);
+app.get("/patient/getDoctorDiscount", PatientProtect, doctorDiscount);
 
 //Appointment Endpoints
 app.post("/appointment/add", addAppointment);
