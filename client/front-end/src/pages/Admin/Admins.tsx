@@ -72,6 +72,7 @@ const AllAdmins = () => {
         <thead>
           <tr>
             <th>Username</th>
+            <th>Email</th>
             <th>Remove</th>
           </tr>
         </thead>
@@ -82,6 +83,9 @@ const AllAdmins = () => {
                 {request._id == id
                   ? request.Username + " (You)"
                   : request.Username}
+              </td>
+              <td>
+                {request.Email}
               </td>
               <td>
                 <button
