@@ -38,6 +38,9 @@ import AddAvailableTimeSolts from "./pages/Doctor/AddAvailableTimeSolts";
 import Calendar from "./pages/Doctor/AddAvailableTimeSolts";
 import CheckoutButton from "./pages/CheckoutButton";
 import AllPackagesPatient from "./pages/Patient/Packages";
+import PaymentPage from "./pages/Patient/PaymentChoices";
+import AppointmentBookingPage from "./pages/Patient/AppointmentBookingPage";
+import SubscriptionSuccess from "./pages/Patient/SubscriptionSuccess";
 
 export interface JwtPayload {
   id: string;
@@ -127,7 +130,13 @@ const AppRouter: React.FC = () => {
         />
         <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
         <Route path="/patient/packages" element={<AllPackagesPatient />} />
+        <Route path="/patient/subscribe/options" element={<PaymentPage />} />
         <Route path="/checkout" element={<CheckoutButton />} />
+        <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+        <Route
+          path="/patient/appointment/booking"
+          element={<AppointmentBookingPage />}
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );

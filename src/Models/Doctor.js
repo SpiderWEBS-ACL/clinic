@@ -39,9 +39,15 @@ const doctorSchema = new Schema(
       type: String,
       required: true,
     },
+    AvailableTimeSlots : [
+      {
+        type: String,
+      },
+    ]
   },
   { timestamps: true }
 );
 
 const Doctor = mongoose.model("Doctor", doctorSchema);
+
 module.exports = Doctor;
