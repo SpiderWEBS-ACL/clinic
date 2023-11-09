@@ -12,7 +12,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./StylePatient.css";
 const PatientHome = () => {
   const accessToken = localStorage.getItem("accessToken");
@@ -21,6 +21,8 @@ const PatientHome = () => {
   const [prescriptions, setPrescriptions] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [allAppointments, setAllAppointments] = useState([]);
+  
+  const navigate = useNavigate();
 
   const api = axios.create({
     baseURL: "http://localhost:8000/",
@@ -57,12 +59,24 @@ const PatientHome = () => {
           Dashboard<br></br>
           <Divider borderColor="#052c65" borderWidth="2px" />
         </Heading>
-        <HStack w="350px" align="start" spacing={2}>
+
+        <HStack w="700" spacing={2} align="start">
           <Heading as="h5" size="md" mt={0}>
             Mr./Ms. {patientInfo.Name}
             <Divider borderColor="#052c65" borderWidth="2px" />
           </Heading>
         </HStack>
+
+        <div style={{ display: "flex"}}>
+              <button
+                style={{ marginLeft: "auto", marginRight: "20px" }}
+                className="btn btn-danger"
+                type="button"
+                onClick={()=> {navigate("/patient/changePassword")}}
+              >
+                Change Password
+              </button>
+            </div>
 
         <br></br>
         <br></br>

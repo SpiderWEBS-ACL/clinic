@@ -44,41 +44,44 @@ const registerDoctor = async (req, res) => {
   }
 };
 
-const changePasswordDoctor = async (req, res) => {
-  try {
-    const { id } = req.user.id;
-    const { currPass, newPass, newPassConfirm } = req.body;
-
-    if (!(currPass && newPass && newPassConfirm)) {
-      return res
-        .status(404)
-        .json({ error: "Please fill out all required fields" });
-    }
-
-    //find admin to update password
-    const doctor = await doctorModel.findById(id);
-
-    //Current password entered incorrect
-    if (!(await bcrypt.compare(currPass, doctor.Password))) {
-      return res.status(400).json("Current Password is Incorrect");
-    }
-
-    //confirm password not matching
-    if (newPass !== newPassConfirm) {
-      return res.status(400).json("The passwords do not match.");
-    }
-
-    //hash new Password
-    const hashedPass = await bcrypt.hash(newPass, 10);
-
-    //update password
-    doctor.updateOne({ Password: hashedPass });
-
-    res.status(200).json(doctor);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+// const changePasswordDoctor = async (req, res) => {
+//     try {
+//       const { id } = req.user;
+//       const { currPass, newPass, newPassConfirm } = req.body;
+  
+//       if (!(currPass && newPass && newPassConfirm)) {
+//         return res.status(404).json({ error: "Please fill out all required fields" });
+//       }
+  
+//       //find doctor to update password
+//       const doctor = await doctorModel.findById(id);
+  
+//       //Current password entered incorrect
+//       if (!(await bcrypt.compare(currPass, doctor.Password))) {
+//         return res.status(400).json("Current Password is Incorrect");
+//       }
+  
+//       //confirm password not matching
+//       if (newPass !== newPassConfirm) {
+//         return res.status(400).json("The passwords do not match.");
+//       }
+  
+//        //new password same as old
+//        if(await bcrypt.compare(newPass, doctor.Password)){
+//         return res.status(400).json("New password cannot be the same as your current password.");
+//       }
+  
+//       //hash new Password
+//       const hashedPass = await bcrypt.hash(newPass, 10);
+  
+//       //update password
+//       const newDoctor = await doctorModel.findByIdAndUpdate(id, { Password: hashedPass }, {new:true});
+  
+//       res.status(200).json(newDoctor);
+//     } catch (error) {
+//       res.status(500).json({ error: error.message });
+//     }
+//   };
 
 const searchPatientByName = async (req, res) => {
   const { Name } = req.params;
@@ -253,5 +256,4 @@ module.exports = {
   filterDoctorAppointments,
   getDoctor,
   viewAllDoctorAppointments,
-  changePasswordDoctor,
 };

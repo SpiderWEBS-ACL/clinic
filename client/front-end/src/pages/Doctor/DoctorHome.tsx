@@ -81,54 +81,71 @@ const DoctorHome = () => {
   // };
 
   return (
-    <ChakraProvider cssVarsRoot={undefined}>
-      <Container
-        marginTop="5"
-        boxShadow="lg" // Add shadow
-        borderRadius="lg" // Add border radius for curved edges
-        border="3px solid #052c65" // Add border
-        p={6}
-        maxW="container.xl"
-      >
-        <Heading as="h1" size="xl" mt={0}>
-          Welcome Dr. {doctorInfo.Name}!<br></br>
-          <Divider borderColor="#052c65" borderWidth="2px" />
-        </Heading>
-        <HStack w="350px" align="start" spacing={2}></HStack>
+    <div>
+      <ChakraProvider cssVarsRoot={undefined}>
+        <Container
+          marginTop="5"
+          boxShadow="lg" // Add shadow
+          borderRadius="lg" // Add border radius for curved edges
+          border="3px solid #052c65" // Add border
+          p={6}
+          maxW="container.xl"
+        >
+          <Heading as="h1" size="xl" mt={0}>
+            Welcome Dr. {doctorInfo.Name}!<br></br>
+            <Divider borderColor="#052c65" borderWidth="2px" />
+          </Heading>
+          <HStack w="350px" align="start" spacing={2}></HStack>
 
-        <br></br>
-        <br></br>
-        <Flex mt={8} justify="space-between">
-          <VStack w="30%" align="start" spacing={4}>
-            <Heading as="h2" size="md">
-              Upcoming Appointments
-            </Heading>
-            <Divider borderColor="#052c65" borderWidth="1px" />
+          <div style={{ display: "flex" }}>
             <button
-              style={{ width: 150 }}
-              className="btn btn-sm btn-primary"
-              onClick={appoint}
+              style={{ marginLeft: "auto", marginRight: "20px" }}
+              className="btn btn-danger"
+              type="button"
+              onClick={() => {
+                navigate("/doctor/changePassword");
+              }}
             >
-              View Details
+              Change Password
             </button>
-          </VStack>
+          </div>
 
-          <VStack w="30%" align="start" spacing={4}>
-            <Heading as="h2" size="md">
-              View Patients
-            </Heading>
-            <Divider borderColor="#052c65" borderWidth="1px" />
-            <button
-              style={{ width: 150 }}
-              className="btn btn-sm btn-primary"
-              onClick={viewpatients}
-            >
-              View Details
-            </button>
-          </VStack>
-        </Flex>
-      </Container>
-    </ChakraProvider>
+          <br></br>
+          <br></br>
+          <Flex mt={8} justify="space-between">
+            <VStack w="30%" align="start" spacing={4}>
+              <Heading as="h2" size="md">
+                Upcoming Appointments
+              </Heading>
+              <Divider borderColor="#052c65" borderWidth="1px" />
+              <button
+                style={{ width: 150 }}
+                className="btn btn-sm btn-primary"
+                onClick={appoint}
+              >
+                View Details
+              </button>
+            </VStack>
+
+            <VStack w="30%" align="start" spacing={4}>
+              <Heading as="h2" size="md">
+                View Patients
+              </Heading>
+              <Divider borderColor="#052c65" borderWidth="1px" />
+              <button
+                style={{ width: 150 }}
+                className="btn btn-sm btn-primary"
+                onClick={viewpatients}
+              >
+                View Details
+              </button>
+            </VStack>
+          </Flex>
+        </Container>
+      </ChakraProvider>
+
+      <br />
+    </div>
   );
 };
 

@@ -38,6 +38,10 @@ import AddAvailableTimeSolts from "./pages/Doctor/AddAvailableTimeSolts";
 import Calendar from "./pages/Doctor/AddAvailableTimeSolts";
 import CheckoutButton from "./pages/CheckoutButton";
 import AllPackagesPatient from "./pages/Patient/Packages";
+import ChangePasswordDoctor from "./pages/Doctor/ChangePassword";
+import ChangePasswordAdmin from "./pages/Admin/ChangePassword";
+import ChangePasswordPatient from "./pages/Patient/ChangePassword";
+
 
 export interface JwtPayload {
   id: string;
@@ -73,6 +77,7 @@ const AppRouter: React.FC = () => {
         <Route path="/admin/Patients" element={<Patients />} />
         <Route path="/admin/Admins" element={<AllAdmins />} />
         <Route path="/admin/Packages" element={<AllPackages />} />
+        <Route path="/admin/changePassword" element={<ChangePasswordAdmin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
@@ -96,6 +101,7 @@ const AppRouter: React.FC = () => {
         <Route path="/doctor/home/" element={<DoctorHome />} />
         <Route path="/doctor/timeSlots" element={<Calendar />} />
         <Route path="/checkout" element={<CheckoutButton />} />
+        <Route path="/doctor/changePassword" element={<ChangePasswordDoctor />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
@@ -128,6 +134,7 @@ const AppRouter: React.FC = () => {
         <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
         <Route path="/patient/packages" element={<AllPackagesPatient />} />
         <Route path="/checkout" element={<CheckoutButton />} />
+        <Route path="/patient/changePassword" element={<ChangePasswordPatient />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
