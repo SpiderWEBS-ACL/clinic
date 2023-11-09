@@ -41,6 +41,7 @@ import AllPackagesPatient from "./pages/Patient/Packages";
 import PaymentPage from "./pages/Patient/PaymentChoices";
 import AppointmentBookingPage from "./pages/Patient/AppointmentBookingPage";
 import SubscriptionSuccess from "./pages/Patient/SubscriptionSuccess";
+import Wallet from "./pages/Patient/Wallet";
 
 export interface JwtPayload {
   id: string;
@@ -133,6 +134,7 @@ const AppRouter: React.FC = () => {
         <Route path="/patient/subscribe/options" element={<PaymentPage />} />
         <Route path="/checkout" element={<CheckoutButton />} />
         <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+        <Route path="/patient/wallet" element={<Wallet />} />
         <Route
           path="/patient/appointment/booking"
           element={<AppointmentBookingPage />}

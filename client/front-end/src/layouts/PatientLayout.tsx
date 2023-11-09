@@ -12,8 +12,15 @@ import {
   FileOutlined,
   UserOutlined,
   PoweroffOutlined,
+  WalletOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import AppRouter from "../AppRouter";
+import {
+  IoPeople,
+  IoPeopleCircleOutline,
+  IoPeopleOutline,
+} from "react-icons/io5";
 
 const { Header, Content, Footer, Sider } = Layout;
 const id = localStorage.getItem("id");
@@ -30,11 +37,11 @@ const PatientLayout: React.FC = () => {
     {
       label: "My Appointments",
       key: "/patient/allAppointments",
-      icon: <UserOutlined />,
+      icon: <CalendarOutlined />,
     },
     {
       label: "Family",
-      icon: <UserOutlined />,
+      icon: <IoPeopleOutline />,
       key: "parent1",
       children: [
         {
@@ -58,6 +65,11 @@ const PatientLayout: React.FC = () => {
       label: "Packages",
       key: "/patient/packages",
       icon: <FileOutlined />,
+    },
+    {
+      label: "Wallet",
+      key: "/patient/wallet",
+      icon: <WalletOutlined />,
     },
     {
       label: "Logout",

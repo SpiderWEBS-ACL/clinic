@@ -10,8 +10,11 @@ import {
   Modal,
   Button,
   message,
+  Row,
+  Col,
 } from "antd";
 import { config, headers } from "../../Middleware/authMiddleware";
+import { CreditCardFilled, WalletFilled } from "@ant-design/icons";
 const { Option } = Select;
 
 const ViewAllDoctors = () => {
@@ -31,7 +34,11 @@ const ViewAllDoctors = () => {
   const [AppointmentTime, setAppointmentTime] = useState("");
   const [DoctorId, setDoctorId] = useState("");
   const [Message, setMessage] = useState("");
+  const [WalletMessage, setWalletMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [balance, setBalance] = useState<number>(0);
+  const [HourlyRate, setHourlyRate] = useState<number>(0);
+  const [DoctorDiscount, setDoctorDiscount] = useState<number>(0);
 
   const timeSlots = [];
 
@@ -79,6 +86,14 @@ const ViewAllDoctors = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+    api
+      .get("patient/getDoctorDiscount", config)
+      .then((response) => {
+        setDoctorDiscount(response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
     setLoading(false);
   }, []);
 
@@ -93,6 +108,28 @@ const ViewAllDoctors = () => {
           { headers: headers }
         );
         window.location.href = response.data.url;
+      } catch (error) {
+        console.log(error);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const payWithWallet = async () => {
+    try {
+      try {
+        const response = await api
+          .post(
+            "patient/payAppointmentWallet",
+            {
+              id: DoctorId,
+            },
+            { headers: headers }
+          )
+          .then((response) => {
+            setWalletMessage(response.data);
+            message.success(response.data);
+          });
       } catch (error) {
         console.log(error);
       }
@@ -181,8 +218,9 @@ const ViewAllDoctors = () => {
     setTime("");
     setDoctors(AllDoctors);
   };
-  const handleBookAppointment = (doctor: any) => {
+  const handleBookAppointment = (doctor: any, HourlyRate: any) => {
     setDoctorId(doctor);
+    setHourlyRate(HourlyRate);
     setShowDateTimeModal(true);
     api
       .get("/patient/doctorTimeSlots/" + doctor, config)
@@ -192,10 +230,20 @@ const ViewAllDoctors = () => {
       .catch((error) => {
         console.log(error);
       });
+    api
+      .get("patient/getBalance", config)
+      .then((response) => {
+        setBalance(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
   const handlePaymentSelection = (paymentMethod: string) => {
     if (paymentMethod === "Card") {
       redirectToStripe();
+    } else {
+      payWithWallet();
     }
     console.log("Selected payment method: ", paymentMethod);
     setShowPaymentModal(false);
@@ -269,7 +317,11 @@ const ViewAllDoctors = () => {
           <tr>
             <th>Name</th>
             <th>Specialty</th>
-            <th>Sesssion Price</th>
+            <th>
+              {DoctorDiscount > 0
+                ? `Discounted Sesssion Price (${DoctorDiscount}% Discount)`
+                : "Sesssion Price"}
+            </th>
             <th></th>
             <th></th>
           </tr>
@@ -280,7 +332,9 @@ const ViewAllDoctors = () => {
             <tr key={request._id}>
               <td>{request.Name}</td>
               <td>{request.Specialty}</td>
-              <td>{request.HourlyRate}</td>
+              <td>
+                {Math.round((1 - DoctorDiscount / 100) * request.HourlyRate)}
+              </td>
               <td className="text-end">
                 <button
                   className="btn btn-sm btn-primary"
@@ -305,7 +359,7 @@ const ViewAllDoctors = () => {
                     borderRadius: "5px",
                   }}
                   onClick={() => {
-                    handleBookAppointment(request._id);
+                    handleBookAppointment(request._id, request.HourlyRate);
                   }}
                 >
                   <span aria-hidden="true"></span>
@@ -326,7 +380,11 @@ const ViewAllDoctors = () => {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Dob</th>
-                <th>HourlyRate</th>
+                <th>
+                  {DoctorDiscount > 0
+                    ? `Discounted Sesssion Price (${DoctorDiscount}% Discount)`
+                    : "Sesssion Price"}
+                </th>
                 <th>Affiliation</th>
                 <th>Specialty</th>
                 <th>Education</th>
@@ -338,7 +396,11 @@ const ViewAllDoctors = () => {
                 <td>{selectedDoctor.Name}</td>
                 <td>{selectedDoctor.Email}</td>
                 <td>{selectedDoctor.Dob.split("T")[0]}</td>
-                <td>{selectedDoctor.HourlyRate}</td>
+                <td>
+                  {Math.round(
+                    (1 - DoctorDiscount / 100) * selectedDoctor.HourlyRate
+                  )}
+                </td>
                 <td>{selectedDoctor.Affiliation}</td>
                 <td>{selectedDoctor.Specialty}</td>
                 <td>{selectedDoctor.EducationalBackground}</td>
@@ -369,19 +431,33 @@ const ViewAllDoctors = () => {
         footer={null}
       >
         <Button
+          disabled={balance < HourlyRate * (1 - DoctorDiscount / 100)}
           type="primary"
           block
           style={{ marginBottom: "8px" }}
           onClick={() => handlePaymentSelection("Wallet")}
         >
-          Wallet
+          <Row justify="center" align="middle">
+            <Col>
+              <WalletFilled />
+            </Col>
+            <Col style={{ marginLeft: 8, textAlign: "center" }}>
+              {" "}
+              Wallet (Balance: ${balance})
+            </Col>
+          </Row>
         </Button>
         <Button
           type="primary"
           block
           onClick={() => handlePaymentSelection("Card")}
         >
-          Card
+          <Row justify="center" align="middle">
+            <Col>
+              <CreditCardFilled />
+            </Col>
+            <Col style={{ marginLeft: 8, textAlign: "center" }}>Card</Col>
+          </Row>
         </Button>
       </Modal>
       <Modal

@@ -62,6 +62,10 @@ const patientSchema = new Schema({
         requiired: true,
       }
     }],
+    WalletBalance: {
+      type: Number,
+      default: 0
+    }
 }, { timestamps: true });
 
 const Patient = mongoose.model('Patient', patientSchema);
