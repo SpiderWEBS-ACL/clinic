@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient} = require("./controllers/patientController");
+const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient, linkFamily} = require("./controllers/patientController");
 const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments } = require("./controllers/doctorController");
 const { addAppointment, filterAppointment } = require("./controllers/appointmentController")
 const {addSubscription} = require("./controllers/SubscriptionController")
@@ -93,6 +93,7 @@ app.get("/patient/selectPrescription/:id",PatientProtect,selectPrescription)
 app.get("/patient/viewDoctorsWithPrices",PatientProtect, viewDoctorsWithPrices)
 app.get("/patient/allAppointments",PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors",PatientProtect, getAllDoctorsPatient);
+app.post("/patient/linkfamily",PatientProtect, linkFamily);
 //Appointment Endpoints
 app.post("/appointment/add", addAppointment);
 app.get("/appointment/filterAppointment",filterAppointment)

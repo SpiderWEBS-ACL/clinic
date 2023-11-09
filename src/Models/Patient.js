@@ -39,6 +39,11 @@ const patientSchema = new Schema({
         required: true,
     },
     FamilyMembers: [{
+      PatientID:{
+        type: Schema.Types.ObjectId,
+        ref: 'Patient',
+        required: false
+      },
       Name: {
         type: String,
         required: true,
@@ -50,7 +55,7 @@ const patientSchema = new Schema({
       },
       NationalID: {
         type: String,
-        required: true,
+        required: false,
       },
       Age: {
         type: Number,
