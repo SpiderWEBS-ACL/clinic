@@ -191,6 +191,14 @@ const searchPatientByName = async (req,res) => {
     }
  }
 
+ const AddAvailableTimeSlots = async(req,res) => {
+    const slots = req.body.slots;
+    const id = req.user.id;
+    const updatedDoctor = await doctorModel.findByIdAndUpdate(id, {AvailableTimeSlots: slots});
+    return res.status(200).json(updatedDoctor);
+ }
+
+
 
 module.exports = { registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments,
-    addDoctor, viewPatients,viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments};
+    addDoctor, viewPatients,viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments, AddAvailableTimeSlots};
