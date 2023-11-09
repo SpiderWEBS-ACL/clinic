@@ -1,90 +1,16 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient, getAllPackagesPatient, checkDoctorAvailablity, getDoctorTimeSlots, payAppointmentWithStripe, getSubscribedPackage} = require("./controllers/patientController");
-const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments, AddAvailableTimeSlots } = require("./controllers/doctorController");
+const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient, getAllPackagesPatient, checkDoctorAvailablity, getDoctorTimeSlots, payAppointmentWithStripe, getSubscribedPackage, changePasswordPatient} = require("./controllers/patientController");
+const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments, AddAvailableTimeSlots , changePasswordDoctor, } = require("./controllers/doctorController");
 const { addAppointment, filterAppointment } = require("./controllers/appointmentController")
 const {addSubscription, subscribeWithStripe, deleteOneSubscription} = require("./controllers/SubscriptionController")
-const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages, getAdmin, acceptRegistrationRequest, rejectRegistrationRequest } = require("./controllers/adminController");
+const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages, getAdmin, acceptRegistrationRequest, rejectRegistrationRequest, changePasswordAdmin} = require("./controllers/adminController");
 const cors = require('cors');
 const { AdminProtect, DoctorProtect, PatientProtect } = require("./middleware/authMiddleware");
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const packageModel = require("./Models/Package");
-
-const {
-  addPatient,
-  addFamilyMember,
-  viewFamilyMembers,
-  selectDoctor,
-  filterDoctors,
-  searchForDoctor,
-  filterPatientAppointments,
-  viewDoctorDetails,
-  viewMyPrescriptions,
-  filterPrescriptions,
-  selectPrescription,
-  viewDoctorsWithPrices,
-  filterDoctorsByNameSpecialtyAvailability,
-  addPrescription,
-  getPatient,
-  viewAllPatientAppointments,
-  getAllDoctorsPatient,
-  getAllPackagesPatient,
-  changePasswordPatient,
-} = require("./controllers/patientController");
-
-const {
-  addDoctor,
-  registerDoctor,
-  searchPatientByName,
-  selectPatient,
-  updateDoctor,
-  upcomingAppointments,
-  viewPatients,
-  viewPatientInfo,
-  filterDoctorAppointments,
-  getDoctor,
-  viewAllDoctorAppointments,
-  changePasswordDoctor,
-} = require("./controllers/doctorController");
-
-const {
-  addAppointment,
-  filterAppointment,
-} = require("./controllers/appointmentController");
-
-const {
-  addSubscription,
-  subscribeWithStripe,
-} = require("./controllers/SubscriptionController");
-
-const {
-  addAdmin,
-  removeDoctor,
-  removePatient,
-  removeAdmin,
-  getAllDoctrsRegistrationReqs,
-  getDoctrRegistrationReqDetails,
-  addPackage,
-  updatePackage,
-  deletePackage,
-  getPackage,
-  getAllDoctors,
-  getAllPatients,
-  getAllAdmins,
-  getAllPackages,
-  getAdmin,
-  acceptRegistrationRequest,
-  rejectRegistrationRequest,
-  changePasswordAdmin,
-} = require("./controllers/adminController");
-
-const {
-  AdminProtect,
-  DoctorProtect,
-  PatientProtect,
-} = require("./middleware/authMiddleware");
 
 const {
   login,

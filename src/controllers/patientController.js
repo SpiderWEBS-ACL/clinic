@@ -601,6 +601,5 @@ const getSubscribedPackage = async (req,res) => {
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor,viewFamilyMembers, filterDoctors , searchForDoctor,
    filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, getAllPackagesPatient,payAppointmentWithStripe, checkDoctorAvailablity, getDoctorTimeSlots, getSubscribedPackage ,changePasswordPatient};
+  viewDoctorsWithPrices,filterDoctorsByNameSpecialtyAvailability, addPrescription, getAllPackagesPatient,payAppointmentWithStripe, checkDoctorAvailablity, getDoctorTimeSlots, getSubscribedPackage ,changePasswordPatient};
 
-};
