@@ -44,6 +44,7 @@ const ViewAllDoctors = () => {
   const [DoctorDiscount, setDoctorDiscount] = useState<number>(0);
   const [FamilyMembers, setFamilyMembers] = useState<string[]>([]);
   const [FamilyMember, setFamilyMember] = useState("");
+  var hasFamily = true;
   const navigate = useNavigate();
 
   const timeSlots = [];
@@ -82,8 +83,8 @@ const ViewAllDoctors = () => {
         else message.error("Doctor is not available at this time");
       });
   };
-  const getAllDoctors = async () => {
-    await api
+  const getAllDoctors = () => {
+    api
       .get("patient/allDoctors", config)
       .then((response) => {
         setDoctors(response.data);
@@ -93,8 +94,8 @@ const ViewAllDoctors = () => {
         console.error("Error:", error);
       });
   };
-  const doctorDiscount = async () => {
-    await api
+  const doctorDiscount = () => {
+    api
       .get("patient/getDoctorDiscount", config)
       .then((response) => {
         setDoctorDiscount(response.data);
@@ -104,8 +105,8 @@ const ViewAllDoctors = () => {
       });
   };
 
-  const getFamilyMembers = async () => {
-    await api
+  const getFamilyMembers = () => {
+    api
       .get("patient/viewFamilyMembers", config)
       .then((response) => {
         response.data.map((member: any) => {
@@ -119,9 +120,9 @@ const ViewAllDoctors = () => {
   };
 
   useEffect(() => {
+    getFamilyMembers();
     getAllDoctors();
     doctorDiscount();
-    getFamilyMembers();
     setLoading(false);
   }, []);
 
@@ -157,6 +158,7 @@ const ViewAllDoctors = () => {
         {
           Doctor: DoctorId,
           AppointmentDate: `${AppointmentDate}T${AppointmentTime}.000Z`,
+          FamilyMember: FamilyMember,
         },
         { headers: headers }
       )

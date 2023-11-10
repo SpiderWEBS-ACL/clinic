@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const doctorModel = require("../Models/Doctor");
 const adminModel = require("../Models/Admin");
 const appointmentModel = require("../Models/Appointment");
+const packageModel = require("../Models/Package");
 const fileModel = require("../Models/File");
 
 const prescriptionModel = require("../Models/Prescription");
@@ -15,6 +16,7 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const { generateAccessToken } = require("../middleware/authMiddleware");
 require('dotenv').config();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 
 const addPatient = async (req, res) => {
@@ -122,14 +124,13 @@ const addFamilyMember = async (req, res) => {
     }
     const familyMembers = patient.FamilyMembers;
     const allFamilyMembers = familyMembers.concat([newFamilyMember]);
-    res.json(allFamilyMembers);
     const updatedPatient = await patientModel.findByIdAndUpdate(id, {
       FamilyMembers: allFamilyMembers,
     }, {new: true}
     );
-    res.status(200).json(updatedPatient);
+    return res.status(200).json(updatedPatient);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 const selectDoctor = async (req, res) => {
@@ -726,6 +727,22 @@ const getBalance = async(req,res) => {
     res.status(401).json({error: error});
   }
 }
+const getDoctorDiscount = async (patientId) => {
+  try{
+  const subscription = await subscriptionModel.findOne({Patient: patientId});
+  if(!subscription)
+    return 0;
+  const package = await packageModel.findById(subscription.Package);
+  return package.DoctorDiscount;
+  }catch(error){
+    console.log(error);
+  }
+}
+
+const getHourlyRate = async (doctorId) => {
+  const doctor =await doctorModel.findById(doctorId);
+  return doctor.HourlyRate;
+}
 const doctorDiscount = async (req, res) => {
   try{
   const patientId = req.user.id;
@@ -817,3 +834,4 @@ module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, 
   viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity, getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe
 , };
 
+ 
