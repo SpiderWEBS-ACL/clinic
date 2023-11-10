@@ -12,7 +12,10 @@ const appointmentSchema = new Schema({
           required: true 
         },
     AppointmentDate: Date,
-    
+    FollowUp: {
+      type: Boolean,
+
+    },
     Status:{
       type : String ,  
       enum:[ "Upcoming","Attended","Cancelled","Not-Attended"],

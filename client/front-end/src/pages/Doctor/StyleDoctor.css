@@ -659,3 +659,23 @@
     background-color: #0056b3;
   }
   
+  .card-container:hover .hover-card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    cursor: pointer;
+  }
+
+
+ 
+  .patient-info-container {
+    display: flex;
+  }
+  
+  .vertical-line {
+    border-left: 2px solid #333; /* Customize the color and width of the line */
+    margin: 0 20px; /* Adjust the margin for spacing */
+    height: 100%; /* Make the line the full height of the container */
+  }
+  
+
+
