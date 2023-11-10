@@ -41,6 +41,7 @@ import AllPackagesPatient from "./pages/Patient/Packages";
 import ChangePasswordDoctor from "./pages/Doctor/ChangePassword";
 import ChangePasswordAdmin from "./pages/Admin/ChangePassword";
 import ChangePasswordPatient from "./pages/Patient/ChangePassword";
+import ForgotPassword from "./pages/ForgotPassword";
 import PaymentPage from "./pages/Patient/PaymentChoices";
 import AppointmentBookingPage from "./pages/Patient/AppointmentBookingPage";
 import SubscriptionSuccess from "./pages/Patient/SubscriptionSuccess";
@@ -154,6 +155,7 @@ const AppRouter: React.FC = () => {
     navigate(-1);
     return (
       <Routes>
+        <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/" element={<RegLog />} />
       </Routes>
     );
