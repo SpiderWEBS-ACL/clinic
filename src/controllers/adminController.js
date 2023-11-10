@@ -70,42 +70,45 @@ const removeAdmin = async (req, res) => {
   }
 };
 
+// const changePasswordAdmin = async(req, res) => {
+//   try {  
+//     const {id} = req.user;
+//     const { currPass, newPass, newPassConfirm } = req.body;
 
-const changePasswordAdmin = async(req, res) => {
+//     if (!(currPass && newPass && newPassConfirm)) {
+//       return res.status(404).json({ error: "Please fill out all required fields" });
+//     }
 
-  try {
+//     //find admin to update password
+//     const admin = await adminModel.findById(id);
 
-    const { id } = req.user.id;
-    const { currPass, newPass, newPassConfirm } = req.body;
+//     //Current password entered incorrect
+//     if(!(await bcrypt.compare(currPass, admin.Password))){
+//       return res.status(400).json("Current Password is Incorrect");
+//     }
 
-    if (!(currPass && newPass && newPassConfirm)) {
-      return res.status(404).json({ error: "Please fill out all required fields" });
-    }
+//     //confirm password not matching
+//     if(newPass !== newPassConfirm){
+//       return res.status(400).json("The passwords do not match.");
+//     }
 
-    //find admin to update password
-    const admin = await adminModel.findById(id);
+//     //new password same as old
+//     if(await bcrypt.compare(newPass, admin.Password)){
+//       return res.status(400).json("New password cannot be the same as your current password.");
+//     }
 
-    //Current password entered incorrect
-    if(!(await bcrypt.compare(currPass, admin.Password))){
-      return res.status(400).json("Current Password is Incorrect");
-    }
+//     //hash new Password
+//     const hashedPass = await bcrypt.hash(newPass, 10);
 
-    //confirm password not matching
-    if(newPass !== newPassConfirm){
-      return res.status(400).json("The passwords do not match.");
-    }
+//     //update password
+//     const newAdmin = await adminModel.findByIdAndUpdate(id, {Password: hashedPass}, {new: true});
 
-    //hash new Password
-    const hashedPass = await bcrypt.hash(newPass, 10);
+//     res.status(200).json(newAdmin);
+//   } catch (error) {
+//     res.status(500).json({error: error.message});
+//   }
+// };
 
-    //update password
-    admin.updateOne({Password: hashedPass});
-
-    res.status(200).json(admin);
-  } catch (error) {
-    res.status(500).json({error: error.message});
-  }
-};
 
 /////////////////////////////////////PATIENT///////////////////////////////////////////////////
 
@@ -311,5 +314,4 @@ module.exports = {
   getAllPatients,
   getAllAdmins,
   getAllPackages,
-  changePasswordAdmin,
 };

@@ -53,39 +53,44 @@ const getPatient = async (req, res) => {
   }
 };
 
-const changePasswordPatient = async (req, res) => {
-  try {
-    const { id } = req.user.id;
-    const { currPass, newPass, newPassConfirm } = req.body;
+// const changePasswordPatient = async (req, res) => {
+//   try {
+//     const { id } = req.user;
+//     const { currPass, newPass, newPassConfirm } = req.body;
 
-    if (!(currPass && newPass && newPassConfirm)) {
-      return res.status(404).json({ error: "Please fill out all required fields" });
-    }
+//     if (!(currPass && newPass && newPassConfirm)) {
+//       return res.status(404).json({ error: "Please fill out all required fields" });
+//     }
 
-    //find admin to update password
-    const patient = await patientModel.findById(id);
+//     //find patient to update password
+//     const patient = await patientModel.findById(id);
 
-    //Current password entered incorrect
-    if (!(await bcrypt.compare(currPass, patient.Password))) {
-      return res.status(400).json("Current Password is Incorrect");
-    }
+//     //Current password entered incorrect
+//     if (!(await bcrypt.compare(currPass, patient.Password))) {
+//       return res.status(400).json("Current Password is Incorrect");
+//     }
 
-    //confirm password not matching
-    if (newPass !== newPassConfirm) {
-      return res.status(400).json("The passwords do not match.");
-    }
+//     //confirm password not matching
+//     if (newPass !== newPassConfirm) {
+//       return res.status(400).json("The passwords do not match.");
+//     }
 
-    //hash new Password
-    const hashedPass = await bcrypt.hash(newPass, 10);
+//      //new password same as old
+//      if(await bcrypt.compare(newPass, patient.Password)){
+//       return res.status(400).json("New password cannot be the same as your current password.");
+//     }
 
-    //update password
-    patient.updateOne({ Password: hashedPass });
+//     //hash new Password
+//     const hashedPass = await bcrypt.hash(newPass, 10);
 
-    res.status(200).json(patient);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//     //update password
+//     const newPatient = await patientModel.findByIdAndUpdate(id, { Password: hashedPass }, {new:true});
+
+//     res.status(200).json(newPatient);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 const addFamilyMember = async (req, res) => {
   try {
@@ -641,11 +646,33 @@ const doctorDiscount = async (req, res) => {
   }catch(error){
     res.status(401).json({error: error})
   }
-
-
 }
 
-module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor,viewFamilyMembers, filterDoctors , searchForDoctor,
-   filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices,filterDoctorsByNameSpecialtyAvailability, addPrescription, getAllPackagesPatient,payAppointmentWithStripe, checkDoctorAvailablity, getDoctorTimeSlots, getSubscribedPackage ,changePasswordPatient, getBalance, doctorDiscount, payAppointmentWithWallet};
+module.exports = {
+  getAllDoctorsPatient,
+  viewAllPatientAppointments,
+  getPatient,
+  addPatient,
+  addFamilyMember,
+  selectDoctor,
+  viewFamilyMembers,
+  filterDoctors,
+  searchForDoctor,
+  filterPatientAppointments,
+  viewDoctorDetails,
+  viewMyPrescriptions,
+  filterPrescriptions,
+  selectPrescription,
+  viewDoctorsWithPrices,
+  filterDoctorsByNameSpecialtyAvailability,
+  addPrescription,
+  getAllPackagesPatient,
+  payAppointmentWithStripe, 
+  checkDoctorAvailablity, 
+  getDoctorTimeSlots, 
+  getSubscribedPackage, 
+  getBalance, 
+  doctorDiscount, 
+  payAppointmentWithWallet
+};
 
