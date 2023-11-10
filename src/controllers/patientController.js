@@ -10,6 +10,8 @@ const fileModel = require("../Models/File");
 
 const prescriptionModel = require("../Models/Prescription");
 const subscriptionModel = require("../Models/Subscription");
+const packageModel = require("../Models/Package");
+
 const { fileLoader } = require("ejs");
 const multer = require('multer');
 const fs = require('fs');
@@ -827,11 +829,100 @@ const getSubscribedPackage = async (req,res) => {
 }
 
 
+const linkFamily = async (req,res) => {
+  try{
+    const id = req.user.id;
+    const Email = req.body.emailInput;
+    const RelationToPatient = req.body.RelationToPatient;
+    const PhoneNumber = req.body.phoneInput;
+    const memberEm = await patientModel.findOne({Email : Email});
+    const memberMo = await patientModel.findOne({Mobile : PhoneNumber});
+    const patient = await patientModel.findById(id);
+    const familyMembers = patient.FamilyMembers;
+    if (!patient) {
+      return res.status(404).json({ error: "Patient not found" });
+    }
+    if (!memberEm && !memberMo) {
+      return res.status(404).json({ error: "No such member with this data" });
+    }
+    if(memberMo){
+      if( memberMo.id == id){
+        return res.status(409).json({ error: "You can't add yourself as a Family Member" })
+      }
+      let repeated = false;
+    familyMembers.map(member =>{
+      if (member.PatientID == memberMo.id)
+        repeated = true
+        return;
+    });
+    if (repeated == true){
+      return res.status(404).json({ error: "Member already linked" });
+    }
+    else{
+      const newFamilyMember = {PatientID: memberMo.id ,Name: memberMo.Name,RelationToPatient:RelationToPatient,Age: memberMo.Age,Gender: memberMo.Gender};
+      const allFamilyMembers = familyMembers.concat([newFamilyMember]);
+      const updatedPatient = await patientModel.findByIdAndUpdate(id, {
+        FamilyMembers: allFamilyMembers,
+      }, {new: true}
+      );
+      res.status(200).json(updatedPatient);
+      }
+    }
+    if(memberEm){
+      if(memberEm.id == id ){
+        return res.status(409).json({ error: "You can't add yourself as a Family Member" })
+      }
+      let repeated = false;
+    familyMembers.map(member =>{
+      if (member.PatientID == memberEm.id)
+        repeated = true
+        return;
+    });
+    if (repeated == true){
+      return res.status(404).json({ error: "Member already linked" });
+    }
+    else{
+      const newFamilyMember = {PatientID:memberEm.id,Name: memberEm.Name,RelationToPatient:RelationToPatient,Age: memberEm.Age,Gender: memberEm.Gender};
+      const allFamilyMembers = familyMembers.concat([newFamilyMember]);
+      const updatedPatient = await patientModel.findByIdAndUpdate(id, {
+        FamilyMembers: allFamilyMembers,
+      }, {new: true}
+      );
+      res.status(200).json(updatedPatient);
+    }
+  }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 
+const cancelSubscription = async (req,res) => {
+
+  const id = req.body.id;
+  const packageID = req.body.PackageID
+
+  const patient = await patientModel.findById(id);
+  const package = await packageModel.findById(packageID);
+  try {
+    if (!package) {
+      return res.status(404).json("this Package isn't found")
+    }
+    if(!patient){
+      return res.status(404).json('This Patient is not Found')
+    }
+    if(patient && package){
+      packageModel.findOneAndDelete({Patient: patient, Package: package})
+    }
+  }
+  catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
+
    filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
   viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity, getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe
-, };
+,linkFamily, cancelSubscription };
 
  
