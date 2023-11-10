@@ -21,7 +21,7 @@ const subscribeWithStripe = async (req,res) => {
         },
         quantity: 1
       }],
-      success_url: `${process.env.SERVER_URL}/patiient/packages`,
+      success_url: `${process.env.SERVER_URL}/subscription/success`,
       cancel_url: `${process.env.SERVER_URL}/patient/packages` //TODO:back to shopping cart page
     })
     res.json({url: session.url})
@@ -32,19 +32,34 @@ const subscribeWithStripe = async (req,res) => {
 
 const addSubscription = async (req, res) => {
     try {
-      const { packageId } = req.body; 
-      const subscription = new subscriptionModel({
-        Patient: req.params.id,  
+      console.log("Here");
+      const { packageId } = req.body;
+      const subscribedAlready = await subscriptionModel.findOne({Patient: req.user.id}) 
+      if(subscribedAlready)
+        return res.status(400).json("You are already subscribed to a package");
+      const subscription = {
+        Patient: req.user.id,  
         Package: packageId
-      });
-      await subscription.save();
-      res.status(201).json({ message: 'Subscription added successfully', subscription });
+      };
+      const newSubscription = await subscriptionModel.create(subscription);
+      res.status(201).json({ message: 'Subscription added successfully', newSubscription });
     } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  const deleteOneSubscription = async (req, res) => {
+    try {
+      const subscriptions = await subscriptionModel.find({Patient: req.user.id})
+      if(subscriptions.length == 2)
+         var deletedSubscription = await subscriptionModel.deleteOne({Patient: req.user.id});
+    }catch (error) {
       res.status(400).json({ error: error.message });
     }
   }
 
 module.exports = {
     addSubscription,
-    subscribeWithStripe
+    subscribeWithStripe,
+    deleteOneSubscription
 };

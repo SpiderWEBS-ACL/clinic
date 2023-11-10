@@ -1,20 +1,63 @@
+import { ApiFilled } from "@ant-design/icons";
+import { Button, message } from "antd";
+import axios from "axios";
 import React, { useState } from "react";
+import { config, headers } from "../../Middleware/authMiddleware";
 
-const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+const daysOfWeek = ["Select your available time slots"];
+const api = axios.create({
+  baseURL: "http://localhost:8000/",
+});
 
 const timeSlots = [
-  "6:00 AM",
-  "7:00 AM",
-  "8:00 AM",
-  "9:00 AM",
-  "10:00 AM",
-  "11:00 AM",
-  "12:00 PM",
-  "1:00 PM",
-  "2:00 PM",
-  "3:00 PM",
-  "4:00 PM",
-  "5:00 PM",
+  "00:00",
+  "00:30",
+  "01:00",
+  "01:30",
+  "02:00",
+  "02:30",
+  "03:00",
+  "03:30",
+  "04:00",
+  "04:30",
+  "05:00",
+  "05:30",
+  "06:00",
+  "06:30",
+  "07:00",
+  "07:30",
+  "08:00",
+  "08:30",
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "12:00",
+  "12:30",
+  "13:00",
+  "13:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+  "16:30",
+  "17:00",
+  "17:30",
+  "18:00",
+  "18:30",
+  "19:00",
+  "19:30",
+  "20:00",
+  "20:30",
+  "21:00",
+  "21:30",
+  "22:00",
+  "22:30",
+  "23:00",
+  "23:30",
 ];
 
 const Calendar: React.FC = () => {
@@ -26,19 +69,42 @@ const Calendar: React.FC = () => {
     setSelectedSlots((prevSelectedSlots) => {
       const daySelection = prevSelectedSlots[day];
       if (daySelection && daySelection.includes(timeSlot)) {
-        // Unselect the time slot if it's already selected
+        const updatedSelection = daySelection.filter(
+          (selected) => selected !== timeSlot
+        );
         return {
           ...prevSelectedSlots,
-          [day]: daySelection.filter((selected) => selected !== timeSlot),
+          [day]: updatedSelection,
         };
       } else {
-        // Select the time slot
+        const updatedSelection = daySelection
+          ? [...daySelection, timeSlot]
+          : [timeSlot];
         return {
           ...prevSelectedSlots,
-          [day]: daySelection ? [...daySelection, timeSlot] : [timeSlot],
+          [day]: updatedSelection,
         };
       }
     });
+  };
+  const slots: string[] = [];
+  for (const day of daysOfWeek) {
+    if (selectedSlots[day]) {
+      for (const timeSlot of selectedSlots[day]) {
+        const timestamp = `${timeSlot}:00`;
+        slots.push(timestamp);
+      }
+    }
+  }
+  const handleSave = () => {
+    api
+      .put("/doctor/addTimeSlots", { slots: slots }, { headers: headers })
+      .then((response) => {
+        message.success("Time slots added successfully!");
+      })
+      .catch((error) => {
+        message.error("an error has occurred");
+      });
   };
 
   return (
@@ -66,6 +132,19 @@ const Calendar: React.FC = () => {
           ))}
         </div>
       ))}
+      <div style={{ textAlign: "center", margin: "20px auto" }}>
+        <button className="btn btn-primary" onClick={handleSave}>
+          Save
+        </button>
+      </div>
+      <div>
+        <h3>Selected Slots:</h3>
+        <ul>
+          {slots.map((slot) => (
+            <li key={slot}>{slot}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

@@ -225,7 +225,14 @@ const filterDoctorAppointments = async (req, res) => {
   }
 };
 
-const viewAllDoctorAppointments = async (req, res) => {
+ const AddAvailableTimeSlots = async(req,res) => {
+    const slots = req.body.slots;
+    const id = req.user.id;
+    const updatedDoctor = await doctorModel.findByIdAndUpdate(id, {AvailableTimeSlots: slots});
+    return res.status(200).json(updatedDoctor);
+ }
+
+ const viewAllDoctorAppointments = async (req, res) => {
   const id = req.user.id;
   const doctor = await doctorModel.findById(id);
   try {
@@ -244,6 +251,11 @@ const viewAllDoctorAppointments = async (req, res) => {
   }
 };
 
+const getBalance = async(req,res) => {
+    const id = req.user.id;
+    
+}
+
 module.exports = {
   registerDoctor,
   searchPatientByName,
@@ -256,4 +268,7 @@ module.exports = {
   filterDoctorAppointments,
   getDoctor,
   viewAllDoctorAppointments,
+  AddAvailableTimeSlots,
 };
+
+
