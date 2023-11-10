@@ -57,7 +57,7 @@ const ViewDoctorAppointments = () => {
     };
     try {
       api.get(`/doctor/allAppointments/`, config).then((response) => {
-        setAppointments(response.data);
+   //     setAppointments(response.data);
         setAllAppointments(response.data);
         setHasAppointments(response.data.length > 0);
       });
@@ -73,7 +73,6 @@ const ViewDoctorAppointments = () => {
     const jsDate = selectedDate ? selectedDate.toDate() : null;
     setDate(dateString);
   };
-
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">

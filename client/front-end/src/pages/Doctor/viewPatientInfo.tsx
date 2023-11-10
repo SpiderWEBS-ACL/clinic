@@ -180,50 +180,48 @@ const ViewPatientInfo = () => {
   return (
     
     <div className="container">
-      <h2 className="text-center mt-4 mb-4">Patient Information</h2>
+      <h2 className="text-center mt-4 mb-4"><strong>Patient Information</strong></h2>
 
       <Card
-                style={{ height: 400, width: 800, marginTop: 16, marginLeft: 220 }}
-               loading={loadingList}
-                hoverable
-                className="hover-card"
-
-              >
-                <Meta
-                  avatar={<Avatar src="/broken-image.jpg" sx={{ width: 200, height: 200 }} />}
-                  title={<div style={{fontSize: '22px', marginLeft: 50}}>
-                  {patientInfo.Name}
-                  </div>
-                  }
-                  
-                  description={
-                    <div style={{ fontSize: '15px', lineHeight: '1.5' ,  marginLeft: 50}}>
-                      <p><strong>Email: </strong>{patientInfo.Email}</p>
-                      <p><strong>Date of birth: </strong>{String(patientInfo.Dob).substring(0, 10)}</p>
-                      <p><strong>Gender: </strong>{patientInfo.Gender}</p>
-                      <p><strong>Mobile: </strong>{patientInfo.Mobile}</p>
-                      <p><strong>Age: </strong>{age}</p>
-                      <p><strong>Health Records: </strong><InfoCircleOutlined onClick={handleHealth} /></p>
-
-                    </div>
-                  }        />
-              </Card>
-              <Row style={{ display: "flex", marginLeft: 400}}>
-              <button
-                onClick={showModal}
-                style={{ marginTop: 10, width: 200, marginRight: 30 }}
-                className="btn btn-sm btn-primary"
-           >
-              Add Health Record
-            </button>
-            <button
-               onClick={schedule}
-               style={{ marginTop: 10, width: 200 }}
-               className="btn btn-sm btn-primary"
-  >
-            Schedule a FollowUp
-          </button>
-</Row>
+      style={{ height: 400, width: 800, marginTop: 16, marginLeft: 220 }}
+      loading={loadingList}
+      hoverable
+      className="hover-card"
+    >
+      <div style={{ display: 'flex', borderBottom: '2px solid #333', paddingBottom: '10px' }}>
+        <Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel" style={{ width: 100, height: 100 }} />
+        <div style={{ marginLeft: '20px', flex: 1 }}>
+          <div style={{ fontSize: '22px', marginBottom: '10px' }}>
+            {patientInfo.Name}
+          </div>
+          <div style={{ fontSize: '15px', lineHeight: '1.5' }}>
+            <p><strong>Email: </strong>{patientInfo.Email}</p>
+            <p><strong>Date of birth: </strong>{String(patientInfo.Dob).substring(0, 10)}</p>
+            <p><strong>Gender: </strong>{patientInfo.Gender}</p>
+            <p><strong>Mobile: </strong>{patientInfo.Mobile}</p>
+            <p><strong>Age: </strong>{age}</p>
+            <p><strong>Health Records: </strong><InfoCircleOutlined onClick={handleHealth} /></p>
+          </div>
+        </div>
+      </div>
+      
+      <Row style={{ display: 'flex', justifyContent: 'space-between', marginTop: 25}}>
+        <button
+          onClick={showModal}
+         style={{ marginLeft: 200 }}
+          className="btn btn-sm btn-primary"
+        >
+          Add Health Record
+        </button>
+        <button
+          onClick={schedule}
+         style={{ marginRight: 200 }}
+          className="btn btn-sm btn-primary"
+        >
+          Schedule a FollowUp
+        </button>
+      </Row>
+    </Card>
 
           <Modal title="Enter health record:" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} width={500} style={{height:"900px"}}>
           <p>

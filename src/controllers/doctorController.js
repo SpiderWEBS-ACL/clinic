@@ -383,13 +383,11 @@ const filterDoctorAppointments = async (req, res) => {
   try {
     if (doctor) {
       const appointments = await appointmentModel
-        .find({ Doctor: doctor })
+        .find({ Doctor: id })
         .populate("Doctor")
         .populate("Patient")
         .exec();
-      if (!appointments || appointments.length === 0) {
-        res.status(404).json({ error: "no appointments were found" });
-      } else return res.status(200).json(appointments);
+      return res.status(200).json(appointments);
     }
   } catch (error) {
     res.status(500).json({ error: error.message });

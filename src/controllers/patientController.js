@@ -652,25 +652,25 @@ const viewHealthRecords = async(req,res) =>{
   }
 }
 const subscribeToHealthPackage = async(req,res) => {
-  const { id } = req.params;
+  const id = req.user.id;
   const packageId = req.body;
   try{
-    const currPatient = patientModel.findById({ id });
+    const currPatient = patientModel.findById(id);
     if(!currPatient){
       res.status(404).json({error: 'No patient found!'});
     }
-    if(currPatient.FamilyMembers.length>0){
-      for (const familyMember of currPatient.FamilyMembers) {
-          if(familyMember.MemberID){
-            const newSubscription = new subscriptionModel({
-              Patient: familyMember.MemberID,
-              Package: packageId,
-            });
-            await newSubscription.save();
+    // if(currPatient.FamilyMembers.length>0){
+    //   for (const familyMember of currPatient.FamilyMembers) {
+    //       if(familyMember.MemberID){
+    //         const newSubscription = new subscriptionModel({
+    //           Patient: familyMember.MemberID,
+    //           Package: packageId,
+    //         });
+    //         await newSubscription.save();
             
-          }
-      }
-    }
+    //       }
+    //   }
+    // }
     const newSubscription = new subscriptionModel({
       Patient: id,
       Package: packageId,
