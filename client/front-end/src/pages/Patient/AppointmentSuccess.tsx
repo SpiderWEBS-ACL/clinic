@@ -17,6 +17,7 @@ const AppointmentSuccess = () => {
         {
           Doctor: sessionStorage.getItem("DoctorId"),
           AppointmentDate: sessionStorage.getItem("AppointmentDate"),
+          FamilyMember: sessionStorage.getItem("FamilyMember")
         },
         { headers: headers }
       );

@@ -6,7 +6,15 @@ const { upcomingAppointments } = require('./doctorController');
 
 const addAppointment = async (req, res) => {
     try{
-        req.body.Patient = req.user.id;
+        if(req.body.FamilyMember == null)
+            req.body.Patient = req.user.id;
+        else{
+             const familyMember = await req.user.FamilyMembers.find(
+            (member) => member.Name === req.body.FamilyMember
+          );
+          console.log(familyMember);
+          req.body.Patient = familyMember._id;
+        }
         const appointment = await appointmentModel.create(req.body);
         res.status(201).json(appointment);
     }catch(error){

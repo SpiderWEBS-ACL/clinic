@@ -48,6 +48,7 @@ const ViewPatientAppointments = () => {
   });
 
   useEffect(() => {
+    sessionStorage.clear();
     const config = {
       headers: {
         Authorization: "Bearer " + accessToken,
