@@ -3,8 +3,7 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { Input, Select, message } from "antd";
 import { Col, Row } from "react-bootstrap";
-import {Card, Skeleton, Switch } from 'antd';
-import Avatar from '@mui/material/Avatar';
+import {Card, Skeleton, Switch, Avatar } from 'antd';
 
 
 const ViewAllPatients = () => {
@@ -206,17 +205,28 @@ const ViewAllPatients = () => {
             <Col span={8} key={subIndex}>
               <div>
               <Card
-                style={{ height: 150, width: 400, marginTop: 16 }}
+                style={{width: 400, marginTop: 16 }}
                 loading={loadingList}
                 hoverable
                 className="hover-card"
+                cover={
+                  <img
+                    alt="example"
+                    src="https://img.freepik.com/free-vector/doctor-examining-patient-clinic-illustrated_23-2148856559.jpg?w=1380&t=st=1699651650~exp=1699652250~hmac=beb4f5b10e87a92fc98a6afdbec668faa4127bf16f374383eaacb5337798e6bf"
+                    />
+                }
                 onClick={() => handleRedirection(patient._id)}
 
               >
                 <Meta
-                  avatar={<Avatar src="/broken-image.jpg" sx={{ width: 100, height: 100 }} />}
-                  title={patient.Name}
-                  description={"Email: " + patient.Email + "\n" + "Date of birth: " + patient.Dob + "\n" + "Gender: " + patient.Gender + "\n" + "Mobile: " + patient.Mobile}
+              avatar={<Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel"  style={{width:75, height:75}}/>}
+               title={<div style={{ fontSize: '20px' }}>{patient.Name}</div>}
+                  description={  <div>
+                    <p><strong>Email:</strong> {patient.Email}</p>
+                    <p><strong>Date of birth:</strong> {patient.Dob.substring(0,10)}</p>
+                    <p><strong>Gender:</strong> {patient.Gender}</p>
+                    <p><strong>Mobile:</strong> {patient.Mobile}</p>
+                  </div>}
                   />
               </Card>
               </div>
