@@ -552,7 +552,7 @@ const getAllPackagesPatient = async (req, res) => {
           },
           quantity: 1
         }],
-        success_url: `${process.env.SERVER_URL}/patient/success`,
+        success_url: `${process.env.SERVER_URL}/appointment/success`,
         cancel_url: `${process.env.SERVER_URL}/patient/viewAllDoctors`
       })
       res.json({url: session.url})

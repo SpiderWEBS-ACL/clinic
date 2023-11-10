@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Button, Spin, Modal } from "antd";
+import { Button, Spin, Modal, Row, Col } from "antd";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { JwtPayload } from "../../AppRouter";
@@ -10,11 +10,15 @@ import {
   CheckCircleFilled,
   CheckCircleOutlined,
   CheckCircleTwoTone,
+  CreditCardFilled,
+  WalletFilled,
 } from "@ant-design/icons";
 
 const AllPackagesPatient = () => {
   const [Packages, setPackages] = useState([]);
   const [SubscribedPackageId, setSubscribedPackageId] = useState("");
+  const [SubscriptionPrice, setSubscriptionPrice] = useState(0);
+  const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [PackageId, setPackageId] = useState("");
@@ -70,6 +74,14 @@ const AllPackagesPatient = () => {
       setLoading(false);
       console.log(response.data);
     });
+    api
+      .get("patient/getBalance", config)
+      .then((response) => {
+        setBalance(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, []);
   const navigate = useNavigate();
   const handleRedirect = async (id: string) => {
@@ -90,10 +102,11 @@ const AllPackagesPatient = () => {
       </div>
     );
   }
-  const handleSubscribe = async (id: string) => {
+  const handleSubscribe = async (id: string, SubscriptionPrice: number) => {
     localStorage.setItem("packageId", id);
     setShowPaymentModal(true);
     setPackageId(id);
+    setSubscriptionPrice(SubscriptionPrice);
   };
 
   return (
@@ -132,7 +145,9 @@ const AllPackagesPatient = () => {
                       : "btn btn-sm btn-secondary"
                   }
                   disabled={SubscribedPackageId != ""}
-                  onClick={() => handleSubscribe(request._id)}
+                  onClick={() =>
+                    handleSubscribe(request._id, request.SubscriptionPrice)
+                  }
                 >
                   {request._id == SubscribedPackageId ? (
                     <CheckCircleOutlined />
@@ -161,19 +176,33 @@ const AllPackagesPatient = () => {
         footer={null}
       >
         <Button
+          disabled={balance < SubscriptionPrice / 100}
           type="primary"
           block
           style={{ marginBottom: "8px" }}
           onClick={() => handlePaymentSelection("Wallet")}
         >
-          Wallet
+          <Row justify="center" align="middle">
+            <Col>
+              <WalletFilled />
+            </Col>
+            <Col style={{ marginLeft: 8, textAlign: "center" }}>
+              {" "}
+              Wallet (Balance: ${balance})
+            </Col>
+          </Row>
         </Button>
         <Button
           type="primary"
           block
           onClick={() => handlePaymentSelection("Card")}
         >
-          Card
+          <Row justify="center" align="middle">
+            <Col>
+              <CreditCardFilled />
+            </Col>
+            <Col style={{ marginLeft: 8, textAlign: "center" }}>Card</Col>
+          </Row>
         </Button>
       </Modal>
     </div>
