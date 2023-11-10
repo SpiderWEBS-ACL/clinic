@@ -27,15 +27,15 @@ const {
   viewMedicalDocuments,
   deleteMedicalDocuments,
   uploadMedicalDocuments,
-  subscribeToHealthPackage
-  // checkDoctorAvailablity, 
-  // getDoctorTimeSlots, 
-  // payAppointmentWithStripe, 
-  // getSubscribedPackage, 
-  // getBalance, 
-  // getAllPackagesPatient,
-  // doctorDiscount, 
-  // payAppointmentWithWallet
+  subscribeToHealthPackage,
+  checkDoctorAvailablity, 
+  getDoctorTimeSlots, 
+  payAppointmentWithStripe, 
+  getSubscribedPackage, 
+  getBalance, 
+  getAllPackagesPatient,
+  doctorDiscount, 
+  payAppointmentWithWallet
 } = require("./controllers/patientController");
 
 const {
@@ -132,7 +132,7 @@ mongoose
 app.post("/login", login);
 app.post("/forgotPassword", forgotPassword);
 app.post("/verifyOTP", verifyOTP);
-app.put("/resetPassword", resetPassword);
+app.post("/resetPassword", resetPassword);
 
 //Admin Endpoints
 app.get("/admin/me", AdminProtect, getAdmin);
@@ -213,12 +213,12 @@ app.get("/patient/selectPrescription/:id",PatientProtect,selectPrescription)
 app.get("/patient/viewDoctorsWithPrices",PatientProtect, viewDoctorsWithPrices)
 app.get("/patient/allAppointments",PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors",PatientProtect, getAllDoctorsPatient);
-// app.get("/patient/allPackages",PatientProtect,getAllPackagesPatient);
-// app.post("/patient/checkDoctor",PatientProtect,checkDoctorAvailablity);
-// app.get("/patient/doctorTimeSlots/:id",PatientProtect,getDoctorTimeSlots);
-// app.post("/patient/payAppointmentStripe",PatientProtect,payAppointmentWithStripe);
-// app.post("/patient/payAppointmentWallet",PatientProtect,payAppointmentWithWallet);
-// app.get("/patient/subscribedPackage",PatientProtect,getSubscribedPackage);
+app.get("/patient/allPackages",PatientProtect,getAllPackagesPatient);
+app.post("/patient/checkDoctor",PatientProtect,checkDoctorAvailablity);
+app.get("/patient/doctorTimeSlots/:id",PatientProtect,getDoctorTimeSlots);
+app.post("/patient/payAppointmentStripe",PatientProtect,payAppointmentWithStripe);
+app.post("/patient/payAppointmentWallet",PatientProtect,payAppointmentWithWallet);
+app.get("/patient/subscribedPackage",PatientProtect,getSubscribedPackage);
 app.post("/patient/addFamilyMember", PatientProtect, addFamilyMember); //TODO: fix in frontend was taking id
 app.post("/patient/addPrescription", PatientProtect, addPrescription);
 app.get("/patient/selectDoctor/:id", PatientProtect, selectDoctor);
@@ -234,9 +234,9 @@ app.get("/patient/selectPrescription/:id", PatientProtect, selectPrescription);
 app.get("/patient/viewDoctorsWithPrices", PatientProtect, viewDoctorsWithPrices);
 app.get("/patient/allAppointments", PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors", PatientProtect, getAllDoctorsPatient);
-// app.get("/patient/allPackages", PatientProtect, getAllPackagesPatient);
-// app.get("/patient/getBalance", PatientProtect, getBalance);
-// app.get("/patient/getDoctorDiscount", PatientProtect, doctorDiscount);
+app.get("/patient/allPackages", PatientProtect, getAllPackagesPatient);
+app.get("/patient/getBalance", PatientProtect, getBalance);
+app.get("/patient/getDoctorDiscount", PatientProtect, doctorDiscount);
 
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);

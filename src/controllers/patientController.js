@@ -690,12 +690,130 @@ const subscribeToHealthPackage = async(req,res) => {
   
   
   
-  
-  
+const checkDoctorAvailablity = async (req, res) => {
+
+  const {Date, Time, DoctorId} = req.body;
+  const {AvailableTimeSlots} = await doctorModel.findById(DoctorId);
+  let date =  Date+"T"+Time+".000Z";
+  if(!AvailableTimeSlots.includes(Time))
+      return res.status(200).json({message: "not available"});
+  const query = {
+      $and:[
+          {Doctor: DoctorId},
+          { AppointmentDate: date }
+          ]}
+  try{
+  const appointment = await appointmentModel.findOne(query)
+  if(appointment == null)
+      return res.status(200).json({message: "available"});
+  return res.status(200).json({message: "not available"});
+  }catch(error){
+    return res.status(400).json({error: error.message});
+    }
+}
+const getDoctorTimeSlots = async (req, res) => {
+  const {id} = req.params;
+  const doctor = await doctorModel.findById(id);
+  res.status(200).json(doctor.AvailableTimeSlots);
+}
+
+const getBalance = async(req,res) => {
+  try{
+  const id = req.user.id;
+  const { WalletBalance } = await patientModel.findById(id);
+  res.status(200).json(WalletBalance);
+  }catch(error){
+    res.status(401).json({error: error});
+  }
+}
+const doctorDiscount = async (req, res) => {
+  try{
+  const patientId = req.user.id;
+  const doctorDiscount = await getDoctorDiscount(patientId);
+  res.status(200).json(doctorDiscount);
+  }catch(error){
+    res.status(401).json({error: error})
+  }
+}
+const getAllPackagesPatient = async (req, res) => {
+  try {
+    const packages = await packageModel.find({});
+    res.status(200).json(packages);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+const payAppointmentWithWallet  = async(req,res) => {
+  try{
+  let message = "";
+  const patientId = req.user.id;
+  const {WalletBalance} = await patientModel.findById(patientId);
+    const doctorId = req.body.id;
+    const duration = 1; //for testing
+    const doctor = await  doctorModel.findById(doctorId);
+    const originalHourlyRate =await getHourlyRate(doctorId);
+    const doctorDiscount = await getDoctorDiscount(patientId);
+    const hourlyRate =  Math.round((1 - (doctorDiscount/100)) * originalHourlyRate * duration);
+    if(WalletBalance >= hourlyRate){
+      const updatedPatient = await patientModel.findByIdAndUpdate(patientId, {WalletBalance: WalletBalance - hourlyRate});
+      message = "Appointment Booked Successfully!"
+      res.status(200).json(message);
+    }else{
+      message = "Insufficient funds in wallet!"
+      res.status(400).json(message);
+    }
+  }catch(error){
+    res.status(401).json({error : error});
+    }
+  }
+const payAppointmentWithStripe = async (req,res) => {
+  try{
+    let message = "";
+    const patientId = req.user.id;
+    const doctorId = req.body.id;
+    const duration = 1; //for testing
+    const doctor = await  doctorModel.findById(doctorId);
+    const originalHourlyRate =await getHourlyRate(doctorId);
+    const doctorDiscount = await getDoctorDiscount(patientId);
+    if(doctorDiscount == 0)
+      message = "Appointment with Dr. " + doctor.Name
+    else
+      message = "Appointment with Dr. " + doctor.Name + " after "+ doctorDiscount+"% package discount" 
+    const hourlyRate =  (1 - (doctorDiscount/100)) * originalHourlyRate * duration;
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items:[
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {name: message},
+          unit_amount: Math.round(hourlyRate * 100) //In cents
+        },
+        quantity: 1
+      }],
+      success_url: `${process.env.SERVER_URL}/appointment/success`,
+      cancel_url: `${process.env.SERVER_URL}/patient/viewAllDoctors`,
+      
+    })
+    res.json({url: session.url})
+  }catch(error){
+    res.status(400).json({ error: error.message });
+    }
+  }
+const getSubscribedPackage = async (req,res) => {
+  const patientId = req.user.id;
+  const subscription = await subscriptionModel.findOne({Patient: patientId});
+  if(!subscription)
+    return res.status(200).json("");
+  return res.status(200).json(subscription.Package);
+}
+
 
 
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
    filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage}; //getAllPackagesPatient};
+  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity, getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe
+, };
 
