@@ -132,7 +132,7 @@ mongoose
 app.post("/login", login);
 app.post("/forgotPassword", forgotPassword);
 app.post("/verifyOTP", verifyOTP);
-app.post("/resetPassword", resetPassword);
+app.put("/resetPassword", resetPassword);
 
 //Admin Endpoints
 app.get("/admin/me", AdminProtect, getAdmin);
