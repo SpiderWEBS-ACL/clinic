@@ -11,7 +11,9 @@ const packageModel = require("../Models/Package");
 const { fileLoader } = require("ejs");
 const jwt = require("jsonwebtoken");
 const { generateAccessToken } = require("../middleware/authMiddleware");
-require("dotenv").config();
+require('dotenv').config();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
 
 //--------------------------------ACCOUNT--------------------------------------
 
@@ -511,7 +513,140 @@ const getAllPackagesPatient = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+}
+  const getDoctorDiscount = async (patientId) => {
+    try{
+    const subscription = await subscriptionModel.findOne({Patient: patientId});
+    if(!subscription)
+      return 0;
+    const package = await packageModel.findById(subscription.Package);
+    return package.DoctorDiscount;
+    }catch(error){
+      console.log(error);
+    }
+  }
+
+  const getHourlyRate = async (doctorId) => {
+    const doctor =await doctorModel.findById(doctorId);
+    return doctor.HourlyRate;
+  }
+
+  const payAppointmentWithStripe = async (req,res) => {
+    try{
+      let message = "";
+      const patientId = req.user.id;
+      const doctorId = req.body.id;
+      const duration = 1; //for testing
+      const doctor = await  doctorModel.findById(doctorId);
+      const originalHourlyRate =await getHourlyRate(doctorId);
+      const doctorDiscount = await getDoctorDiscount(patientId);
+      if(doctorDiscount == 0)
+        message = "Appointment with Dr. " + doctor.Name
+      else
+        message = "Appointment with Dr. " + doctor.Name + " after "+ doctorDiscount+"% package discount" 
+      const hourlyRate =  (1 - (doctorDiscount/100)) * originalHourlyRate * duration;
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'payment',
+        line_items:[
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {name: message},
+            unit_amount: Math.round(hourlyRate * 100) //In cents
+          },
+          quantity: 1
+        }],
+        success_url: `${process.env.SERVER_URL}/patient/success`,
+        cancel_url: `${process.env.SERVER_URL}/patient/viewAllDoctors`
+      })
+      res.json({url: session.url})
+    }catch(error){
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  const payAppointmentWithWallet  = async(req,res) => {
+    try{
+    let message = "";
+    const patientId = req.user.id;
+    const {WalletBalance} = await patientModel.findById(patientId);
+      const doctorId = req.body.id;
+      const duration = 1; //for testing
+      const doctor = await  doctorModel.findById(doctorId);
+      const originalHourlyRate =await getHourlyRate(doctorId);
+      const doctorDiscount = await getDoctorDiscount(patientId);
+      const hourlyRate =  Math.round((1 - (doctorDiscount/100)) * originalHourlyRate * duration);
+      if(WalletBalance >= hourlyRate){
+        const updatedPatient = await patientModel.findByIdAndUpdate(patientId, {WalletBalance: WalletBalance - hourlyRate});
+        message = "Appointment Booked Successfully!"
+        res.status(200).json(message);
+      }else{
+        message = "Insufficient funds in wallet!"
+        res.status(400).json(message);
+      }
+    }catch(error){
+      res.status(401).json({error : error});
+    }
+
+
+  }
+
+  const checkDoctorAvailablity = async (req, res) => {
+
+    const {Date, Time, DoctorId} = req.body;
+    const {AvailableTimeSlots} = await doctorModel.findById(DoctorId);
+    let date =  Date+"T"+Time+".000Z";
+    if(!AvailableTimeSlots.includes(Time))
+        return res.status(200).json({message: "not available"});
+    const query = {
+        $and:[
+            {Doctor: DoctorId},
+            { AppointmentDate: date }
+            ]}
+    try{
+    const appointment = await appointmentModel.findOne(query)
+    if(appointment == null)
+        return res.status(200).json({message: "available"});
+    return res.status(200).json({message: "not available"});
+    }catch(error){
+      return res.status(400).json({error: error.message});
+    }
+}
+
+const getDoctorTimeSlots = async (req, res) => {
+  const {id} = req.params;
+  const doctor = await doctorModel.findById(id);
+  res.status(200).json(doctor.AvailableTimeSlots);
+}
+
+const getSubscribedPackage = async (req,res) => {
+  const patientId = req.user.id;
+  const subscription = await subscriptionModel.findOne({Patient: patientId});
+  if(!subscription)
+    return res.status(200).json("");
+  return res.status(200).json(subscription.Package);
+}
+
+const getBalance = async(req,res) => {
+  try{
+  const id = req.user.id;
+  const { WalletBalance } = await patientModel.findById(id);
+  res.status(200).json(WalletBalance);
+  }catch(error){
+    res.status(401).json({error: error});
+  }
+}
+
+const doctorDiscount = async (req, res) => {
+  try{
+  const patientId = req.user.id;
+  const doctorDiscount = await getDoctorDiscount(patientId);
+  res.status(200).json(doctorDiscount);
+  }catch(error){
+    res.status(401).json({error: error})
+  }
+}
 
 module.exports = {
   getAllDoctorsPatient,
@@ -532,4 +667,12 @@ module.exports = {
   filterDoctorsByNameSpecialtyAvailability,
   addPrescription,
   getAllPackagesPatient,
+  payAppointmentWithStripe, 
+  checkDoctorAvailablity, 
+  getDoctorTimeSlots, 
+  getSubscribedPackage, 
+  getBalance, 
+  doctorDiscount, 
+  payAppointmentWithWallet
 };
+

@@ -1,14 +1,24 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Spin } from "antd";
+import { Button, Spin, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { JwtPayload } from "../../AppRouter";
 import jwt_decode from "jwt-decode";
+import { config } from "../../Middleware/authMiddleware";
+import {
+  CheckCircleFilled,
+  CheckCircleOutlined,
+  CheckCircleTwoTone,
+} from "@ant-design/icons";
 
 const AllPackagesPatient = () => {
   const [Packages, setPackages] = useState([]);
+  const [SubscribedPackageId, setSubscribedPackageId] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [PackageId, setPackageId] = useState("");
+
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
@@ -35,6 +45,14 @@ const AllPackagesPatient = () => {
       console.error(error);
     }
   };
+  const handlePaymentSelection = (paymentMethod: string) => {
+    if (paymentMethod === "Card") {
+      redirectToStripe(PackageId);
+    }
+    console.log("Selected payment method: ", paymentMethod);
+    setShowPaymentModal(false);
+  };
+
   useEffect(() => {
     const headers = {
       Authorization: "Bearer " + accessToken,
@@ -43,14 +61,16 @@ const AllPackagesPatient = () => {
       .get("patient/allPackages", { headers })
       .then((response) => {
         setPackages(response.data);
-        setLoading(false);
-        console.log(response.data);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
+    api.get("patient/subscribedPackage", config).then((response) => {
+      setSubscribedPackageId(response.data);
+      setLoading(false);
+      console.log(response.data);
+    });
   }, []);
-
   const navigate = useNavigate();
   const handleRedirect = async (id: string) => {
     navigate("/admin/editPackage/" + id);
@@ -70,6 +90,11 @@ const AllPackagesPatient = () => {
       </div>
     );
   }
+  const handleSubscribe = async (id: string) => {
+    localStorage.setItem("packageId", id);
+    setShowPaymentModal(true);
+    setPackageId(id);
+  };
 
   return (
     <div className="container">
@@ -100,16 +125,57 @@ const AllPackagesPatient = () => {
               <td>{request.FamilyDiscount}%</td>
               <td>
                 <button
-                  className="btn btn-sm btn-success"
-                  onClick={() => redirectToStripe(request._id)}
+                  className={
+                    request._id == SubscribedPackageId ||
+                    SubscribedPackageId === ""
+                      ? "btn btn-sm btn-success"
+                      : "btn btn-sm btn-secondary"
+                  }
+                  disabled={SubscribedPackageId != ""}
+                  onClick={() => handleSubscribe(request._id)}
                 >
-                  Subscribe
+                  {request._id == SubscribedPackageId ? (
+                    <CheckCircleOutlined />
+                  ) : (
+                    "Subscribe "
+                  )}
+                </button>
+                <button
+                  style={{ marginLeft: "1rem" }}
+                  className="btn btn-sm btn-danger"
+                  hidden={request._id != SubscribedPackageId}
+                >
+                  Cancel Subscription
                 </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <Modal
+        title="Select Payment Method"
+        visible={showPaymentModal}
+        onCancel={() => {
+          setShowPaymentModal(false);
+        }}
+        footer={null}
+      >
+        <Button
+          type="primary"
+          block
+          style={{ marginBottom: "8px" }}
+          onClick={() => handlePaymentSelection("Wallet")}
+        >
+          Wallet
+        </Button>
+        <Button
+          type="primary"
+          block
+          onClick={() => handlePaymentSelection("Card")}
+        >
+          Card
+        </Button>
+      </Modal>
     </div>
   );
 };

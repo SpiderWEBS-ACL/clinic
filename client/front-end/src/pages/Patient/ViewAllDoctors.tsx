@@ -5,23 +5,40 @@ import {
   Select,
   DatePicker,
   DatePickerProps,
-  TimePicker,
   TimePickerProps,
   Spin,
+  Modal,
+  Button,
+  message,
+  Row,
+  Col,
 } from "antd";
+import { config, headers } from "../../Middleware/authMiddleware";
+import { CreditCardFilled, WalletFilled } from "@ant-design/icons";
 const { Option } = Select;
 
 const ViewAllDoctors = () => {
   const accessToken = localStorage.getItem("accessToken");
   const [Doctors, setDoctors] = useState([]);
   const [AllDoctors, setAllDoctors] = useState([]);
+  const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<any | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showDateTimeModal, setShowDateTimeModal] = useState(false);
   const [Name, setName] = useState("");
   const [Specialty, setSpecialty] = useState("");
   const [Date, setDate] = useState("");
+  const [AppointmentDate, setAppointmentDate] = useState("");
   const [Time, setTime] = useState("");
+  const [AppointmentTime, setAppointmentTime] = useState("");
+  const [DoctorId, setDoctorId] = useState("");
+  const [Message, setMessage] = useState("");
+  const [WalletMessage, setWalletMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [balance, setBalance] = useState<number>(0);
+  const [HourlyRate, setHourlyRate] = useState<number>(0);
+  const [DoctorDiscount, setDoctorDiscount] = useState<number>(0);
 
   const timeSlots = [];
 
@@ -36,6 +53,24 @@ const ViewAllDoctors = () => {
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
+
+  const handleCheckAvailability = () => {
+    api
+      .post(
+        "patient/checkDoctor",
+        {
+          Date: AppointmentDate,
+          Time: AppointmentTime,
+          DoctorId: DoctorId,
+        },
+        { headers: headers }
+      )
+      .then((response) => {
+        setMessage(response.data.message);
+        if (response.data.message === "available") message.success("Available");
+        else message.error("Doctor is not available at this time");
+      });
+  };
   useEffect(() => {
     const config = {
       headers: {
@@ -51,8 +86,57 @@ const ViewAllDoctors = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+    api
+      .get("patient/getDoctorDiscount", config)
+      .then((response) => {
+        setDoctorDiscount(response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
     setLoading(false);
   }, []);
+
+  const redirectToStripe = async () => {
+    try {
+      try {
+        const response = await api.post(
+          "patient/payAppointmentStripe",
+          {
+            id: DoctorId,
+          },
+          { headers: headers }
+        );
+        window.location.href = response.data.url;
+      } catch (error) {
+        console.log(error);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const payWithWallet = async () => {
+    try {
+      try {
+        const response = await api
+          .post(
+            "patient/payAppointmentWallet",
+            {
+              id: DoctorId,
+            },
+            { headers: headers }
+          )
+          .then((response) => {
+            setWalletMessage(response.data);
+            message.success(response.data);
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (loading) {
     return (
@@ -77,6 +161,14 @@ const ViewAllDoctors = () => {
   const onDateChange: DatePickerProps["onChange"] = (date, dateString) => {
     setDate(dateString);
   };
+  const onAppointmentDateChange: DatePickerProps["onChange"] = (
+    date,
+    dateString
+  ) => {
+    setAppointmentDate(dateString);
+    setMessage("");
+    console.log(dateString);
+  };
 
   const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -88,8 +180,12 @@ const ViewAllDoctors = () => {
     setTime(timeString);
   };
   const handleTimeSlotChange = (selectedTimeSlot: string) => {
-    // console.log(selectedTimeSlot);
     setTime(selectedTimeSlot);
+  };
+  const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
+    setAppointmentTime(selectedTimeSlot);
+    setMessage("");
+    console.log(selectedTimeSlot);
   };
   const handleFilter = async () => {
     setLoading(true);
@@ -101,6 +197,7 @@ const ViewAllDoctors = () => {
           date: Date,
           Time: Time,
         },
+        headers: headers,
       });
 
       setDoctors(response.data);
@@ -120,6 +217,36 @@ const ViewAllDoctors = () => {
     setDate("");
     setTime("");
     setDoctors(AllDoctors);
+  };
+  const handleBookAppointment = (doctor: any, HourlyRate: any) => {
+    setDoctorId(doctor);
+    setHourlyRate(HourlyRate);
+    setShowDateTimeModal(true);
+    api
+      .get("/patient/doctorTimeSlots/" + doctor, config)
+      .then((response) => {
+        setTimeSlotsDoctor(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    api
+      .get("patient/getBalance", config)
+      .then((response) => {
+        setBalance(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const handlePaymentSelection = (paymentMethod: string) => {
+    if (paymentMethod === "Card") {
+      redirectToStripe();
+    } else {
+      payWithWallet();
+    }
+    console.log("Selected payment method: ", paymentMethod);
+    setShowPaymentModal(false);
   };
 
   return (
@@ -190,7 +317,12 @@ const ViewAllDoctors = () => {
           <tr>
             <th>Name</th>
             <th>Specialty</th>
-            <th>Sesssion Price</th>
+            <th>
+              {DoctorDiscount > 0
+                ? `Discounted Sesssion Price (${DoctorDiscount}% Discount)`
+                : "Sesssion Price"}
+            </th>
+            <th></th>
             <th></th>
           </tr>
         </thead>
@@ -200,7 +332,9 @@ const ViewAllDoctors = () => {
             <tr key={request._id}>
               <td>{request.Name}</td>
               <td>{request.Specialty}</td>
-              <td>{request.HourlyRate}</td>
+              <td>
+                {Math.round((1 - DoctorDiscount / 100) * request.HourlyRate)}
+              </td>
               <td className="text-end">
                 <button
                   className="btn btn-sm btn-primary"
@@ -213,6 +347,23 @@ const ViewAllDoctors = () => {
                 >
                   <span aria-hidden="true"></span>
                   Details
+                </button>
+              </td>
+              <td>
+                <button
+                  key={request._id}
+                  className="btn btn-sm btn-success"
+                  style={{
+                    padding: "4px 8px",
+                    fontSize: "12px",
+                    borderRadius: "5px",
+                  }}
+                  onClick={() => {
+                    handleBookAppointment(request._id, request.HourlyRate);
+                  }}
+                >
+                  <span aria-hidden="true"></span>
+                  Book Appointment
                 </button>
               </td>
             </tr>
@@ -229,7 +380,11 @@ const ViewAllDoctors = () => {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Dob</th>
-                <th>HourlyRate</th>
+                <th>
+                  {DoctorDiscount > 0
+                    ? `Discounted Sesssion Price (${DoctorDiscount}% Discount)`
+                    : "Sesssion Price"}
+                </th>
                 <th>Affiliation</th>
                 <th>Specialty</th>
                 <th>Education</th>
@@ -241,14 +396,17 @@ const ViewAllDoctors = () => {
                 <td>{selectedDoctor.Name}</td>
                 <td>{selectedDoctor.Email}</td>
                 <td>{selectedDoctor.Dob.split("T")[0]}</td>
-                <td>{selectedDoctor.HourlyRate}</td>
+                <td>
+                  {Math.round(
+                    (1 - DoctorDiscount / 100) * selectedDoctor.HourlyRate
+                  )}
+                </td>
                 <td>{selectedDoctor.Affiliation}</td>
                 <td>{selectedDoctor.Specialty}</td>
                 <td>{selectedDoctor.EducationalBackground}</td>
               </tr>
             </tbody>
           </table>
-
           <button
             className="btn btn-sm btn-danger"
             style={{
@@ -263,6 +421,103 @@ const ViewAllDoctors = () => {
           </button>
         </div>
       )}
+      <Modal
+        title="Select Payment Method"
+        visible={showPaymentModal}
+        onCancel={() => {
+          setShowPaymentModal(false);
+          setShowDateTimeModal(true);
+        }}
+        footer={null}
+      >
+        <Button
+          disabled={balance < HourlyRate * (1 - DoctorDiscount / 100)}
+          type="primary"
+          block
+          style={{ marginBottom: "8px" }}
+          onClick={() => handlePaymentSelection("Wallet")}
+        >
+          <Row justify="center" align="middle">
+            <Col>
+              <WalletFilled />
+            </Col>
+            <Col style={{ marginLeft: 8, textAlign: "center" }}>
+              {" "}
+              Wallet (Balance: ${balance})
+            </Col>
+          </Row>
+        </Button>
+        <Button
+          type="primary"
+          block
+          onClick={() => handlePaymentSelection("Card")}
+        >
+          <Row justify="center" align="middle">
+            <Col>
+              <CreditCardFilled />
+            </Col>
+            <Col style={{ marginLeft: 8, textAlign: "center" }}>Card</Col>
+          </Row>
+        </Button>
+      </Modal>
+      <Modal
+        title="Select Appointment Time"
+        visible={showDateTimeModal}
+        onCancel={() => {
+          setShowDateTimeModal(false);
+          setMessage("");
+        }}
+        footer={null}
+      >
+        <DatePicker
+          onChange={onAppointmentDateChange}
+          style={{ width: 150, marginRight: 30 }}
+        />
+        <label style={{ marginRight: 8 }}></label>
+        <Select
+          value={AppointmentTime}
+          onChange={handleAppointmentTimeSlotChange}
+          style={{ width: 150, marginRight: 30 }}
+        >
+          <Option value="">Select slot</Option>
+          {timeSlotsDoctor.map((slot) => (
+            <Option key={slot} value={slot}>
+              {slot}
+            </Option>
+          ))}
+        </Select>
+        <button
+          className="btn btn-sm btn-primary"
+          style={{
+            marginBlock: "1rem",
+            padding: "4px 8px",
+            fontSize: "12px",
+            borderRadius: "5px",
+          }}
+          onClick={() => handleCheckAvailability()}
+        >
+          <span aria-hidden="true"></span>
+          Check Availability
+        </button>
+        <button
+          className="btn btn-sm btn-success"
+          style={{
+            marginLeft: "1rem",
+            marginBlock: "1rem",
+            padding: "4px 8px",
+            fontSize: "12px",
+            borderRadius: "5px",
+          }}
+          disabled={Message === "available" ? false : true}
+          onClick={() => {
+            setShowDateTimeModal(false);
+            setShowPaymentModal(true);
+          }}
+        >
+          <span aria-hidden="true"></span>
+          Book
+        </button>
+      </Modal>
     </div>
   );
 };
