@@ -317,13 +317,14 @@ const viewPatients = async (req, res) => {
     const patients = [];
     for (const appointment of appointments) {
       const patient = appointment.Patient;
-      patients.push(patient);
+      if(!patients.includes(patient))
+         patients.push(patient);
     }
 
     if (patients.length == 0) {
       return res.status(400).json({ error: "You have no patients" });
     }
-
+    console.log(patients)
     res.status(200).json(patients);
   } catch (error) {
     res.status(500).json({ error: "no patients available" });

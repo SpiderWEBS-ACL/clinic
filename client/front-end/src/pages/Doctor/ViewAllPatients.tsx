@@ -31,6 +31,7 @@ const ViewAllPatients = () => {
         setLoadingList(false);
         setPatients(response.data);
         setAllPatients(response.data);
+        console.log(response.data)
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -122,7 +123,6 @@ const ViewAllPatients = () => {
       })
       .catch((error) => {
         if (error.response && error.response.status === 404) {
-          console.log(1111111111)
           setLoadingList(false);
           setPatients([]);
           message.error("No data found!")
