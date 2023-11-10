@@ -118,7 +118,7 @@ const addFamilyMember = async (req, res) => {
       return res.status(404).json({ error: "Patient not found" });
     }
     if(checkMember){
-      newFamilyMember.MemberID = checkMember;
+      newFamilyMember.MemberID = checkMember._id;
     }
     const familyMembers = patient.FamilyMembers;
     const allFamilyMembers = familyMembers.concat([newFamilyMember]);
@@ -564,17 +564,15 @@ const uploadMedicalDocuments = async (req, res) => {
         newFiles = req.files.map((file) => ({
         filename: file.filename,
         originalname: file.originalname,
+        path: file.path,
         filedata: file.buffer,
         Patient: id,
       }));
     }
     else{
-      newFiles = req.files.map((file) => ({
-        filename: file.filename,
-        originalname: file.originalname,
-        filedata: file.buffer
-      }));
+      res.status(404).json({error: 'No patient id was given'});
     }
+  
 
       try {
         const savedFiles = await fileModel.create(newFiles);
@@ -623,11 +621,10 @@ const viewMedicalDocuments = async (req, res) => {
 
   try {
     let files = [];
-
     if (id) {
       files = await fileModel.find({ Patient: id });
     } else {
-      files = await fileModel.find();
+      res.status(404).json({error: 'No patient id was given'});
     }
 
     if (files.length === 0) {
@@ -642,8 +639,8 @@ const viewMedicalDocuments = async (req, res) => {
 const viewHealthRecords = async(req,res) =>{
   const { id } = req.params;
   try{
-    const currPatient = await patientModel.findById({id});
-    if (currPatient && currPatient.length > 0 && currPatient.HealthRecords) {
+    const currPatient = await patientModel.findById(id);
+    if (currPatient && currPatient.HealthRecords) {
           res.status(200).json(currPatient.HealthRecords);
     }
     else{

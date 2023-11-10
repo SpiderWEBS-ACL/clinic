@@ -11,13 +11,13 @@ import ViewAllRegReqs from "./pages/Admin/ViewAllDoctorRegReqs";
 import RegistrationRequestDetails from "./pages/Admin/DoctorRegReqDetails";
 import AddPackage from "./pages/Admin/AddPackage";
 import PackageView from "./pages/Admin/PackageView";
-
 import Doctors from "./pages/Admin/Doctors";
 import Patients from "./pages/Admin/Patients";
 import AllAdmins from "./pages/Admin/Admins";
 import ViewFamilyMembers from "./pages/Patient/ViewFamilyMembers";
 import ViewAllPatients from "./pages/Doctor/ViewAllPatients";
 import ViewPatientInfo from "./pages/Doctor/viewPatientInfo";
+
 import AllPackages from "./pages/Admin/Packages";
 import EditDoctor from "./pages/Doctor/Edit";
 import RegLog from "./pages/RegLog";
@@ -34,6 +34,7 @@ import ViewPatientAppointments from "./pages/Patient/Appointments";
 import jwt_decode from "jwt-decode";
 import Cookies from "js-cookie";
 import NotFound from "./pages/NotFound";
+import Calendar from "./pages/Doctor/AddAvailableTimeSlots";
 
 export interface JwtPayload {
   id: string;
@@ -77,6 +78,8 @@ const AppRouter: React.FC = () => {
       <Routes>
         <Route path="/" element={<RegLog />} />
         <Route path="/doctor/viewPatients/" element={<ViewAllPatients />} />
+        <Route path="/doctor/timeSlots" element={<Calendar />} />
+
         <Route
           path="/doctor/viewPatientInfo/:id"
           element={<ViewPatientInfo />}

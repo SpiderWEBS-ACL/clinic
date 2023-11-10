@@ -1,9 +1,13 @@
 const doctorModel = require('../Models/Doctor');
+const fileModel = require("../Models/File");
+
 const patientModel = require('../Models/Patient');
 const doctorRegisterRequestModel = require('../Models/DoctorRegisterRequest');
 const appointmentModel = require('../Models/Appointment')
 const { default: mongoose } = require('mongoose');
 const bcrypt = require("bcrypt");
+const multer = require('multer');
+
 const { PatientProtect } = require('../middleware/authMiddleware');
 
 // FOR TESTING
@@ -37,6 +41,147 @@ const registerDoctor = async (req,res) => {
         res.status(400).json({ error: error.message });
     }
 }
+const storage = multer.diskStorage({
+    fileName: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
+  });
+const uploadGuest = multer({ storage: storage });
+const uploadPersonalID = async (req, res) => {
+  uploadGuest.single('file')(req, res, async (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    } else {
+      const { id } = req.params; // assuming `id` holds the doctor's ID
+
+      if (!id) {
+        res.status(400).send('Doctor ID is missing');
+        return;
+      }
+
+      const file = req.file;
+
+      if (!file) {
+        res.status(400).send('No file uploaded');
+        return;
+      }
+
+      const newFile = {
+        filename: file.filename,
+        originalname: file.originalname,
+        path: file.path,
+        filedata: file.buffer,
+        Doctor: id,
+      };
+
+      try {
+        const savedFile = await fileModel.create(newFile);
+        const doctor = await doctorModel.findByIdAndUpdate(id,
+          { PersonalID: savedFile._id },
+        );
+        await doctor.save();
+        res.status(201).json(savedFile);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+      }
+    }
+  });
+};
+
+const storageSecond = multer.diskStorage({
+    fileName: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
+  });
+const uploadDegree = multer({ storage: storageSecond });
+const uploadMedicalDegree = async (req, res) => {
+    uploadDegree.single('file')(req, res, async (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    } else {
+      const { id } = req.params; // assuming `id` holds the doctor's ID
+
+      if (!id) {
+        res.status(400).send('Doctor ID is missing');
+        return;
+      }
+
+      const file = req.file;
+
+      if (!file) {
+        res.status(400).send('No file uploaded');
+        return;
+      }
+
+      const newFile = {
+        filename: file.filename,
+        originalname: file.originalname,
+        path: file.path,
+        filedata: file.buffer,
+        Doctor: id,
+      };
+
+      try {
+        const savedFile = await fileModel.create(newFile);
+        const doctor = await doctorModel.findByIdAndUpdate(id,
+          { MedicalDegree: savedFile._id },
+        );
+        await doctor.save();
+        res.status(201).json(savedFile);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+      }
+    }
+  });
+};
+const storageLicense = multer.diskStorage({
+    fileName: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
+  });
+const uploadThree = multer({ storage: storageLicense });
+const uploadLicenses = async (req, res) => {
+    uploadThree.array('files')(req, res, async (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    } else {
+      let newFiles=[];
+      const { id } = req.params; // assuming id holds doctor's id
+      if(id && req.files){
+        newFiles = req.files.map((file) => ({
+        filename: file.filename,
+        originalname: file.originalname,
+        path: file.path,
+        filedata: file.buffer,
+        Doctor: id,
+      }));
+    }
+    else{
+      res.status(404).json({error: 'No file(s) was selected'});
+    }
+  
+
+      try {
+        const savedFiles = await fileModel.create(newFiles);
+        const doctor = await doctorModel.findByIdAndUpdate(
+            id,
+            { $push: { MedicalLicenses: { $each: savedFiles.map(file => file._id) } } },
+            { new: true }
+          );
+          await doctor.save();
+        res.status(201).json(savedFiles);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+      }
+    }
+  });
+};
 
 const searchPatientByName = async (req,res) => {
     const { Name }= req.params;
@@ -45,7 +190,13 @@ const searchPatientByName = async (req,res) => {
       }
     try{
         const patients = await patientModel.find({ Name: { $regex: Name, $options: "i"} }); // $options : "i" to make it case insensitive
-        res.status(200).json(patients);
+        if(patients){
+            res.status(200).json(patients);
+
+        }
+        else{
+            res.status(404).json({error: "No patients found!"});
+        }
     } catch (error) {
         res.status(500).json({ error: 'An error occurred while searching' });
     }
@@ -97,7 +248,8 @@ const searchPatientByName = async (req,res) => {
     try{
      const appointments =  await appointmentModel.find({
         Doctor: doctorId,
-        AppointmentDate: {$gte: currentDate } //$gte = Greater Than or Equal
+        AppointmentDate: {$gte: currentDate }, //$gte = Greater Than or Equal
+        Status: "Upcoming"
     }).populate("Patient").exec()
 
     if(appointments.length == 0){
@@ -119,8 +271,9 @@ const searchPatientByName = async (req,res) => {
     }).populate("Patient").exec()
     const patients = [];
     for (const appointment of appointments) {
-      const patient = appointment.Patient;
-      patients.push(patient);
+      let patient = appointment.Patient;
+      if(!patients.includes(patient))
+         patients.push(patient);
     }
 
     if(patients.length == 0){
@@ -193,23 +346,26 @@ const searchPatientByName = async (req,res) => {
  }
  const addHealthRecordForPatient = async(req,res) =>{
     const { id } = req.params;
-    const description = req.body.description;
-    const patientId = req.body.patientId;
-    const type = req.body.description;
-
+    const description = req.body.Description;
+    const type = req.body.Type;
     try{
-        const currPatient = patientModel.findById(patientId);
+        const currPatient = await patientModel.findById(id);
         if(!currPatient){
             return res.status(404).json({error: 'Patient not found!'});
         }
         const healthRecord = {
-            Doctor: id,
+            Doctor: req.user.id,
             Description: description,
-            Type: type
-        };
-        currPatient.HealthRecords.push(healthRecord);
+            Type: type,
+          };
+          if(!currPatient.HealthRecords){
+            return res.status(404).json({error: 'Health records not found!'});
+
+          }
+        currPatient.HealthRecords = currPatient.HealthRecords || []; // Ensure HealthRecords is initialized as an array
+        currPatient.HealthRecords = currPatient.HealthRecords.concat(healthRecord);
         await currPatient.save();
-        res.status(200).json({ message: 'Health record added successfully' });
+        res.status(200).json(currPatient.HealthRecords);
 
         
 
@@ -219,11 +375,11 @@ const searchPatientByName = async (req,res) => {
  }
  const viewHealthRecordsDoctor = async (req, res) => {
     const { id } = req.params;
-    const patientId = req.body.patientId;
+    const doctorid = req.user.id;
   
     try {
-      const doctor = await doctorModel.findById({ id }) ;
-      const currPatient = await patientModel.findById(patientId); 
+      const doctor = await doctorModel.findById(doctorid) ;
+      const currPatient = await patientModel.findById(id); 
   
       if (!doctor || !currPatient) {
         return res.status(404).json({ error: 'Doctor or patient not found' });
@@ -244,28 +400,76 @@ const searchPatientByName = async (req,res) => {
       return res.status(500).json({ error: error.message });
     }
   };
-const scheduleFollowUp = async(req,res) =>{
-    const { id } = req.params;
-    const patientId = req.body.patientId;
+  const AddAvailableTimeSlots = async(req,res) => {
+    const slots = req.body.slots;
+    const id = req.user.id;
+    const updatedDoctor = await doctorModel.findByIdAndUpdate(id, {AvailableTimeSlots: slots});
+    return res.status(200).json(updatedDoctor);
+ }
+ const getDoctorTimeSlots = async (req, res) => {
+    const id = req.user.id;
+    const doctor = await doctorModel.findById(id);
+    res.status(200).json(doctor.AvailableTimeSlots);
+  }
+  const checkDoctorAvailablity = async (req, res) => {
+
+    const Date = req.body.Date;
+    const Time = req.body.Time;
+    const {AvailableTimeSlots} = await doctorModel.findById(req.user.id);
+    let date =  Date+"T"+Time+".000Z";
+    if(!AvailableTimeSlots.includes(Time))
+        return res.status(200).json({message: "not available"});
+    const query = {
+        $and:[
+            {Doctor: req.user.id},
+            { AppointmentDate: date }
+            ]}
     try{
-        const doctor = doctorModel.findById(id);
-        const currPatient = await patientModel.findById(patientId); 
-        const appointments = await appointmentModel
-        .find({ Doctor: doctor, Patient: currPatient}) 
-        .populate("Doctor")
-        .populate("Patient")
-        .exec();
-        for (const appointment of appointments) {
-            const appointmentFollowUp = await appointmentModel.create(req.body);
-            appointment.FollowUp.Check = true;
-            appointment.FollowUp.AppointmentFollowUp = appointmentFollowUp;
-            await appointment.save();
-          }
-        res.status(200).json(appointments.FollowUp);
+    const appointment = await appointmentModel.findOne(query)
+    if(appointment == null)
+        return res.status(200).json({message: "available"});
+    return res.status(200).json({message: "not available"});
+    }catch(error){
+      return res.status(400).json({error: error.message});
+    }
+}
+  
+const scheduleFollowUp = async(req,res) =>{
+    const id  = req.user.id;
+    const patientId = req.body.Patient;
+    const appDate = req.body.appDate;
+    const followUp= true;
+    const status = req.body.status;
+    try{
+        
+          const newFollowup = await appointmentModel.create({
+            Patient: patientId,
+            Doctor: id,
+            Date: appDate,
+            FollowUp: followUp,
+            Status: status
+        })
+        await newFollowup.save();
+
+        const timeSlot = appDate.substring(11,19);
+        console.log(timeSlot)
+        const doc = await  doctorModel.findByIdAndUpdate(
+            id,
+            { $pull: { AvailableTimeSlots: timeSlot}},
+            { new: true }
+          )
+          console.log(doc)
+          
+            
+    
+        res.status(200).json(newFollowup);
+    
+  
+
     }catch(error){
         return res.status(500).json({error: error.message});
     }
 }
 
 module.exports = { registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments,
-    addDoctor, viewPatients,viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments, viewHealthRecordsDoctor, addHealthRecordForPatient};
+    addDoctor, viewPatients,viewPatientInfo, filterDoctorAppointments, getDoctor, checkDoctorAvailablity, viewAllDoctorAppointments, viewHealthRecordsDoctor, addHealthRecordForPatient, scheduleFollowUp,uploadPersonalID, uploadMedicalDegree, uploadLicenses,getDoctorTimeSlots, AddAvailableTimeSlots};

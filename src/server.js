@@ -6,7 +6,7 @@ const fs = require('fs');
 
 
 const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices,login, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, viewHealthRecords, subscribeToHealthPackage} = require("./controllers/patientController");
-const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments , viewHealthRecordsDoctor, addHealthRecordForPatient} = require("./controllers/doctorController");
+const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments , viewHealthRecordsDoctor, addHealthRecordForPatient, uploadPersonalID, uploadMedicalDegree, uploadLicenses, scheduleFollowUp,getDoctorTimeSlots,AddAvailableTimeSlots,checkDoctorAvailablity} = require("./controllers/doctorController");
 const { addAppointment, filterAppointment } = require("./controllers/appointmentController")
 const {addSubscription} = require("./controllers/SubscriptionController")
 const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages, getAdmin, acceptRegistrationRequest, rejectRegistrationRequest } = require("./controllers/adminController");
@@ -37,7 +37,7 @@ mongoose.connect(MongoURI, {useNewUrlParser:true})
 
 //Admin Endpoints
 app.get("/admin/me", AdminProtect,getAdmin);
-app.post("/admin/add",AdminProtect, addAdmin);
+app.post("/admin/add", addAdmin);
 app.get("/admin/allPackages",AdminProtect,getAllPackages);
 app.get("/admin/allAdmins",AdminProtect,getAllAdmins);
 app.get("/admin/allPatients",AdminProtect,getAllPatients);
@@ -60,6 +60,9 @@ app.delete("/admin/rejectRequest/:id",AdminProtect,rejectRegistrationRequest);
 
 app.post("/doctor/add", addDoctor);
 app.post("/doctor/register", registerDoctor);
+app.post("/doctor/uploadPersonalID/:id", uploadPersonalID);
+app.post("/doctor/uploadMedicalDegree/:id", uploadMedicalDegree);
+app.post("/doctor/uploadLicense/:id", uploadLicenses);
 
 //Private endpoints
 
@@ -70,10 +73,16 @@ app.put("/doctor/update/",DoctorProtect, updateDoctor); //TODO: fix in frontend 
 app.get("/doctor/upcomingAppointments/",DoctorProtect, upcomingAppointments); //TODO: fix in frontend was taking id
 app.get("/doctor/viewPatients/",DoctorProtect, viewPatients); //TODO: fix in frontend was taking id
 app.get("/doctor/viewPatientInfo/:id",DoctorProtect, viewPatientInfo);
+app.put("/doctor/addTimeSlots", DoctorProtect, AddAvailableTimeSlots);
 app.get("/doctor/filterAppointments/",DoctorProtect, filterDoctorAppointments) //TODO: fix in frontend was taking id
 app.get("/doctor/allAppointments/", DoctorProtect, viewAllDoctorAppointments);
+app.post("/doctor/checkDoctor",DoctorProtect,checkDoctorAvailablity);
+
 app.get("/doctor/viewHealthRecords/:id", DoctorProtect, viewHealthRecordsDoctor);
 app.post("/doctor/addHealthRecordForPatient/:id", DoctorProtect, addHealthRecordForPatient);
+app.post("/doctor/scheduleFollowup/", DoctorProtect, scheduleFollowUp);
+app.get("/doctor/doctorTimeSlots/",DoctorProtect,getDoctorTimeSlots);
+
 
 //Patient Endpoints
 
@@ -97,7 +106,7 @@ app.get("/patient/filterAppointments",PatientProtect,filterPatientAppointments)
 app.post("/patient/uploadMedicalDocuments/:id",PatientProtect, uploadMedicalDocuments);
 app.delete("/patient/removeMedicalDocument/:id",PatientProtect, deleteMedicalDocuments);
 app.post("/patient/subscribeToHealthPackage/:id",PatientProtect, subscribeToHealthPackage);
-app.get("/patient/viewMyMedicalDocument/:id",PatientProtect, viewMedicalDocuments)
+app.get("/patient/viewMyMedicalDocument/:id",PatientProtect, viewMedicalDocuments);
 app.get("/patient/viewSelectedDoctor/:id",PatientProtect,viewDoctorDetails)
 app.get("/patient/viewMyPrescriptions",PatientProtect,viewMyPrescriptions)
 app.get("/patient/filterPrescriptions",PatientProtect,filterPrescriptions)
