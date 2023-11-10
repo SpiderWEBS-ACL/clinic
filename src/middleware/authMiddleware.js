@@ -2,8 +2,6 @@ const jwt = require('jsonwebtoken');
 const patientModel = require('../Models/Patient');
 const doctorModel = require('../Models/Doctor');
 const adminModel = require('../Models/Admin');
-const { Next } = require('@nestjs/common');
-
 
 function generateAccessToken(user){
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'})
@@ -16,6 +14,7 @@ const AdminProtect = async (req,res,next) => {
     try{
     //Get token from header
      token = authHeader.split(' ')[1];
+     
 
      //Verify Token
      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -23,6 +22,7 @@ const AdminProtect = async (req,res,next) => {
      //Get Admin from token
 
      req.user = await adminModel.findById(decoded.id);
+
      next();
     }catch(error){
         console.log(error)

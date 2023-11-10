@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./style.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { message } from "antd";
 import {
   validateMobile,
@@ -82,7 +82,7 @@ const RegLog: React.FC = () => {
         Password,
         Username,
       };
-      const response = await api.post(`/patient/login`, data);
+      const response = await api.post(`/login`, data);
       localStorage.setItem("id", response.data.id);
       localStorage.setItem("type", response.data.type);
       localStorage.setItem("accessToken", response.data.accessToken);
@@ -103,7 +103,7 @@ const RegLog: React.FC = () => {
     } else if (item.type == "Doctor") {
       navigate(`/doctor/home`);
     } else if (item.type == "Admin") {
-      navigate(`/admin/`);
+      navigate(`/admin/Home`);
     }
   };
 
@@ -166,7 +166,9 @@ const RegLog: React.FC = () => {
           onBlur={() => handleBlur("password")}
         />
 
-        <p className="forgot-pass">Forgot password?</p>
+        <a href="/forgotPassword" className="forgot-pass text-right" style={{display: "block", textAlign:"center"}}>Forgot Password?</a>
+        {/* <Link to= "/forgotPassword" onClick={() => { }} className="forgot-pass text-right" style={{display: "block", textAlign:"center"}}>Forgot Password?</Link> */}
+
         <button onClick={handleSignIn} type="button" className="submit button">
           Sign In
         </button>
@@ -193,7 +195,6 @@ const RegLog: React.FC = () => {
           <div className={`img__text m--in ${isSignUp ? "" : "m--up"}`}>
             <h2 className="h2">One of us?</h2>
             <p className="p">
-
               If you already have an account, just sign in. We've missed you!
             </p>
           </div>
@@ -333,7 +334,6 @@ const RegLog: React.FC = () => {
             type="button"
             className=" button submit"
           >
-
             Sign Up
           </button>
         </div>

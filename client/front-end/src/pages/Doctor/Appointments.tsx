@@ -4,9 +4,10 @@ import { useParams } from "react-router-dom";
 import Alert from "../../components/Alert";
 import { DatePicker, DatePickerProps, Input, Select, TimePicker } from "antd";
 import { message } from "antd";
+import Cookies from "js-cookie";
 
 const ViewDoctorAppointments = () => {
-  const accessToken = localStorage.getItem("accessToken");
+  const accessToken = Cookies.get("accessToken");
   const { Option } = Select;
   const { id } = useParams();
   const [alertVisible, setAlertVisibility] = useState(false);
@@ -55,7 +56,7 @@ const ViewDoctorAppointments = () => {
       },
     };
     try {
-      api.get(`/patient/allAppointments/`, config).then((response) => {
+      api.get(`/doctor/allAppointments/`, config).then((response) => {
         setAppointments(response.data);
         setAllAppointments(response.data);
         setHasAppointments(response.data.length > 0);

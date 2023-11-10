@@ -5,14 +5,20 @@ const bcrypt = require("bcrypt");
 const doctorModel = require("../Models/Doctor");
 const adminModel = require("../Models/Admin");
 const appointmentModel = require("../Models/Appointment");
+const packageModel = require("../Models/Package");
+const fileModel = require("../Models/File");
+
 const prescriptionModel = require("../Models/Prescription");
 const subscriptionModel = require("../Models/Subscription");
 const packageModel = require("../Models/Package");
 
 const { fileLoader } = require("ejs");
+const multer = require('multer');
+const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const { generateAccessToken } = require("../middleware/authMiddleware");
 require('dotenv').config();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 
 const addPatient = async (req, res) => {
@@ -110,22 +116,25 @@ const addFamilyMember = async (req, res) => {
     const  id  = req.user.id;
     const newFamilyMember = req.body;
     const patient = await patientModel.findById(id);
+    const checkMember = await patientModel.find({Email: req.body.Email});
+
     if (!patient) {
       return res.status(404).json({ error: "Patient not found" });
     }
+    if(checkMember){
+      newFamilyMember.MemberID = checkMember._id;
+    }
     const familyMembers = patient.FamilyMembers;
     const allFamilyMembers = familyMembers.concat([newFamilyMember]);
-    res.json(allFamilyMembers);
     const updatedPatient = await patientModel.findByIdAndUpdate(id, {
       FamilyMembers: allFamilyMembers,
     }, {new: true}
     );
-    res.status(200).json(updatedPatient);
+    return res.status(200).json(updatedPatient);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
-
 const selectDoctor = async (req, res) => {
   const { id } = req.params;
   try {
@@ -538,6 +547,287 @@ const getAllDoctorsPatient = async (req,res) =>{
     res.status(500).json({ error: error.message });
   }
 }
+const storage = multer.diskStorage({
+  fileName: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+const uploadMedicalDocuments = async (req, res) => {
+  upload.array('files')(req, res, async (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    } else {
+      let newFiles=[];
+      const { id } = req.params; // assuming id holds patient's id
+      if(id){
+        newFiles = req.files.map((file) => ({
+        filename: file.filename,
+        originalname: file.originalname,
+        path: file.path,
+        filedata: file.buffer,
+        Patient: id,
+      }));
+    }
+    else{
+      res.status(404).json({error: 'No patient id was given'});
+    }
+  
+
+      try {
+        const savedFiles = await fileModel.create(newFiles);
+        res.status(201).json(savedFiles);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+      }
+    }
+  });
+};
+const deleteMedicalDocuments = async (req, res) => {
+  const { id } = req.params;
+  try {
+    let currFiles = [];
+
+    if (id) {
+      currFiles = await fileModel.find({ Patient: id });
+
+      if (currFiles.length === 0) {
+        return res.status(404).json({ error: 'Files not found' });
+      }
+
+      await fileModel.deleteMany({ Patient: id });
+
+    } else {
+      currFiles = await fileModel.find({ _id: id });
+
+      if (currFiles.length === 0) {
+        return res.status(404).json({ error: 'File not found' });
+      }
+
+      await fileModel.findByIdAndDelete(id);
+    }
+
+ 
+
+    res.status(200).json({ message: 'Files deleted' });
+    console.log('Files deleted');
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const viewMedicalDocuments = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    let files = [];
+    if (id) {
+      files = await fileModel.find({ Patient: id });
+    } else {
+      res.status(404).json({error: 'No patient id was given'});
+    }
+
+    if (files.length === 0) {
+      return res.status(404).json({ error: 'No files found' });
+    }
+
+    res.status(200).json(files);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const viewHealthRecords = async(req,res) =>{
+  const { id } = req.params;
+  try{
+    const currPatient = await patientModel.findById(id);
+    if (currPatient.HealthRecords) {
+          res.status(200).json(currPatient.HealthRecords);
+    }
+    else{
+      res.status(404).json({ error: 'Health records not found' });
+    }
+
+  } catch(error) {
+    res.status(500).json({error: error.message});
+  }
+}
+const subscribeToHealthPackage = async(req,res) => {
+  const { id } = req.params;
+  const packageId = req.body;
+  try{
+    const currPatient = patientModel.findById({ id });
+    if(!currPatient){
+      res.status(404).json({error: 'No patient found!'});
+    }
+    if(currPatient.FamilyMembers.length>0){
+      for (const familyMember of currPatient.FamilyMembers) {
+          if(familyMember.MemberID){
+            const newSubscription = new subscriptionModel({
+              Patient: familyMember.MemberID,
+              Package: packageId,
+            });
+            await newSubscription.save();
+            
+          }
+      }
+    }
+    const newSubscription = new subscriptionModel({
+      Patient: id,
+      Package: packageId,
+    });
+    await newSubscription.save();
+
+  }catch(error){
+    res.status(500).json({error: error.message});
+  }
+}
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+const checkDoctorAvailablity = async (req, res) => {
+
+  const {Date, Time, DoctorId} = req.body;
+  const {AvailableTimeSlots} = await doctorModel.findById(DoctorId);
+  let date =  Date+"T"+Time+".000Z";
+  if(!AvailableTimeSlots.includes(Time))
+      return res.status(200).json({message: "not available"});
+  const query = {
+      $and:[
+          {Doctor: DoctorId},
+          { AppointmentDate: date }
+          ]}
+  try{
+  const appointment = await appointmentModel.findOne(query)
+  if(appointment == null)
+      return res.status(200).json({message: "available"});
+  return res.status(200).json({message: "not available"});
+  }catch(error){
+    return res.status(400).json({error: error.message});
+    }
+}
+const getDoctorTimeSlots = async (req, res) => {
+  const {id} = req.params;
+  const doctor = await doctorModel.findById(id);
+  res.status(200).json(doctor.AvailableTimeSlots);
+}
+
+const getBalance = async(req,res) => {
+  try{
+  const id = req.user.id;
+  const { WalletBalance } = await patientModel.findById(id);
+  res.status(200).json(WalletBalance);
+  }catch(error){
+    res.status(401).json({error: error});
+  }
+}
+const getDoctorDiscount = async (patientId) => {
+  try{
+  const subscription = await subscriptionModel.findOne({Patient: patientId});
+  if(!subscription)
+    return 0;
+  const package = await packageModel.findById(subscription.Package);
+  return package.DoctorDiscount;
+  }catch(error){
+    console.log(error);
+  }
+}
+
+const getHourlyRate = async (doctorId) => {
+  const doctor =await doctorModel.findById(doctorId);
+  return doctor.HourlyRate;
+}
+const doctorDiscount = async (req, res) => {
+  try{
+  const patientId = req.user.id;
+  const doctorDiscount = await getDoctorDiscount(patientId);
+  res.status(200).json(doctorDiscount);
+  }catch(error){
+    res.status(401).json({error: error})
+  }
+}
+const getAllPackagesPatient = async (req, res) => {
+  try {
+    const packages = await packageModel.find({});
+    res.status(200).json(packages);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+const payAppointmentWithWallet  = async(req,res) => {
+  try{
+  let message = "";
+  const patientId = req.user.id;
+  const {WalletBalance} = await patientModel.findById(patientId);
+    const doctorId = req.body.id;
+    const duration = 1; //for testing
+    const doctor = await  doctorModel.findById(doctorId);
+    const originalHourlyRate =await getHourlyRate(doctorId);
+    const doctorDiscount = await getDoctorDiscount(patientId);
+    const hourlyRate =  Math.round((1 - (doctorDiscount/100)) * originalHourlyRate * duration);
+    if(WalletBalance >= hourlyRate){
+      const updatedPatient = await patientModel.findByIdAndUpdate(patientId, {WalletBalance: WalletBalance - hourlyRate});
+      message = "Appointment Booked Successfully!"
+      res.status(200).json(message);
+    }else{
+      message = "Insufficient funds in wallet!"
+      res.status(400).json(message);
+    }
+  }catch(error){
+    res.status(401).json({error : error});
+    }
+  }
+const payAppointmentWithStripe = async (req,res) => {
+  try{
+    let message = "";
+    const patientId = req.user.id;
+    const doctorId = req.body.id;
+    const duration = 1; //for testing
+    const doctor = await  doctorModel.findById(doctorId);
+    const originalHourlyRate =await getHourlyRate(doctorId);
+    const doctorDiscount = await getDoctorDiscount(patientId);
+    if(doctorDiscount == 0)
+      message = "Appointment with Dr. " + doctor.Name
+    else
+      message = "Appointment with Dr. " + doctor.Name + " after "+ doctorDiscount+"% package discount" 
+    const hourlyRate =  (1 - (doctorDiscount/100)) * originalHourlyRate * duration;
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items:[
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {name: message},
+          unit_amount: Math.round(hourlyRate * 100) //In cents
+        },
+        quantity: 1
+      }],
+      success_url: `${process.env.SERVER_URL}/appointment/success`,
+      cancel_url: `${process.env.SERVER_URL}/patient/viewAllDoctors`,
+      
+    })
+    res.json({url: session.url})
+  }catch(error){
+    res.status(400).json({ error: error.message });
+    }
+  }
+const getSubscribedPackage = async (req,res) => {
+  const patientId = req.user.id;
+  const subscription = await subscriptionModel.findOne({Patient: patientId});
+  if(!subscription)
+    return res.status(200).json("");
+  return res.status(200).json(subscription.Package);
+}
+
 
 const linkFamily = async (req,res) => {
   try{
@@ -630,6 +920,9 @@ const cancelSubscription = async (req,res) => {
 }
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
-  filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, linkFamily, cancelSubscription};
 
+   filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
+  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity, getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe
+,linkFamily, cancelSubscription };
+
+ 

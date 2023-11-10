@@ -34,6 +34,19 @@ import ViewPatientAppointments from "./pages/Patient/Appointments";
 import jwt_decode from "jwt-decode";
 import Cookies from "js-cookie";
 import NotFound from "./pages/NotFound";
+import AddAvailableTimeSolts from "./pages/Doctor/AddAvailableTimeSolts";
+import Calendar from "./pages/Doctor/AddAvailableTimeSolts";
+import CheckoutButton from "./pages/CheckoutButton";
+import AllPackagesPatient from "./pages/Patient/Packages";
+import ChangePasswordDoctor from "./pages/Doctor/ChangePassword";
+import ChangePasswordAdmin from "./pages/Admin/ChangePassword";
+import ChangePasswordPatient from "./pages/Patient/ChangePassword";
+import ForgotPassword from "./pages/ForgotPassword";
+import PaymentPage from "./pages/Patient/PaymentChoices";
+import AppointmentBookingPage from "./pages/Patient/AppointmentBookingPage";
+import SubscriptionSuccess from "./pages/Patient/SubscriptionSuccess";
+import Wallet from "./pages/Patient/Wallet";
+import AppointmentSuccess from "./pages/Patient/AppointmentSuccess";
 
 export interface JwtPayload {
   id: string;
@@ -69,6 +82,7 @@ const AppRouter: React.FC = () => {
         <Route path="/admin/Patients" element={<Patients />} />
         <Route path="/admin/Admins" element={<AllAdmins />} />
         <Route path="/admin/Packages" element={<AllPackages />} />
+        <Route path="/admin/changePassword" element={<ChangePasswordAdmin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
@@ -90,6 +104,9 @@ const AppRouter: React.FC = () => {
         />
         <Route path="/appointment/view/:id" element={<ViewAppointments />} />
         <Route path="/doctor/home/" element={<DoctorHome />} />
+        <Route path="/doctor/timeSlots" element={<Calendar />} />
+        <Route path="/checkout" element={<CheckoutButton />} />
+        <Route path="/doctor/changePassword" element={<ChangePasswordDoctor />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
@@ -120,6 +137,17 @@ const AppRouter: React.FC = () => {
           element={<ViewPrescriptions />}
         />
         <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
+        <Route path="/patient/packages" element={<AllPackagesPatient />} />
+        <Route path="/patient/subscribe/options" element={<PaymentPage />} />
+        <Route path="/checkout" element={<CheckoutButton />} />
+        <Route path="/patient/changePassword" element={<ChangePasswordPatient />} />
+        <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+        <Route path="/patient/wallet" element={<Wallet />} />
+        <Route path="/appointment/success" element={<AppointmentSuccess />} />
+        <Route
+          path="/patient/appointment/booking"
+          element={<AppointmentBookingPage />}
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
@@ -127,6 +155,7 @@ const AppRouter: React.FC = () => {
     navigate(-1);
     return (
       <Routes>
+        <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/" element={<RegLog />} />
       </Routes>
     );
