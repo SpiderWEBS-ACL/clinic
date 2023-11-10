@@ -22,14 +22,14 @@ const RegistrationRequestDetails = () => {
   const handleAccept = (id: string) => {
     
     if(!salary){
-      message.error("Please enter an offered salary");
+      message.error("Please enter an offered hourly rate");
       return;
     }
 
     setLoading(true);
     try {
       api
-        .get("admin/acceptRequest/" + id, { headers })
+        .post("admin/acceptRequest/" + id, {salary}, { headers })
         .then(message.success("Registration Request Accepted!"));
     } catch (error) {
       message.error("An Error has occurred");
@@ -158,12 +158,12 @@ const RegistrationRequestDetails = () => {
             (<i style={{color: "green"}}>Employment Contract Sent. Pending Doctor Approval</i>): 
             (<InputField
                 id="salary"
-                label="Offered Salary"
+                label="Offered Hourly Rate"
                 type="Number"
                 value={salary}
                 onChange={setSalary}
                 required={true}
-                style={{borderWidth: 2, borderColor: "salmon"}}
+                style={{borderWidth: 2, borderColor: "darkgray"}}
               />
             )}
             </div>

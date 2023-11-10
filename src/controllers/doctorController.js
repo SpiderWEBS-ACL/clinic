@@ -274,7 +274,7 @@ const acceptContract = async (req, res) => {
       Email: regReq.Email,
       Password: regReq.Password,
       Dob: regReq.Dob,
-      HourlyRate: regReq.HourlyRate,
+      HourlyRate: regReq.Salary,
       Affiliation: regReq.Affiliation,
       EducationalBackground: regReq.EducationalBackground,
       Specialty: regReq.Specialty,

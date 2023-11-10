@@ -86,9 +86,10 @@ const AllDoctors = () => {
         <thead>
           <tr>
             <th>Name</th>
+            <th>Specialty</th>
             <th>Status</th>
-            <th>Accept</th>
-            <th>Reject</th>
+            {/* <th>Accept</th>
+            <th>Reject</th> */}
             <th>Details</th>
           </tr>
         </thead>
@@ -100,12 +101,15 @@ const AllDoctors = () => {
                 <strong>{request.Name}</strong>
               </td>
               <td>
+                {request.Specialty}
+              </td>
+              <td>
                 {request.AdminAccept? 
                   request.DoctorReject? (<i style={{color: "red"}}>Employment Contract Rejected</i>) :
                   (<i style={{color: "green"}}>Employment Contract Sent. Pending Doctor Approval</i>) : 
                   (<i>Pending</i>) }
               </td>
-              <td>
+              {/* <td>
                 <button
                   className="btn btn-sm btn-success"
                   style={{
@@ -136,7 +140,7 @@ const AllDoctors = () => {
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>
-              </td>
+              </td> */}
               <td>
                 <button
                   className="btn btn-sm btn-primary"
