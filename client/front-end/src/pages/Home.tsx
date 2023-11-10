@@ -1,11 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+
+  const navigate = useNavigate();
+
   const containerStyle: React.CSSProperties = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    minHeight: "100vh",
+    minHeight: "80vh",
   };
 
   const headingStyle: React.CSSProperties = {
@@ -22,8 +26,21 @@ const Home = () => {
   };
 
   return (
+    <div className="container">
     <div style={containerStyle}>
       <h1 style={headingStyle}>Welcome, Admin!</h1>
+    </div>
+
+    <div style={{ display: "flex" }}>
+    <button
+      style={{ marginLeft: "auto", marginRight: "20px" }}
+      className="btn btn-danger"
+      type="button"
+      onClick={()=> {navigate("/admin/changePassword")}}
+    >
+      Change Password
+    </button>
+  </div>
     </div>
   );
 };

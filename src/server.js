@@ -1,22 +1,109 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const { addPatient, addFamilyMember, viewFamilyMembers, selectDoctor, filterDoctors,searchForDoctor, filterPatientAppointments, viewDoctorDetails, viewMyPrescriptions, filterPrescriptions, selectPrescription ,viewDoctorsWithPrices, filterDoctorsByNameSpecialtyAvailability, addPrescription, getPatient, viewAllPatientAppointments, getAllDoctorsPatient, getAllPackagesPatient, checkDoctorAvailablity, getDoctorTimeSlots, payAppointmentWithStripe, getSubscribedPackage, changePasswordPatient, getBalance, doctorDiscount, payAppointmentWithWallet} = require("./controllers/patientController");
-const { addDoctor , registerDoctor, searchPatientByName, selectPatient, updateDoctor, upcomingAppointments, viewPatients, viewPatientInfo, filterDoctorAppointments, getDoctor, viewAllDoctorAppointments, AddAvailableTimeSlots , changePasswordDoctor, } = require("./controllers/doctorController");
-const { addAppointment, filterAppointment } = require("./controllers/appointmentController")
-const {addSubscription, subscribeWithStripe, deleteOneSubscription} = require("./controllers/SubscriptionController")
-const { addAdmin, removeDoctor, removePatient, removeAdmin, getAllDoctrsRegistrationReqs, getDoctrRegistrationReqDetails, addPackage, updatePackage, deletePackage, getPackage, getAllDoctors, getAllPatients, getAllAdmins, getAllPackages, getAdmin, acceptRegistrationRequest, rejectRegistrationRequest, changePasswordAdmin} = require("./controllers/adminController");
 const cors = require('cors');
-const { AdminProtect, DoctorProtect, PatientProtect } = require("./middleware/authMiddleware");
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const packageModel = require("./Models/Package");
+
+const {
+  addPatient,
+  addFamilyMember,
+  viewFamilyMembers,
+  selectDoctor,
+  filterDoctors,
+  searchForDoctor,
+  filterPatientAppointments,
+  viewDoctorDetails,
+  viewMyPrescriptions,
+  filterPrescriptions,
+  selectPrescription,
+  viewDoctorsWithPrices,
+  filterDoctorsByNameSpecialtyAvailability,
+  addPrescription,
+  getPatient,
+  viewAllPatientAppointments,
+  getAllDoctorsPatient,
+  viewMedicalDocuments,
+  deleteMedicalDocuments,
+  uploadMedicalDocuments,
+  subscribeToHealthPackage,
+  checkDoctorAvailablity, 
+  getDoctorTimeSlots, 
+  payAppointmentWithStripe, 
+  getSubscribedPackage, 
+  getBalance, 
+  getAllPackagesPatient,
+  doctorDiscount, 
+  payAppointmentWithWallet
+} = require("./controllers/patientController");
+
+const {
+  addDoctor,
+  registerDoctor,
+  searchPatientByName,
+  selectPatient,
+  updateDoctor,
+  upcomingAppointments,
+  viewPatients,
+  viewPatientInfo,
+  filterDoctorAppointments,
+  getDoctor,
+  viewAllDoctorAppointments,
+  AddAvailableTimeSlots, 
+  viewHealthRecordsDoctor,
+  addHealthRecordForPatient,
+  uploadLicenses,
+  uploadPersonalID,
+  uploadMedicalDegree,
+  getDoctorTimeSlotsForDoctor,
+  checkDoctorAvailablityForDoctor,
+  scheduleFollowUp
+} = require("./controllers/doctorController");
+
+const {
+  addAppointment,
+  filterAppointment,
+} = require("./controllers/appointmentController");
+
+const {
+  addSubscription,
+  subscribeWithStripe,
+  deleteOneSubscription
+} = require("./controllers/SubscriptionController");
+
+const {
+  addAdmin,
+  removeDoctor,
+  removePatient,
+  removeAdmin,
+  getAllDoctrsRegistrationReqs,
+  getDoctrRegistrationReqDetails,
+  addPackage,
+  updatePackage,
+  deletePackage,
+  getPackage,
+  getAllDoctors,
+  getAllPatients,
+  getAllAdmins,
+  getAllPackages,
+  getAdmin,
+  acceptRegistrationRequest,
+  rejectRegistrationRequest,
+} = require("./controllers/adminController");
+
+const {
+  AdminProtect,
+  DoctorProtect,
+  PatientProtect,
+} = require("./middleware/authMiddleware");
 
 const {
   login,
   forgotPassword,
   verifyOTP,
   resetPassword,
+  changePassword,
 } = require("./controllers/loginController");
 
 require("dotenv").config();
@@ -49,7 +136,7 @@ app.post("/resetPassword", resetPassword);
 
 //Admin Endpoints
 app.get("/admin/me", AdminProtect, getAdmin);
-app.put("/admin/changePassword", AdminProtect, changePasswordAdmin);
+app.put("/admin/changePassword", AdminProtect, changePassword);
 app.post("/admin/add", AdminProtect, addAdmin);
 app.get("/admin/allPackages", AdminProtect, getAllPackages);
 app.get("/admin/allAdmins", AdminProtect, getAllAdmins);
@@ -73,11 +160,14 @@ app.delete("/admin/rejectRequest/:id", AdminProtect, rejectRegistrationRequest);
 
 app.post("/doctor/add", addDoctor);
 app.post("/doctor/register", registerDoctor);
+app.post("/doctor/uploadPersonalID/:id", uploadPersonalID);
+app.post("/doctor/uploadMedicalDegree/:id", uploadMedicalDegree);
+app.post("/doctor/uploadLicense/:id", uploadLicenses);
 
 //Private endpoints
 
 app.get("/doctor/getDoctor/", DoctorProtect, getDoctor); //TODO: fix in frontend was taking id
-app.put("/doctor/changePassword", DoctorProtect, changePasswordDoctor);
+app.put("/doctor/changePassword", DoctorProtect, changePassword);
 app.get("/doctor/searchPatient/:Name", DoctorProtect, searchPatientByName);
 app.get("/doctor/selectPatient/:id", DoctorProtect, selectPatient);
 app.put("/doctor/update/", DoctorProtect, updateDoctor); //TODO: fix in frontend was taking id
@@ -87,6 +177,11 @@ app.get("/doctor/viewPatientInfo/:id", DoctorProtect, viewPatientInfo);
 app.get("/doctor/filterAppointments/", DoctorProtect, filterDoctorAppointments); //TODO: fix in frontend was taking id
 app.get("/doctor/allAppointments/", DoctorProtect, viewAllDoctorAppointments);
 app.put("/doctor/addTimeSlots", DoctorProtect, AddAvailableTimeSlots);
+app.post("/doctor/checkDoctor", DoctorProtect, checkDoctorAvailablityForDoctor);
+app.get("/doctor/viewHealthRecords/:id", DoctorProtect, viewHealthRecordsDoctor);
+app.post("/doctor/addHealthRecordForPatient/:id", DoctorProtect, addHealthRecordForPatient);
+app.post("/doctor/scheduleFollowup/", DoctorProtect, scheduleFollowUp);
+app.get("/doctor/doctorTimeSlots/",DoctorProtect,getDoctorTimeSlotsForDoctor);
 //Patient Endpoints
 
 //Public Endpoints
@@ -97,6 +192,7 @@ app.post("/patient/register", addPatient);
 //Private Endpoints
 
 app.get("/patient/getPatient/", PatientProtect, getPatient);
+app.put("/patient/changePassword", PatientProtect, changePassword);
 app.post("/patient/addFamilyMember",PatientProtect,addFamilyMember);//TODO: fix in frontend was taking id
 app.post("/patient/addPrescription",PatientProtect,addPrescription);
 app.get("/patient/selectDoctor/:id",PatientProtect, selectDoctor);
@@ -104,8 +200,13 @@ app.get("/patient/searchForDoctor",PatientProtect,searchForDoctor);
 app.get("/patient/filterDoctorsCriteria",PatientProtect,filterDoctorsByNameSpecialtyAvailability);
 app.get("/patient/viewFamilyMembers",PatientProtect,viewFamilyMembers)
 app.get("/patient/filterDoctors", PatientProtect,filterDoctors);
+app.post("/patient/subscribeToHealthPackage/:id",PatientProtect, subscribeToHealthPackage);
 app.get("/patient/filterAppointments",PatientProtect,filterPatientAppointments)
 app.get("/patient/viewSelectedDoctor/:id",PatientProtect,viewDoctorDetails)
+app.post("/patient/uploadMedicalDocuments/:id",PatientProtect, uploadMedicalDocuments);
+app.delete("/patient/removeMedicalDocument/:id",PatientProtect, deleteMedicalDocuments);
+app.post("/patient/subscribeToHealthPackage/:id",PatientProtect, subscribeToHealthPackage);
+app.get("/patient/viewMyMedicalDocument/:id",PatientProtect, viewMedicalDocuments);
 app.get("/patient/viewMyPrescriptions",PatientProtect,viewMyPrescriptions)
 app.get("/patient/filterPrescriptions",PatientProtect,filterPrescriptions)
 app.get("/patient/selectPrescription/:id",PatientProtect,selectPrescription)
@@ -118,7 +219,6 @@ app.get("/patient/doctorTimeSlots/:id",PatientProtect,getDoctorTimeSlots);
 app.post("/patient/payAppointmentStripe",PatientProtect,payAppointmentWithStripe);
 app.post("/patient/payAppointmentWallet",PatientProtect,payAppointmentWithWallet);
 app.get("/patient/subscribedPackage",PatientProtect,getSubscribedPackage);
-app.put("/patient/changePassword", PatientProtect, changePasswordPatient);
 app.post("/patient/addFamilyMember", PatientProtect, addFamilyMember); //TODO: fix in frontend was taking id
 app.post("/patient/addPrescription", PatientProtect, addPrescription);
 app.get("/patient/selectDoctor/:id", PatientProtect, selectDoctor);

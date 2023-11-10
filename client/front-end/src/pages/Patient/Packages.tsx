@@ -52,6 +52,8 @@ const AllPackagesPatient = () => {
   const handlePaymentSelection = (paymentMethod: string) => {
     if (paymentMethod === "Card") {
       redirectToStripe(PackageId);
+    }else {
+      
     }
     console.log("Selected payment method: ", paymentMethod);
     setShowPaymentModal(false);
