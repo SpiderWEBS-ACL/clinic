@@ -8,6 +8,18 @@ const fileSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Patient",
     },
+    Doctor: {
+      type: Schema.Types.ObjectId,
+      ref: "Doctor",
+    },
+    filedata: {
+      type: Buffer, 
+      required: true
+    },
+    path:{
+      type:String,
+      required: true
+    },
     filename:{
         type: String,
         required: true
@@ -16,10 +28,6 @@ const fileSchema = new Schema(
         type: String,
         required: true
     },
-    path:{
-        type: String,
-        required: true
-    }
   }
 );
 

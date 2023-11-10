@@ -4,7 +4,7 @@ const doctorRegisterRequestModel = require("../Models/DoctorRegisterRequest");
 const appointmentModel = require("../Models/Appointment");
 const { default: mongoose } = require("mongoose");
 const bcrypt = require("bcrypt");
-
+const multer = require("multer");
 // FOR TESTING
 const addDoctor = async (req, res) => {
   try {
@@ -43,6 +43,148 @@ const registerDoctor = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+const storage = multer.diskStorage({
+    fileName: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
+  });
+const uploadGuest = multer({ storage: storage });
+const uploadPersonalID = async (req, res) => {
+  uploadGuest.single('file')(req, res, async (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    } else {
+      const { id } = req.params; // assuming `id` holds the doctor's ID
+
+      if (!id) {
+        res.status(400).send('Doctor ID is missing');
+        return;
+      }
+
+      const file = req.file;
+
+      if (!file) {
+        res.status(400).send('No file uploaded');
+        return;
+      }
+
+      const newFile = {
+        filename: file.filename,
+        originalname: file.originalname,
+        path: file.path,
+        filedata: file.buffer,
+        Doctor: id,
+      };
+
+      try {
+        const savedFile = await fileModel.create(newFile);
+        const doctor = await doctorModel.findByIdAndUpdate(id,
+          { PersonalID: savedFile._id },
+        );
+        await doctor.save();
+        res.status(201).json(savedFile);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+      }
+    }
+  });
+};
+
+const storageSecond = multer.diskStorage({
+    fileName: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
+  });
+const uploadDegree = multer({ storage: storageSecond });
+const uploadMedicalDegree = async (req, res) => {
+    uploadDegree.single('file')(req, res, async (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    } else {
+      const { id } = req.params; // assuming `id` holds the doctor's ID
+
+      if (!id) {
+        res.status(400).send('Doctor ID is missing');
+        return;
+      }
+
+      const file = req.file;
+
+      if (!file) {
+        res.status(400).send('No file uploaded');
+        return;
+      }
+
+      const newFile = {
+        filename: file.filename,
+        originalname: file.originalname,
+        path: file.path,
+        filedata: file.buffer,
+        Doctor: id,
+      };
+
+      try {
+        const savedFile = await fileModel.create(newFile);
+        const doctor = await doctorModel.findByIdAndUpdate(id,
+          { MedicalDegree: savedFile._id },
+        );
+        await doctor.save();
+        res.status(201).json(savedFile);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+      }
+    }
+  });
+};
+const storageLicense = multer.diskStorage({
+    fileName: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
+  });
+const uploadThree = multer({ storage: storageLicense });
+const uploadLicenses = async (req, res) => {
+    uploadThree.array('files')(req, res, async (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    } else {
+      let newFiles=[];
+      const { id } = req.params; // assuming id holds doctor's id
+      if(id && req.files){
+        newFiles = req.files.map((file) => ({
+        filename: file.filename,
+        originalname: file.originalname,
+        path: file.path,
+        filedata: file.buffer,
+        Doctor: id,
+      }));
+    }
+    else{
+      res.status(404).json({error: 'No file(s) was selected'});
+    }
+  
+
+      try {
+        const savedFiles = await fileModel.create(newFiles);
+        const doctor = await doctorModel.findByIdAndUpdate(
+            id,
+            { $push: { MedicalLicenses: { $each: savedFiles.map(file => file._id) } } },
+            { new: true }
+          );
+          await doctor.save();
+        res.status(201).json(savedFiles);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+      }
+    }
+  });
+};
+
 
 // const changePasswordDoctor = async (req, res) => {
 //     try {
@@ -145,6 +287,8 @@ const upcomingAppointments = async (req, res) => {
       .find({
         Doctor: doctorId,
         AppointmentDate: { $gte: currentDate }, //$gte = Greater Than or Equal
+        Status: "Upcoming"
+
       })
       .populate("Patient")
       .exec();
@@ -255,6 +399,125 @@ const getBalance = async(req,res) => {
     const id = req.user.id;
     
 }
+const addHealthRecordForPatient = async(req,res) =>{
+    const { id } = req.params;
+    const description = req.body.Description;
+    const type = req.body.Type;
+    try{
+        const currPatient = await patientModel.findById(id);
+        if(!currPatient){
+            return res.status(404).json({error: 'Patient not found!'});
+        }
+        const healthRecord = {
+            Doctor: req.user.id,
+            Description: description,
+            Type: type,
+          };
+          if(!currPatient.HealthRecords){
+            return res.status(404).json({error: 'Health records not found!'});
+			  }
+        currPatient.HealthRecords = currPatient.HealthRecords || []; // Ensure HealthRecords is initialized as an array
+        currPatient.HealthRecords = currPatient.HealthRecords.concat(healthRecord);
+        await currPatient.save();
+        res.status(200).json(currPatient.HealthRecords);
+
+        
+
+    } catch(error){
+        return res.status(500).json({error: error.message});
+    }
+ }
+ const viewHealthRecordsDoctor = async (req, res) => {
+    const { id } = req.params;
+    const doctorid = req.user.id;
+  
+    try {
+      const doctor = await doctorModel.findById(doctorid) ;
+      const currPatient = await patientModel.findById(id); 
+  
+      if (!doctor || !currPatient) {
+        return res.status(404).json({ error: 'Doctor or patient not found' });
+      }
+  
+      const appointments = await appointmentModel
+        .find({ Doctor: doctor, Patient: currPatient }) 
+        .populate("Doctor")
+        .populate("Patient")
+        .exec();
+  
+      if (appointments.length > 0) {
+        return res.status(200).json(currPatient.HealthRecords);
+      } else {
+        return res.status(404).json({ error: 'Health records not found' });
+      }
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  };
+ const getDoctorTimeSlotsForDoctor = async (req, res) => {
+    const id = req.user.id;
+    const doctor = await doctorModel.findById(id);
+    res.status(200).json(doctor.AvailableTimeSlots);
+  }
+  const checkDoctorAvailablityForDoctor = async (req, res) => {
+
+    const Date = req.body.Date;
+    const Time = req.body.Time;
+    const {AvailableTimeSlots} = await doctorModel.findById(req.user.id);
+    let date =  Date+"T"+Time+".000Z";
+    if(!AvailableTimeSlots.includes(Time))
+        return res.status(200).json({message: "not available"});
+    const query = {
+        $and:[
+            {Doctor: req.user.id},
+            { AppointmentDate: date }
+            ]}
+    try{
+    const appointment = await appointmentModel.findOne(query)
+    if(appointment == null)
+        return res.status(200).json({message: "available"});
+    return res.status(200).json({message: "not available"});
+    }catch(error){
+      return res.status(400).json({error: error.message});
+    }
+}
+  
+const scheduleFollowUp = async(req,res) =>{
+    const id  = req.user.id;
+    const patientId = req.body.Patient;
+    const appDate = req.body.appDate;
+    const followUp= true;
+    const status = req.body.status;
+    try{
+        
+          const newFollowup = await appointmentModel.create({
+            Patient: patientId,
+            Doctor: id,
+            Date: appDate,
+            FollowUp: followUp,
+            Status: status
+        })
+        await newFollowup.save();
+
+        const timeSlot = appDate.substring(11,19);
+        console.log(timeSlot)
+        const doc = await  doctorModel.findByIdAndUpdate(
+            id,
+            { $pull: { AvailableTimeSlots: timeSlot}},
+            { new: true }
+          )
+          console.log(doc)
+          
+            
+    
+        res.status(200).json(newFollowup);
+    
+  
+
+    }catch(error){
+        return res.status(500).json({error: error.message});
+    }
+}
 
 module.exports = {
   registerDoctor,
@@ -269,6 +532,12 @@ module.exports = {
   getDoctor,
   viewAllDoctorAppointments,
   AddAvailableTimeSlots,
+  viewHealthRecordsDoctor,
+  addHealthRecordForPatient,
+  uploadLicenses,
+  uploadPersonalID,
+  uploadMedicalDegree,
+  getDoctorTimeSlotsForDoctor,
+  checkDoctorAvailablityForDoctor,
+  scheduleFollowUp
 };
-
-

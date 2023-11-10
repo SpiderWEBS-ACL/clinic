@@ -174,7 +174,6 @@ const ViewPatientInfo = () => {
        status: "Upcoming"
     }, config)
     setShowDateTimeModal(false)
-    message.success("Scheduled a followup successfully")
     setAppointmentTime("");
     setAppointmentDate("");
   }

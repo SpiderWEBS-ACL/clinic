@@ -24,14 +24,18 @@ const {
   getPatient,
   viewAllPatientAppointments,
   getAllDoctorsPatient,
-  getAllPackagesPatient,
-  checkDoctorAvailablity, 
-  getDoctorTimeSlots, 
-  payAppointmentWithStripe, 
-  getSubscribedPackage, 
-  getBalance, 
-  doctorDiscount, 
-  payAppointmentWithWallet
+  viewMedicalDocuments,
+  deleteMedicalDocuments,
+  uploadMedicalDocuments,
+  subscribeToHealthPackage
+  // checkDoctorAvailablity, 
+  // getDoctorTimeSlots, 
+  // payAppointmentWithStripe, 
+  // getSubscribedPackage, 
+  // getBalance, 
+  // getAllPackagesPatient,
+  // doctorDiscount, 
+  // payAppointmentWithWallet
 } = require("./controllers/patientController");
 
 const {
@@ -47,6 +51,14 @@ const {
   getDoctor,
   viewAllDoctorAppointments,
   AddAvailableTimeSlots, 
+  viewHealthRecordsDoctor,
+  addHealthRecordForPatient,
+  uploadLicenses,
+  uploadPersonalID,
+  uploadMedicalDegree,
+  getDoctorTimeSlotsForDoctor,
+  checkDoctorAvailablityForDoctor,
+  scheduleFollowUp
 } = require("./controllers/doctorController");
 
 const {
@@ -148,6 +160,9 @@ app.delete("/admin/rejectRequest/:id", AdminProtect, rejectRegistrationRequest);
 
 app.post("/doctor/add", addDoctor);
 app.post("/doctor/register", registerDoctor);
+app.post("/doctor/uploadPersonalID/:id", uploadPersonalID);
+app.post("/doctor/uploadMedicalDegree/:id", uploadMedicalDegree);
+app.post("/doctor/uploadLicense/:id", uploadLicenses);
 
 //Private endpoints
 
@@ -162,6 +177,11 @@ app.get("/doctor/viewPatientInfo/:id", DoctorProtect, viewPatientInfo);
 app.get("/doctor/filterAppointments/", DoctorProtect, filterDoctorAppointments); //TODO: fix in frontend was taking id
 app.get("/doctor/allAppointments/", DoctorProtect, viewAllDoctorAppointments);
 app.put("/doctor/addTimeSlots", DoctorProtect, AddAvailableTimeSlots);
+app.post("/doctor/checkDoctor", DoctorProtect, checkDoctorAvailablityForDoctor);
+app.get("/doctor/viewHealthRecords/:id", DoctorProtect, viewHealthRecordsDoctor);
+app.post("/doctor/addHealthRecordForPatient/:id", DoctorProtect, addHealthRecordForPatient);
+app.post("/doctor/scheduleFollowup/", DoctorProtect, scheduleFollowUp);
+app.get("/doctor/doctorTimeSlots/",DoctorProtect,getDoctorTimeSlotsForDoctor);
 //Patient Endpoints
 
 //Public Endpoints
@@ -180,20 +200,25 @@ app.get("/patient/searchForDoctor",PatientProtect,searchForDoctor);
 app.get("/patient/filterDoctorsCriteria",PatientProtect,filterDoctorsByNameSpecialtyAvailability);
 app.get("/patient/viewFamilyMembers",PatientProtect,viewFamilyMembers)
 app.get("/patient/filterDoctors", PatientProtect,filterDoctors);
+app.post("/patient/subscribeToHealthPackage/:id",PatientProtect, subscribeToHealthPackage);
 app.get("/patient/filterAppointments",PatientProtect,filterPatientAppointments)
 app.get("/patient/viewSelectedDoctor/:id",PatientProtect,viewDoctorDetails)
+app.post("/patient/uploadMedicalDocuments/:id",PatientProtect, uploadMedicalDocuments);
+app.delete("/patient/removeMedicalDocument/:id",PatientProtect, deleteMedicalDocuments);
+app.post("/patient/subscribeToHealthPackage/:id",PatientProtect, subscribeToHealthPackage);
+app.get("/patient/viewMyMedicalDocument/:id",PatientProtect, viewMedicalDocuments);
 app.get("/patient/viewMyPrescriptions",PatientProtect,viewMyPrescriptions)
 app.get("/patient/filterPrescriptions",PatientProtect,filterPrescriptions)
 app.get("/patient/selectPrescription/:id",PatientProtect,selectPrescription)
 app.get("/patient/viewDoctorsWithPrices",PatientProtect, viewDoctorsWithPrices)
 app.get("/patient/allAppointments",PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors",PatientProtect, getAllDoctorsPatient);
-app.get("/patient/allPackages",PatientProtect,getAllPackagesPatient);
-app.post("/patient/checkDoctor",PatientProtect,checkDoctorAvailablity);
-app.get("/patient/doctorTimeSlots/:id",PatientProtect,getDoctorTimeSlots);
-app.post("/patient/payAppointmentStripe",PatientProtect,payAppointmentWithStripe);
-app.post("/patient/payAppointmentWallet",PatientProtect,payAppointmentWithWallet);
-app.get("/patient/subscribedPackage",PatientProtect,getSubscribedPackage);
+// app.get("/patient/allPackages",PatientProtect,getAllPackagesPatient);
+// app.post("/patient/checkDoctor",PatientProtect,checkDoctorAvailablity);
+// app.get("/patient/doctorTimeSlots/:id",PatientProtect,getDoctorTimeSlots);
+// app.post("/patient/payAppointmentStripe",PatientProtect,payAppointmentWithStripe);
+// app.post("/patient/payAppointmentWallet",PatientProtect,payAppointmentWithWallet);
+// app.get("/patient/subscribedPackage",PatientProtect,getSubscribedPackage);
 app.post("/patient/addFamilyMember", PatientProtect, addFamilyMember); //TODO: fix in frontend was taking id
 app.post("/patient/addPrescription", PatientProtect, addPrescription);
 app.get("/patient/selectDoctor/:id", PatientProtect, selectDoctor);
@@ -209,9 +234,9 @@ app.get("/patient/selectPrescription/:id", PatientProtect, selectPrescription);
 app.get("/patient/viewDoctorsWithPrices", PatientProtect, viewDoctorsWithPrices);
 app.get("/patient/allAppointments", PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors", PatientProtect, getAllDoctorsPatient);
-app.get("/patient/allPackages", PatientProtect, getAllPackagesPatient);
-app.get("/patient/getBalance", PatientProtect, getBalance);
-app.get("/patient/getDoctorDiscount", PatientProtect, doctorDiscount);
+// app.get("/patient/allPackages", PatientProtect, getAllPackagesPatient);
+// app.get("/patient/getBalance", PatientProtect, getBalance);
+// app.get("/patient/getDoctorDiscount", PatientProtect, doctorDiscount);
 
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
