@@ -69,7 +69,8 @@ const {
 const {
   addSubscription,
   subscribeWithStripe,
-  deleteOneSubscription
+  deleteOneSubscription,
+  subscribeWithWallet
 } = require("./controllers/SubscriptionController");
 
 const {
@@ -244,6 +245,7 @@ app.get("/appointment/filterAppointment", filterAppointment);
 
 //Subscription Endpoints
 app.post("/subscription/subscribe/:id",subscribeWithStripe);
+app.post("/subscription/subscribeWallet/:id",PatientProtect,subscribeWithWallet);
 app.post("/subscription/add",PatientProtect,addSubscription);
 app.delete("/subscription/deleteDuplicate/",PatientProtect,deleteOneSubscription);
 

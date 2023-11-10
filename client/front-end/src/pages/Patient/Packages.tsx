@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Button, Spin, Modal, Row, Col } from "antd";
+import { Button, Spin, Modal, Row, Col, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { JwtPayload } from "../../AppRouter";
 import jwt_decode from "jwt-decode";
-import { config } from "../../Middleware/authMiddleware";
+import { config, headers } from "../../Middleware/authMiddleware";
 import {
   CheckCircleFilled,
   CheckCircleOutlined,
@@ -49,11 +49,31 @@ const AllPackagesPatient = () => {
       console.error(error);
     }
   };
+  const payWithWallet = async (id: string) => {
+    try {
+      try {
+        const response = await api.post(
+          "subscription/subscribeWallet/" + patientId,
+          {
+            packageId: id,
+          },
+          { headers: headers }
+        );
+        navigate("/subscription/success");
+        message.success("Subscribed Successfully!");
+        window.location.reload();
+      } catch (error) {
+        console.log(error);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const handlePaymentSelection = (paymentMethod: string) => {
     if (paymentMethod === "Card") {
       redirectToStripe(PackageId);
-    }else {
-      
+    } else {
+      payWithWallet(PackageId);
     }
     console.log("Selected payment method: ", paymentMethod);
     setShowPaymentModal(false);
