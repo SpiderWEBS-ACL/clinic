@@ -15,6 +15,7 @@ import {
 } from "antd";
 import { config, headers } from "../../Middleware/authMiddleware";
 import { CreditCardFilled, WalletFilled } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 const { Option } = Select;
 
 const ViewAllDoctors = () => {
@@ -25,7 +26,9 @@ const ViewAllDoctors = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<any | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showPaymentFamilyModal, setShowPaymentFamilyModal] = useState(false);
   const [showDateTimeModal, setShowDateTimeModal] = useState(false);
+  const [showDateTimeFamilyModal, setShowDateTimeFamilyModal] = useState(false);
   const [Name, setName] = useState("");
   const [Specialty, setSpecialty] = useState("");
   const [Date, setDate] = useState("");
@@ -39,6 +42,10 @@ const ViewAllDoctors = () => {
   const [balance, setBalance] = useState<number>(0);
   const [HourlyRate, setHourlyRate] = useState<number>(0);
   const [DoctorDiscount, setDoctorDiscount] = useState<number>(0);
+  const [FamilyMembers, setFamilyMembers] = useState<string[]>([]);
+  const [FamilyMember, setFamilyMember] = useState("");
+  var hasFamily = true;
+  const navigate = useNavigate();
 
   const timeSlots = [];
 
@@ -53,6 +60,11 @@ const ViewAllDoctors = () => {
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
+  const config = {
+    headers: {
+      Authorization: "Bearer " + accessToken,
+    },
+  };
 
   const handleCheckAvailability = () => {
     api
@@ -71,12 +83,7 @@ const ViewAllDoctors = () => {
         else message.error("Doctor is not available at this time");
       });
   };
-  useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
-    };
+  const getAllDoctors = () => {
     api
       .get("patient/allDoctors", config)
       .then((response) => {
@@ -86,6 +93,8 @@ const ViewAllDoctors = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+  };
+  const doctorDiscount = () => {
     api
       .get("patient/getDoctorDiscount", config)
       .then((response) => {
@@ -94,6 +103,26 @@ const ViewAllDoctors = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+  };
+
+  const getFamilyMembers = () => {
+    api
+      .get("patient/viewFamilyMembers", config)
+      .then((response) => {
+        response.data.map((member: any) => {
+          FamilyMembers.push(member.Name);
+          console.log(member.Name);
+        });
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
+  useEffect(() => {
+    getFamilyMembers();
+    getAllDoctors();
+    doctorDiscount();
     setLoading(false);
   }, []);
 
@@ -107,6 +136,13 @@ const ViewAllDoctors = () => {
           },
           { headers: headers }
         );
+        sessionStorage.setItem("DoctorId", DoctorId);
+        sessionStorage.setItem(
+          "AppointmentDate",
+          `${AppointmentDate}T${AppointmentTime}.000Z`
+        );
+        if (FamilyMember != "")
+          sessionStorage.setItem("FamilyMember", FamilyMember);
         window.location.href = response.data.url;
       } catch (error) {
         console.log(error);
@@ -114,6 +150,23 @@ const ViewAllDoctors = () => {
     } catch (error) {
       console.error(error);
     }
+  };
+  const addAppointment = async () => {
+    const response = await api
+      .post(
+        "appointment/add",
+        {
+          Doctor: DoctorId,
+          AppointmentDate: `${AppointmentDate}T${AppointmentTime}.000Z`,
+          FamilyMember: FamilyMember,
+        },
+        { headers: headers }
+      )
+      .then((response) => {
+        console.log(response.data);
+        message.success("Appointment added Successfully!");
+        navigate("/patient/allAppointments");
+      });
   };
   const payWithWallet = async () => {
     try {
@@ -128,7 +181,7 @@ const ViewAllDoctors = () => {
           )
           .then((response) => {
             setWalletMessage(response.data);
-            message.success(response.data);
+            addAppointment();
           });
       } catch (error) {
         console.log(error);
@@ -187,6 +240,11 @@ const ViewAllDoctors = () => {
     setMessage("");
     console.log(selectedTimeSlot);
   };
+  const handleAppointmentFamilyChange = (familyMember: string) => {
+    setFamilyMember(familyMember);
+    setMessage("");
+    console.log(familyMember);
+  };
   const handleFilter = async () => {
     setLoading(true);
     try {
@@ -218,11 +276,9 @@ const ViewAllDoctors = () => {
     setTime("");
     setDoctors(AllDoctors);
   };
-  const handleBookAppointment = (doctor: any, HourlyRate: any) => {
-    setDoctorId(doctor);
-    setHourlyRate(HourlyRate);
-    setShowDateTimeModal(true);
-    api
+
+  const getDoctorTimeSlotsApi = async (doctor: any) => {
+    await api
       .get("/patient/doctorTimeSlots/" + doctor, config)
       .then((response) => {
         setTimeSlotsDoctor(response.data);
@@ -230,6 +286,8 @@ const ViewAllDoctors = () => {
       .catch((error) => {
         console.log(error);
       });
+  };
+  const getBalanceApi = async () => {
     api
       .get("patient/getBalance", config)
       .then((response) => {
@@ -238,6 +296,20 @@ const ViewAllDoctors = () => {
       .catch((error) => {
         console.log(error);
       });
+  };
+  const handleBookAppointment = async (doctor: any, HourlyRate: any) => {
+    setDoctorId(doctor);
+    setHourlyRate(HourlyRate);
+    setShowDateTimeModal(true);
+    getDoctorTimeSlotsApi(doctor);
+    getBalanceApi();
+  };
+  const handleBookAppointmentFamily = async (doctor: any, HourlyRate: any) => {
+    setDoctorId(doctor);
+    setHourlyRate(HourlyRate);
+    setShowDateTimeFamilyModal(true);
+    getDoctorTimeSlotsApi(doctor);
+    getBalanceApi();
   };
   const handlePaymentSelection = (paymentMethod: string) => {
     if (paymentMethod === "Card") {
@@ -324,6 +396,7 @@ const ViewAllDoctors = () => {
             </th>
             <th></th>
             <th></th>
+            <th></th>
           </tr>
         </thead>
 
@@ -364,6 +437,27 @@ const ViewAllDoctors = () => {
                 >
                   <span aria-hidden="true"></span>
                   Book Appointment
+                </button>
+              </td>
+              <td>
+                <button
+                  key={request._id}
+                  className="btn btn-sm btn-success"
+                  hidden={FamilyMembers.length == 0}
+                  style={{
+                    padding: "4px 8px",
+                    fontSize: "12px",
+                    borderRadius: "5px",
+                  }}
+                  onClick={() => {
+                    handleBookAppointmentFamily(
+                      request._id,
+                      request.HourlyRate
+                    );
+                  }}
+                >
+                  <span aria-hidden="true"></span>
+                  Book for family member
                 </button>
               </td>
             </tr>
@@ -461,6 +555,45 @@ const ViewAllDoctors = () => {
         </Button>
       </Modal>
       <Modal
+        title="Select Payment Method"
+        visible={showPaymentFamilyModal}
+        onCancel={() => {
+          setShowPaymentFamilyModal(false);
+          setShowDateTimeFamilyModal(true);
+        }}
+        footer={null}
+      >
+        <Button
+          disabled={balance < HourlyRate * (1 - DoctorDiscount / 100)}
+          type="primary"
+          block
+          style={{ marginBottom: "8px" }}
+          onClick={() => handlePaymentSelection("Wallet")}
+        >
+          <Row justify="center" align="middle">
+            <Col>
+              <WalletFilled />
+            </Col>
+            <Col style={{ marginLeft: 8, textAlign: "center" }}>
+              {" "}
+              Wallet (Balance: ${balance})
+            </Col>
+          </Row>
+        </Button>
+        <Button
+          type="primary"
+          block
+          onClick={() => handlePaymentSelection("Card")}
+        >
+          <Row justify="center" align="middle">
+            <Col>
+              <CreditCardFilled />
+            </Col>
+            <Col style={{ marginLeft: 8, textAlign: "center" }}>Card</Col>
+          </Row>
+        </Button>
+      </Modal>
+      <Modal
         title="Select Appointment Time"
         visible={showDateTimeModal}
         onCancel={() => {
@@ -512,6 +645,76 @@ const ViewAllDoctors = () => {
           onClick={() => {
             setShowDateTimeModal(false);
             setShowPaymentModal(true);
+          }}
+        >
+          <span aria-hidden="true"></span>
+          Book
+        </button>
+      </Modal>
+      <Modal
+        title="Select Appointment Time"
+        visible={showDateTimeFamilyModal}
+        onCancel={() => {
+          setShowDateTimeFamilyModal(false);
+          setMessage("");
+        }}
+        footer={null}
+      >
+        <DatePicker
+          onChange={onAppointmentDateChange}
+          style={{ width: 207, marginRight: 30 }}
+        />
+        <label style={{ marginRight: 8 }}></label>
+        <Select
+          value={AppointmentTime}
+          onChange={handleAppointmentTimeSlotChange}
+          style={{ width: 207 }}
+        >
+          <Option value="">Select slot</Option>
+          {timeSlotsDoctor.map((slot) => (
+            <Option key={slot} value={slot}>
+              {slot}
+            </Option>
+          ))}
+        </Select>
+        <Select
+          value={FamilyMember}
+          onChange={handleAppointmentFamilyChange}
+          style={{ width: 250, marginRight: 30 }}
+        >
+          <Option value="">Choose Family Member</Option>
+          {FamilyMembers.map((member) => (
+            <Option key={member} value={member}>
+              {member}
+            </Option>
+          ))}
+        </Select>
+        <button
+          className="btn btn-sm btn-primary"
+          style={{
+            marginBlock: "1rem",
+            padding: "4px 8px",
+            fontSize: "12px",
+            borderRadius: "5px",
+          }}
+          onClick={() => handleCheckAvailability()}
+        >
+          <span aria-hidden="true"></span>
+          Check Availability
+        </button>
+        <button
+          className="btn btn-sm btn-success"
+          style={{
+            marginLeft: "1rem",
+            marginBlock: "1rem",
+            padding: "4px 8px",
+            fontSize: "12px",
+            borderRadius: "5px",
+          }}
+          disabled={Message === "available" ? false : true}
+          onClick={() => {
+            setShowDateTimeFamilyModal(false);
+            setShowPaymentFamilyModal(true);
           }}
         >
           <span aria-hidden="true"></span>

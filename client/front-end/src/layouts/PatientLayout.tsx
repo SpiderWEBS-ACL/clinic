@@ -14,6 +14,7 @@ import {
   PoweroffOutlined,
   WalletOutlined,
   CalendarOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import AppRouter from "../AppRouter";
 import {
@@ -70,6 +71,11 @@ const PatientLayout: React.FC = () => {
       label: "Wallet",
       key: "/patient/wallet",
       icon: <WalletOutlined />,
+    },
+    {
+      label: "Settings",
+      key: "/patient/settings",
+      icon: <SettingOutlined />,
     },
     {
       label: "Logout",

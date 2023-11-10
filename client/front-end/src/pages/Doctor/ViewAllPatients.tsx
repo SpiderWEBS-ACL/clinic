@@ -1,43 +1,41 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import { Spin } from "antd";
-import { Input, Select } from "antd";
-import InputField from "../../components/InputField";
+import { Input, Select, message } from "antd";
+import { Col, Row } from "react-bootstrap";
+import {Card, Skeleton, Switch, Avatar } from 'antd';
+
 
 const ViewAllPatients = () => {
   const accessToken = localStorage.getItem("accessToken");
   const [name, setName] = useState("");
   const [selectedOption, setSelectedOption] = useState("All");
-  const { id } = useParams<{ id: string }>();
-
+  const { Meta } = Card;
   const [patients, setPatients] = useState<any[]>([]);
   const [AllPatients, setAllPatients] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingList, setLoadingList] = useState(true);
 
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
-
+  const config = {
+    headers: {
+      Authorization: "Bearer " + accessToken,
+    },
+  };
   useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
-    };
     api
       .get(`/doctor/viewPatients/`, config)
       .then((response) => {
+        setLoadingList(false);
         setPatients(response.data);
         setAllPatients(response.data);
-        setLoading(false);
-        console.log(response.data);
+        console.log(response.data)
       })
       .catch((error) => {
         console.error("Error:", error);
-        setLoading(false);
       });
-  }, [id]);
+  },[]);
 
   const navigate = useNavigate();
 
@@ -45,29 +43,13 @@ const ViewAllPatients = () => {
     navigate(`/doctor/viewPatientInfo/${item}`);
   };
 
-  const Loading = () => {
-    if (loading) {
-      return (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100vh",
-          }}
-        >
-          <Spin size="large" />
-        </div>
-      );
-    }
-    return null;
-  };
-
+ 
   const handleChange = (value: string) => {
-    setLoading(true);
+    setLoadingList(true);
     if (value === "Upcoming") {
+      setSelectedOption("Upcoming");
       api
-        .get(`/doctor/upcomingAppointments/${id}`)
+        .get(`/doctor/upcomingAppointments/`, config)
         .then((response) => {
           const array = response.data;
           const myArray: any[] = [];
@@ -76,23 +58,34 @@ const ViewAllPatients = () => {
           }
           setPatients(myArray);
           console.log(response.data);
-          setLoading(false);
+          setLoadingList(false);
         })
         .catch((error) => {
-          console.error("Error:", error);
-          setLoading(false);
-        });
+
+          if (error.response && error.response.status === 404) {
+            setPatients([])
+            setLoadingList(false);
+            message.error("No upcoming appointments!")
+          }
+          else{
+            console.error("Error:", error);
+
+          }
+                });
     } else {
+      setSelectedOption("All");
+
       api
-        .get(`/doctor/viewPatients/${id}`)
+        .get(`/doctor/viewPatients/`, config)
         .then((response) => {
           setPatients(response.data);
-          console.log(response.data);
-          setLoading(false);
+          setLoadingList(false);
         })
         .catch((error) => {
+          setLoadingList(false);
+          message.error(error);
+
           console.error("Error:", error);
-          setLoading(false);
         });
     }
   };
@@ -118,30 +111,40 @@ const ViewAllPatients = () => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
   };
-
+ 
   const handleSearch = () => {
-    setLoading(true);
+    setLoadingList(true);
     api
-      .get(`/doctor/searchPatient/${name}`)
+      .get(`/doctor/searchPatient/${name}`, config)
       .then((response) => {
         setPatients(response.data);
-        console.log(response.data);
-        setLoading(false);
+        setLoadingList(false);
       })
       .catch((error) => {
-        console.error("Error:", error);
-        setLoading(false);
+        if (error.response && error.response.status === 404) {
+          setLoadingList(false);
+          setPatients([]);
+          message.error("No data found!")
+        }
+        else{
+          console.error("Error:", error);
+
+        }
+
+
       });
   };
   const handleClearFilters = async () => {
     setName("");
+    setLoadingList(false);
     setSelectedOption("All");
     setPatients(AllPatients);
+    message.success("Cleared!");
+
   };
 
   return (
     <div className="container">
-      <Loading />
       <h2 className="text-center mt-4 mb-4">
         <strong>Patients</strong>
       </h2>
@@ -181,6 +184,7 @@ const ViewAllPatients = () => {
           >
             Search
           </button>
+
           <button
             onClick={handleClearFilters}
             style={{ width: 100 }}
@@ -191,32 +195,57 @@ const ViewAllPatients = () => {
         </span>
       </div>
       <br />
-      <table className="table">
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Name</th>
-            <th>View Details</th>
-          </tr>
-        </thead>
+   
 
         <tbody>
-          {patients.map((member: any, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{member.Name}</td>
-              <td>
-                <button
-                  className="btn btn-sm btn-primary"
-                  onClick={() => handleRedirection(member._id)}
-                >
-                  Details
-                </button>
-              </td>
-            </tr>
+        {patients.map((patient, index) => (
+      index % 3 === 0  && (
+        <Row gutter={16} key={index}>
+          {patients.slice(index, index + 3).map((patient, subIndex) => (
+            <Col span={8} key={subIndex}>
+              <div>
+              <Card
+                style={{width: 400, marginTop: 16 }}
+                loading={loadingList}
+                hoverable
+                className="hover-card"
+                cover={
+                  <img
+                    alt="example"
+                    src="https://img.freepik.com/free-vector/doctor-examining-patient-clinic-illustrated_23-2148856559.jpg?w=1380&t=st=1699651650~exp=1699652250~hmac=beb4f5b10e87a92fc98a6afdbec668faa4127bf16f374383eaacb5337798e6bf"
+                    />
+                }
+                onClick={() => handleRedirection(patient._id)}
+
+              >
+                <Meta
+              avatar={<Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel"  style={{width:75, height:75}}/>}
+               title={<div style={{ fontSize: '20px' }}>{patient.Name}</div>}
+                  description={  <div>
+                    <p><strong>Email:</strong> {patient.Email}</p>
+                    <p><strong>Date of birth:</strong> {patient.Dob.substring(0,10)}</p>
+                    <p><strong>Gender:</strong> {patient.Gender}</p>
+                    <p><strong>Mobile:</strong> {patient.Mobile}</p>
+                  </div>}
+                  />
+              </Card>
+              </div>
+
+            </Col>
           ))}
+        </Row>
+      )
+    ))}
+             
+              
+              
+              
+          
+              
+           
+          
         </tbody>
-      </table>
+     
     </div>
   );
 };

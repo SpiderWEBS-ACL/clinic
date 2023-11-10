@@ -7,6 +7,18 @@ const doctorRegisterSchema = new Schema(
       type: String,
       required: true,
     },
+    PersonalID:{
+      type: Schema.Types.ObjectId,
+      ref: "File",
+    },
+    MedicalDegree:{
+      type: Schema.Types.ObjectId,
+      ref: "File",
+    },
+    MedicalLicenses:[{
+      type: Schema.Types.ObjectId,
+      ref: "File",
+    }],
     Name: {
       type: String,
       required: true,
@@ -39,6 +51,11 @@ const doctorRegisterSchema = new Schema(
       type: String,
       required: true,
     },
+    AvailableTimeSlots : [
+      {
+        type: String,
+      },
+    ],
     AdminAccept: {
       type: Boolean,
       default: false
