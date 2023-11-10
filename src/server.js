@@ -214,7 +214,7 @@ app.get("/patient/getBalance", PatientProtect, getBalance);
 app.get("/patient/getDoctorDiscount", PatientProtect, doctorDiscount);
 
 //Appointment Endpoints
-app.post("/appointment/add", addAppointment);
+app.post("/appointment/add", PatientProtect, addAppointment);
 app.get("/appointment/filterAppointment", filterAppointment);
 
 //Subscription Endpoints

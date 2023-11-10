@@ -15,6 +15,7 @@ import {
 } from "antd";
 import { config, headers } from "../../Middleware/authMiddleware";
 import { CreditCardFilled, WalletFilled } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 const { Option } = Select;
 
 const ViewAllDoctors = () => {
@@ -39,6 +40,7 @@ const ViewAllDoctors = () => {
   const [balance, setBalance] = useState<number>(0);
   const [HourlyRate, setHourlyRate] = useState<number>(0);
   const [DoctorDiscount, setDoctorDiscount] = useState<number>(0);
+  const navigate = useNavigate();
 
   const timeSlots = [];
 
@@ -107,6 +109,11 @@ const ViewAllDoctors = () => {
           },
           { headers: headers }
         );
+        sessionStorage.setItem("DoctorId", DoctorId);
+        sessionStorage.setItem(
+          "AppointmentDate",
+          `${AppointmentDate}T${AppointmentTime}.000Z`
+        );
         window.location.href = response.data.url;
       } catch (error) {
         console.log(error);
@@ -114,6 +121,22 @@ const ViewAllDoctors = () => {
     } catch (error) {
       console.error(error);
     }
+  };
+  const addAppointment = async () => {
+    const response = await api
+      .post(
+        "appointment/add",
+        {
+          Doctor: DoctorId,
+          AppointmentDate: `${AppointmentDate}T${AppointmentTime}.000Z`,
+        },
+        { headers: headers }
+      )
+      .then((response) => {
+        console.log(response.data);
+        message.success("Appointment added Successfully!");
+        navigate("/patient/allAppointments");
+      });
   };
   const payWithWallet = async () => {
     try {
@@ -128,7 +151,7 @@ const ViewAllDoctors = () => {
           )
           .then((response) => {
             setWalletMessage(response.data);
-            message.success(response.data);
+            addAppointment();
           });
       } catch (error) {
         console.log(error);

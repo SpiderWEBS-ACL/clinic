@@ -6,6 +6,7 @@ const { upcomingAppointments } = require('./doctorController');
 
 const addAppointment = async (req, res) => {
     try{
+        req.body.Patient = req.user.id;
         const appointment = await appointmentModel.create(req.body);
         res.status(201).json(appointment);
     }catch(error){
