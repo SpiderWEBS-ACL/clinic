@@ -24,9 +24,11 @@ const addAppointment = async (req, res) => {
 
  const filterAppointment = async (req, res) => {
     try {
-        const id = req.query.id; // Ensure appointments is an array
+        const id = req.user.id;
         const doctor = await doctorModel.findById(id);
         const patient = await patientModel.findById(id);
+        console.log(doctor);
+        console.log(patient);
         var appointments = []
         const AppointmentDate = req.query.AppointmentDate;
         const date = new Date(AppointmentDate);
@@ -52,6 +54,7 @@ const addAppointment = async (req, res) => {
         if (!Status && !AppointmentDate) {
             return res.status(400).json({ error: "No filters were selected" });
         }
+        console.log(appointments);
 
         const appointmentsFiltered = appointments.filter(appointment => {
             if (Status && AppointmentDate) {

@@ -36,7 +36,7 @@ const PatientLayout: React.FC = () => {
       icon: <HomeOutlined />,
     },
     {
-      label: "My Appointments",
+      label: "Appointments",
       key: "/patient/allAppointments",
       icon: <CalendarOutlined />,
     },
@@ -88,6 +88,7 @@ const PatientLayout: React.FC = () => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider
+        theme="light"
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
@@ -103,7 +104,7 @@ const PatientLayout: React.FC = () => {
             }
             navigate(key);
           }}
-          theme="dark"
+          theme="light"
           defaultSelectedKeys={["1"]}
           mode="inline"
           items={items}

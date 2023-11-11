@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 
 const appointmentSchema = new Schema({
+    title:{ type: String,
+      default: "Appointment"
+    },
+
     Doctor: { type: Schema.Types.ObjectId,
          ref: 'Doctor',
           required: true
@@ -12,9 +16,18 @@ const appointmentSchema = new Schema({
           required: true 
         },
     AppointmentDate: Date,
+    start: {
+      type: Date,
+      default: function () {
+          return new Date(this.AppointmentDate.getTime() - 120 * 60 * 1000);
+      }},
+    end: {
+      type: Date,
+      default: function () {
+          return new Date(this.AppointmentDate.getTime() - 60 * 60 * 1000);
+      }},
     FollowUp: {
       type: Boolean,
-
     },
     Status:{
       type : String ,  

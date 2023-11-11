@@ -247,7 +247,8 @@ app.post("/patient/linkfamily",PatientProtect, linkFamily);
 
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
-app.get("/appointment/filterAppointment", filterAppointment);
+app.get("/appointment/filterAppointment",PatientProtect || DoctorProtect, filterAppointment);
+app.get("/appointment/filterAppointmentDoctor",DoctorProtect, filterAppointment);
 
 //Subscription Endpoints
 app.post("/subscription/subscribe/:id",subscribeWithStripe);
