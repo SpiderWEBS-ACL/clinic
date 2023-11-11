@@ -152,30 +152,31 @@ const ViewPatientAppointments = () => {
         </Alert>
       )}
       <br></br>
-
-      <FullCalendar
-        stickyHeaderDates
-        aspectRatio={1}
-        height={"75vh"}
-        plugins={[
-          dayGridPlugin,
-          timeGridPlugin,
-          bootstrap5Plugin,
-          interactionPlugin,
-        ]}
-        events={appointments}
-        eventClick={(info) => {
-          console.log(info);
-          handleEventClick(info);
-        }}
-        themeSystem="bootstrap5"
-        initialView="dayGridMonth"
-        headerToolbar={{
-          left: "prev,next,today",
-          center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay",
-        }}
-      />
+      <div>
+        <FullCalendar
+          stickyHeaderDates
+          aspectRatio={1}
+          height={"75vh"}
+          plugins={[
+            dayGridPlugin,
+            timeGridPlugin,
+            bootstrap5Plugin,
+            interactionPlugin,
+          ]}
+          events={appointments}
+          eventClick={(info) => {
+            console.log(info);
+            handleEventClick(info);
+          }}
+          themeSystem="bootstrap5"
+          initialView="dayGridMonth"
+          headerToolbar={{
+            left: "prev,next,today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
+          }}
+        />
+      </div>
       <Modal
         visible={ShowAppointmentModal}
         onCancel={() => {
