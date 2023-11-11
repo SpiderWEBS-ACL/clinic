@@ -10,7 +10,6 @@ const fileModel = require("../Models/File");
 
 const prescriptionModel = require("../Models/Prescription");
 const subscriptionModel = require("../Models/Subscription");
-const packageModel = require("../Models/Package");
 
 const { fileLoader } = require("ejs");
 const multer = require('multer');
