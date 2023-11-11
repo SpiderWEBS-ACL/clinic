@@ -1,7 +1,7 @@
-const patientModel = require("../Models/Patient");
 const { default: mongoose } = require("mongoose");
 const express = require("express");
 const bcrypt = require("bcrypt");
+const patientModel = require("../Models/Patient");
 const doctorModel = require("../Models/Doctor");
 const adminModel = require("../Models/Admin");
 const appointmentModel = require("../Models/Appointment");
