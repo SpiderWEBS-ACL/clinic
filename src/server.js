@@ -168,6 +168,8 @@ app.post("/doctor/rejectContract/:id", rejectContract);
 app.post("/doctor/uploadPersonalID/:id", uploadPersonalID);
 app.post("/doctor/uploadMedicalDegree/:id", uploadMedicalDegree);
 app.post("/doctor/uploadLicense/:id", uploadLicenses);
+app.get("/doctor/registrationRequest/:id", getDoctrRegistrationReqDetails); 	//for employment contract
+
 
 //Private endpoints
 

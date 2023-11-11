@@ -201,7 +201,7 @@ const acceptRegistrationRequest = async (req, res) => {
       return res.status(404).json({error: "Please enter the offered salary."});
     }
 
-    await regReq.updateOne({AdminAccept: true, Salary: salary}, {new: true});
+    await regReq.updateOne({AdminAccept: true, Salary: salary, AcceptanceDate: Date.now()}, {new: true});
 
     await sendEmploymentContract(regReq, salary);
 
@@ -232,7 +232,7 @@ const rejectRegistrationRequest = async (req, res) => {
 const sendEmploymentContract = async(regReq) => {
   try {
 
-    const contractLink = `http://localhost:5174/employeeContract/${regReq._id}`
+    const contractLink = `http://localhost:5174/employmentContract/${regReq._id}`
 
     //set up source email
     const transporter = nodemailer.createTransport({
@@ -251,7 +251,7 @@ const sendEmploymentContract = async(regReq) => {
       html: `<p>Dear ${regReq.Name},</p>
               <p>Congratulations! Your application to join our clinic as a doctor has been accepted. </p>
               <p>Please review and accept your employment contract through the link below to get started:</p>
-              <a href= ${contractLink}"><b>View Employment Contract</b></a>
+              <a href= ${contractLink}><b>View Employment Contract</b></a>
               <p>We can't wait to have you on our team!</p>
               
               <p>Best Regards, <br>

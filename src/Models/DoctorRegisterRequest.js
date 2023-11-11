@@ -67,6 +67,10 @@ const doctorRegisterSchema = new Schema(
     Salary: {
       type: Number,
       required: false
+    },
+    AcceptanceDate: {
+      type: Date,
+      required: false
     }
   },
   { timestamps: true }

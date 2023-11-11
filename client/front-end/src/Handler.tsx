@@ -1,6 +1,7 @@
 import AdminLayout from "./layouts/AdminLayout";
 import DoctorLayout from "./layouts/DoctorLayout";
 import PatientLayout from "./layouts/PatientLayout";
+import EmploymentContract from "./pages/Doctor/EmploymentContract";
 import Register from "./pages/Doctor/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import RegLog from "./pages/RegLog";
@@ -15,6 +16,8 @@ const Handler: React.FC = () => {
     return <Register />;
   else if (currentPath.includes("/forgotPassword")) 
     return <ForgotPassword />;
+  else if (currentPath.includes("/employmentContract")) 
+    return <EmploymentContract />;
   else return <RegLog />;
 };
 export default Handler;

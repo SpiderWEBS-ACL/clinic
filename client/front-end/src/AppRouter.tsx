@@ -47,6 +47,7 @@ import AppointmentBookingPage from "./pages/Patient/AppointmentBookingPage";
 import SubscriptionSuccess from "./pages/Patient/SubscriptionSuccess";
 import Wallet from "./pages/Patient/Wallet";
 import AppointmentSuccess from "./pages/Patient/AppointmentSuccess";
+import EmploymentContract from "./pages/Doctor/EmploymentContract";
 
 export interface JwtPayload {
   id: string;
@@ -155,6 +156,7 @@ const AppRouter: React.FC = () => {
     navigate(-1);
     return (
       <Routes>
+        <Route path="/employmentContract/:id" element={<EmploymentContract />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/" element={<RegLog />} />
       </Routes>
