@@ -7,16 +7,13 @@ import { JwtPayload } from "../../AppRouter";
 import jwt_decode from "jwt-decode";
 import { config, headers } from "../../Middleware/authMiddleware";
 import {
-  CheckCircleFilled,
   CheckCircleOutlined,
-  CheckCircleTwoTone,
   CreditCardFilled,
   WalletFilled,
 } from "@ant-design/icons";
 import { Avatar } from "@mui/material";
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import { green } from '@mui/material/colors';
-
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import { green } from "@mui/material/colors";
 
 const AllPackagesPatient = () => {
   const [Packages, setPackages] = useState<any[]>([]);
@@ -92,7 +89,7 @@ const AllPackagesPatient = () => {
       .get("patient/allPackages", { headers })
       .then((response) => {
         setPackages(response.data);
-        setLoading(false)
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -106,8 +103,7 @@ const AllPackagesPatient = () => {
       .get("patient/getBalance", config)
       .then((response) => {
         setBalance(response.data);
-        setLoading(false)
-
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
@@ -117,7 +113,6 @@ const AllPackagesPatient = () => {
   const handleRedirect = async (id: string) => {
     navigate("/admin/editPackage/" + id);
   };
-
 
   const handleSubscribe = async (id: string, SubscriptionPrice: number) => {
     localStorage.setItem("packageId", id);
@@ -131,71 +126,108 @@ const AllPackagesPatient = () => {
       <h2 className="text-center mt-4 mb-4">
         <strong>Health Packages</strong>
       </h2>
-     
 
-        <tbody>
-           {Packages.map((request, index) => (
-      index % 3 === 0  && (
-        <Row gutter={16} key={index}>
-          {Packages.slice(index, index + 3).map((request, subIndex) => (
-            <Col span={8} key={subIndex}>
-              <div>
-              <Card
-                style={{ height: 270, width: 400, marginTop: 16 }}
-                loading={loading}
-                hoverable
-                className="hover-card"
-              >
-                <Meta
-                  avatar={<Avatar sx={{ width: 50, height: 50, bgcolor: green[500] }}> <AssignmentIcon /></Avatar>}
-                  title={<div style={{ fontSize: '20px' }}>{request.Name}</div>}
-                  description={  <div>
-                    <p><strong>Subscription Price:</strong> {request.SubscriptionPrice}</p>
-                    <p><strong>Doctor Discount:</strong> {request.DoctorDiscount}</p>
-                    <p><strong>Pharmacy Discount:</strong> {request.PharmacyDiscount}</p>
-                    <p><strong>Family Discount:</strong> {request.FamilyDiscount}</p>
-                  </div>}
-                  
-                  />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-                    <button
-                  className="btn btn-sm btn-danger"
-                  hidden={request._id != SubscribedPackageId}
-                >
-                  Cancel Subscription
-                </button> 
-                  <button
-                  className={
-                    request._id == SubscribedPackageId ||
-                    SubscribedPackageId === ""
-                      ? "btn btn-sm btn-success"
-                      : "btn btn-sm btn-secondary"
-                  }
-                  disabled={SubscribedPackageId != ""}
-                  onClick={() =>
-                    handleSubscribe(request._id, request.SubscriptionPrice)
-                  }
-                >
-                  {request._id == SubscribedPackageId ? (
-                    <CheckCircleOutlined />
-                  ) : (
-                    "Subscribe "
-                  )}
-                </button>
-               
-                </div>
-              </Card>
-              </div>
+      <tbody>
+        {Packages.map(
+          (request, index) =>
+            index % 3 === 0 && (
+              <Row gutter={16} key={index}>
+                {Packages.slice(index, index + 3).map((request, subIndex) => (
+                  <Col span={8} key={subIndex}>
+                    <div>
+                      <Card
+                        style={{
+                          height: "17rem",
+                          width: "24rem",
+                          marginTop: 16,
+                        }}
+                        loading={loading}
+                        hoverable
+                        className="hover-card"
+                      >
+                        <Meta
+                          avatar={
+                            <Avatar
+                              sx={{
+                                width: 50,
+                                height: 50,
+                                bgcolor: green[500],
+                              }}
+                            >
+                              {" "}
+                              <AssignmentIcon />
+                            </Avatar>
+                          }
+                          title={
+                            <div style={{ fontSize: "20px" }}>
+                              {request.Name}
+                            </div>
+                          }
+                          description={
+                            <div>
+                              <p>
+                                <strong>Subscription Price:</strong>{" "}
+                                {request.SubscriptionPrice}
+                              </p>
+                              <p>
+                                <strong>Doctor Discount:</strong>{" "}
+                                {request.DoctorDiscount}
+                              </p>
+                              <p>
+                                <strong>Pharmacy Discount:</strong>{" "}
+                                {request.PharmacyDiscount}
+                              </p>
+                              <p>
+                                <strong>Family Discount:</strong>{" "}
+                                {request.FamilyDiscount}
+                              </p>
+                            </div>
+                          }
+                        />
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            marginTop: "10px",
+                          }}
+                        >
+                          <button
+                            className={
+                              request._id == SubscribedPackageId ||
+                              SubscribedPackageId === ""
+                                ? "btn btn-sm btn-success"
+                                : "btn btn-sm btn-secondary"
+                            }
+                            disabled={SubscribedPackageId != ""}
+                            onClick={() =>
+                              handleSubscribe(
+                                request._id,
+                                request.SubscriptionPrice
+                              )
+                            }
+                          >
+                            {request._id == SubscribedPackageId ? (
+                              <CheckCircleOutlined />
+                            ) : (
+                              "Subscribe "
+                            )}
+                          </button>
+                          <button
+                            className="btn btn-sm btn-danger"
+                            hidden={request._id != SubscribedPackageId}
+                          >
+                            Cancel Subscription
+                          </button>
+                        </div>
+                      </Card>
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            )
+        )}
+      </tbody>
 
-            </Col>
-          ))}
-        </Row>
-      )
-    ))}
-    </tbody>
-      
-             
-        
       <Modal
         title="Select Payment Method"
         visible={showPaymentModal}
@@ -235,9 +267,7 @@ const AllPackagesPatient = () => {
         </Button>
       </Modal>
     </div>
-  
-    );
+  );
 };
-
 
 export default AllPackagesPatient;

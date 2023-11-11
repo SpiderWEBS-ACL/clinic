@@ -170,6 +170,13 @@ const ViewAllDoctors = () => {
   };
   const payWithWallet = async () => {
     try {
+      sessionStorage.setItem("DoctorId", DoctorId);
+      sessionStorage.setItem(
+        "AppointmentDate",
+        `${AppointmentDate}T${AppointmentTime}.000Z`
+      );
+      if (FamilyMember != "")
+        sessionStorage.setItem("FamilyMember", FamilyMember);
       try {
         const response = await api
           .post(
@@ -181,7 +188,7 @@ const ViewAllDoctors = () => {
           )
           .then((response) => {
             setWalletMessage(response.data);
-            addAppointment();
+            navigate("/appointment/success");
           });
       } catch (error) {
         console.log(error);

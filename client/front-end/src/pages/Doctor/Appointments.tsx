@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../../components/Alert";
 import {
   DatePicker,
@@ -35,6 +35,7 @@ const ViewPatientAppointments = () => {
   const setTimeoutAl = async () => setAlertVisibility(false);
   const setTimeoutAl1 = async () => setAlertVisibility1(false);
   const [ShowAppointmentModal, setShowAppointmentModal] = useState(false);
+  const navigate = useNavigate();
   const clearFilters = async () => {
     setAppointments(allAppointments);
     setDate("");
@@ -193,7 +194,25 @@ const ViewPatientAppointments = () => {
 
           <tbody>
             <tr key={1}>
-              <td>{appointment != null ? appointment.Patient.Name : ""}</td>
+              <td
+                onClick={() => {
+                  if (appointment) {
+                    navigate(
+                      `/doctor/viewPatientInfo/${appointment.Patient._id}`
+                    );
+                  }
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.cursor = "pointer";
+                  e.currentTarget.style.color = "#007BFF";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.cursor = "auto";
+                  e.currentTarget.style.color = "";
+                }}
+              >
+                {appointment ? appointment.Patient.Name : ""}
+              </td>
               <td>
                 {appointment != null
                   ? appointment.AppointmentDate.split("T")[0]
