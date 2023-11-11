@@ -190,35 +190,35 @@ const uploadLicenses = async (req, res) => {
 //     try {
 //       const { id } = req.user;
 //       const { currPass, newPass, newPassConfirm } = req.body;
-  
+
 //       if (!(currPass && newPass && newPassConfirm)) {
 //         return res.status(404).json({ error: "Please fill out all required fields" });
 //       }
-  
+
 //       //find doctor to update password
 //       const doctor = await doctorModel.findById(id);
-  
+
 //       //Current password entered incorrect
 //       if (!(await bcrypt.compare(currPass, doctor.Password))) {
 //         return res.status(400).json("Current Password is Incorrect");
 //       }
-  
+
 //       //confirm password not matching
 //       if (newPass !== newPassConfirm) {
 //         return res.status(400).json("The passwords do not match.");
 //       }
-  
+
 //        //new password same as old
 //        if(await bcrypt.compare(newPass, doctor.Password)){
 //         return res.status(400).json("New password cannot be the same as your current password.");
 //       }
-  
+
 //       //hash new Password
 //       const hashedPass = await bcrypt.hash(newPass, 10);
-  
+
 //       //update password
 //       const newDoctor = await doctorModel.findByIdAndUpdate(id, { Password: hashedPass }, {new:true});
-  
+
 //       res.status(200).json(newDoctor);
 //     } catch (error) {
 //       res.status(500).json({ error: error.message });
@@ -317,13 +317,14 @@ const viewPatients = async (req, res) => {
     const patients = [];
     for (const appointment of appointments) {
       const patient = appointment.Patient;
-      patients.push(patient);
+      if(!patients.includes(patient))
+         patients.push(patient);
     }
 
     if (patients.length == 0) {
       return res.status(400).json({ error: "You have no patients" });
     }
-
+    console.log(patients)
     res.status(200).json(patients);
   } catch (error) {
     res.status(500).json({ error: "no patients available" });
@@ -369,36 +370,91 @@ const filterDoctorAppointments = async (req, res) => {
   }
 };
 
- const AddAvailableTimeSlots = async(req,res) => {
-    const slots = req.body.slots;
-    const id = req.user.id;
-    const updatedDoctor = await doctorModel.findByIdAndUpdate(id, {AvailableTimeSlots: slots});
-    return res.status(200).json(updatedDoctor);
- }
+const AddAvailableTimeSlots = async (req, res) => {
+  const slots = req.body.slots;
+  const id = req.user.id;
+  const updatedDoctor = await doctorModel.findByIdAndUpdate(id, {
+    AvailableTimeSlots: slots,
+  });
+  return res.status(200).json(updatedDoctor);
+};
 
- const viewAllDoctorAppointments = async (req, res) => {
+const viewAllDoctorAppointments = async (req, res) => {
   const id = req.user.id;
   const doctor = await doctorModel.findById(id);
   try {
     if (doctor) {
       const appointments = await appointmentModel
-        .find({ Doctor: doctor })
+        .find({ Doctor: id })
         .populate("Doctor")
         .populate("Patient")
         .exec();
-      if (!appointments || appointments.length === 0) {
-        res.status(404).json({ error: "no appointments were found" });
-      } else return res.status(200).json(appointments);
+      return res.status(200).json(appointments);
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-const getBalance = async(req,res) => {
-    const id = req.user.id;
-    
-}
+const getBalance = async (req, res) => {
+  const id = req.user.id;
+};
+
+const acceptContract = async (req, res) => {
+  try {
+    //request id
+    const { id } = req.params;
+
+    var regReq = await doctorRegisterRequestModel.findById(id);
+
+    if (!regReq) {
+      return res.status(404).json({ error: "Registration Request Not Found!" });
+    }
+
+    const newDoctor = await doctorModel.create({
+      Username: regReq.Username,
+      Name: regReq.Name,
+      Email: regReq.Email,
+      Password: regReq.Password,
+      Dob: regReq.Dob,
+      HourlyRate: regReq.Salary,
+      Affiliation: regReq.Affiliation,
+      EducationalBackground: regReq.EducationalBackground,
+      Specialty: regReq.Specialty,
+    });
+    if (!newDoctor) {
+      return res
+        .status(404)
+        .json({ error: "Error accepting registration request" });
+    }
+
+    await doctorRegisterRequestModel.findByIdAndDelete(id);
+
+    res.status(200).json(newDoctor);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const rejectContract = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const regReq = await doctorRegisterRequestModel.findByIdAndUpdate(
+      id,
+      { DoctorReject: true },
+      { new: true }
+    );
+
+    if (!regReq) {
+      return res.status(404).json({ error: "Registration Request Not Found!" });
+    }
+
+    res.status(200).json("Contract Rejected");
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const addHealthRecordForPatient = async(req,res) =>{
     const { id } = req.params;
     const description = req.body.Description;
@@ -532,6 +588,8 @@ module.exports = {
   getDoctor,
   viewAllDoctorAppointments,
   AddAvailableTimeSlots,
+  acceptContract,
+  rejectContract,
   viewHealthRecordsDoctor,
   addHealthRecordForPatient,
   uploadLicenses,

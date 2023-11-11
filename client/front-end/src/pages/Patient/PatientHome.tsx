@@ -44,7 +44,11 @@ const PatientHome = () => {
         console.error("Error:", error);
       });
   }, [id]);
-
+  var pron = "";
+  if(patientInfo.Gender == "Male")
+      pron = "Mr.";
+    else 
+      pron = "Ms."
   return (
     <ChakraProvider>
       <Container
@@ -62,7 +66,11 @@ const PatientHome = () => {
 
         <HStack w="700" spacing={2} align="start">
           <Heading as="h5" size="md" mt={0}>
-            Mr./Ms. {patientInfo.Name}
+
+            {
+           pron
+            }
+            {patientInfo.Name}
             <Divider borderColor="#052c65" borderWidth="2px" />
           </Heading>
         </HStack>

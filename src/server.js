@@ -35,7 +35,7 @@ const {
   getBalance, 
   getAllPackagesPatient,
   doctorDiscount, 
-  payAppointmentWithWallet
+  payAppointmentWithWallet, linkFamily, cancelSubscription
 } = require("./controllers/patientController");
 
 const {
@@ -50,6 +50,8 @@ const {
   filterDoctorAppointments,
   getDoctor,
   viewAllDoctorAppointments,
+  acceptContract,
+  rejectContract, 
   AddAvailableTimeSlots, 
   viewHealthRecordsDoctor,
   addHealthRecordForPatient,
@@ -69,7 +71,8 @@ const {
 const {
   addSubscription,
   subscribeWithStripe,
-  deleteOneSubscription
+  deleteOneSubscription,
+  subscribeWithWallet
 } = require("./controllers/SubscriptionController");
 
 const {
@@ -151,7 +154,7 @@ app.get("/admin/package/:id", AdminProtect, getPackage);
 app.post("/admin/addPackage", AdminProtect, addPackage);
 app.put("/admin/updatePackage/:id", AdminProtect, updatePackage);
 app.delete("/admin/deletePackage/:id", AdminProtect, deletePackage);
-app.get("/admin/acceptRequest/:id", AdminProtect, acceptRegistrationRequest);
+app.post("/admin/acceptRequest/:id", AdminProtect, acceptRegistrationRequest);
 app.delete("/admin/rejectRequest/:id", AdminProtect, rejectRegistrationRequest);
 
 //Doctor Endpoints
@@ -160,6 +163,8 @@ app.delete("/admin/rejectRequest/:id", AdminProtect, rejectRegistrationRequest);
 
 app.post("/doctor/add", addDoctor);
 app.post("/doctor/register", registerDoctor);
+app.post("/doctor/acceptContract/:id", acceptContract);
+app.post("/doctor/rejectContract/:id", rejectContract);
 app.post("/doctor/uploadPersonalID/:id", uploadPersonalID);
 app.post("/doctor/uploadMedicalDegree/:id", uploadMedicalDegree);
 app.post("/doctor/uploadLicense/:id", uploadLicenses);
@@ -213,6 +218,7 @@ app.get("/patient/selectPrescription/:id",PatientProtect,selectPrescription)
 app.get("/patient/viewDoctorsWithPrices",PatientProtect, viewDoctorsWithPrices)
 app.get("/patient/allAppointments",PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors",PatientProtect, getAllDoctorsPatient);
+
 app.get("/patient/allPackages",PatientProtect,getAllPackagesPatient);
 app.post("/patient/checkDoctor",PatientProtect,checkDoctorAvailablity);
 app.get("/patient/doctorTimeSlots/:id",PatientProtect,getDoctorTimeSlots);
@@ -237,6 +243,7 @@ app.get("/patient/allDoctors", PatientProtect, getAllDoctorsPatient);
 app.get("/patient/allPackages", PatientProtect, getAllPackagesPatient);
 app.get("/patient/getBalance", PatientProtect, getBalance);
 app.get("/patient/getDoctorDiscount", PatientProtect, doctorDiscount);
+app.post("/patient/linkfamily",PatientProtect, linkFamily);
 
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
@@ -245,6 +252,7 @@ app.get("/appointment/filterAppointmentDoctor",DoctorProtect, filterAppointment)
 
 //Subscription Endpoints
 app.post("/subscription/subscribe/:id",subscribeWithStripe);
+app.post("/subscription/subscribeWallet/:id",PatientProtect,subscribeWithWallet);
 app.post("/subscription/add",PatientProtect,addSubscription);
 app.delete("/subscription/deleteDuplicate/",PatientProtect,deleteOneSubscription);
 

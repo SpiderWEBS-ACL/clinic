@@ -92,16 +92,12 @@ const ViewPatientAppointments = () => {
   const handleEventClick = (info: any) => {
     setShowAppointmentModal(true);
     setAppointment(info.event._def.extendedProps);
-    console.log(info.event);
-    //info.event.title
   };
-
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
         <strong>Appointments</strong>
       </h2>
-
       <span>
         <label style={{ marginLeft: devicePixelRatio * 90, marginRight: 8 }}>
           <strong>Status:</strong>

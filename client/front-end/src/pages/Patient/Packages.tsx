@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Button, Spin, Modal, Row, Col } from "antd";
+import { Button, Spin, Modal, Row, Col, message, Card } from "antd";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { JwtPayload } from "../../AppRouter";
 import jwt_decode from "jwt-decode";
-import { config } from "../../Middleware/authMiddleware";
+import { config, headers } from "../../Middleware/authMiddleware";
 import {
   CheckCircleFilled,
   CheckCircleOutlined,
@@ -13,15 +13,20 @@ import {
   CreditCardFilled,
   WalletFilled,
 } from "@ant-design/icons";
+import { Avatar } from "@mui/material";
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import { green } from '@mui/material/colors';
+
 
 const AllPackagesPatient = () => {
-  const [Packages, setPackages] = useState([]);
+  const [Packages, setPackages] = useState<any[]>([]);
   const [SubscribedPackageId, setSubscribedPackageId] = useState("");
   const [SubscriptionPrice, setSubscriptionPrice] = useState(0);
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [PackageId, setPackageId] = useState("");
+  const { Meta } = Card;
 
   const api = axios.create({
     baseURL: "http://localhost:8000/",
@@ -49,11 +54,31 @@ const AllPackagesPatient = () => {
       console.error(error);
     }
   };
+  const payWithWallet = async (id: string) => {
+    try {
+      try {
+        const response = await api.post(
+          "subscription/subscribeWallet/" + patientId,
+          {
+            packageId: id,
+          },
+          { headers: headers }
+        );
+        navigate("/subscription/success");
+        message.success("Subscribed Successfully!");
+        window.location.reload();
+      } catch (error) {
+        console.log(error);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const handlePaymentSelection = (paymentMethod: string) => {
     if (paymentMethod === "Card") {
       redirectToStripe(PackageId);
-    }else {
-      
+    } else {
+      payWithWallet(PackageId);
     }
     console.log("Selected payment method: ", paymentMethod);
     setShowPaymentModal(false);
@@ -67,6 +92,7 @@ const AllPackagesPatient = () => {
       .get("patient/allPackages", { headers })
       .then((response) => {
         setPackages(response.data);
+        setLoading(false)
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -80,6 +106,8 @@ const AllPackagesPatient = () => {
       .get("patient/getBalance", config)
       .then((response) => {
         setBalance(response.data);
+        setLoading(false)
+
       })
       .catch((error) => {
         console.log(error);
@@ -90,20 +118,7 @@ const AllPackagesPatient = () => {
     navigate("/admin/editPackage/" + id);
   };
 
-  if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
+
   const handleSubscribe = async (id: string, SubscriptionPrice: number) => {
     localStorage.setItem("packageId", id);
     setShowPaymentModal(true);
@@ -116,30 +131,40 @@ const AllPackagesPatient = () => {
       <h2 className="text-center mt-4 mb-4">
         <strong>Health Packages</strong>
       </h2>
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Price (USD)</th>
-            <th>Doctor Discount</th>
-            <th>Pharmacy Discount</th>
-            <th>Family Discount</th>
-            <th></th>
-          </tr>
-        </thead>
+     
 
         <tbody>
-          {Packages.map((request: any, index) => (
-            <tr key={request._id}>
-              <td>
-                <strong>{request.Name}</strong>
-              </td>
-              <td>{request.SubscriptionPrice / 100}</td>
-              <td>{request.DoctorDiscount}%</td>
-              <td>{request.PharmacyDiscount}%</td>
-              <td>{request.FamilyDiscount}%</td>
-              <td>
-                <button
+           {Packages.map((request, index) => (
+      index % 3 === 0  && (
+        <Row gutter={16} key={index}>
+          {Packages.slice(index, index + 3).map((request, subIndex) => (
+            <Col span={8} key={subIndex}>
+              <div>
+              <Card
+                style={{ height: 270, width: 400, marginTop: 16 }}
+                loading={loading}
+                hoverable
+                className="hover-card"
+              >
+                <Meta
+                  avatar={<Avatar sx={{ width: 50, height: 50, bgcolor: green[500] }}> <AssignmentIcon /></Avatar>}
+                  title={<div style={{ fontSize: '20px' }}>{request.Name}</div>}
+                  description={  <div>
+                    <p><strong>Subscription Price:</strong> {request.SubscriptionPrice}</p>
+                    <p><strong>Doctor Discount:</strong> {request.DoctorDiscount}</p>
+                    <p><strong>Pharmacy Discount:</strong> {request.PharmacyDiscount}</p>
+                    <p><strong>Family Discount:</strong> {request.FamilyDiscount}</p>
+                  </div>}
+                  
+                  />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+                    <button
+                  className="btn btn-sm btn-danger"
+                  hidden={request._id != SubscribedPackageId}
+                >
+                  Cancel Subscription
+                </button> 
+                  <button
                   className={
                     request._id == SubscribedPackageId ||
                     SubscribedPackageId === ""
@@ -157,18 +182,20 @@ const AllPackagesPatient = () => {
                     "Subscribe "
                   )}
                 </button>
-                <button
-                  style={{ marginLeft: "1rem" }}
-                  className="btn btn-sm btn-danger"
-                  hidden={request._id != SubscribedPackageId}
-                >
-                  Cancel Subscription
-                </button>
-              </td>
-            </tr>
+               
+                </div>
+              </Card>
+              </div>
+
+            </Col>
           ))}
-        </tbody>
-      </table>
+        </Row>
+      )
+    ))}
+    </tbody>
+      
+             
+        
       <Modal
         title="Select Payment Method"
         visible={showPaymentModal}
@@ -208,7 +235,9 @@ const AllPackagesPatient = () => {
         </Button>
       </Modal>
     </div>
-  );
+  
+    );
 };
+
 
 export default AllPackagesPatient;

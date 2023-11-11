@@ -1,5 +1,6 @@
 const subscriptionModel = require("../Models/Subscription");
 const packageModel = require("../Models/Package")
+const patientModel = require("../Models/Patient")
 const { default: mongoose } = require("mongoose");
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -29,6 +30,21 @@ const subscribeWithStripe = async (req,res) => {
     res.status(400).json({ error: error.message });
   }
 }
+const subscribeWithWallet = async (req,res) => {
+  try {
+    const { packageId } = req.body; 
+    const package = await packageModel.findById(packageId);
+    console.log(package);
+    console.log(req.user);
+    if(req.user.WalletBalance >= package.SubscriptionPrice)
+      var updatePatient = await patientModel.findByIdAndUpdate(req.user.id, {WalletBalance: req.user.WalletBalance - package.SubscriptionPrice} )
+    else
+      return res.status(500).json("Insufficient")
+    return res.status(200).json("Success");
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
 
 const addSubscription = async (req, res) => {
     try {
@@ -52,7 +68,7 @@ const addSubscription = async (req, res) => {
     try {
       const subscriptions = await subscriptionModel.find({Patient: req.user.id})
       if(subscriptions.length == 2)
-         var deletedSubscription = await subscriptionModel.deleteOne({Patient: req.user.id});
+        var deletedSubscription = await subscriptionModel.deleteOne({Patient: req.user.id});
     }catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -61,5 +77,6 @@ const addSubscription = async (req, res) => {
 module.exports = {
     addSubscription,
     subscribeWithStripe,
-    deleteOneSubscription
+    deleteOneSubscription,
+    subscribeWithWallet
 };
