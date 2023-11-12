@@ -86,8 +86,10 @@ const AllDoctors = () => {
         <thead>
           <tr>
             <th>Name</th>
-            <th>Accept</th>
-            <th>Reject</th>
+            <th>Specialty</th>
+            <th>Status</th>
+            {/* <th>Accept</th>
+            <th>Reject</th> */}
             <th>Details</th>
           </tr>
         </thead>
@@ -99,6 +101,15 @@ const AllDoctors = () => {
                 <strong>{request.Name}</strong>
               </td>
               <td>
+                {request.Specialty}
+              </td>
+              <td>
+                {request.AdminAccept? 
+                  request.DoctorReject? (<i style={{color: "red"}}>Employment Contract Rejected</i>) :
+                  (<i style={{color: "green"}}>Employment Contract Sent. Pending Doctor Approval</i>) : 
+                  (<i>Pending</i>) }
+              </td>
+              {/* <td>
                 <button
                   className="btn btn-sm btn-success"
                   style={{
@@ -106,6 +117,7 @@ const AllDoctors = () => {
                     fontSize: "12px",
                     borderRadius: "5px",
                   }}
+                  disabled={request.AdminAccept? true : false}
                   onClick={() => handleAccept(request._id)}
                 >
                   <span aria-hidden="true" style={{ color: "white" }}>
@@ -122,12 +134,13 @@ const AllDoctors = () => {
                     fontSize: "12px",
                     borderRadius: "5px",
                   }}
+                  disabled={request.AdminAccept? true : false}
                   onClick={() => handleReject(request._id)}
                   //TODO onClick in sprint 2 this is just a view
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>
-              </td>
+              </td> */}
               <td>
                 <button
                   className="btn btn-sm btn-primary"

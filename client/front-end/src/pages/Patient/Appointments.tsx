@@ -2,15 +2,31 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import Alert from "../../components/Alert";
-import { DatePicker, DatePickerProps, Input, Select, TimePicker } from "antd";
+import {
+  DatePicker,
+  DatePickerProps,
+  Input,
+  Modal,
+  Select,
+  TimePicker,
+} from "antd";
 import { message } from "antd";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import bootstrap5Plugin from "@fullcalendar/bootstrap5";
+import interactionPlugin from "@fullcalendar/interaction";
+import { headers } from "../../Middleware/authMiddleware";
 
 const ViewPatientAppointments = () => {
   const { Option } = Select;
   const { id } = useParams();
   const [alertVisible, setAlertVisibility] = useState(false);
   const [alertVisible1, setAlertVisibility1] = useState(false);
-  const [appointments, setAppointments] = useState([]);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [appointment, setAppointment] = useState<any>(null);
   const [allAppointments, setAllAppointments] = useState([]);
   const [hasAppointments, setHasAppointments] = useState(false);
   const [status, setStatus] = useState([]);
@@ -18,6 +34,7 @@ const ViewPatientAppointments = () => {
   const accessToken = localStorage.getItem("accessToken");
   const setTimeoutAl = async () => setAlertVisibility(false);
   const setTimeoutAl1 = async () => setAlertVisibility1(false);
+  const [ShowAppointmentModal, setShowAppointmentModal] = useState(false);
   const clearFilters = async () => {
     setAppointments(allAppointments);
     setDate("");
@@ -29,10 +46,10 @@ const ViewPatientAppointments = () => {
     try {
       const response = await api.get(`appointment/filterAppointment`, {
         params: {
-          id: id,
           Status: status,
           AppointmentDate: date,
         },
+        headers: headers,
       });
       setAppointments(response.data);
       setHasAppointments(response.data.length > 0);
@@ -72,11 +89,17 @@ const ViewPatientAppointments = () => {
     const jsDate = selectedDate ? selectedDate.toDate() : null;
     setDate(dateString);
   };
+  const handleEventClick = (info: any) => {
+    setShowAppointmentModal(true);
+    setAppointment(info.event._def.extendedProps);
+    console.log(info.event);
+    //info.event.title
+  };
 
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
-        <strong>My Appointments</strong>
+        <strong>Appointments</strong>
       </h2>
 
       <span>
@@ -129,30 +152,68 @@ const ViewPatientAppointments = () => {
         </Alert>
       )}
       <br></br>
-
-      <table className="table">
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>status</th>
-            <th>Appointment Date</th>
-            <th>Appointment Time</th>
-            <th>Doctor</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {appointments.map((member: any, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{member.Status}</td>
-              <td>{member.AppointmentDate.split("T")[0]}</td>
-              <td>{member.AppointmentDate.split("T")[1].split(".")[0]}</td>
-              <td>{member.Doctor.Name}</td>
+      <div>
+        <FullCalendar
+          stickyHeaderDates
+          aspectRatio={1}
+          height={"75vh"}
+          plugins={[
+            dayGridPlugin,
+            timeGridPlugin,
+            bootstrap5Plugin,
+            interactionPlugin,
+          ]}
+          events={appointments}
+          eventClick={(info) => {
+            console.log(info);
+            handleEventClick(info);
+          }}
+          themeSystem="bootstrap5"
+          initialView="dayGridMonth"
+          headerToolbar={{
+            left: "prev,next,today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
+          }}
+        />
+      </div>
+      <Modal
+        visible={ShowAppointmentModal}
+        onCancel={() => {
+          setShowAppointmentModal(false);
+        }}
+        onOk={() => {
+          setShowAppointmentModal(false);
+        }}
+      >
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Doctor</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>status</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            <tr key={1}>
+              <td>{appointment != null ? appointment.Doctor.Name : ""}</td>
+              <td>
+                {appointment != null
+                  ? appointment.AppointmentDate.split("T")[0]
+                  : ""}
+              </td>
+              <td>
+                {appointment != null
+                  ? appointment.AppointmentDate.split("T")[1].split(".")[0]
+                  : ""}
+              </td>
+              <td>{appointment != null ? appointment.Status : ""}</td>
+            </tr>
+          </tbody>
+        </table>
+      </Modal>
     </div>
   );
 };

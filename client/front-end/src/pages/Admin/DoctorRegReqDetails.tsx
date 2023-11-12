@@ -3,12 +3,14 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { Spin, message } from "antd";
 import Button from "../../components/Button";
+import InputField from "../../components/InputField";
 
 const RegistrationRequestDetails = () => {
   const accessToken = localStorage.getItem("accessToken");
   const { id } = useParams<{ id: string }>();
   const [registrationDetails, setRegistrationDetails] = useState<any>("");
   const [loading, setLoading] = useState(true);
+  const [salary, setSalary] = useState<Number>();
   const api = axios.create({
     baseURL: "http://localhost:8000",
   });
@@ -18,10 +20,16 @@ const RegistrationRequestDetails = () => {
     Authorization: "Bearer " + accessToken,
   };
   const handleAccept = (id: string) => {
+    
+    if(!salary){
+      message.error("Please enter an offered hourly rate");
+      return;
+    }
+
     setLoading(true);
     try {
       api
-        .get("admin/acceptRequest/" + id, { headers })
+        .post("admin/acceptRequest/" + id, {salary}, { headers })
         .then(message.success("Registration Request Accepted!"));
     } catch (error) {
       message.error("An Error has occurred");
@@ -117,6 +125,7 @@ const RegistrationRequestDetails = () => {
                   fontSize: "12px",
                   borderRadius: "5px",
                 }}
+                disabled={registrationDetails.AdminAccept? true : false}
                 onClick={() => handleAccept(registrationDetails._id)}
               >
                 <span aria-hidden="true" style={{ color: "white" }}>
@@ -133,6 +142,7 @@ const RegistrationRequestDetails = () => {
                   fontSize: "12px",
                   borderRadius: "5px",
                 }}
+                disabled={registrationDetails.AdminAccept? true : false}
                 onClick={() => handleReject(registrationDetails._id)}
                 //TODO onClick in sprint 2 this is just a view
               >
@@ -142,6 +152,22 @@ const RegistrationRequestDetails = () => {
           </tr>
         </tbody>
       </table>
+        <div style={{display: "flex", float: "right"}}>
+        {registrationDetails.AdminAccept? registrationDetails.DoctorReject? 
+            (<i style={{color: "red"}}>Employment Contract Rejected</i>) :
+            (<i style={{color: "green"}}>Employment Contract Sent. Pending Doctor Approval</i>): 
+            (<InputField
+                id="salary"
+                label="Offered Hourly Rate"
+                type="Number"
+                value={salary}
+                onChange={setSalary}
+                required={true}
+                style={{borderWidth: 2, borderColor: "darkgray"}}
+              />
+            )}
+            </div>
+      
       <Button
         style={{ marginRight: "10px", marginTop: "10px" }}
         color="primary"

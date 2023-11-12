@@ -71,7 +71,7 @@ const patientSchema = new Schema({
       },
       Email:{
         type: String,
-        required: true
+        required: false
       },
       NationalID: {
         type: String,

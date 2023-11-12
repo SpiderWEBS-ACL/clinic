@@ -77,7 +77,6 @@ const ForgotPassword = () => {
   };
 
   const handleOTP = async () => {
-    console.log("test");
     if (!otp) {
       setError("Please Enter Your OTP.");
       setAlertVisibility(true);

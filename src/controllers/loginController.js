@@ -104,13 +104,16 @@ const forgotPassword = async (req, res) => {
       Email: { $regex: "^" + req.body.email + "$", $options: "i" },
     });
 
-    if (!doctor && !patient && !admin) {
-      return res.status(404).json({
-        error: "There's no account associated with the provided email.",
-      });
-    }
+    var user;
 
-    const passwordResetOTP = await sendPasswordResetOTP(req.body.email);
+    if (admin) user = admin;
+    else if (patient) user = patient;
+    else if (doctor) user = doctor;
+    else return res.status(404).json({
+      error: "There's no account associated with the provided email.",
+    });
+
+    const passwordResetOTP = await sendPasswordResetOTP(req.body.email, user);
 
     res.status(200).json(passwordResetOTP);
   } catch (error) {
@@ -118,7 +121,7 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-const sendPasswordResetOTP = async (email) => {
+const sendPasswordResetOTP = async (email, user) => {
   try {
     //delete any previously generated otp for this email
     await OTP.deleteOne({ email });
@@ -142,7 +145,8 @@ const sendPasswordResetOTP = async (email) => {
       from: "spiderwebsacl@gmail.com",
       to: email,
       subject: "Password reset OTP",
-      html: `<p>Enter the code below to reset your password:</p>
+      html: `<p>Dear ${user.Username},</p>
+              <p>Enter the code below to reset your password:</p>
               <p style="color:red; font-size:25px; letter-spacing:2px;"><b>${otp}</b></p>
               <p>This code <b>expires in 10 minutes</b>.</p>`,
     };

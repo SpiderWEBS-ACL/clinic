@@ -50,6 +50,8 @@ const {
   filterDoctorAppointments,
   getDoctor,
   viewAllDoctorAppointments,
+  acceptContract,
+  rejectContract, 
   AddAvailableTimeSlots, 
   viewHealthRecordsDoctor,
   addHealthRecordForPatient,
@@ -152,7 +154,7 @@ app.get("/admin/package/:id", AdminProtect, getPackage);
 app.post("/admin/addPackage", AdminProtect, addPackage);
 app.put("/admin/updatePackage/:id", AdminProtect, updatePackage);
 app.delete("/admin/deletePackage/:id", AdminProtect, deletePackage);
-app.get("/admin/acceptRequest/:id", AdminProtect, acceptRegistrationRequest);
+app.post("/admin/acceptRequest/:id", AdminProtect, acceptRegistrationRequest);
 app.delete("/admin/rejectRequest/:id", AdminProtect, rejectRegistrationRequest);
 
 //Doctor Endpoints
@@ -161,9 +163,13 @@ app.delete("/admin/rejectRequest/:id", AdminProtect, rejectRegistrationRequest);
 
 app.post("/doctor/add", addDoctor);
 app.post("/doctor/register", registerDoctor);
+app.post("/doctor/acceptContract/:id", acceptContract);
+app.post("/doctor/rejectContract/:id", rejectContract);
 app.post("/doctor/uploadPersonalID/:id", uploadPersonalID);
 app.post("/doctor/uploadMedicalDegree/:id", uploadMedicalDegree);
 app.post("/doctor/uploadLicense/:id", uploadLicenses);
+app.get("/doctor/registrationRequest/:id", getDoctrRegistrationReqDetails); 	//for employment contract
+
 
 //Private endpoints
 
@@ -243,7 +249,8 @@ app.post("/patient/linkfamily",PatientProtect, linkFamily);
 
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
-app.get("/appointment/filterAppointment", filterAppointment);
+app.get("/appointment/filterAppointment",PatientProtect || DoctorProtect, filterAppointment);
+app.get("/appointment/filterAppointmentDoctor",DoctorProtect, filterAppointment);
 
 //Subscription Endpoints
 app.post("/subscription/subscribe/:id",subscribeWithStripe);

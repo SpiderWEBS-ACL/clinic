@@ -47,6 +47,8 @@ import AppointmentBookingPage from "./pages/Patient/AppointmentBookingPage";
 import SubscriptionSuccess from "./pages/Patient/SubscriptionSuccess";
 import Wallet from "./pages/Patient/Wallet";
 import AppointmentSuccess from "./pages/Patient/AppointmentSuccess";
+import EmploymentContract from "./pages/Doctor/EmploymentContract";
+import Calendarr from "./pages/Calendar";
 
 export interface JwtPayload {
   id: string;
@@ -106,7 +108,10 @@ const AppRouter: React.FC = () => {
         <Route path="/doctor/home/" element={<DoctorHome />} />
         <Route path="/doctor/timeSlots" element={<Calendar />} />
         <Route path="/checkout" element={<CheckoutButton />} />
-        <Route path="/doctor/changePassword" element={<ChangePasswordDoctor />} />
+        <Route
+          path="/doctor/changePassword"
+          element={<ChangePasswordDoctor />}
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
@@ -140,10 +145,14 @@ const AppRouter: React.FC = () => {
         <Route path="/patient/packages" element={<AllPackagesPatient />} />
         <Route path="/patient/subscribe/options" element={<PaymentPage />} />
         <Route path="/checkout" element={<CheckoutButton />} />
-        <Route path="/patient/changePassword" element={<ChangePasswordPatient />} />
+        <Route
+          path="/patient/changePassword"
+          element={<ChangePasswordPatient />}
+        />
         <Route path="/subscription/success" element={<SubscriptionSuccess />} />
         <Route path="/patient/wallet" element={<Wallet />} />
         <Route path="/appointment/success" element={<AppointmentSuccess />} />
+        <Route path="/patient/calendar" element={<Calendarr />} />
         <Route
           path="/patient/appointment/booking"
           element={<AppointmentBookingPage />}
@@ -155,6 +164,7 @@ const AppRouter: React.FC = () => {
     navigate(-1);
     return (
       <Routes>
+        <Route path="/employmentContract/:id" element={<EmploymentContract />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/" element={<RegLog />} />
       </Routes>

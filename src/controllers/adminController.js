@@ -6,6 +6,7 @@ const packageModel = require("../Models/Package");
 const appointmentModel = require("../Models/Appointment");
 const doctorRegisterRequestModel = require("../Models/DoctorRegisterRequest");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 
 const { default: mongoose } = require("mongoose");
 
@@ -188,39 +189,28 @@ const getDoctrRegistrationReqDetails = async (req, res) => {
 const acceptRegistrationRequest = async (req, res) => {
   try {
     const { id } = req.params;
-    const {
-      Username,
-      Name,
-      Email,
-      Password,
-      Dob,
-      HourlyRate,
-      Affiliation,
-      EducationalBackground,
-      Specialty,
-    } = await doctorRegisterRequestModel.findById(id);
-    const newDoctor = await doctorModel.create({
-      Username: Username,
-      Name: Name,
-      Email: Email,
-      Password: Password,
-      Dob: Dob,
-      HourlyRate: HourlyRate,
-      Affiliation: Affiliation,
-      EducationalBackground: EducationalBackground,
-      Specialty: Specialty,
-    });
-    if (!newDoctor) {
-      return res
-        .status(404)
-        .json({ error: "Error accepting registration request" });
+    const { salary } = req.body;
+
+    var regReq = await doctorRegisterRequestModel.findById(id);
+
+    if(!regReq){
+      return res.status(404).json({error: "Registration Request Not Found!"});
     }
-    await doctorRegisterRequestModel.findByIdAndDelete(id);
-    res.status(200).json(newDoctor);
+
+    if(!salary){
+      return res.status(404).json({error: "Please enter the offered salary."});
+    }
+
+    await regReq.updateOne({AdminAccept: true, Salary: salary, AcceptanceDate: Date.now()}, {new: true});
+
+    await sendEmploymentContract(regReq, salary);
+
+    res.status(200).json("Employment Contract Sent");
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 const rejectRegistrationRequest = async (req, res) => {
   try {
     const { id } = req.params;
@@ -237,6 +227,46 @@ const rejectRegistrationRequest = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+const sendEmploymentContract = async(regReq) => {
+  try {
+
+    const contractLink = `http://localhost:5174/employmentContract/${regReq._id}`
+
+    //set up source email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "spiderwebsacl@gmail.com",
+        pass: "vngs gkzg otrz vzbg",
+      },
+    });
+
+    //format email details
+    const mailOptions = {
+      from: "spiderwebsacl@gmail.com",
+      to: regReq.Email,
+      subject: "Employment Contract",
+      html: `<p>Dear ${regReq.Name},</p>
+              <p>Congratulations! Your application to join our clinic as a doctor has been accepted. </p>
+              <p>Please review and accept your employment contract through the link below to get started:</p>
+              <a href= ${contractLink}><b>View Employment Contract</b></a>
+              <p>We can't wait to have you on our team!</p>
+              
+              <p>Best Regards, <br>
+              SpiderWEBS</p>`,
+    };
+
+    //send email
+    transporter.sendMail(mailOptions);
+
+  } catch (err) {
+    throw err;
+  }
+}
+
+
 ///////////////////////////////////////PACKAGES////////////////////////////////////////////////////
 
 const getAllPackages = async (req, res) => {

@@ -80,7 +80,12 @@ function RegisterDoctor() {
       console.log("Response:", response.data);
       setError(null);
       setModalActive(true);
-      setTimeout(closeModal, 1500);
+      setTimeout(() => {
+        closeModal; 
+        navigate("/");
+        window.location.reload();
+      }, 1500);
+    
     } catch (error) {
       console.error("Error:", error);
       if (axios.isAxiosError(error) && error.response) {
@@ -142,8 +147,8 @@ function RegisterDoctor() {
 
   const closeModal = () => {
     setModalActive(false);
-    navigate("/");
-    window.location.reload();
+    // navigate("/");
+    // window.location.reload();
   };
 
   return (

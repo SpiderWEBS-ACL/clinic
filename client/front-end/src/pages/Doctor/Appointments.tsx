@@ -1,25 +1,41 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../../components/Alert";
-import { DatePicker, DatePickerProps, Input, Select, TimePicker } from "antd";
+import {
+  DatePicker,
+  DatePickerProps,
+  Input,
+  Modal,
+  Select,
+  TimePicker,
+} from "antd";
 import { message } from "antd";
-import Cookies from "js-cookie";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import bootstrap5Plugin from "@fullcalendar/bootstrap5";
+import interactionPlugin from "@fullcalendar/interaction";
+import { headers } from "../../Middleware/authMiddleware";
 
-const ViewDoctorAppointments = () => {
-  const accessToken = Cookies.get("accessToken");
+const ViewPatientAppointments = () => {
   const { Option } = Select;
   const { id } = useParams();
   const [alertVisible, setAlertVisibility] = useState(false);
   const [alertVisible1, setAlertVisibility1] = useState(false);
-  const [appointments, setAppointments] = useState([]);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [appointment, setAppointment] = useState<any>(null);
   const [allAppointments, setAllAppointments] = useState([]);
   const [hasAppointments, setHasAppointments] = useState(false);
   const [status, setStatus] = useState([]);
   const [date, setDate] = useState("");
-
+  const accessToken = localStorage.getItem("accessToken");
   const setTimeoutAl = async () => setAlertVisibility(false);
   const setTimeoutAl1 = async () => setAlertVisibility1(false);
+  const [ShowAppointmentModal, setShowAppointmentModal] = useState(false);
+  const navigate = useNavigate();
   const clearFilters = async () => {
     setAppointments(allAppointments);
     setDate("");
@@ -29,12 +45,12 @@ const ViewDoctorAppointments = () => {
     // setStatus([]);
     // setDate("");
     try {
-      const response = await api.get(`appointment/filterAppointment`, {
+      const response = await api.get(`appointment/filterAppointmentDoctor`, {
         params: {
-          id: id,
           Status: status,
           AppointmentDate: date,
         },
+        headers: headers,
       });
       setAppointments(response.data);
       setHasAppointments(response.data.length > 0);
@@ -50,13 +66,14 @@ const ViewDoctorAppointments = () => {
   });
 
   useEffect(() => {
+    sessionStorage.clear();
     const config = {
       headers: {
         Authorization: "Bearer " + accessToken,
       },
     };
     try {
-      api.get(`/doctor/allAppointments/`, config).then((response) => {
+      api.get(`/doctor/allAppointments`, config).then((response) => {
         setAppointments(response.data);
         setAllAppointments(response.data);
         setHasAppointments(response.data.length > 0);
@@ -73,13 +90,15 @@ const ViewDoctorAppointments = () => {
     const jsDate = selectedDate ? selectedDate.toDate() : null;
     setDate(dateString);
   };
-
+  const handleEventClick = (info: any) => {
+    setShowAppointmentModal(true);
+    setAppointment(info.event._def.extendedProps);
+  };
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
-        <strong>My Appointments</strong>
+        <strong>Appointments</strong>
       </h2>
-
       <span>
         <label style={{ marginLeft: devicePixelRatio * 90, marginRight: 8 }}>
           <strong>Status:</strong>
@@ -131,31 +150,86 @@ const ViewDoctorAppointments = () => {
       )}
       <br></br>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>status</th>
-            <th>Appointment Date</th>
-            <th>Appointment Time</th>
-            <th>Patient</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {appointments.map((member: any, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{member.Status}</td>
-              <td>{member.AppointmentDate.split("T")[0]}</td>
-              <td>{member.AppointmentDate.split("T")[1].split(".")[0]}</td>
-              <td>{member.Patient.Name}</td>
+      <FullCalendar
+        stickyHeaderDates
+        aspectRatio={1}
+        height={"75vh"}
+        plugins={[
+          dayGridPlugin,
+          timeGridPlugin,
+          bootstrap5Plugin,
+          interactionPlugin,
+        ]}
+        events={appointments}
+        eventClick={(info) => {
+          console.log(info);
+          handleEventClick(info);
+        }}
+        themeSystem="bootstrap5"
+        initialView="dayGridMonth"
+        headerToolbar={{
+          left: "prev,next,today",
+          center: "title",
+          right: "dayGridMonth,timeGridWeek,timeGridDay",
+        }}
+      />
+      <Modal
+        visible={ShowAppointmentModal}
+        onCancel={() => {
+          setShowAppointmentModal(false);
+        }}
+        onOk={() => {
+          setShowAppointmentModal(false);
+        }}
+      >
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>status</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            <tr key={1}>
+              <td
+                onClick={() => {
+                  if (appointment) {
+                    navigate(
+                      `/doctor/viewPatientInfo/${appointment.Patient._id}`
+                    );
+                  }
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.cursor = "pointer";
+                  e.currentTarget.style.color = "#007BFF";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.cursor = "auto";
+                  e.currentTarget.style.color = "";
+                }}
+              >
+                {appointment ? appointment.Patient.Name : ""}
+              </td>
+              <td>
+                {appointment != null
+                  ? appointment.AppointmentDate.split("T")[0]
+                  : ""}
+              </td>
+              <td>
+                {appointment != null
+                  ? appointment.AppointmentDate.split("T")[1].split(".")[0]
+                  : ""}
+              </td>
+              <td>{appointment != null ? appointment.Status : ""}</td>
+            </tr>
+          </tbody>
+        </table>
+      </Modal>
     </div>
   );
 };
 
-export default ViewDoctorAppointments;
+export default ViewPatientAppointments;
