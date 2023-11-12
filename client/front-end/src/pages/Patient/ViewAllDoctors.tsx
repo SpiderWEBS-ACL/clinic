@@ -44,7 +44,8 @@ const ViewAllDoctors = () => {
   const [DoctorDiscount, setDoctorDiscount] = useState<number>(0);
   const [FamilyMembers, setFamilyMembers] = useState<string[]>([]);
   const [FamilyMember, setFamilyMember] = useState("");
-  var hasFamily = true;
+  const [SessionPrice, setSessionPrice] = useState("");
+  const [hasFamily, setHasFamily] = useState<boolean>();
   const navigate = useNavigate();
 
   const timeSlots = [];
@@ -99,6 +100,11 @@ const ViewAllDoctors = () => {
       .get("patient/getDoctorDiscount", config)
       .then((response) => {
         setDoctorDiscount(response.data);
+        setSessionPrice(
+          response.data > 0
+            ? `Discounted Sesssion Price (${response.data}% Discount)`
+            : "Sesssion Price"
+        );
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -109,9 +115,9 @@ const ViewAllDoctors = () => {
     api
       .get("patient/viewFamilyMembers", config)
       .then((response) => {
+        setHasFamily(response.data.length > 0);
         response.data.map((member: any) => {
           FamilyMembers.push(member.Name);
-          console.log(member.Name);
         });
       })
       .catch((error) => {
@@ -125,6 +131,21 @@ const ViewAllDoctors = () => {
     doctorDiscount();
     setLoading(false);
   }, []);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   const redirectToStripe = async () => {
     try {
@@ -197,21 +218,6 @@ const ViewAllDoctors = () => {
       console.error(error);
     }
   };
-
-  if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
 
   const viewDetails = (doctor: []) => {
     setShowPopup(true);
@@ -396,11 +402,7 @@ const ViewAllDoctors = () => {
           <tr>
             <th>Name</th>
             <th>Specialty</th>
-            <th>
-              {DoctorDiscount > 0
-                ? `Discounted Sesssion Price (${DoctorDiscount}% Discount)`
-                : "Sesssion Price"}
-            </th>
+            <th>{SessionPrice}</th>
             <th></th>
             <th></th>
             <th></th>
@@ -450,7 +452,7 @@ const ViewAllDoctors = () => {
                 <button
                   key={request._id}
                   className="btn btn-sm btn-success"
-                  hidden={FamilyMembers.length == 0}
+                  hidden={!hasFamily}
                   style={{
                     padding: "4px 8px",
                     fontSize: "12px",
@@ -481,11 +483,7 @@ const ViewAllDoctors = () => {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Dob</th>
-                <th>
-                  {DoctorDiscount > 0
-                    ? `Discounted Sesssion Price (${DoctorDiscount}% Discount)`
-                    : "Sesssion Price"}
-                </th>
+                <th>{SessionPrice}</th>
                 <th>Affiliation</th>
                 <th>Specialty</th>
                 <th>Education</th>

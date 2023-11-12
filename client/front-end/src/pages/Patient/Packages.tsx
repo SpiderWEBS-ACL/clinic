@@ -96,8 +96,8 @@ const AllPackagesPatient = () => {
       });
     api.get("patient/subscribedPackage", config).then((response) => {
       setSubscribedPackageId(response.data);
-      setLoading(false);
       console.log(response.data);
+      setLoading(false);
     });
     api
       .get("patient/getBalance", config)
@@ -109,6 +109,7 @@ const AllPackagesPatient = () => {
         console.log(error);
       });
   }, []);
+
   const navigate = useNavigate();
   const handleRedirect = async (id: string) => {
     navigate("/admin/editPackage/" + id);
@@ -193,7 +194,7 @@ const AllPackagesPatient = () => {
                         >
                           <button
                             className={
-                              request._id == SubscribedPackageId ||
+                              request._id === SubscribedPackageId ||
                               SubscribedPackageId === ""
                                 ? "btn btn-sm btn-success"
                                 : "btn btn-sm btn-secondary"

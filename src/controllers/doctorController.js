@@ -549,7 +549,7 @@ const scheduleFollowUp = async(req,res) =>{
           const newFollowup = await appointmentModel.create({
             Patient: patientId,
             Doctor: id,
-            Date: appDate,
+            AppointmentDate: appDate,
             FollowUp: followUp,
             Status: status
         })

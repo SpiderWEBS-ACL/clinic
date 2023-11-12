@@ -8,6 +8,7 @@ import {
   Input,
   Modal,
   Select,
+  Spin,
   TimePicker,
 } from "antd";
 import { message } from "antd";
@@ -32,9 +33,8 @@ const ViewPatientAppointments = () => {
   const [status, setStatus] = useState([]);
   const [date, setDate] = useState("");
   const accessToken = localStorage.getItem("accessToken");
-  const setTimeoutAl = async () => setAlertVisibility(false);
-  const setTimeoutAl1 = async () => setAlertVisibility1(false);
   const [ShowAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   const clearFilters = async () => {
     setAppointments(allAppointments);
     setDate("");
@@ -76,11 +76,29 @@ const ViewPatientAppointments = () => {
         setAppointments(response.data);
         setAllAppointments(response.data);
         setHasAppointments(response.data.length > 0);
+        setLoading(false);
       });
     } catch (error: any) {
       message.error(`${error.response.data.error}`);
+      setLoading(false);
     }
+    setLoading(false);
   }, [id]);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   const onDateChange: DatePickerProps["onChange"] = (
     selectedDate,
