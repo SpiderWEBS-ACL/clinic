@@ -86,10 +86,13 @@ const patientSchema = new Schema({
         enum: ["Male", "Female"],
         requiired: true,
       },
-      MedicalHistory:{
-        type: Schema.Types.ObjectId,
-        ref: "File"
-     }
+   
+     
+    }],
+    MedicalHistory:[
+      {
+      type: Schema.Types.ObjectId,
+      ref: "File",
     }],
     WalletBalance: {
       type: Number,

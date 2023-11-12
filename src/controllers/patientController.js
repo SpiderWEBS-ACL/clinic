@@ -1,12 +1,13 @@
+const patientModel = require("../Models/Patient");
 const { default: mongoose } = require("mongoose");
 const express = require("express");
 const bcrypt = require("bcrypt");
-const patientModel = require("../Models/Patient");
 const doctorModel = require("../Models/Doctor");
 const adminModel = require("../Models/Admin");
 const appointmentModel = require("../Models/Appointment");
 const packageModel = require("../Models/Package");
 const fileModel = require("../Models/File");
+
 const prescriptionModel = require("../Models/Prescription");
 const subscriptionModel = require("../Models/Subscription");
 
@@ -120,7 +121,7 @@ const addFamilyMember = async (req, res) => {
       return res.status(404).json({ error: "Patient not found" });
     }
     if(checkMember){
-      newFamilyMember.PatientID = checkMember._id;
+      newFamilyMember.MemberID = checkMember._id;
     }
     const familyMembers = patient.FamilyMembers;
     const allFamilyMembers = familyMembers.concat([newFamilyMember]);
@@ -545,45 +546,53 @@ const getAllDoctorsPatient = async (req,res) =>{
     res.status(500).json({ error: error.message });
   }
 }
-const storage = multer.diskStorage({
-  fileName: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
-
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
 const uploadMedicalDocuments = async (req, res) => {
   upload.array('files')(req, res, async (err) => {
     if (err) {
       console.error(err);
       res.status(500).send('Server Error');
     } else {
-      let newFiles=[];
-      const { id } = req.params; // assuming id holds patient's id
-      if(id){
-        newFiles = req.files.map((file) => ({
-        filename: file.filename,
-        originalname: file.originalname,
-        path: file.path,
-        filedata: file.buffer,
-        Patient: id,
-      }));
-    }
-    else{
-      res.status(404).json({error: 'No patient id was given'});
-    }
-  
+      const id = req.user.id;
+      let newFiles = [];
 
-      try {
-        const savedFiles = await fileModel.create(newFiles);
-        res.status(201).json(savedFiles);
-      } catch (err) {
-        console.error(err);
-        res.status(500).send('Server Error');
+      if (req.files && Array.isArray(req.files)) {
+        try {
+          newFiles = await Promise.all(
+            req.files.map(async (file) => {
+              const fileData = {
+                Patient: id,
+                filename: file.originalname,
+                filedata: file.buffer,
+                contentType: file.mimetype,
+                originalname: file.originalname
+              };
+              const savedFile = await fileModel.create(fileData);
+              return savedFile._id;
+            })
+          );
+
+          const currPatient = await patientModel.findByIdAndUpdate(
+            id,
+            { $push: { MedicalHistory: { $each: newFiles } } },
+            { new: true }
+          );
+
+          await currPatient.save();
+          res.status(200).json('Files uploaded successfully!');
+        } catch (error) {
+          console.error(error);
+          res.status(500).send('Server Error');
+        }
+      } else {
+        res.status(400).json('No files were uploaded!');
       }
     }
   });
 };
+
 const deleteMedicalDocuments = async (req, res) => {
   const { id } = req.params;
   try {
@@ -897,15 +906,19 @@ const linkFamily = async (req,res) => {
 const cancelSubscription = async (req,res) => {
 
   const id = req.body.id;
+  const packageID = req.body.PackageID
 
   const patient = await patientModel.findById(id);
+  const package = await packageModel.findById(packageID);
   try {
-  
+    if (!package) {
+      return res.status(404).json("this Package isn't found")
+    }
     if(!patient){
       return res.status(404).json('This Patient is not Found')
     }
-    if(patient){
-      subscriptionModel.findOneAndDelete({Patient: patient})
+    if(patient && package){
+      packageModel.findOneAndDelete({Patient: patient, Package: package})
     }
   }
   catch (error) {
@@ -914,8 +927,9 @@ const cancelSubscription = async (req,res) => {
 }
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
-filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
-viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity,
-getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription };
+
+   filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
+  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity, getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe
+,linkFamily, cancelSubscription };
 
  

@@ -168,8 +168,6 @@ app.post("/doctor/rejectContract/:id", rejectContract);
 app.post("/doctor/uploadPersonalID/:id", uploadPersonalID);
 app.post("/doctor/uploadMedicalDegree/:id", uploadMedicalDegree);
 app.post("/doctor/uploadLicense/:id", uploadLicenses);
-app.get("/doctor/registrationRequest/:id", getDoctrRegistrationReqDetails); 	//for employment contract
-
 
 //Private endpoints
 
@@ -210,10 +208,10 @@ app.get("/patient/filterDoctors", PatientProtect,filterDoctors);
 app.post("/patient/subscribeToHealthPackage/:id",PatientProtect, subscribeToHealthPackage);
 app.get("/patient/filterAppointments",PatientProtect,filterPatientAppointments)
 app.get("/patient/viewSelectedDoctor/:id",PatientProtect,viewDoctorDetails)
-app.post("/patient/uploadMedicalDocuments/:id",PatientProtect, uploadMedicalDocuments);
+app.post("/patient/uploadMedicalDocuments",PatientProtect, uploadMedicalDocuments);
 app.delete("/patient/removeMedicalDocument/:id",PatientProtect, deleteMedicalDocuments);
 app.post("/patient/subscribeToHealthPackage/:id",PatientProtect, subscribeToHealthPackage);
-app.get("/patient/viewMyMedicalDocument/:id",PatientProtect, viewMedicalDocuments);
+app.get("/patient/viewMyMedicalDocument",PatientProtect, viewMedicalDocuments);
 app.get("/patient/viewMyPrescriptions",PatientProtect,viewMyPrescriptions)
 app.get("/patient/filterPrescriptions",PatientProtect,filterPrescriptions)
 app.get("/patient/selectPrescription/:id",PatientProtect,selectPrescription)
@@ -249,8 +247,7 @@ app.post("/patient/linkfamily",PatientProtect, linkFamily);
 
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
-app.get("/appointment/filterAppointment",PatientProtect || DoctorProtect, filterAppointment);
-app.get("/appointment/filterAppointmentDoctor",DoctorProtect, filterAppointment);
+app.get("/appointment/filterAppointment", filterAppointment);
 
 //Subscription Endpoints
 app.post("/subscription/subscribe/:id",subscribeWithStripe);
