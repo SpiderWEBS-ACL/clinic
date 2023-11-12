@@ -120,7 +120,7 @@ const addFamilyMember = async (req, res) => {
       return res.status(404).json({ error: "Patient not found" });
     }
     if(checkMember){
-      newFamilyMember.MemberID = checkMember._id;
+      newFamilyMember.PatientID = checkMember._id;
     }
     const familyMembers = patient.FamilyMembers;
     const allFamilyMembers = familyMembers.concat([newFamilyMember]);

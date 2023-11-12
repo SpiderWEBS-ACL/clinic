@@ -32,8 +32,6 @@ const ViewPatientAppointments = () => {
   const [status, setStatus] = useState([]);
   const [date, setDate] = useState("");
   const accessToken = localStorage.getItem("accessToken");
-  const setTimeoutAl = async () => setAlertVisibility(false);
-  const setTimeoutAl1 = async () => setAlertVisibility1(false);
   const [ShowAppointmentModal, setShowAppointmentModal] = useState(false);
   const navigate = useNavigate();
   const clearFilters = async () => {
@@ -42,8 +40,6 @@ const ViewPatientAppointments = () => {
     setStatus([]);
   };
   const handleFilter = async () => {
-    // setStatus([]);
-    // setDate("");
     try {
       const response = await api.get(`appointment/filterAppointmentDoctor`, {
         params: {
@@ -198,7 +194,7 @@ const ViewPatientAppointments = () => {
                 onClick={() => {
                   if (appointment) {
                     navigate(
-                      `/doctor/viewPatientInfo/${appointment.Patient._id}`
+                      `/doctor/viewPatientInfo/${appointment.Patient?._id}`
                     );
                   }
                 }}
@@ -211,16 +207,16 @@ const ViewPatientAppointments = () => {
                   e.currentTarget.style.color = "";
                 }}
               >
-                {appointment ? appointment.Patient.Name : ""}
+                {appointment ? appointment.Patient?.Name : ""}
               </td>
               <td>
                 {appointment != null
-                  ? appointment.AppointmentDate.split("T")[0]
+                  ? appointment.AppointmentDate?.split("T")[0]
                   : ""}
               </td>
               <td>
                 {appointment != null
-                  ? appointment.AppointmentDate.split("T")[1].split(".")[0]
+                  ? appointment.AppointmentDate?.split("T")[1].split(".")[0]
                   : ""}
               </td>
               <td>{appointment != null ? appointment.Status : ""}</td>
