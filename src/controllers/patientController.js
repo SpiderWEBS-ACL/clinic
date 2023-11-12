@@ -7,7 +7,6 @@ const adminModel = require("../Models/Admin");
 const appointmentModel = require("../Models/Appointment");
 const packageModel = require("../Models/Package");
 const fileModel = require("../Models/File");
-
 const prescriptionModel = require("../Models/Prescription");
 const subscriptionModel = require("../Models/Subscription");
 
@@ -898,19 +897,15 @@ const linkFamily = async (req,res) => {
 const cancelSubscription = async (req,res) => {
 
   const id = req.body.id;
-  const packageID = req.body.PackageID
 
   const patient = await patientModel.findById(id);
-  const package = await packageModel.findById(packageID);
   try {
-    if (!package) {
-      return res.status(404).json("this Package isn't found")
-    }
+  
     if(!patient){
       return res.status(404).json('This Patient is not Found')
     }
-    if(patient && package){
-      packageModel.findOneAndDelete({Patient: patient, Package: package})
+    if(patient){
+      subscriptionModel.findOneAndDelete({Patient: patient})
     }
   }
   catch (error) {
@@ -919,9 +914,8 @@ const cancelSubscription = async (req,res) => {
 }
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
-
-   filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity, getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe
-,linkFamily, cancelSubscription };
+filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
+viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity,
+getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription };
 
  
