@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@fullcalendar/react": "^6.1.9",
     "@nestjs/common": "^10.2.8",
+    "@types/styled-components": "^5.1.30",
     "@vitejs/plugin-react": "^4.1.0",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
@@ -15,6 +17,7 @@
     "nodemon": "^3.0.1",
     "react-datepicker": "^4.20.0",
     "stripe": "^14.4.0",
+    "styled-components": "^6.1.1",
     "vite": "^4.4.11"
   },
   "scripts": {

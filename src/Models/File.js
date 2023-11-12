@@ -13,13 +13,14 @@ const fileSchema = new Schema(
       ref: "Doctor",
     },
     filedata: {
-      type: Buffer, 
+      type: Buffer,
+      required: true, // or false, depending on your requirements
+    },
+    contentType:{
+      type: String,
       required: true
     },
-    path:{
-      type:String,
-      required: true
-    },
+
     filename:{
         type: String,
         required: true
