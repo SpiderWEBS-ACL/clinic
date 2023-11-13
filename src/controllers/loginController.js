@@ -60,6 +60,7 @@ const login = async (req, res) => {
           refreshToken: refreshToken,
           id: doctor._id,
           type: "Doctor",
+          user: doctor,
         });
       } else {
         res.status(400).json({ error: "Password doesn't match!" });

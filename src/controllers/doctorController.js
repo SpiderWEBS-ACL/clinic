@@ -575,6 +575,12 @@ const scheduleFollowUp = async(req,res) =>{
     }
 }
 
+const loggedInFirstTime = async (req,res) => {
+  const id = req.user.id;
+  await doctorModel.findByIdAndUpdate(id, {FirstTime: false});
+  return res.status(200).json("Logged in first time");
+}
+
 module.exports = {
   registerDoctor,
   searchPatientByName,
@@ -597,5 +603,6 @@ module.exports = {
   uploadMedicalDegree,
   getDoctorTimeSlotsForDoctor,
   checkDoctorAvailablityForDoctor,
-  scheduleFollowUp
+  scheduleFollowUp,
+  loggedInFirstTime
 };

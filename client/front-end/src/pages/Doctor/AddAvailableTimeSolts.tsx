@@ -105,6 +105,11 @@ const Calendar: React.FC = () => {
       .catch((error) => {
         message.error("an error has occurred");
       });
+    api
+      .put("doctor/loggedInFirstTime", [], { headers: headers })
+      .catch((error) => {
+        message.error("an error has occurred");
+      });
   };
 
   return (

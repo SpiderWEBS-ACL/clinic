@@ -60,12 +60,14 @@ const {
   uploadMedicalDegree,
   getDoctorTimeSlotsForDoctor,
   checkDoctorAvailablityForDoctor,
-  scheduleFollowUp
+  scheduleFollowUp,
+  loggedInFirstTime
 } = require("./controllers/doctorController");
 
 const {
   addAppointment,
-  filterAppointment,
+  filterAppointmentPatient,
+  filterAppointmentDoctor,
 } = require("./controllers/appointmentController");
 
 const {
@@ -187,6 +189,7 @@ app.get("/doctor/viewHealthRecords/:id", DoctorProtect, viewHealthRecordsDoctor)
 app.post("/doctor/addHealthRecordForPatient/:id", DoctorProtect, addHealthRecordForPatient);
 app.post("/doctor/scheduleFollowup/", DoctorProtect, scheduleFollowUp);
 app.get("/doctor/doctorTimeSlots/",DoctorProtect,getDoctorTimeSlotsForDoctor);
+app.put("/doctor/loggedInFirstTime",DoctorProtect,loggedInFirstTime);
 //Patient Endpoints
 
 //Public Endpoints
@@ -247,7 +250,8 @@ app.post("/patient/linkfamily",PatientProtect, linkFamily);
 
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
-app.get("/appointment/filterAppointment", filterAppointment);
+app.get("/appointment/filterAppointment",PatientProtect, filterAppointmentPatient);
+app.get("/appointment/filterAppointmentDoctor", DoctorProtect, filterAppointmentDoctor);
 
 //Subscription Endpoints
 app.post("/subscription/subscribe/:id",subscribeWithStripe);
