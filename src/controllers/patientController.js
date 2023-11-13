@@ -23,7 +23,6 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const addPatient = async (req, res) => {
   try {
-    console.log(req)
     const exists = await patientModel.findOne({"Username" : { $regex: '^' + req.body.Username + '$', $options:'i'}});
     const exists2 = await patientModel.findOne({"Email" : { $regex: '^' + req.body.Email + '$', $options:'i'}});
     if(!exists && !exists2){
@@ -571,8 +570,8 @@ const uploadMedicalDocuments = async (req, res) => {
         filename: file.filename,
         originalname: file.originalname,
         path: file.path,
-        contentType: file.type,
         Patient: id,
+        contentType: file.mimetype
       }));
 
       try {
@@ -623,15 +622,17 @@ const deleteMedicalDocuments = async (req, res) => {
   }
 };
 const viewMedicalDocuments = async (req, res) => {
-  const id = req.user.id;
+  const id = req.user.id;  
   try {
     let files = [];
       files = await fileModel.find({ Patient: id });
-    if (files.length === 0) {
+    if (!files) {
       return res.status(404).json({ error: 'No files found' });
     }
+    if(files){
+      res.status(200).json(files);
 
-    res.status(200).json(files);
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

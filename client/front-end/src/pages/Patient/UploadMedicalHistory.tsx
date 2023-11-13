@@ -63,7 +63,7 @@ const UploadMedicalHistory = () => {
         formData.append('files', file); 
         formData.append('filename', file.name); 
         formData.append('originalname', file.name); 
-        formData.append('contentType', file.type); 
+       formData.append('contentType', file.type); 
 
       }
   

@@ -16,6 +16,10 @@ const fileSchema = new Schema(
       type: String,
       required: true
     },
+    contentType:{
+      type:String,
+      required:true
+    },
     filename:{
         type: String,
         required: true
