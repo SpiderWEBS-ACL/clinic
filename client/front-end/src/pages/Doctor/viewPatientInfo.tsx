@@ -366,12 +366,7 @@ const ViewPatientInfo = () => {
               className="hover-card"
             >
               <Meta
-                avatar={
-                  <Avatar
-                    src="https://xsgames.co/randomusers/avatar.php?g=pixel"
-                    style={{ width: 100, height: 100 }}
-                  />
-                }
+                avatar={<Avatar style={{ width: 100, height: 100 }} />}
                 title={member.Name}
                 description={`${member.RelationToPatient}: ${member.Age} Years old`}
               />
