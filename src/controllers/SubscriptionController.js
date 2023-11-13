@@ -73,10 +73,18 @@ const addSubscription = async (req, res) => {
       res.status(400).json({ error: error.message });
     }
   }
-
+  const getSubscription = async (req,res) => {
+    const id = req.user.id;
+    const subscription = await subscriptionModel.findOne({Patient: id});
+    if(!subscription)
+      return res.status(200).json("");
+    if(subscription)
+    return res.status(200).json(subscription);
+  }
 module.exports = {
     addSubscription,
     subscribeWithStripe,
     deleteOneSubscription,
-    subscribeWithWallet
+    subscribeWithWallet,
+    getSubscription
 };

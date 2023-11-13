@@ -8,8 +8,7 @@ const appointmentModel = require("../Models/Appointment");
 const packageModel = require("../Models/Package");
 const fileModel = require("../Models/File");
 const prescriptionModel = require("../Models/Prescription");
-const subscriptionModel = require("../Models/Subscription");
-
+const subscriptionModel = require('../Models/Subscription');
 const { fileLoader } = require("ejs");
 const multer = require('multer');
 const fs = require('fs');
@@ -438,7 +437,6 @@ const filterDoctorsByNameSpecialtyAvailability = async (req, res) => {
   const date  = req.query.date || "0001-01-01";
   const Time = req.query.Time || "00:00:00";
   let datee =  date+"T"+Time+".000Z";
-  console.log(datee);
   try {
     const query = {}
       if(Name != "")
@@ -825,8 +823,16 @@ const getSubscribedPackage = async (req,res) => {
     return res.status(200).json("");
   return res.status(200).json(subscription.Package);
 }
-
-
+const showSubscribedPackage = async (req,res) => {
+  const patientId = req.user.id;
+  const subscription = await subscriptionModel.find({Patient: patientId});
+  if(!subscription)
+    return res.status(200).json([]);
+  if(subscription){
+    const package = await packageModel.find({_id: (subscription[0].Package),});
+    return res.status(200).json(package);
+}
+}
 const linkFamily = async (req,res) => {
   try{
     const id = req.user.id;
@@ -895,17 +901,16 @@ const linkFamily = async (req,res) => {
 }
 
 const cancelSubscription = async (req,res) => {
-
-  const id = req.body.id;
-
-  const patient = await patientModel.findById(id);
+  const id = req.user.id;
   try {
-  
-    if(!patient){
+    if(!id){
       return res.status(404).json('This Patient is not Found')
     }
-    if(patient){
-      subscriptionModel.findOneAndDelete({Patient: patient})
+    if(id){
+      const sub = await subscriptionModel.findOne({Patient: id})
+       subscriptionModel.findByIdAndUpdate(sub.id,{
+        Status: "Cancelled"
+      });
     }
   }
   catch (error) {
@@ -916,6 +921,6 @@ const cancelSubscription = async (req,res) => {
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
 filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
 viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity,
-getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription };
+getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription,showSubscribedPackage };
 
  
