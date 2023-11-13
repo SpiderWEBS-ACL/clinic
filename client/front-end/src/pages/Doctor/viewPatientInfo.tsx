@@ -193,10 +193,16 @@ const ViewPatientInfo = () => {
       </h2>
 
       <Card
-        style={{ height: 400, width: 800, marginTop: 16, marginLeft: 220 }}
+        style={{ height: 900, width: 800, marginTop: 16, marginLeft: 220 }}
         loading={loadingList}
         hoverable
         className="hover-card"
+        cover={
+          <img
+            alt="example"
+            src="https://img.freepik.com/free-vector/doctor-examining-patient-clinic-illustrated_23-2148856559.jpg?w=1380&t=st=1699651650~exp=1699652250~hmac=beb4f5b10e87a92fc98a6afdbec668faa4127bf16f374383eaacb5337798e6bf"
+            />
+        }
       >
         <div
           style={{
