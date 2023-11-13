@@ -37,7 +37,7 @@ const {
   getBalance, 
   getAllPackagesPatient,
   doctorDiscount, 
-  payAppointmentWithWallet, linkFamily, cancelSubscription
+  payAppointmentWithWallet, linkFamily, cancelSubscription,showSubscribedPackage
 } = require("./controllers/patientController");
 
 const {
@@ -76,7 +76,8 @@ const {
   addSubscription,
   subscribeWithStripe,
   deleteOneSubscription,
-  subscribeWithWallet
+  subscribeWithWallet,
+  getSubscription
 } = require("./controllers/SubscriptionController");
 
 const {
@@ -252,6 +253,9 @@ app.get("/patient/allPackages", PatientProtect, getAllPackagesPatient);
 app.get("/patient/getBalance", PatientProtect, getBalance);
 app.get("/patient/getDoctorDiscount", PatientProtect, doctorDiscount);
 app.post("/patient/linkfamily",PatientProtect, linkFamily);
+app.delete("/patient/cancelSubscription",PatientProtect, cancelSubscription);
+app.get("/patient/showSubscribedPackage", PatientProtect, showSubscribedPackage);
+
 
 
 //Appointment Endpoints
@@ -264,6 +268,8 @@ app.post("/subscription/subscribe/:id",subscribeWithStripe);
 app.post("/subscription/subscribeWallet/:id",PatientProtect,subscribeWithWallet);
 app.post("/subscription/add",PatientProtect,addSubscription);
 app.delete("/subscription/deleteDuplicate/",PatientProtect,deleteOneSubscription);
+app.get("/subscription/getSubscription",PatientProtect,getSubscription);
+
 
 //Prescription Endpoints
 app.post("/prescription/add", addPrescription);

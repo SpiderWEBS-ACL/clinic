@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Button, Spin, Modal, Row, Col, message, Card } from "antd";
+import { Layout, Popconfirm, Menu, Button, Breadcrumb, Card, Typography, List, Row, Col, Spin, Modal, message, Switch } from 'antd';
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { JwtPayload } from "../../AppRouter";
 import jwt_decode from "jwt-decode";
 import { config, headers } from "../../Middleware/authMiddleware";
+const { Title } = Typography;
 import {
   CheckCircleOutlined,
   CreditCardFilled,
@@ -23,7 +24,11 @@ const AllPackagesPatient = () => {
   const [loading, setLoading] = useState(true);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [PackageId, setPackageId] = useState("");
+  const [open, setOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
   const { Meta } = Card;
+  const [subscribedPackage, setSubscribedPackage] = useState<any>([]);
+
 
   const api = axios.create({
     baseURL: "http://localhost:8000/",
@@ -99,6 +104,9 @@ const AllPackagesPatient = () => {
       console.log(response.data);
       setLoading(false);
     });
+    api.get("/subscription/getSubscription",config).then((response) =>{
+      setSubscribedPackage(response.data)
+    })
     api
       .get("patient/getBalance", config)
       .then((response) => {
@@ -119,14 +127,40 @@ const AllPackagesPatient = () => {
     localStorage.setItem("packageId", id);
     setShowPaymentModal(true);
     setPackageId(id);
-    setSubscriptionPrice(SubscriptionPrice);
+    setSubscriptionPrice(SubscriptionPrice); 
+    
+  };
+  const showPopconfirm = () => {
+    setOpen(true);
   };
 
+  const handleOk = () => {
+    setConfirmLoading(true);
+
+    setTimeout(() => {
+      setOpen(false);
+      setConfirmLoading(false);
+      handleUnsubscribe();
+    }, 2000);
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+  };
+
+  const handleUnsubscribe =  () => {
+    api.delete("/patient/cancelSubscription", config)
+    setLoading(true);
+    window.location.reload()
+  }
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
         <strong>Health Packages</strong>
       </h2>
+
+
+      
 
       <tbody>
         {Packages.map(
@@ -138,7 +172,7 @@ const AllPackagesPatient = () => {
                     <div>
                       <Card
                         style={{
-                          height: "17rem",
+                          height: "21rem",
                           width: "24rem",
                           marginTop: 16,
                         }}
@@ -182,6 +216,20 @@ const AllPackagesPatient = () => {
                                 <strong>Family Discount:</strong>{" "}
                                 {request.FamilyDiscount}
                               </p>
+                              <p> {request._id == SubscribedPackageId && subscribedPackage.Status == "Subscribed" ? 
+                                   `Renewal Date:${subscribedPackage.Date.split("T")[0]}` 
+                                  : request._id == SubscribedPackageId && subscribedPackage.Status== "Cancelled"?
+                                 `End Date:${subscribedPackage.Date.split("T")[0]}`
+                                 :""
+                                }
+                              </p>
+                              <p> {request._id == SubscribedPackageId ? (
+                                `Status:
+                                  ${subscribedPackage.Status}`
+                                  ) : (
+                                    "Status: Unsubscribed"
+                                  )}
+                              </p>
                             </div>
                           }
                         />
@@ -194,12 +242,12 @@ const AllPackagesPatient = () => {
                         >
                           <button
                             className={
-                              request._id === SubscribedPackageId ||
+                              request._id === SubscribedPackageId  && subscribedPackage.Status == "Subscribed" ||
                               SubscribedPackageId === ""
                                 ? "btn btn-sm btn-success"
                                 : "btn btn-sm btn-secondary"
                             }
-                            disabled={SubscribedPackageId != ""}
+                            disabled={SubscribedPackageId != "" || (subscribedPackage.Status == "Cancelled" && request._id == SubscribedPackageId)}
                             onClick={() =>
                               handleSubscribe(
                                 request._id,
@@ -207,18 +255,31 @@ const AllPackagesPatient = () => {
                               )
                             }
                           >
-                            {request._id == SubscribedPackageId ? (
+                            {request._id == SubscribedPackageId && subscribedPackage.Status == "Subscribed" ? (
                               <CheckCircleOutlined />
                             ) : (
-                              "Subscribe "
+                              "Subscribe"
                             )}
+
                           </button>
-                          <button
-                            className="btn btn-sm btn-danger"
-                            hidden={request._id != SubscribedPackageId}
+                         
+                          <Popconfirm
+                            title="ALERT"
+                            description="Are you sure you want to unsubscribe?"
+                            open={open}
+                            onConfirm={handleOk}
+                            okButtonProps={{ loading: confirmLoading }}
+                            onCancel={handleCancel}
                           >
-                            Cancel Subscription
-                          </button>
+                          <button
+                                className="btn btn-sm btn-danger"
+                                hidden={request._id != SubscribedPackageId || subscribedPackage.Status == "Cancelled"}
+                                onClick={showPopconfirm}
+                                
+                              >
+                                Cancel Subscription
+                              </button>
+                          </Popconfirm>
                         </div>
                       </Card>
                     </div>
