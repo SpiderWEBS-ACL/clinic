@@ -321,11 +321,13 @@ const viewPatients = async (req, res) => {
          patients.push(patient);
     }
 
-    if (patients.length == 0) {
+    if (!patients) {
       return res.status(400).json({ error: "You have no patients" });
     }
-    console.log(patients)
-    res.status(200).json(patients);
+    if(patients){
+      res.status(200).json(patients);
+
+    }
   } catch (error) {
     res.status(500).json({ error: "no patients available" });
   }

@@ -61,8 +61,8 @@ const RegLog: React.FC = () => {
           EmergencyContactName,
           EmergencyContactMobile,
         };
-
         const response = await api.post(`/patient/register`, data);
+        console.log(data)
         message.success("Congrats, you are in");
         setTimeout(toggleSignUp, 1500);
       } catch (error: any) {
