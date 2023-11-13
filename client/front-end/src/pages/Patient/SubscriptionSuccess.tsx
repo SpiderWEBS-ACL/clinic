@@ -18,8 +18,9 @@ const SubscriptionSuccess = () => {
       { headers: headers }
     );
     navigate("/patient/packages");
+    window.location.reload();
   }, []);
-  return <div>SubscriptionSuccess</div>;
+  return <div></div>;
 };
 
 export default SubscriptionSuccess;

@@ -27,6 +27,8 @@ const ViewPatientInfo = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [Message, setMessage] = useState("");
   const [isModalOpen2, setIsModalOpen2] = useState(false);
+  const [isFamilyMembersModalOpen, setIsFamilyMembersModalOpen] =
+    useState(false);
   const [healthRecords, setHealthRecords] = useState<any[]>([]);
   const [selectedOption, setSelectedOption] = useState<any>();
   const [name, setName] = useState("");
@@ -58,6 +60,7 @@ const ViewPatientInfo = () => {
     await api
       .get(`/doctor/viewPatientInfo/${id}`, config)
       .then((response) => {
+        console.log(response.data);
         setPatientInfo(response.data);
         setLoadingList(false);
       })
@@ -170,6 +173,9 @@ const ViewPatientInfo = () => {
       message.error("Something happened");
     }
   };
+  const handleFamilyMembers = async () => {
+    setIsFamilyMembersModalOpen(true);
+  };
   const followup = async () => {
     const date = AppointmentDate.concat("T" + AppointmentTime + ".000" + "Z");
     const response = await api.post(
@@ -193,7 +199,12 @@ const ViewPatientInfo = () => {
       </h2>
 
       <Card
-        style={{ height: 400, width: 800, marginTop: 16, marginLeft: 220 }}
+        style={{
+          height: "27rem",
+          width: "50rem",
+          marginTop: "2rem",
+          marginLeft: "12rem",
+        }}
         loading={loadingList}
         hoverable
         className="hover-card"
@@ -238,6 +249,10 @@ const ViewPatientInfo = () => {
                 <strong>Health Records: </strong>
                 <InfoCircleOutlined onClick={handleHealth} />
               </p>
+              <p>
+                <strong>Family Members: </strong>
+                <InfoCircleOutlined onClick={handleFamilyMembers} />
+              </p>
             </div>
           </div>
         </div>
@@ -261,7 +276,7 @@ const ViewPatientInfo = () => {
             style={{ marginRight: 200 }}
             className="btn btn-sm btn-primary"
           >
-            Schedule a FollowUp
+            Schedule a follow up
           </button>
         </Row>
       </Card>
@@ -325,6 +340,40 @@ const ViewPatientInfo = () => {
                 }
                 title={"Type: " + record.Type}
                 description={"Description: " + record.Description}
+              />
+            </Card>
+          </div>
+        ))}
+      </Modal>
+      <Modal
+        title={patientInfo.Name + "'s Family Members"}
+        open={isFamilyMembersModalOpen}
+        onOk={() => {
+          setIsFamilyMembersModalOpen(false);
+        }}
+        onCancel={() => {
+          setIsFamilyMembersModalOpen(false);
+        }}
+        width={500}
+        bodyStyle={{ maxHeight: "300px", overflowY: "auto" }}
+      >
+        {" "}
+        {patientInfo.FamilyMembers?.map((member: any) => (
+          <div>
+            <Card
+              style={{ height: 150, width: 400, marginTop: 16 }}
+              loading={false}
+              className="hover-card"
+            >
+              <Meta
+                avatar={
+                  <Avatar
+                    src="https://xsgames.co/randomusers/avatar.php?g=pixel"
+                    style={{ width: 100, height: 100 }}
+                  />
+                }
+                title={member.Name}
+                description={`${member.RelationToPatient}: ${member.Age} Years old`}
               />
             </Card>
           </div>

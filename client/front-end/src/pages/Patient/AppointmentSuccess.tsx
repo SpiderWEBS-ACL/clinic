@@ -17,7 +17,7 @@ const AppointmentSuccess = () => {
         {
           Doctor: sessionStorage.getItem("DoctorId"),
           AppointmentDate: sessionStorage.getItem("AppointmentDate"),
-          FamilyMember: sessionStorage.getItem("FamilyMember")
+          FamilyMember: sessionStorage.getItem("FamilyMember"),
         },
         { headers: headers }
       );
@@ -32,7 +32,7 @@ const AppointmentSuccess = () => {
 
   useEffect(() => {
     console.log("useEffect ran");
-    addAppointment();   
+    addAppointment();
     return () => {
       console.log("Cleanup logic (useEffect cleanup)");
     };
@@ -40,7 +40,7 @@ const AppointmentSuccess = () => {
 
   console.log("Component rendered");
 
-  return <div>AppointmentSuccess</div>;
+  return <div></div>;
 };
 
 export default AppointmentSuccess;

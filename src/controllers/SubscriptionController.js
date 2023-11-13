@@ -18,7 +18,7 @@ const subscribeWithStripe = async (req,res) => {
         price_data: {
           currency: 'usd',
           product_data: {name: package.Name},
-          unit_amount: package.SubscriptionPrice
+          unit_amount: package.SubscriptionPrice*100
         },
         quantity: 1
       }],
