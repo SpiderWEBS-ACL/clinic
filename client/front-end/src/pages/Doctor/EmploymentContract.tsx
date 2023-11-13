@@ -17,8 +17,8 @@ import { config } from "../../Middleware/authMiddleware";
 import { useNavigate, useParams } from "react-router-dom";
 
 const EmploymentContract = () => {
-  const {id} = useParams<{ id: string }>();
-  // const id = "654ebafc8c55248699ce62b5"
+  const currentUrl = window.location.href;
+  var id = currentUrl.split("/")[4];
   const [regReqDetails, setRegReqDetails] = useState<any>({});
   const [date, setDate] = useState<string>("");
 
@@ -27,6 +27,9 @@ const EmploymentContract = () => {
   });
 
   useEffect(() => {
+    console.log(currentUrl);
+    console.log(id);
+    localStorage.clear();
     api
       .get(`/doctor/registrationRequest/${id}`, config)
       .then((response) => {
@@ -48,10 +51,10 @@ const EmploymentContract = () => {
 
   const handleAccept = async () => {
     try {
-      await api.post("doctor/acceptContract/" + id, config);
+      const response = await api.post("doctor/acceptContract/" + id, config);
       message.success("Employment Contract Accepted! Welcome Aboard!");
       setTimeout(() => {
-        navigate("/doctor/timeSlots");
+        navigate("/");
         window.location.reload();
       }, 1500);
     } catch (error) {

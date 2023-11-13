@@ -1,3 +1,4 @@
+
 const patientModel = require("../Models/Patient");
 const { default: mongoose } = require("mongoose");
 const express = require("express");
@@ -19,7 +20,6 @@ const jwt = require('jsonwebtoken');
 const { generateAccessToken } = require("../middleware/authMiddleware");
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
 
 const addPatient = async (req, res) => {
   try {
@@ -527,11 +527,25 @@ const viewAllPatientAppointments = async(req,res) => {
 
   try{
           if(patient){
-              const appointments = await appointmentModel.find({Patient: patient}).populate("Doctor").populate("Patient").exec();
+
+              var appointments = await appointmentModel.find({Patient: patient}).populate("Doctor");
+              await Promise.all(
+                patient.FamilyMembers.map( async (member) => {
+                var appointmentsMember =  await appointmentModel.find({Patient: member._id}).populate("Doctor");
+                appointmentsMember.map((member2) => {
+                  member2.title = member.Name + "'s Appointment"
+                  console.log(member.Name);
+                })
+                appointments.push(...appointmentsMember);
+                // appointments.map((appointment) => {
+                //   appointment.title += " with Dr. " + appointment.Doctor.Name;
+                // })
+              }))
                   if(!appointments || appointments.length === 0){
                       res.status(404).json({error: "no appointments were found"});
                   }
                   else
+                      console.log(appointments);
                       return res.status(200).json(appointments);
                   }
       }catch(error){
@@ -829,6 +843,15 @@ const getSubscribedPackage = async (req,res) => {
 }
 
 
+function calculateAge(date) {
+  const startDate = new Date(date);
+  const endDate = new Date();
+  const timeDifference = endDate - startDate;
+  const yearDifference = timeDifference / (1000 * 60 * 60 * 24 * 365.25);
+  const roundedYearDifference = Math.floor(yearDifference);
+  return roundedYearDifference;
+}
+
 const linkFamily = async (req,res) => {
   try{
     const id = req.user.id;
@@ -859,7 +882,7 @@ const linkFamily = async (req,res) => {
       return res.status(404).json({ error: "Member already linked" });
     }
     else{
-      const newFamilyMember = {PatientID: memberMo.id ,Name: memberMo.Name,RelationToPatient:RelationToPatient,Age: memberMo.Age,Gender: memberMo.Gender};
+      const newFamilyMember = {PatientID: memberMo.id ,Name: memberMo.Name,RelationToPatient:RelationToPatient,Age: calculateAge(memberMo.Dob),Gender: memberMo.Gender};
       const allFamilyMembers = familyMembers.concat([newFamilyMember]);
       const updatedPatient = await patientModel.findByIdAndUpdate(id, {
         FamilyMembers: allFamilyMembers,
@@ -882,7 +905,7 @@ const linkFamily = async (req,res) => {
       return res.status(404).json({ error: "Member already linked" });
     }
     else{
-      const newFamilyMember = {PatientID:memberEm.id,Name: memberEm.Name,RelationToPatient:RelationToPatient,Age: memberEm.Age,Gender: memberEm.Gender};
+      const newFamilyMember = {PatientID:memberEm.id,Name: memberEm.Name,RelationToPatient:RelationToPatient,Age: calculateAge(memberEm.Dob),Gender: memberEm.Gender};
       const allFamilyMembers = familyMembers.concat([newFamilyMember]);
       const updatedPatient = await patientModel.findByIdAndUpdate(id, {
         FamilyMembers: allFamilyMembers,
@@ -922,8 +945,6 @@ const cancelSubscription = async (req,res) => {
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
 
-   filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
-  viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity, getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe
+filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
+viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity, getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe
 ,linkFamily, cancelSubscription };
-
- 

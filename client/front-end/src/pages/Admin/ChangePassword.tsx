@@ -30,7 +30,6 @@ const ChangePassword = () => {
     baseURL: "http://localhost:8000/",
   });
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -63,12 +62,8 @@ const ChangePassword = () => {
 
       //logout
       localStorage.clear();
-      setTimeout(()=> {
-        navigate("/");
-       }, 1000);
-      window.location.reload;
-
-      
+      navigate("/");
+      window.location.reload();
     } catch (error) {
       console.error("Error:", error);
 
@@ -80,9 +75,8 @@ const ChangePassword = () => {
       }
     }
     setAlertVisibility(true);
-
   };
-  
+
   return (
     <div
       style={{
@@ -95,7 +89,7 @@ const ChangePassword = () => {
       <div>
         <h1 className="text-center mt-4 mb-4">Change Password</h1>
         <br />
-        <form onSubmit={handleSubmit} >
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
             <div className="input-container">
               <InputLabel htmlFor="standard-adornment-password">
@@ -127,10 +121,10 @@ const ChangePassword = () => {
           <br />
 
           <div className="form-group">
-          <div className="input-container">
-            <InputLabel htmlFor="standard-adornment-password">
-              New Password
-            </InputLabel>
+            <div className="input-container">
+              <InputLabel htmlFor="standard-adornment-password">
+                New Password
+              </InputLabel>
               <Input
                 type={showNewPass ? "text" : "password"}
                 onChange={(e) => {
@@ -152,8 +146,17 @@ const ChangePassword = () => {
               />
               {!validatePassword(newPass) && (
                 <div className="text-danger" style={{ textAlign: "left" }}>
-                  <small>Password must be at least 6 characters long and contain at least </small><br />
-                    <small><b>one uppercase letter, one lowercase letter, and one digit</b> </small><br />
+                  <small>
+                    Password must be at least 6 characters long and contain at
+                    least{" "}
+                  </small>
+                  <br />
+                  <small>
+                    <b>
+                      one uppercase letter, one lowercase letter, and one digit
+                    </b>{" "}
+                  </small>
+                  <br />
                 </div>
               )}
             </div>
@@ -161,10 +164,10 @@ const ChangePassword = () => {
           <br />
 
           <div className="form-group">
-          <div className="input-container">
-            <InputLabel htmlFor="standard-adornment-password">
-              Confirm New Password
-            </InputLabel>
+            <div className="input-container">
+              <InputLabel htmlFor="standard-adornment-password">
+                Confirm New Password
+              </InputLabel>
               <Input
                 type={showNewPassConfirm ? "text" : "password"}
                 onChange={(e) => {
@@ -185,7 +188,7 @@ const ChangePassword = () => {
                 style={{ width: "300px" }}
               />
             </div>
-          </div>   
+          </div>
           <br />
           <br />
           <div
@@ -204,10 +207,9 @@ const ChangePassword = () => {
             </button>
           </div>
           <br />
-          
         </form>
-        <div> 
-        {alertVisible && (
+        <div>
+          {alertVisible && (
             <Alert
               type={error ? "danger" : "success"}
               onClose={() => setAlertVisibility(false)}
@@ -217,8 +219,6 @@ const ChangePassword = () => {
           )}
         </div>
       </div>
-  
-      
     </div>
   );
 };

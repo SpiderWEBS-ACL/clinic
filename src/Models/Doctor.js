@@ -55,7 +55,11 @@ const doctorSchema = new Schema(
       {
         type: String,
       },
-    ]
+    ],
+    FirstTime: {
+      type: Boolean,
+      default: true
+    }
   },
   { timestamps: true }
 );
