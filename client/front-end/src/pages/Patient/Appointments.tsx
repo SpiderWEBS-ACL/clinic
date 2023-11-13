@@ -74,6 +74,7 @@ const ViewPatientAppointments = () => {
     try {
       api.get(`/patient/allAppointments`, config).then((response) => {
         setAppointments(response.data);
+        console.log(response.data);
         setAllAppointments(response.data);
         setHasAppointments(response.data.length > 0);
         setLoading(false);
@@ -130,9 +131,9 @@ const ViewPatientAppointments = () => {
           onChange={setStatus}
         >
           <Option value="Upcoming">Upcoming</Option>
-          <Option value="Attended">Attended</Option>
+          <Option value="Completed">Completed</Option>
           <Option value="Cancelled">Cancelled</Option>
-          <Option value="Not-Attended">Not-Attended</Option>
+          <Option value="Rescheduled">Rescheduled</Option>
         </Select>
         <label style={{ marginRight: 8 }}>
           <strong>Date:</strong>

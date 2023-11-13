@@ -61,8 +61,8 @@ const RegLog: React.FC = () => {
           EmergencyContactName,
           EmergencyContactMobile,
         };
-
         const response = await api.post(`/patient/register`, data);
+        console.log(data)
         message.success("Congrats, you are in");
         setTimeout(toggleSignUp, 1500);
       } catch (error: any) {
@@ -100,8 +100,10 @@ const RegLog: React.FC = () => {
   const handleRedirection = (item: any) => {
     if (item.type == "Patient") {
       navigate(`/patient/Home`);
-    } else if (item.type == "Doctor") {
-      navigate(`/doctor/home`);
+    } else if (item.type == "Doctor" && item.user.FirstTime == true) {
+      navigate(`/doctor/timeSlots`);
+    } else if (item.type == "Doctor" && item.user.FirstTime != true) {
+      navigate(`/doctor/Home`);
     } else if (item.type == "Admin") {
       navigate(`/admin/Home`);
     }
@@ -166,7 +168,13 @@ const RegLog: React.FC = () => {
           onBlur={() => handleBlur("password")}
         />
 
-        <a href="/forgotPassword" className="forgot-pass text-right" style={{display: "block", textAlign:"center"}}>Forgot Password?</a>
+        <a
+          href="/forgotPassword"
+          className="forgot-pass text-right"
+          style={{ display: "block", textAlign: "center" }}
+        >
+          Forgot Password?
+        </a>
         {/* <Link to= "/forgotPassword" onClick={() => { }} className="forgot-pass text-right" style={{display: "block", textAlign:"center"}}>Forgot Password?</Link> */}
 
         <button onClick={handleSignIn} type="button" className="submit button">

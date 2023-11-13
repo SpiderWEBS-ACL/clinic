@@ -5,6 +5,7 @@ const cors = require('cors');
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const packageModel = require("./Models/Package");
+const path = require('path');
 
 const {
   addPatient,
@@ -32,6 +33,7 @@ const {
   getDoctorTimeSlots, 
   payAppointmentWithStripe, 
   getSubscribedPackage, 
+  viewHealthRecords,
   getBalance, 
   getAllPackagesPatient,
   doctorDiscount, 
@@ -60,12 +62,14 @@ const {
   uploadMedicalDegree,
   getDoctorTimeSlotsForDoctor,
   checkDoctorAvailablityForDoctor,
-  scheduleFollowUp
+  scheduleFollowUp,
+  loggedInFirstTime
 } = require("./controllers/doctorController");
 
 const {
   addAppointment,
-  filterAppointment,
+  filterAppointmentPatient,
+  filterAppointmentDoctor,
 } = require("./controllers/appointmentController");
 
 const {
@@ -116,7 +120,9 @@ const MongoURI = process.env.ATLAS_MONGO_URI;
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json())
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 const port = process.env.PORT || "8000";
 
 // configurations
@@ -136,7 +142,7 @@ mongoose
 app.post("/login", login);
 app.post("/forgotPassword", forgotPassword);
 app.post("/verifyOTP", verifyOTP);
-app.post("/resetPassword", resetPassword);
+app.put("/resetPassword", resetPassword);
 
 //Admin Endpoints
 app.get("/admin/me", AdminProtect, getAdmin);
@@ -169,8 +175,6 @@ app.post("/doctor/rejectContract/:id", rejectContract);
 app.post("/doctor/uploadPersonalID/:id", uploadPersonalID);
 app.post("/doctor/uploadMedicalDegree/:id", uploadMedicalDegree);
 app.post("/doctor/uploadLicense/:id", uploadLicenses);
-app.get("/doctor/registrationRequest/:id", getDoctrRegistrationReqDetails); 	//for employment contract
-
 
 //Private endpoints
 
@@ -190,6 +194,7 @@ app.get("/doctor/viewHealthRecords/:id", DoctorProtect, viewHealthRecordsDoctor)
 app.post("/doctor/addHealthRecordForPatient/:id", DoctorProtect, addHealthRecordForPatient);
 app.post("/doctor/scheduleFollowup/", DoctorProtect, scheduleFollowUp);
 app.get("/doctor/doctorTimeSlots/",DoctorProtect,getDoctorTimeSlotsForDoctor);
+app.put("/doctor/loggedInFirstTime",DoctorProtect,loggedInFirstTime);
 //Patient Endpoints
 
 //Public Endpoints
@@ -207,14 +212,15 @@ app.get("/patient/selectDoctor/:id",PatientProtect, selectDoctor);
 app.get("/patient/searchForDoctor",PatientProtect,searchForDoctor);
 app.get("/patient/filterDoctorsCriteria",PatientProtect,filterDoctorsByNameSpecialtyAvailability);
 app.get("/patient/viewFamilyMembers",PatientProtect,viewFamilyMembers)
+app.get("/patient/viewHealthRecords", PatientProtect, viewHealthRecords);
 app.get("/patient/filterDoctors", PatientProtect,filterDoctors);
 app.post("/patient/subscribeToHealthPackage/:id",PatientProtect, subscribeToHealthPackage);
 app.get("/patient/filterAppointments",PatientProtect,filterPatientAppointments)
 app.get("/patient/viewSelectedDoctor/:id",PatientProtect,viewDoctorDetails)
-app.post("/patient/uploadMedicalDocuments/:id",PatientProtect, uploadMedicalDocuments);
-app.delete("/patient/removeMedicalDocument/:id",PatientProtect, deleteMedicalDocuments);
+app.post("/patient/uploadMedicalDocuments",PatientProtect, uploadMedicalDocuments);
+app.delete("/patient/removeMedicalDocument",PatientProtect, deleteMedicalDocuments);
 app.post("/patient/subscribeToHealthPackage/:id",PatientProtect, subscribeToHealthPackage);
-app.get("/patient/viewMyMedicalDocument/:id",PatientProtect, viewMedicalDocuments);
+app.get("/patient/viewMyMedicalDocument",PatientProtect, viewMedicalDocuments);
 app.get("/patient/viewMyPrescriptions",PatientProtect,viewMyPrescriptions)
 app.get("/patient/filterPrescriptions",PatientProtect,filterPrescriptions)
 app.get("/patient/selectPrescription/:id",PatientProtect,selectPrescription)
@@ -251,10 +257,11 @@ app.delete("/patient/cancelSubscription",PatientProtect, cancelSubscription);
 app.get("/patient/showSubscribedPackage", PatientProtect, showSubscribedPackage);
 
 
+
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
-app.get("/appointment/filterAppointment",PatientProtect || DoctorProtect, filterAppointment);
-app.get("/appointment/filterAppointmentDoctor",DoctorProtect, filterAppointment);
+app.get("/appointment/filterAppointment",PatientProtect, filterAppointmentPatient);
+app.get("/appointment/filterAppointmentDoctor", DoctorProtect, filterAppointmentDoctor);
 
 //Subscription Endpoints
 app.post("/subscription/subscribe/:id",subscribeWithStripe);

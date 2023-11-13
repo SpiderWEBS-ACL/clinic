@@ -12,22 +12,22 @@ const fileSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Doctor",
     },
-    filedata: {
-      type: Buffer, 
+    path: {
+      type: String,
       required: true
     },
-    path:{
+    contentType:{
       type:String,
-      required: true
+      required:true
     },
     filename:{
         type: String,
         required: true
     },
     originalname:{
-        type: String,
-        required: true
-    },
+      type: String,
+      required: true
+    }
   }
 );
 

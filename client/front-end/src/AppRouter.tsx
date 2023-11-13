@@ -49,6 +49,7 @@ import Wallet from "./pages/Patient/Wallet";
 import AppointmentSuccess from "./pages/Patient/AppointmentSuccess";
 import EmploymentContract from "./pages/Doctor/EmploymentContract";
 import Calendarr from "./pages/Calendar";
+import UploadMedicalHistory from "./pages/Patient/UploadMedicalHistory";
 
 export interface JwtPayload {
   id: string;
@@ -120,6 +121,10 @@ const AppRouter: React.FC = () => {
       <Routes>
         <Route path="/" element={<RegLog />} />
         <Route path="/patient/Home" element={<PatientHome />} />
+        <Route
+          path="/patient/uploadMedicalHistory"
+          element={<UploadMedicalHistory />}
+        />
 
         <Route path="/patient/addFamilyMember" element={<AddFamilyMember />} />
         <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
@@ -164,7 +169,10 @@ const AppRouter: React.FC = () => {
     navigate(-1);
     return (
       <Routes>
-        <Route path="/employmentContract/:id" element={<EmploymentContract />} />
+        <Route
+          path="/employmentContract/:id"
+          element={<EmploymentContract />}
+        />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/" element={<RegLog />} />
       </Routes>

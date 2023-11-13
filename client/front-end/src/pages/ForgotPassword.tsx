@@ -40,7 +40,7 @@ const ForgotPassword = () => {
   const navigate = useNavigate();
 
   const api = axios.create({
-    baseURL: "http://localhost:5000/",
+    baseURL: "http://localhost:8000/",
   });
 
   const handleSendOTP = async () => {
@@ -99,7 +99,6 @@ const ForgotPassword = () => {
         setPassVisible(true);
         setAlertVisibility(false);
       }, 1000);
-
     } catch (error) {
       console.error("Error:", error);
 
@@ -130,7 +129,7 @@ const ForgotPassword = () => {
       return;
     }
 
-    if(newPass !== newPassConfirm){
+    if (newPass !== newPassConfirm) {
       setError("The Passwords Do Not Match");
       setAlertVisibility(true);
       return;
@@ -169,145 +168,147 @@ const ForgotPassword = () => {
     setAlertVisibility(true);
   };
 
-
   return (
     <Layout>
-    <Content style={{ margin: "39px" }}>
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        //alignItems: "center",
-        height: "80vh",
-      }}
-    >
-      <div>
-        <h1 className="text-center mt-4 mb-4">Forgot Password?</h1>
-        <br />
-        <form onSubmit={handleReset}>
-          {!passVisible ? (
-            <div id="EmailOTP">
-              <div className="form-group">
-                <div className="input-container">
-                  <h5>
-                    Enter the email you're registered with and we'll send you an
-                    OTP to reset your password
-                  </h5>
+      <Content style={{ margin: "39px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            //alignItems: "center",
+            height: "80vh",
+          }}
+        >
+          <div>
+            <h1 className="text-center mt-4 mb-4">Forgot Password?</h1>
+            <br />
+            <form onSubmit={handleReset}>
+              {!passVisible ? (
+                <div id="EmailOTP">
+                  <div className="form-group">
+                    <div className="input-container">
+                      <h5>
+                        Enter the email you're registered with and we'll send
+                        you an OTP to reset your password
+                      </h5>
+                      <br />
+                      <InputLabel htmlFor="standard-adornment-password">
+                        Email
+                      </InputLabel>
+                      <Grid container={true}>
+                        <Input
+                          type={"text"}
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                          }}
+                          value={email}
+                          style={{ width: "400px", marginRight: 30 }}
+                        />
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={handleSendOTP}
+                        >
+                          Send OTP
+                        </Button>
+                      </Grid>
+                    </div>
+                  </div>
+
                   <br />
-                  <InputLabel htmlFor="standard-adornment-password">
-                    Email
-                  </InputLabel>
-                  <Grid container={true}>
-                    <Input
-                      type={"text"}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                      }}
-                      value={email}
-                      style={{ width: "400px", marginRight: 30 }}
-                    />
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleSendOTP}
-                    >
-                      Send OTP
-                    </Button>
-                  </Grid>
-                </div>
-              </div>
+                  <br />
 
-              <br />
-              <br />
-
-              <div style={{ visibility: otpVisible ? "visible" : "hidden" }}>
-                <div className="form-group">
-                  <div className="input-container">
-                    <InputLabel htmlFor="standard-adornment-password">
-                      <h6>
-                        An OTP has been sent to{" "}
-                        <b>
-                          <i>{email}</i>
-                        </b>
-                        . Kindly, check your inbox and enter it below.
-                      </h6>
-                    </InputLabel>
-                    <Grid container={true}>
-                      <Input
-                        type={"text"}
-                        onChange={(e) => {
-                          setOTP(e.target.value);
-                        }}
-                        value={otp}
-                        style={{ marginRight: 30 }}
-                      />
-                      <Button
-                        variant="contained"
-                        color="error"
-                        style={{ height: 30, width: 70 }}
-                        onClick={handleOTP}
-                      >
-                        Verify
-                      </Button>
-                    </Grid>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div>
-              <br />
-              <br />
-              <h5>Enter Your New Password Below to Reset. </h5>
-              <br /><br />
-                <div className="form-group">
-                  <div className="input-container">
-                    <InputLabel htmlFor="standard-adornment-password">
-                      New Password
-                    </InputLabel>
-                    <Input
-                      type={showNewPass ? "text" : "password"}
-                      onChange={(e) => {
-                        setNewPass(e.target.value);
-                      }}
-                      value={newPass}
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <IconButton
-                            onClick={() => {
-                              setShowNewPass(!showNewPass);
+                  <div
+                    style={{ visibility: otpVisible ? "visible" : "hidden" }}
+                  >
+                    <div className="form-group">
+                      <div className="input-container">
+                        <InputLabel htmlFor="standard-adornment-password">
+                          <h6>
+                            An OTP has been sent to{" "}
+                            <b>
+                              <i>{email}</i>
+                            </b>
+                            . Kindly, check your inbox and enter it below.
+                          </h6>
+                        </InputLabel>
+                        <Grid container={true}>
+                          <Input
+                            type={"text"}
+                            onChange={(e) => {
+                              setOTP(e.target.value);
                             }}
+                            value={otp}
+                            style={{ marginRight: 30 }}
+                          />
+                          <Button
+                            variant="contained"
+                            color="error"
+                            style={{ height: 30, width: 70 }}
+                            onClick={handleOTP}
                           >
-                            {showNewPass ? <Visibility /> : <VisibilityOff />}
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                      style={{ width: "350px" }}
-                    />
-                    {!validatePassword(newPass) && (
-                      <div
-                        className="text-danger"
-                        style={{ textAlign: "left" }}
-                      >
-                        <small>
-                          Password must be at least 6 characters long and
-                          contain at least{" "}
-                        </small>
-                        <br />
-                        <small>
-                          <b>
-                            one uppercase letter, one lowercase letter, and one
-                            digit
-                          </b>{" "}
-                        </small>
-                        <br />
+                            Verify
+                          </Button>
+                        </Grid>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
-                <br />
+              ) : (
+                <div>
+                  <br />
+                  <br />
+                  <h5>Enter Your New Password Below to Reset. </h5>
+                  <br />
+                  <br />
+                  <div className="form-group">
+                    <div className="input-container">
+                      <InputLabel htmlFor="standard-adornment-password">
+                        New Password
+                      </InputLabel>
+                      <Input
+                        type={showNewPass ? "text" : "password"}
+                        onChange={(e) => {
+                          setNewPass(e.target.value);
+                        }}
+                        value={newPass}
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => {
+                                setShowNewPass(!showNewPass);
+                              }}
+                            >
+                              {showNewPass ? <Visibility /> : <VisibilityOff />}
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                        style={{ width: "350px" }}
+                      />
+                      {!validatePassword(newPass) && (
+                        <div
+                          className="text-danger"
+                          style={{ textAlign: "left" }}
+                        >
+                          <small>
+                            Password must be at least 6 characters long and
+                            contain at least{" "}
+                          </small>
+                          <br />
+                          <small>
+                            <b>
+                              one uppercase letter, one lowercase letter, and
+                              one digit
+                            </b>{" "}
+                          </small>
+                          <br />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <br />
 
-                  <div className="form-group" >
+                  <div className="form-group">
                     <div className="input-container">
                       <InputLabel htmlFor="standard-adornment-password">
                         Confirm New Password
@@ -354,27 +355,27 @@ const ForgotPassword = () => {
                       Reset Password
                     </button>
                   </div>
-                <br />
-            </div>
-          )}
-        </form>
+                  <br />
+                </div>
+              )}
+            </form>
 
-        <div>
-        <br />
-          {alertVisible && (
-            <Alert
-              type={error ? "danger" : "success"}
-              onClose={() => setAlertVisibility(false)}
-            >
-              {error ? error : message}
-            </Alert>
-          )}
+            <div>
+              <br />
+              {alertVisible && (
+                <Alert
+                  type={error ? "danger" : "success"}
+                  onClose={() => setAlertVisibility(false)}
+                >
+                  {error ? error : message}
+                </Alert>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    </Content>
-    <ImportedFooter />
-  </Layout>
+      </Content>
+      <ImportedFooter />
+    </Layout>
   );
 };
 
