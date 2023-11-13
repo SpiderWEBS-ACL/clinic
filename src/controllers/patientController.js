@@ -525,11 +525,25 @@ const viewAllPatientAppointments = async(req,res) => {
 
   try{
           if(patient){
-              const appointments = await appointmentModel.find({Patient: patient}).populate("Doctor").populate("Patient").exec();
+
+              var appointments = await appointmentModel.find({Patient: patient}).populate("Doctor");
+              await Promise.all(
+                patient.FamilyMembers.map( async (member) => {
+                var appointmentsMember =  await appointmentModel.find({Patient: member._id}).populate("Doctor");
+                appointmentsMember.map((member2) => {
+                  member2.title = member.Name + "'s Appointment"
+                  console.log(member.Name);
+                })
+                appointments.push(...appointmentsMember);
+                appointments.map((appointment) => {
+                  appointment.title += " with Dr. " + appointment.Doctor.Name;
+                })
+              }))
                   if(!appointments || appointments.length === 0){
                       res.status(404).json({error: "no appointments were found"});
                   }
                   else
+                      console.log(appointments);
                       return res.status(200).json(appointments);
                   }
       }catch(error){

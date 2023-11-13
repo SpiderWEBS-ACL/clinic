@@ -317,7 +317,7 @@ const viewPatients = async (req, res) => {
     const patients = [];
     for (const appointment of appointments) {
       const patient = appointment.Patient;
-      if(!patients.includes(patient))
+      if(!patients.includes(patient) && patient != null)
          patients.push(patient);
     }
 
@@ -386,9 +386,9 @@ const viewAllDoctorAppointments = async (req, res) => {
     if (doctor) {
       const appointments = await appointmentModel
         .find({ Doctor: id })
-        .populate("Doctor")
         .populate("Patient")
         .exec();
+      
       return res.status(200).json(appointments);
     }
   } catch (error) {

@@ -74,6 +74,7 @@ const ViewPatientAppointments = () => {
     try {
       api.get(`/patient/allAppointments`, config).then((response) => {
         setAppointments(response.data);
+        console.log(response.data);
         setAllAppointments(response.data);
         setHasAppointments(response.data.length > 0);
         setLoading(false);
