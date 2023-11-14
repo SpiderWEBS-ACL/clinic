@@ -62,6 +62,7 @@ const {
   uploadMedicalDegree,
   getDoctorTimeSlotsForDoctor,
   checkDoctorAvailablityForDoctor,
+  viewPatientMedicalRecords,
   scheduleFollowUp,
   loggedInFirstTime,
   getTimeSlotsOfDateDoctor,
@@ -174,9 +175,9 @@ app.post("/doctor/add", addDoctor);
 app.post("/doctor/register", registerDoctor);
 app.post("/doctor/acceptContract/:id", acceptContract);
 app.post("/doctor/rejectContract/:id", rejectContract);
-app.post("/doctor/uploadPersonalID/:id", uploadPersonalID);
-app.post("/doctor/uploadMedicalDegree/:id", uploadMedicalDegree);
-app.post("/doctor/uploadLicense/:id", uploadLicenses);
+app.post("/doctor/uploadPersonalID", uploadPersonalID);
+app.post("/doctor/uploadMedicalDegree", uploadMedicalDegree);
+app.post("/doctor/uploadLicense",uploadLicenses);
 app.get("/doctor/registrationRequest/:id", getDoctrRegistrationReqDetails);
 
 //Private endpoints
@@ -198,6 +199,7 @@ app.post("/doctor/addHealthRecordForPatient/:id", DoctorProtect, addHealthRecord
 app.post("/doctor/scheduleFollowup/", DoctorProtect, scheduleFollowUp);
 app.get("/doctor/doctorTimeSlots/",DoctorProtect,getDoctorTimeSlotsForDoctor);
 app.put("/doctor/loggedInFirstTime",DoctorProtect,loggedInFirstTime);
+app.get("/doctor/viewPatientFiles/:id",DoctorProtect, viewPatientMedicalRecords);
 app.put("/doctor/getTimeSlotDate",DoctorProtect,getTimeSlotsOfDateDoctor);
 app.get("/doctor/getAvailableTimeSlots",DoctorProtect,getAvailableTimeSlots);
 //Patient Endpoints

@@ -3,7 +3,8 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { Input, Select, message } from "antd";
 import { Col, Row } from "react-bootstrap";
-import { Card, Skeleton, Switch, Avatar } from "antd";
+import {Card, Skeleton, Switch, Avatar } from 'antd';
+
 
 const ViewAllPatients = () => {
   const accessToken = localStorage.getItem("accessToken");
@@ -26,16 +27,14 @@ const ViewAllPatients = () => {
     api
       .get(`/doctor/viewPatients/`, config)
       .then((response) => {
-        console.log(response.data);
-        setLoadingList(false);
         setPatients(response.data);
+        setLoadingList(false);
         setAllPatients(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, []);
+  },[]);
 
   const navigate = useNavigate();
 
@@ -43,6 +42,7 @@ const ViewAllPatients = () => {
     navigate(`/doctor/viewPatientInfo/${item}`);
   };
 
+ 
   const handleChange = (value: string) => {
     setLoadingList(true);
     if (value === "Upcoming") {
@@ -60,14 +60,17 @@ const ViewAllPatients = () => {
           setLoadingList(false);
         })
         .catch((error) => {
+
           if (error.response && error.response.status === 404) {
-            setPatients([]);
+            setPatients([])
             setLoadingList(false);
-            message.error("No upcoming appointments!");
-          } else {
-            console.error("Error:", error);
+            message.error("No upcoming appointments!")
           }
-        });
+          else{
+            console.error("Error:", error);
+
+          }
+                });
     } else {
       setSelectedOption("All");
 
@@ -107,7 +110,7 @@ const ViewAllPatients = () => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
   };
-
+ 
   const handleSearch = () => {
     setLoadingList(true);
     api
@@ -120,10 +123,14 @@ const ViewAllPatients = () => {
         if (error.response && error.response.status === 404) {
           setLoadingList(false);
           setPatients([]);
-          message.error("No data found!");
-        } else {
-          console.error("Error:", error);
+          message.error("No data found!")
         }
+        else{
+          console.error("Error:", error);
+
+        }
+
+
       });
   };
   const handleClearFilters = async () => {
@@ -132,6 +139,7 @@ const ViewAllPatients = () => {
     setSelectedOption("All");
     setPatients(AllPatients);
     message.success("Cleared!");
+
   };
 
   return (
@@ -185,8 +193,9 @@ const ViewAllPatients = () => {
           </button>
         </span>
       </div>
-      <br />
-
+      <br />   
+          
+        </tbody>
       <tbody>
         {patients.map(
           (patient, index) =>
@@ -244,6 +253,7 @@ const ViewAllPatients = () => {
             )
         )}
       </tbody>
+
     </div>
   );
 };

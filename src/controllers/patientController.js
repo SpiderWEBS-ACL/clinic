@@ -533,7 +533,6 @@ const viewAllPatientAppointments = async(req,res) => {
                 var appointmentsMember =  await appointmentModel.find({Patient: member._id}).populate("Doctor");
                 appointmentsMember.map((member2) => {
                   member2.title = member.Name + "'s Appointment"
-                  console.log(member.Name);
                 })
                 appointments.push(...appointmentsMember);
                 // appointments.map((appointment) => {
@@ -544,7 +543,6 @@ const viewAllPatientAppointments = async(req,res) => {
                     return res.status(404).json({error: "no appointments were found"});
                   }
                   else
-                      console.log(appointments);
                       return res.status(200).json(appointments);
                   }
       }catch(error){
@@ -563,7 +561,7 @@ const getAllDoctorsPatient = async (req,res) =>{
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Set the destination folder to 'public/uploads'
+    cb(null, 'uploads/'); 
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -613,23 +611,22 @@ const uploadMedicalDocuments = async (req, res) => {
 
 
 const deleteMedicalDocuments = async (req, res) => {
-  const id = req.user.id
+  const patientID = req.user.id
+  const id  = req.body.fileid;
   try {
-    let currFiles = [];
-    currFiles = await fileModel.find({ Patient: id });
-
-      if (currFiles.length === 0) {
-        return res.status(404).json({ error: 'Files not found' });
+     const currFile = await fileModel.findByIdAndDelete(id);
+     fs.unlink(currFile.path, function (err) {
+      if (err) {
+        console.error(err);
       }
-
-      await fileModel.deleteMany({ Patient: id });
-
-    
-
- 
-
-    return res.status(200).json({ message: 'Files deleted' });
-    console.log('Files deleted');
+    });
+          const updatedPatient = await patientModel.findByIdAndUpdate(
+        patientID,
+        { $pull: { MedicalHistory: id} },
+        { new: true }
+      );
+      await updatedPatient.save();
+      res.status(200).json({ message: 'Files deleted' });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -674,18 +671,6 @@ const subscribeToHealthPackage = async(req,res) => {
     if(!currPatient){
       return res.status(404).json({error: 'No patient found!'});
     }
-    // if(currPatient.FamilyMembers.length>0){
-    //   for (const familyMember of currPatient.FamilyMembers) {
-    //       if(familyMember.MemberID){
-    //         const newSubscription = new subscriptionModel({
-    //           Patient: familyMember.MemberID,
-    //           Package: packageId,
-    //         });
-    //         await newSubscription.save();
-            
-    //       }
-    //   }
-    // }
     const newSubscription = new subscriptionModel({
       Patient: id,
       Package: packageId,
@@ -696,15 +681,6 @@ const subscribeToHealthPackage = async(req,res) => {
     return res.status(500).json({error: error.message});
   }
 }
-
-
-  
-  
-  
-  
-  
-  
-  
   
 const checkDoctorAvailablity = async (req, res) => {
 
@@ -882,7 +858,7 @@ const getSubscribedPackage = async (req,res) => {
 const showSubscribedPackage = async (req,res) => {
   const patientId = req.user.id;
   const subscription = await subscriptionModel.find({Patient: patientId});
-  if(!subscription)
+  if(subscription.length==0)
     return res.status(200).json([]);
   if(subscription){
     const package = await packageModel.find({_id: (subscription[0].Package),});
