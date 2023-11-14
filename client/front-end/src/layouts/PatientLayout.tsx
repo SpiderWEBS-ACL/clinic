@@ -58,6 +58,11 @@ const PatientLayout: React.FC = () => {
       key: "/patient/viewalldoctors",
     },
     {
+      label: "Health Records",
+      icon: <FileOutlined />,
+      key: "/patient/viewhealthrecords",
+    },
+    {
       label: "Prescriptions",
       key: "/patient/viewPrescriptions",
       icon: <FileOutlined />,
@@ -72,11 +77,11 @@ const PatientLayout: React.FC = () => {
       key: "/patient/wallet",
       icon: <WalletOutlined />,
     },
-    {
-      label: "Settings",
-      key: "/patient/settings",
-      icon: <SettingOutlined />,
-    },
+    // {
+    //   label: "Settings",
+    //   key: "/patient/settings",
+    //   icon: <SettingOutlined />,
+    // },
     {
       label: "Logout",
       key: "/",

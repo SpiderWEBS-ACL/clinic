@@ -12,6 +12,8 @@ import {
   FileOutlined,
   UserOutlined,
   PoweroffOutlined,
+  ClockCircleOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import AppRouter from "../AppRouter";
 
@@ -40,12 +42,17 @@ const DoctorLayout: React.FC = () => {
     {
       label: "Appointments",
       key: "/doctor/allAppointments",
-      icon: <UserOutlined />,
+      icon: <CalendarOutlined />,
     },
     {
       label: "Update Info",
       key: "/doctor/update",
       icon: <UserOutlined />,
+    },
+    {
+      label: "Time Slots",
+      key: "/doctor/timeSlots",
+      icon: <ClockCircleOutlined />,
     },
     {
       label: "Logout",

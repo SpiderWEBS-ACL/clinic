@@ -4,6 +4,8 @@ const doctorModel = require("../Models/Doctor");
 const patientModel = require("../Models/Patient");
 const packageModel = require("../Models/Package");
 const appointmentModel = require("../Models/Appointment");
+const fileModel = require("../Models/File");
+
 const doctorRegisterRequestModel = require("../Models/DoctorRegisterRequest");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
@@ -14,7 +16,7 @@ const { default: mongoose } = require("mongoose");
 
 const getAdmin = async (req, res) => {
   const { _id, Username, Password, Email } = await adminModel.findById(req.user.id);
-  res.status(200).json({
+  return res.status(200).json({
     id: _id,
     Username,
     Password,
@@ -25,9 +27,9 @@ const getAdmin = async (req, res) => {
 const getAllAdmins = async (req, res) => {
   try {
     const admin = await adminModel.find({});
-    res.status(200).json(admin);
+    return res.status(200).json(admin);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -47,14 +49,14 @@ const addAdmin = async (req, res) => {
     if (!exists && !exists2) {
       req.body.Password = await bcrypt.hash(req.body.Password, 10);
       var newAdmin = await adminModel.create(req.body);
-      res.status(201).json(newAdmin);
+      return res.status(201).json(newAdmin);
     } else if (exists) {
-      res.status(400).json({ error: "Username already taken!" });
+      return res.status(400).json({ error: "Username already taken!" });
     } else {
-      res.status(400).json({ error: "Email already taken!" });
+      return res.status(400).json({ error: "Email already taken!" });
     }
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 };
 
@@ -65,9 +67,9 @@ const removeAdmin = async (req, res) => {
     if (!removedAmin) {
       return res.status(404).json({ error: "Admin not found" });
     }
-    res.status(200).json(removedAmin);
+    return res.status(200).json(removedAmin);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -116,9 +118,9 @@ const removeAdmin = async (req, res) => {
 const getAllPatients = async (req, res) => {
   try {
     const patient = await patientModel.find({});
-    res.status(200).json(patient);
+    return res.status(200).json(patient);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 const removePatient = async (req, res) => {
@@ -129,9 +131,9 @@ const removePatient = async (req, res) => {
       return res.status(404).json({ error: "Patient not found" });
     }
     await appointmentModel.deleteMany({ Patient: id });
-    res.status(200).json(removedPatient);
+    return res.status(200).json(removedPatient);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -145,18 +147,18 @@ const removeDoctor = async (req, res) => {
       return res.status(404).json({ error: "Doctor not found" });
     }
     await appointmentModel.deleteMany({ Doctor: id });
-    res.status(200).json(removedDoctor);
+    return res.status(200).json(removedDoctor);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
 const getAllDoctors = async (req, res) => {
   try {
     const RegistrationReqs = await doctorModel.find({});
-    res.status(200).json(RegistrationReqs);
+    return res.status(200).json(RegistrationReqs);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -165,9 +167,9 @@ const getAllDoctors = async (req, res) => {
 const getAllDoctrsRegistrationReqs = async (req, res) => {
   try {
     const RegistrationReqs = await doctorRegisterRequestModel.find({});
-    res.status(200).json(RegistrationReqs);
+    return res.status(200).json(RegistrationReqs);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -180,9 +182,9 @@ const getDoctrRegistrationReqDetails = async (req, res) => {
         .status(404)
         .json({ error: "Doctor registration request not found" });
     }
-    res.status(200).json(RegistrationReq);
+    return res.status(200).json(RegistrationReq);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -205,9 +207,9 @@ const acceptRegistrationRequest = async (req, res) => {
 
     await sendEmploymentContract(regReq, salary);
 
-    res.status(200).json("Employment Contract Sent");
+    return res.status(200).json("Employment Contract Sent");
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -222,9 +224,9 @@ const rejectRegistrationRequest = async (req, res) => {
         .status(404)
         .json({ error: "Doctor registration request not found" });
     }
-    res.status(200).json(RegistrationReq);
+    return res.status(200).json(RegistrationReq);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -272,9 +274,9 @@ const sendEmploymentContract = async(regReq) => {
 const getAllPackages = async (req, res) => {
   try {
     const packages = await packageModel.find({});
-    res.status(200).json(packages);
+    return res.status(200).json(packages);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -285,17 +287,17 @@ const getPackage = async (req, res) => {
     if (!package) {
       return res.status(404).json({ error: "Package not found" });
     }
-    res.status(200).json(package);
+    return res.status(200).json(package);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 const addPackage = async (req, res) => {
   try {
     const newPackage = await packageModel.create(req.body);
-    res.status(201).json(newPackage);
+    return res.status(201).json(newPackage);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 };
 
@@ -307,9 +309,9 @@ const updatePackage = async (req, res) => {
     if (!updatedPackage) {
       return res.status(404).json({ error: "Package not found" });
     }
-    res.status(200).json(updatedPackage);
+    return res.status(200).json(updatedPackage);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -320,18 +322,57 @@ const deletePackage = async (req, res) => {
     if (!deletedPackage) {
       return res.status(404).json({ error: "Package not found" });
     }
-    res.status(200).json(deletedPackage);
+    return res.status(200).json(deletedPackage);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
+
+
+const getPersonalID = async(req, res) => {
+  const { id } = req.params;
+  const currDoctor = await doctorRegisterRequestModel.findById(id);
+  const currFile = await fileModel.find({DocEmail: currDoctor.Email})
+  for(const file of currFile){
+    if(file.docFileType === "PersonalID"){
+      return res.status(200).json(file);
+    }
+  }
+}
+
+const getMedicalDegree = async(req, res) => {
+  const { id } = req.params;
+  const currDoctor = await doctorRegisterRequestModel.findById(id);
+  const currFile = await fileModel.find({DocEmail: currDoctor.Email})
+  for(const file of currFile){
+    if(file.docFileType === "Degree"){
+      return res.status(200).json(file);
+    }
+  }
+}
+
+const getLicenses = async(req, res) => {
+  const { id } = req.params;
+  const currDoctor = await doctorRegisterRequestModel.findById(id);
+  const currFile = await fileModel.find({DocEmail: currDoctor.Email})
+  let licenses = [];
+  for(const file of currFile){
+    if(file.docFileType === "License"){
+      licenses.push(file);
+  }
+  }
+  return res.status(200).json(licenses);
+}
 
 module.exports = {
   acceptRegistrationRequest,
   rejectRegistrationRequest,
   getAdmin,
   addAdmin,
+  getMedicalDegree,
+  getPersonalID,
   removeDoctor,
+  getLicenses,
   removePatient,
   removeAdmin,
   getAllDoctrsRegistrationReqs,

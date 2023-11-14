@@ -2,7 +2,21 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./style.css";
 import { Link, useNavigate } from "react-router-dom";
-import { message } from "antd";
+import {
+  message,
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  AutoComplete,
+  Cascader,
+  Col,
+  InputNumber,
+  Row,
+  DatePicker,
+  Select,
+} from "antd";
+
 import {
   validateMobile,
   validatePassword,
@@ -10,6 +24,8 @@ import {
 } from "../utils/ValidationUtils";
 import InputField2 from "../components/InputField2";
 import Cookies from "js-cookie";
+import moment from "moment";
+import dayjs from "dayjs";
 
 const RegLog: React.FC = () => {
   const [alertVisible, setAlertVisibility] = useState(false);
@@ -19,11 +35,11 @@ const RegLog: React.FC = () => {
   const [Password, setPassword] = useState<string>("");
   const [Username, setUsername] = useState<string>("");
   const [Gender, setGender] = useState<string>();
-  const [Dob, setDob] = useState<Date>();
-  const [Mobile, setMobile] = useState<number>();
+  const [Dob, setDob] = useState<any>();
+  const [Mobile, setMobile] = useState<string>();
   const [EmergencyContactName, setEmergencyContactName] = useState<string>();
   const [EmergencyContactMobile, setEmergencyContactMobile] =
-    useState<number>();
+    useState<string>();
   const [error, setError] = useState<string | null>(null);
   const [touchedFields, setTouchedFields] = useState({
     username: false,
@@ -35,6 +51,17 @@ const RegLog: React.FC = () => {
   });
 
   const handleSignUp = async () => {
+    console.log(
+      Name,
+      Email,
+      Password,
+      Username,
+      Dob,
+      Gender,
+      Mobile,
+      EmergencyContactName,
+      EmergencyContactMobile
+    );
     if (
       !Name ||
       !Email ||
@@ -62,7 +89,7 @@ const RegLog: React.FC = () => {
           EmergencyContactMobile,
         };
         const response = await api.post(`/patient/register`, data);
-        console.log(data)
+        console.log(data);
         message.success("Congrats, you are in");
         setTimeout(toggleSignUp, 1500);
       } catch (error: any) {
@@ -71,17 +98,40 @@ const RegLog: React.FC = () => {
       }
     }
   };
+  const validatePassword = (rule: any, value: string, callback: any) => {
+    const regex = /^(?=.*[A-Z])(?=.*\d).{6,}$/; 
+    if (!regex.test(value)) {
+      callback("Password must be at least 6 characters long and include one capital letter and one number.");
+    } else {
+      callback();
+    }
+  };
 
-  const handleSignIn = async () => {
-    if (!Password || !Username) {
+  const validatePhoneNumber = (rule: any, value: string, callback: any) => {
+    const regex = /^[0-9]+$/;
+    if (!regex.test(value)) {
+      callback("Please enter a valid phone number.");
+    } else if (value.length !== 11) {
+      callback("Please enter a valid phone number.");
+    } else {
+      callback();
+    }
+  };
+
+  const handleSignIn = async (values: any) => {
+    const { password, username } = values; // Destructure the values from the form
+
+    if (!password || !username) {
       message.warning(" Please fill in all the required fields.");
       return;
     }
+
     try {
       const data = {
-        Password,
-        Username,
+        Password: password, // Use the value from the form for Password
+        Username: username, // Use the value from the form for Username
       };
+
       const response = await api.post(`/login`, data);
       localStorage.setItem("id", response.data.id);
       localStorage.setItem("type", response.data.type);
@@ -137,61 +187,98 @@ const RegLog: React.FC = () => {
     window.location.reload();
   };
 
+  //------------------------------------------------------------------
+  type FieldType = {
+    username?: string;
+    password?: string;
+  };
+  const formItemLayout = {
+    labelCol: {
+      xs: { span: 24 },
+      sm: { span: 8 },
+    },
+    wrapperCol: {
+      xs: { span: 24 },
+      sm: { span: 16 },
+    },
+  };
+
+  const tailFormItemLayout = {
+    wrapperCol: {
+      xs: {
+        span: 24,
+        offset: 0,
+      },
+      sm: {
+        span: 16,
+        offset: 8,
+      },
+    },
+  };
+  const { Option } = Select;
+  const [form] = Form.useForm();
+  const prefixSelector = (
+    <Form.Item name="prefix" noStyle>
+      <Select style={{ width: 70 }}>
+        <Option value="20">+20</Option>
+      </Select>
+    </Form.Item>
+  );
+
   return (
     <div
       style={{
         boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2)", // Add shadow
         border: "1px solid #ccc", // Add border
+        maxHeight: 660,
+        margin: "auto",
       }}
       className={`cont ${isSignUp ? "s--signup" : ""}`}
     >
       <div className="form sign-in ">
-        <h2 className="h2">Welcome Back</h2>
+        <Form
+          name="basic"
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }}
+          style={{ maxWidth: 350, margin: 70 }}
+          initialValues={{ remember: true }}
+          onFinish={handleSignIn}
+          autoComplete="off"
+        >
+          <h2 style={{ margin: 30 }} className="h2">
+            Welcome Back
+          </h2>
+          <br></br>
+          <Form.Item<FieldType>
+            label="Username"
+            name="username"
+            rules={[{ required: true, message: "Please input your username!" }]}
+          >
+            <Input />
+          </Form.Item>
 
-        <InputField2
-          id="Username"
-          label="Username"
-          type="text"
-          value={Username}
-          onChange={setUsername}
-          onBlur={() => handleBlur("username")}
-          required={true}
-        />
+          <Form.Item<FieldType>
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <Input.Password />
+          </Form.Item>
 
-        <InputField2
-          id="Password"
-          label="Password"
-          type="password"
-          value={Password}
-          onChange={setPassword}
-          required={true}
-          onBlur={() => handleBlur("password")}
-        />
-
-        <a
+          <a
           href="/forgotPassword"
           className="forgot-pass text-right"
-          style={{ display: "block", textAlign: "center" }}
+          style={{ display: "block", textAlign: "center", marginBottom: 17 }}
         >
           Forgot Password?
         </a>
-        {/* <Link to= "/forgotPassword" onClick={() => { }} className="forgot-pass text-right" style={{display: "block", textAlign:"center"}}>Forgot Password?</Link> */}
-
-        <button onClick={handleSignIn} type="button" className="submit button">
-          Sign In
-        </button>
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <button
-          onClick={handleRegAsDoctor}
-          type="button"
-          className="submit button"
-        >
-          Register As Doctor
-        </button>
+       
+          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+            <Button style={{margin: "auto"}} type="primary" htmlType="submit">
+              Sign in
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
 
       <div className="sub-cont">
@@ -214,136 +301,185 @@ const RegLog: React.FC = () => {
               Sign In
             </span>
           </div>
+          <div
+            style={{ marginTop: 20, minWidth: 140, minHeight: 60 }}
+            className="img__btn"
+            onClick={handleRegAsDoctor}
+          >
+            <span
+              style={{ textAlign: "center" }}
+              className={`span m--up ${isSignUp ? "m--in" : ""}`}
+            >
+              Sign Up as a doctor
+            </span>
+            <span
+              style={{ textAlign: "center" }}
+              className={`span m--in ${isSignUp ? "" : "m--up"}`}
+            >
+              Sign Up as a doctor
+            </span>
+          </div>
         </div>
         <div className="form sign-up">
-          <h2 className="h2">Time to feel like home</h2>
-
-          <div className="input_wrap">
-            <InputField2
-              id="Username"
-              label="Username"
-              type="text"
-              value={Username}
-              onChange={setUsername}
-              onBlur={() => handleBlur("username")}
-              isValid={validateUsername(Username)}
-              errorMessage="Username must be at least 3 characters long."
-              touched={touchedFields.username}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="Password"
-              label="Password"
-              type="password"
-              value={Password}
-              onChange={setPassword}
-              onBlur={() => handleBlur("password")}
-              isValid={validatePassword(Password)}
-              errorMessage="Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, and one digit."
-              touched={touchedFields.password}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="Email"
-              label="Email"
-              type="text"
-              value={Email}
-              onChange={setEmail}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="Name"
-              label="Name"
-              type="text"
-              value={Name}
-              onChange={setName}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <label className="label">
-              <span className="span">Date Of Birth</span>
-              <input
-                className="input"
-                value={Dob !== undefined ? Dob.toISOString().split("T")[0] : ""}
-                onChange={handleDobChange}
-                type="date"
-              />
-            </label>
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="Gender"
-              label="Gender"
-              type="select"
-              options={["Male", "Female"]}
-              value={Gender}
-              onChange={setGender}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="MobileNo"
-              label="Mobile Number"
-              type="tel"
-              value={Mobile !== undefined ? Mobile.toString() : ""}
-              onChange={setMobile}
-              isValid={Mobile !== undefined ? validateMobile(Mobile) : true}
-              errorMessage="Invalid Mobile Number! Accepted Format: +201234567890 OR 0123456789"
-              touched={true}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="EmergencyContName"
-              label="Emergency Contact Name"
-              type="text"
-              value={EmergencyContactName}
-              onChange={setEmergencyContactName}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="EmergencyContMobile"
-              label="Emergency Contact Mobile"
-              type="tel"
-              value={
-                EmergencyContactMobile !== undefined
-                  ? EmergencyContactMobile.toString()
-                  : ""
-              }
-              onChange={setEmergencyContactMobile}
-              isValid={validateMobile(EmergencyContactMobile)}
-              errorMessage="Invalid Mobile Number! Accepted Format: +201234567890 OR 0123456789"
-              touched={true}
-              required={true}
-            />
-          </div>
-
-          <button
-            onClick={handleSignUp}
-            type="button"
-            className=" button submit"
+          <Form
+            {...formItemLayout}
+            form={form}
+            name="register"
+            onFinish={handleSignUp}
+            labelWrap
+            initialValues={{ prefix: "20" }}
+            style={{ maxWidth: 430, marginTop: 20 }}
+            scrollToFirstError
           >
-            Sign Up
-          </button>
+            <h2 style={{ marginBottom: 20 }} className="h2">
+              Time to feel like home
+            </h2>
+
+            <Form.Item
+              name="name"
+              label="Name"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your Name!",
+                  whitespace: true,
+                },
+              ]}
+            >
+              <Input onChange={(e) => setName(e.target.value)} />
+            </Form.Item>
+            <Form.Item
+              name="username"
+              label="Username"
+              rules={[
+                {
+                  type: "string",
+                  message: "The input is not valid Username",
+                },
+                {
+                  required: true,
+                  message: "Please input your E-mail!",
+                },
+              ]}
+            >
+              <Input onChange={(e) => setUsername(e.target.value)} />
+            </Form.Item>
+            <Form.Item
+              name="email"
+              label="E-mail"
+              rules={[
+                {
+                  type: "email",
+                  message: "The input is not valid E-mail!",
+                },
+                {
+                  required: true,
+                  message: "Please input your E-mail!",
+                },
+              ]}
+            >
+              <Input onChange={(e) => setEmail(e.target.value)} />
+            </Form.Item>
+
+            <Form.Item
+              name="password"
+              label="Password"
+              tooltip="Your password must be 8 character and contain: one capital letter, one small letter, one number"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your password!",
+                },{
+                  validator: validatePassword,
+                },
+              ]}
+              hasFeedback
+            >
+              <Input.Password onChange={(e) => setPassword(e.target.value)} />
+            </Form.Item>
+
+            <Form.Item
+              name="dob"
+              label="Date of birth"
+              hasFeedback
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter you date of birth!",
+                },
+              ]}
+            >
+              <DatePicker
+               value={Dob ? dayjs(Dob) : undefined}
+               onChange={(date, dateString) => {
+                 if (dateString) {
+                   setDob(dateString);
+                 }
+               }}
+                style={{ width: "100%" }}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="mobile"
+              label="Mobile Number"
+              rules={[
+                { required: true, message: "Please input your phone number!" },{
+                  validator: validatePhoneNumber,
+                },
+              ]}
+            >
+              <Input
+                addonBefore={prefixSelector}
+                style={{ width: "100%" }}
+                onChange={(e) => setMobile(e.target.value)}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="gender"
+              label="Gender"
+              rules={[{ required: true, message: "Please select gender!" }]}
+            >
+              <Select
+                onChange={(value) => setGender(value)}
+                placeholder="select your gender"
+              >
+                <Option value="Male">Male</Option>
+                <Option value="Female">Female</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="EmergencyContactName"
+              label="Emergency Contact Name"
+              rules={[{ required: true, message: "Please input name" }]}
+            >
+              <Input
+                onChange={(e) => setEmergencyContactName(e.target.value)}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="EmergencyContactMobile"
+              label="Emergency Contact Mobile"
+              rules={[
+                { required: true, message: "Please input mobile number" },
+              ]}
+            >
+              <Input
+                onChange={(e) => setEmergencyContactMobile(e.target.value)}
+                addonBefore={prefixSelector}
+                style={{ width: "100%" }}
+              />
+            </Form.Item>
+
+            <Form.Item {...tailFormItemLayout}>
+              <Button type="primary" htmlType="submit">
+                Sign up
+              </Button>
+            </Form.Item>
+          </Form>
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ import {
   Modal,
   message,
   Switch,
+  Avatar,
 } from "antd";
 import {
   DesktopOutlined,
@@ -65,7 +66,8 @@ const PatientHome = () => {
       });
 
     api.get("/subscription/getSubscription", config).then((response) => {
-     setDateOf(response.data.Date+"")
+      if(response.data)
+      setDateOf(response.data.Date+"")
     });
 
     api.get("patient/showSubscribedPackage", config).then((response) => {
@@ -142,7 +144,9 @@ const PatientHome = () => {
             footer={null}
             onCancel={closeModal}
           >
-            <Card title="My Details" style={{ marginBottom: 0 }}>
+            <Card title="My Details" style={{ marginBottom: 0 }} >
+      
+
               <List>
                 <List.Item>
                   <Title level={5}>Name: {patientInfo.Name}</Title>
@@ -203,17 +207,28 @@ const PatientHome = () => {
                 }
                 style={{ marginBottom: 16 }}
               >
+                  <Row>
+                      <Avatar
+            src="https://xsgames.co/randomusers/avatar.php?g=pixel"
+            style={{ width: 160, height: 160 }}
+          />
+          <Col>
+          
+        
                 <Title level={4}>
                   Name: {pron}
                   {patientInfo.Name}
                 </Title>
                 <Title level={4}>Age: {calculateAge(patientInfo.Dob)}</Title>
                 <Title level={4}>Gender {patientInfo.Gender}</Title>
+                </Col>
+                </Row>
+
               </Card>
             </Col>
           </Row>
           <Row gutter={40}>
-            <Col xs={9}>
+            <Col xl={9}>
               <Card
                 hoverable
                 title="Upcoming Appointments"
@@ -224,7 +239,7 @@ const PatientHome = () => {
                     onClick={appointmentsRedirect}
                   />
                 }
-                style={{ marginBottom: 16 }}
+                style={{ marginBottom: 16, minHeight: 335}}
               >
                 <Row>
                   <Col>
@@ -271,6 +286,7 @@ const PatientHome = () => {
               <Card
                 hoverable
                 title="My Subscriptions"
+
                 loading={loadingCard}
                 extra={
                   <InfoCircleTwoTone
@@ -278,7 +294,7 @@ const PatientHome = () => {
                     onClick={subscriptionsRedirect}
                   />
                 }
-                style={{ marginBottom: 16 }}
+                style={{ marginBottom: 16, minHeight: 335 }}
               >
                 <Row>
                   <Col>
@@ -363,7 +379,7 @@ const PatientHome = () => {
           </Row>
         </Content>
         <Footer style={{ textAlign: "center" }}>
-          Haysom ©2023 Created by AHIH
+          spiderWEBS ©2023 Created by AHIH
         </Footer>
       </Layout>
     </Layout>

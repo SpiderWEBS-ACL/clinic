@@ -122,7 +122,7 @@ const AppRouter: React.FC = () => {
         <Route path="/" element={<RegLog />} />
         <Route path="/patient/Home" element={<PatientHome />} />
         <Route
-          path="/patient/uploadMedicalHistory"
+          path="/patient/viewhealthrecords"
           element={<UploadMedicalHistory />}
         />
 

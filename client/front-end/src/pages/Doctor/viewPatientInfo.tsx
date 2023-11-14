@@ -15,11 +15,13 @@ import {
 import { Col } from "react-bootstrap";
 import { Card, Skeleton, Switch } from "antd";
 import { Avatar } from "@mui/material";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { tr } from "date-fns/locale";
 import "./StyleDoctor.css";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { green } from "@mui/material/colors";
+import FolderIcon from '@mui/icons-material/Folder';
+import { headers } from "../../Middleware/authMiddleware";
 
 const ViewPatientInfo = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,11 +34,14 @@ const ViewPatientInfo = () => {
   const [healthRecords, setHealthRecords] = useState<any[]>([]);
   const [selectedOption, setSelectedOption] = useState<any>();
   const [name, setName] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loadingHealth, setLoadingHealth] = useState(true);
   const [loadingList, setLoadingList] = useState(true);
   const [AppointmentTime, setAppointmentTime] = useState<any>();
   const [AppointmentDate, setAppointmentDate] = useState("");
   const [showDateTimeModal, setShowDateTimeModal] = useState(false);
+  const [activeTabKey1, setActiveTabKey1] = useState<string>('tab1');
+  const [patientFiles, setPatientFiles] = useState<any[]>([]);
+
   const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
 
   const [patientInfo, setPatientInfo] = useState<any>({});
@@ -68,6 +73,16 @@ const ViewPatientInfo = () => {
         console.error("Error:", error);
       });
   };
+  const tabList = [
+    {
+      key: 'tab1',
+      tab: 'Health Records',
+    },
+    {
+      key: 'tab2',
+      tab: 'Medical History',
+    },
+  ];
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -91,12 +106,30 @@ const ViewPatientInfo = () => {
       message.error("Please enter required fields");
     }
   };
+  const setTimeSlotsApi = (date: string) => {
+    api
+      .post(
+        "patient/getTimeSlotsDoctorDate",
+        {
+          date: date,
+        },
+        { headers: headers }
+      )
+      .then((response) => {
+        setTimeSlotsDoctor(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const onAppointmentDateChange: DatePickerProps["onChange"] = (
     date,
     dateString
   ) => {
     setAppointmentDate(dateString);
+    setTimeSlotsApi(dateString);
     setMessage("");
+    console.log(dateString);
   };
 
   const handleCheckAvailability = () => {
@@ -124,14 +157,6 @@ const ViewPatientInfo = () => {
   };
   const schedule = async () => {
     setShowDateTimeModal(true);
-    api
-      .get("/doctor/doctorTimeSlots/", config)
-      .then((response) => {
-        setTimeSlotsDoctor(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
   const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
@@ -164,14 +189,12 @@ const ViewPatientInfo = () => {
   const age = currYear - parseInt(year, 10); // Convert the string to an integer
 
   const handleHealth = async () => {
+    setLoadingHealth(true);
     setIsModalOpen2(true);
     const response = await api.get(`/doctor/viewHealthRecords/${id}`, config);
-    if (response) {
       setHealthRecords(response.data);
-      setLoading(false);
-    } else {
-      message.error("Something happened");
-    }
+      setLoadingHealth(false);
+   
   };
   const handleFamilyMembers = async () => {
     setIsFamilyMembersModalOpen(true);
@@ -192,6 +215,119 @@ const ViewPatientInfo = () => {
     setAppointmentTime("");
     setAppointmentDate("");
   };
+  const getFiles = async () => {
+    try {
+      const response = await api.get(`/doctor/viewPatientFiles/${id}`, config);
+      console.log(response)
+      if (response.data) {
+        setPatientFiles(response.data);
+        setLoadingHealth(false);
+      } else {
+        message.error("Something went wrong");
+      }
+    } catch (error) {
+      message.error("An error occurred while fetching patient files");
+      console.error(error);
+    }
+  };
+  const onTab1Change = (key: string) => {
+    setActiveTabKey1(key);
+    if(key=="tab2"){
+      setLoadingHealth(true);
+      getFiles();
+
+    }
+  };
+  const viewFiles = (filename: String) => {
+
+    const pdfPath = `http://localhost:8000/uploads/${filename}`;
+
+    window.open(pdfPath, '_blank');
+  }
+  const contentList : Record<string, React.ReactNode> = {
+    tab1: (
+      <p>
+          <div style={{ maxHeight: '230px', overflowY: 'auto' }}>
+
+        {healthRecords.map((record, index) => (
+          <div
+            key={index}
+            style={{
+              display: "flex",
+              borderBottom: "0.5px solid #333",
+              paddingBottom: "10px",
+              marginTop: 20
+            }}
+          >
+            <Avatar sx={{ bgcolor: green[500]}}>
+              <AssignmentIcon />
+            </Avatar>
+            <div style={{ marginLeft: "20px", flex: 1 }}>
+              
+              <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
+                <p>
+                  <strong>Type: </strong>
+                  {record.Type}
+                </p>
+                <p>
+                  <strong>Description: </strong>
+                  {record.Description}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+        </div>
+      </p>
+    ),
+    tab2: <p>
+                <div style={{ maxHeight: '230px', overflowY: 'auto' }}>
+
+       {patientFiles.map((file, index) => (
+<div
+    style={{
+      display: "flex",
+      borderBottom: "0.5px solid #333",
+      paddingBottom: "10px",
+      marginTop: 20
+    }}
+  >
+   <Avatar>
+                  
+                    <FolderIcon />
+                  </Avatar>
+                  <div style={{ marginLeft: "20px", flex: 1 }}>
+                  <div style={{ fontSize: "15px", lineHeight: "1.5", display: "flex", justifyContent: "space-between" } }  >
+                  <div onClick={() => viewFiles(file.filename)}>
+
+    <div>
+      
+      <p>
+        
+        <strong>File Name: </strong>
+        {file.filename}
+      </p>
+      <p>
+        <strong>Type: </strong>
+        {file.contentType === "application/pdf" ? "PDF" : file.contentType|| file.contentType === "application/png" ? "PNG" :file.contentType}
+      </p>
+    </div>
+    </div>
+    <div style={{ display: "flex" }}>
+       </div>
+ 
+
+  </div>
+</div>
+
+  </div>
+       ))}
+       
+  </div>
+  
+  </p>,
+  };
+  
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
@@ -200,7 +336,7 @@ const ViewPatientInfo = () => {
 
       <Card
         style={{
-          height: "27rem",
+          height: "28rem",
           width: "50rem",
           marginTop: "2rem",
           marginLeft: "12rem",
@@ -208,13 +344,8 @@ const ViewPatientInfo = () => {
         loading={loadingList}
         hoverable
         className="hover-card"
-        cover={
-          <img
-            alt="example"
-            src="https://img.freepik.com/free-vector/doctor-examining-patient-clinic-illustrated_23-2148856559.jpg?w=1380&t=st=1699651650~exp=1699652250~hmac=beb4f5b10e87a92fc98a6afdbec668faa4127bf16f374383eaacb5337798e6bf"
-            />
-        }
       >
+        
         <div
           style={{
             display: "flex",
@@ -231,34 +362,38 @@ const ViewPatientInfo = () => {
               {patientInfo.Name}
             </div>
             <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
-              <p>
                 <strong>Email: </strong>
                 {patientInfo.Email}
-              </p>
-              <p>
+             <br></br>
+             <br></br>
+
                 <strong>Date of birth: </strong>
                 {String(patientInfo.Dob).substring(0, 10)}
-              </p>
-              <p>
+                <br></br>
+             <br></br>
+
                 <strong>Gender: </strong>
                 {patientInfo.Gender}
-              </p>
-              <p>
+                <br></br>
+             <br></br>
+
                 <strong>Mobile: </strong>
                 {patientInfo.Mobile}
-              </p>
-              <p>
+                <br></br>
+             <br></br>
+
                 <strong>Age: </strong>
                 {age}
-              </p>
-              <p>
+                <br></br>
+             <br></br>
+
                 <strong>Health Records: </strong>
                 <InfoCircleOutlined onClick={handleHealth} />
-              </p>
-              <p>
+                <br></br>
+             <br></br>
+
                 <strong>Family Members: </strong>
                 <InfoCircleOutlined onClick={handleFamilyMembers} />
-              </p>
             </div>
           </div>
         </div>
@@ -285,6 +420,7 @@ const ViewPatientInfo = () => {
             Schedule a follow up
           </button>
         </Row>
+        
       </Card>
 
       <Modal
@@ -293,13 +429,13 @@ const ViewPatientInfo = () => {
         onOk={handleOk}
         onCancel={handleCancel}
         width={500}
-        style={{ height: "900px" }}
+        style={{ height: "900px"}}
       >
         <p>
           <Select
             defaultValue="Type"
             value={selectedOption}
-            style={{ width: 150 }}
+            style={{ width: 150, marginRight: "20rem" }}
             onChange={handleChange}
             options={[
               { value: "Surgical", label: "Surgical" },
@@ -326,15 +462,28 @@ const ViewPatientInfo = () => {
         open={isModalOpen2}
         onOk={handleOk2}
         onCancel={handleCancel2}
-        width={500}
-        bodyStyle={{ maxHeight: "300px", overflowY: "auto" }}
+        width={600}
       >
         {" "}
-        {healthRecords.map((record, index) => (
           <div>
             <Card
-              style={{ height: 150, width: 400, marginTop: 16 }}
-              loading={loading}
+        tabList={tabList}
+        
+        style={{ height: 350, width: 500, marginTop: 16 }}
+        loading={loadingHealth}
+        bodyStyle={{height: "380px" ,maxHeight: "300px", overflowY: "auto" }}
+        hoverable
+        className="hover-card"
+        activeTabKey={activeTabKey1}
+        onTabChange={onTab1Change}
+        
+      >
+                {contentList[activeTabKey1]}
+
+</Card>
+      {/* </Card>
+            <Card
+              loading={loadingHealth}
               className="hover-card"
             >
               <Meta
@@ -347,9 +496,8 @@ const ViewPatientInfo = () => {
                 title={"Type: " + record.Type}
                 description={"Description: " + record.Description}
               />
-            </Card>
+            </Card> */}
           </div>
-        ))}
       </Modal>
       <Modal
         title={patientInfo.Name + "'s Family Members"}
@@ -361,7 +509,8 @@ const ViewPatientInfo = () => {
           setIsFamilyMembersModalOpen(false);
         }}
         width={500}
-        bodyStyle={{ maxHeight: "300px", overflowY: "auto" }}
+        bodyStyle={{maxHeight: "400px", overflowY: "auto" }}
+
       >
         {" "}
         {patientInfo.FamilyMembers?.map((member: any) => (
@@ -374,6 +523,7 @@ const ViewPatientInfo = () => {
               <Meta
                 avatar={<Avatar style={{ width: 100, height: 100 }} />}
                 title={member.Name}
+                
                 description={`${member.RelationToPatient}: ${member.Age} Years old`}
               />
             </Card>

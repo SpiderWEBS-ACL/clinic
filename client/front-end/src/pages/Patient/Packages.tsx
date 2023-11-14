@@ -149,7 +149,7 @@ const AllPackagesPatient = () => {
   };
 
   const handleUnsubscribe =  () => {
-    api.delete("/patient/cancelSubscription", config)
+    api.put("/patient/cancelSubscription", {},config)
     setLoading(true);
     window.location.reload()
   }
@@ -168,11 +168,11 @@ const AllPackagesPatient = () => {
             index % 4 === 0 && (
               <Row gutter={16} key={index}>
                 {Packages.slice(index, index + 4).map((request, subIndex) => (
-                  <Col span={10} key={subIndex}>
+                  <Col span={8} key={subIndex}>
                     <div>
                       <Card
                         style={{
-                          height: "21rem",
+                          height: "23rem",
                           width: "24rem",
                           marginTop: 16,
                         }}
@@ -200,36 +200,44 @@ const AllPackagesPatient = () => {
                           }
                           description={
                             <div>
-                              <p>
+                              
                                 <strong>Subscription Price:</strong>{" "}
                                 {request.SubscriptionPrice}
-                              </p>
-                              <p>
+                                <br></br>
+                                <br></br>
+
+                              
                                 <strong>Doctor Discount:</strong>{" "}
                                 {request.DoctorDiscount}%
-                              </p>
-                              <p>
+
+                                <br></br>
+                                <br></br>
                                 <strong>Pharmacy Discount:</strong>{" "}
                                 {request.PharmacyDiscount}%
-                              </p>
-                              <p>
+                                <br></br>
+                                <br></br>
+                           
                                 <strong>Family Discount:</strong>{" "}
                                 {request.FamilyDiscount}%
-                              </p>
-                              <p> {request._id == SubscribedPackageId && subscribedPackage.Status == "Subscribed" ? 
-                                   `Renewal Date:${subscribedPackage.Date.split("T")[0]}` 
-                                  : request._id == SubscribedPackageId && subscribedPackage.Status== "Cancelled"?
-                                 `End Date:${subscribedPackage.Date.split("T")[0]}`
-                                 :""
-                                }
-                              </p>
-                              <p> {request._id == SubscribedPackageId ? (
+                                <br></br>
+                                <br></br>
+                                {request._id == SubscribedPackageId ? (
                                 `Status:
                                   ${subscribedPackage.Status}`
                                   ) : (
                                     "Status: Unsubscribed"
                                   )}
-                              </p>
+                                  <br></br>
+                                <br></br>
+                               {request._id == SubscribedPackageId && subscribedPackage.Status == "Subscribed" ? 
+                                   `Renewal Date:${subscribedPackage.Date.split("T")[0]}` 
+                                  : request._id == SubscribedPackageId && subscribedPackage.Status== "Cancelled"?
+                                 `End Date:${subscribedPackage.Date.split("T")[0]}`
+                                 :""
+                                }
+                            
+                         
+                            
                             </div>
                           }
                         />
@@ -292,7 +300,7 @@ const AllPackagesPatient = () => {
 
       <Modal
         title="Select Payment Method"
-        visible={showPaymentModal}
+        open={showPaymentModal}
         onCancel={() => {
           setShowPaymentModal(false);
         }}

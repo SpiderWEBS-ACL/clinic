@@ -71,6 +71,7 @@ const UploadMedicalHistory = () => {
         const response = await api.post('/patient/uploadMedicalDocuments/', formData, config);
         message.success("File(s) uploaded successfully!")
         getFiles();
+        setLoading(true);
   
         console.log(response)
       } catch (error) {
@@ -126,6 +127,17 @@ const UploadMedicalHistory = () => {
 
     window.open(pdfPath, '_blank');
   }
+  const removeFile = async(fileid: any) =>{
+
+  const response = await api.delete('/patient/removeMedicalDocument', {
+  data: { fileid: fileid },
+  ...config,
+});
+  getFiles();
+  setLoading(true);
+  message.success("File is being deleted");
+
+  }
   
 
   
@@ -146,21 +158,25 @@ const UploadMedicalHistory = () => {
             <Avatar sx={{ bgcolor: green[500]}}>
               <AssignmentIcon />
             </Avatar>
-            <div style={{ marginLeft: "20px", flex: 1 }}>
+            <div style={{ marginLeft: "20px", flex: 1 , display: "flex", justifyContent: "left", textAlign:"left"}}>
               
-              <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
-                <p>
+              <div style={{ fontSize: "15px", lineHeight: "1.5"}}>
+             
+
                   <strong>Type: </strong>
                   {record.Type}
-                </p>
-                <p>
+              
+                  <br></br>
+               <br></br>
+
                   <strong>Description: </strong>
                   {record.Description}
-                </p>
-                <p>
+                  <br></br>
+               <br></br>
+
+              
                   <strong>By Doctor: </strong>
                   {record.Doctor.Name}
-                </p>
               </div>
             </div>
           </div>
@@ -184,21 +200,22 @@ const UploadMedicalHistory = () => {
                     <FolderIcon />
                   </Avatar>
                   <div style={{ marginLeft: "20px", flex: 1 }}>
-                  <div style={{ fontSize: "15px", lineHeight: "1.5", display: "flex", justifyContent: "space-between" }} onClick={() => viewFiles(file.filename)}>
-    <div>
+                  <div style={{ fontSize: "15px", lineHeight: "1.5", display: "flex", justifyContent: "space-between" } }  >
+                  <div onClick={() => viewFiles(file.filename)}>
+
+    <div style={{ textAlign:"left"}}>
       
-      <p>
         
         <strong>File Name: </strong>
         {file.filename}
-      </p>
-      <p>
+        <br></br>
+        <br></br>
         <strong>Type: </strong>
-        {file.contentType === "application/octet-stream" ? "PDF" : file.contentType}
-      </p>
+        {file.contentType === "application/pdf" ? "PDF" : file.contentType|| file.contentType === "application/png" ? "PNG" :file.contentType}
+    </div>
     </div>
     <div style={{ display: "flex" }}>
-      <DeleteOutlined   style={{color:"#FF0000", marginRight:20}}/>   
+      <DeleteOutlined  onClick={() => removeFile(file._id)} style={{color:"#FF0000", marginRight:20}}/>   
        </div>
  
 
@@ -240,14 +257,6 @@ const UploadMedicalHistory = () => {
         className="hover-card"
         activeTabKey={activeTabKey1}
         onTabChange={onTab1Change}
-        // cover={
-        //   <img
-        //     alt="example"
-        //     style={{ height: 400, width: 800}}
-
-        //     src="https://img.freepik.com/free-vector/doctor-examining-patient-clinic-illustrated_23-2148856559.jpg?w=1380&t=st=1699651650~exp=1699652250~hmac=beb4f5b10e87a92fc98a6afdbec668faa4127bf16f374383eaacb5337798e6bf"
-        //     />
-        // }
       >
                 {contentList[activeTabKey1]}
 

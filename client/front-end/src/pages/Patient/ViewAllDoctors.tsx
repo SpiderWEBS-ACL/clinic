@@ -67,23 +67,6 @@ const ViewAllDoctors = () => {
     },
   };
 
-  const handleCheckAvailability = () => {
-    api
-      .post(
-        "patient/checkDoctor",
-        {
-          Date: AppointmentDate,
-          Time: AppointmentTime,
-          DoctorId: DoctorId,
-        },
-        { headers: headers }
-      )
-      .then((response) => {
-        setMessage(response.data.message);
-        if (response.data.message === "available") message.success("Available");
-        else message.error("Doctor is not available at this time");
-      });
-  };
   const getAllDoctors = () => {
     api
       .get("patient/allDoctors", config)
@@ -160,7 +143,7 @@ const ViewAllDoctors = () => {
         sessionStorage.setItem("DoctorId", DoctorId);
         sessionStorage.setItem(
           "AppointmentDate",
-          `${AppointmentDate}T${AppointmentTime}.000Z`
+          `${AppointmentDate}T${AppointmentTime}:00.000Z`
         );
         if (FamilyMember != "")
           sessionStorage.setItem("FamilyMember", FamilyMember);
@@ -178,7 +161,7 @@ const ViewAllDoctors = () => {
         "appointment/add",
         {
           Doctor: DoctorId,
-          AppointmentDate: `${AppointmentDate}T${AppointmentTime}.000Z`,
+          AppointmentDate: `${AppointmentDate}T${AppointmentTime}:00.000Z`,
           FamilyMember: FamilyMember,
         },
         { headers: headers }
@@ -194,7 +177,7 @@ const ViewAllDoctors = () => {
       sessionStorage.setItem("DoctorId", DoctorId);
       sessionStorage.setItem(
         "AppointmentDate",
-        `${AppointmentDate}T${AppointmentTime}.000Z`
+        `${AppointmentDate}T${AppointmentTime}:00.000Z`
       );
       if (FamilyMember != "")
         sessionStorage.setItem("FamilyMember", FamilyMember);
@@ -227,11 +210,30 @@ const ViewAllDoctors = () => {
   const onDateChange: DatePickerProps["onChange"] = (date, dateString) => {
     setDate(dateString);
   };
+
+  const setTimeSlotsApi = (date: string) => {
+    api
+      .post(
+        "patient/getTimeSlotsDoctorDate",
+        {
+          DoctorId: DoctorId,
+          date: date,
+        },
+        { headers: headers }
+      )
+      .then((response) => {
+        setTimeSlotsDoctor(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const onAppointmentDateChange: DatePickerProps["onChange"] = (
     date,
     dateString
   ) => {
     setAppointmentDate(dateString);
+    setTimeSlotsApi(dateString);
     setMessage("");
     console.log(dateString);
   };
@@ -290,16 +292,6 @@ const ViewAllDoctors = () => {
     setDoctors(AllDoctors);
   };
 
-  const getDoctorTimeSlotsApi = async (doctor: any) => {
-    await api
-      .get("/patient/doctorTimeSlots/" + doctor, config)
-      .then((response) => {
-        setTimeSlotsDoctor(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
   const getBalanceApi = async () => {
     api
       .get("patient/getBalance", config)
@@ -314,14 +306,12 @@ const ViewAllDoctors = () => {
     setDoctorId(doctor);
     setHourlyRate(HourlyRate);
     setShowDateTimeModal(true);
-    getDoctorTimeSlotsApi(doctor);
     getBalanceApi();
   };
   const handleBookAppointmentFamily = async (doctor: any, HourlyRate: any) => {
     setDoctorId(doctor);
     setHourlyRate(HourlyRate);
     setShowDateTimeFamilyModal(true);
-    getDoctorTimeSlotsApi(doctor);
     getBalanceApi();
   };
   const handlePaymentSelection = (paymentMethod: string) => {
@@ -625,19 +615,7 @@ const ViewAllDoctors = () => {
           ))}
         </Select>
         <button
-          className="btn btn-sm btn-primary"
-          style={{
-            marginBlock: "1rem",
-            padding: "4px 8px",
-            fontSize: "12px",
-            borderRadius: "5px",
-          }}
-          onClick={() => handleCheckAvailability()}
-        >
-          <span aria-hidden="true"></span>
-          Check Availability
-        </button>
-        <button
+          disabled={AppointmentDate == "" || AppointmentTime == ""}
           className="btn btn-sm btn-success"
           style={{
             marginLeft: "1rem",
@@ -646,7 +624,6 @@ const ViewAllDoctors = () => {
             fontSize: "12px",
             borderRadius: "5px",
           }}
-          disabled={Message === "available" ? false : true}
           onClick={() => {
             setShowDateTimeModal(false);
             setShowPaymentModal(true);
@@ -695,19 +672,7 @@ const ViewAllDoctors = () => {
           ))}
         </Select>
         <button
-          className="btn btn-sm btn-primary"
-          style={{
-            marginBlock: "1rem",
-            padding: "4px 8px",
-            fontSize: "12px",
-            borderRadius: "5px",
-          }}
-          onClick={() => handleCheckAvailability()}
-        >
-          <span aria-hidden="true"></span>
-          Check Availability
-        </button>
-        <button
+        disabled={AppointmentDate == "" || AppointmentTime == ""}
           className="btn btn-sm btn-success"
           style={{
             marginLeft: "1rem",
@@ -716,7 +681,6 @@ const ViewAllDoctors = () => {
             fontSize: "12px",
             borderRadius: "5px",
           }}
-          disabled={Message === "available" ? false : true}
           onClick={() => {
             setShowDateTimeFamilyModal(false);
             setShowPaymentFamilyModal(true);

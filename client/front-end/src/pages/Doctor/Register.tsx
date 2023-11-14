@@ -8,12 +8,15 @@ import {
   IoAlertCircle,
   IoClose,
 } from "react-icons/io5";
-import { DatePicker, DatePickerProps, message, Button } from "antd";
+import { config, headers } from "../../Middleware/authMiddleware";
+
+import { DatePicker, DatePickerProps, message, Button, Upload } from "antd";
 import InputField from "../../components/InputField";
 import {
   validatePassword,
   validateUsername,
 } from "../../utils/ValidationUtils";
+import { UploadOutlined } from "@ant-design/icons";
 
 const steps = [
   { id: 1, title: "Account Info", fields: ["Username", "Password", "Email"] },
@@ -42,6 +45,10 @@ function RegisterDoctor() {
   const [EducationalBackground, setEducation] = useState<string>("");
   const [Specialty, setSpecialty] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [degreeFile, setDegreeFile] = useState<FileList | null>(null);
+  const [licenseFiles, setLicenseFiles] = useState<FileList | null>(null);
+  const [personalIDFile, setPersonalIDFile] = useState<FileList | null>(null);
+
   const [touchedFields, setTouchedFields] = useState({
     username: false,
     password: false,
@@ -78,13 +85,7 @@ function RegisterDoctor() {
 
       const response = await api.post(`/doctor/register`, data);
       console.log("Response:", response.data);
-      setError(null);
-      setModalActive(true);
-      setTimeout(() => {
-        closeModal; 
-        navigate("/");
-        window.location.reload();
-      }, 1500);
+      setActiveForm(4);
     
     } catch (error) {
       console.error("Error:", error);
@@ -133,6 +134,23 @@ function RegisterDoctor() {
         return;
       }
     }
+    if(activeForm == 4){
+      if(licenseFiles && personalIDFile && degreeFile){
+          uploadLicenses();
+          uploadPersonalID();
+          uploadDegree();
+          setError(null);
+         setModalActive(true);
+        setTimeout(() => {
+        closeModal; 
+        navigate("/");
+        window.location.reload();
+      }, 1500);
+      }
+      else{
+        message.error("Please upload required field(s)!")
+      }
+    }
 
     if (activeForm < steps.length) {
       setActiveForm(activeForm + 1);
@@ -149,6 +167,102 @@ function RegisterDoctor() {
     setModalActive(false);
     // navigate("/");
     // window.location.reload();
+  };
+
+  const personalIDFileChange =  (e: ChangeEvent<HTMLInputElement>) => {
+    setPersonalIDFile(e.target.files)
+  }
+  const licensesFileChange =  (e: ChangeEvent<HTMLInputElement>) => { 
+    setLicenseFiles(e.target.files)
+  }
+  const degreeFileChange =  (e: ChangeEvent<HTMLInputElement>) => {
+    setDegreeFile(e.target.files)
+  }
+
+  const uploadLicenses = async() =>{
+    if (licenseFiles) {
+      const formData = new FormData();
+  
+      for (let i = 0; i < licenseFiles.length; i++) {
+        const file = licenseFiles[i];
+  
+        formData.append('files', file); 
+        formData.append('filename', file.name); 
+        formData.append('originalname', file.name); 
+       formData.append('contentType', file.type); 
+       formData.append('DocEmail', Email);
+       formData.append('docFileType', 'License');
+
+
+      }
+      
+      try {
+        const response = await api.post(`/doctor/uploadLicense`, formData);
+  
+      } catch (error) {
+        console.error('Error uploading files:', error);
+      }
+    }
+    else{
+        message.error("Please select file(s) to upload!")
+    }
+  };
+
+  const uploadDegree = async() =>{
+  if (degreeFile) {
+      const formData = new FormData();
+  
+        const file = degreeFile[0];
+  
+        formData.append('file', file); 
+        formData.append('filename', file.name); 
+        formData.append('originalname', file.name); 
+       formData.append('contentType', file.type); 
+       formData.append('DocEmail', Email);
+       formData.append('docFileType', 'Degree');
+
+
+      
+      
+      try {
+        const response = await api.post(`/doctor/uploadMedicalDegree`, formData);
+  
+      } catch (error) {
+        console.error('Error uploading files:', error);
+      }
+    }
+    else{
+        message.error("Please select file(s) to upload!")
+    }
+  };
+  
+  
+  const uploadPersonalID = async()=>{
+
+    if (personalIDFile) {
+      const formData = new FormData();
+        const file = personalIDFile[0];
+  
+        formData.append('file', file); 
+        formData.append('filename', file.name); 
+        formData.append('originalname', file.name); 
+       formData.append('contentType', file.type); 
+       formData.append('DocEmail', Email);
+       formData.append('docFileType', 'PersonalID');
+
+
+      
+      
+      try {
+        const response = await api.post(`/doctor/uploadPersonalID`, formData);
+  
+      } catch (error) {
+        console.error('Error uploading files:', error);
+      }
+    }
+    else{
+        message.error("Please select file(s) to upload!")
+    }
   };
 
   return (
@@ -205,6 +319,22 @@ function RegisterDoctor() {
               </div>
             </li>
           </ul>
+
+          <ul>
+            <li
+              key={4}
+              className={`form_${4}_progessbar ${
+                activeForm >= 4 ? "active" : ""
+              }`}
+            >
+              <div>
+                <p>{4}</p>
+              </div>
+            </li>
+          </ul>
+         
+
+
         </div>
 
         <div className="form_wrap">
@@ -307,8 +437,11 @@ function RegisterDoctor() {
                 </div>
               </div>
             </form>
+            
           </div>
         </div>
+
+
 
         <div className="form_wrap">
           <div
@@ -351,14 +484,59 @@ function RegisterDoctor() {
                     required={true}
                   />
                 </div>
-              </div>
+               
+                
+           
+           </div>
+
             </form>
+            
           </div>
         </div>
 
+        <div className="form_wrap">
+          <div
+            key={4}
+            className={`form_1 data_info`}
+            style={{ display: activeForm === 4 ? "block" : "none" }}
+          >
+            <h2>{"Upload Your Documents"}</h2>
+            <form>
+              <div className="form_container">
+              <div key="4" className="input_wrap">
+              <div className="input_wrap">
+               <label style={{fontSize: 16, fontFamily: "Open Sans"}}>
+                   <strong>Personal ID:</strong>
+               <input type="file" accept=".pdf, .jpeg, .jpg, .png" onChange={personalIDFileChange} />
+             </label>
+            </div>
+
+            <div style={{ margin: '30px' }} />
+
+           <div className="input_wrap">
+            <label style={{fontSize: 16, fontFamily: "Open Sans"}}>
+          <strong>Medical License(s):</strong>
+          <input type="file" accept=".pdf, .jpeg, .jpg, .png"  onChange={licensesFileChange} multiple />
+        </label>
+     </div>
+
+     <div style={{ margin: '30px' }} />
+
+      <div className="input_wrap">
+      <label style={{fontSize: 16, fontFamily: "Open Sans", marginRight: 50}}>
+          <strong>Degree:</strong>
+          <input type="file" accept=".pdf, .jpeg, .jpg, .png" onChange={degreeFileChange}  />
+        </label>
+      </div>
+                </div>
+                </div>
+                </form>
+                </div>
+                </div>
+
         <div className="btns_wrap" style={{ marginTop: 20 }}>
           <div className={`common_btns form_${activeForm}_btns`}>
-            {activeForm !== 1 && (
+            {activeForm !== 1 && activeForm !== 4 && (
               <Button
                 className="btn_back"
                 onClick={handleBack}
