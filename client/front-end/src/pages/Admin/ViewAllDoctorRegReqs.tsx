@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Spin, message } from "antd";
+import { Avatar, Card, Spin, message } from "antd";
 import { useNavigate } from "react-router-dom";
+import { Col, Row } from "react-bootstrap";
 
 const AllDoctors = () => {
   const accessToken = localStorage.getItem("accessToken");
-  const [doctors, setDoctors] = useState([]);
+  const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingList, setLoadingList] = useState(true);
+  const { Meta } = Card;
   const api = axios.create({
     baseURL: "http://localhost:8000/admin",
   });
@@ -19,8 +22,7 @@ const AllDoctors = () => {
       .get("/registrationRequests", { headers })
       .then((response) => {
         setDoctors(response.data);
-        setLoading(false);
-        console.log(response.data);
+        setLoadingList(false);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -33,20 +35,7 @@ const AllDoctors = () => {
     navigate("/admin/registrationRequests/" + id);
   };
 
-  if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
+
 
   const headers = {
     Authorization: "Bearer " + accessToken,
@@ -60,7 +49,7 @@ const AllDoctors = () => {
     } catch (error) {
       message.error("An Error has occurred");
     }
-    setLoading(false);
+    setLoadingList(false);
   };
 
   const handleReject = async (id: string) => {
@@ -82,77 +71,65 @@ const AllDoctors = () => {
       <h2 className="text-center mt-4 mb-4">
         <strong>Doctors Registration Requests</strong>
       </h2>
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Specialty</th>
-            <th>Status</th>
-            {/* <th>Accept</th>
-            <th>Reject</th> */}
-            <th>Details</th>
-          </tr>
-        </thead>
-
         <tbody>
-          {doctors.map((request: any, index) => (
-            <tr key={request._id}>
-              <td>
-                <strong>{request.Name}</strong>
-              </td>
-              <td>
-                {request.Specialty}
-              </td>
-              <td>
-                {request.AdminAccept? 
-                  request.DoctorReject? (<i style={{color: "red"}}>Employment Contract Rejected</i>) :
-                  (<i style={{color: "green"}}>Employment Contract Sent. Pending Doctor Approval</i>) : 
-                  (<i>Pending</i>) }
-              </td>
-              {/* <td>
-                <button
-                  className="btn btn-sm btn-success"
-                  style={{
-                    padding: "4px 8px",
-                    fontSize: "12px",
-                    borderRadius: "5px",
-                  }}
-                  disabled={request.AdminAccept? true : false}
-                  onClick={() => handleAccept(request._id)}
-                >
-                  <span aria-hidden="true" style={{ color: "white" }}>
-                    &#10003;
-                  </span>
-                </button>
-              </td>
-
-              <td>
-                <button
-                  className="btn btn-sm btn-danger"
-                  style={{
-                    padding: "4px 8px",
-                    fontSize: "12px",
-                    borderRadius: "5px",
-                  }}
-                  disabled={request.AdminAccept? true : false}
-                  onClick={() => handleReject(request._id)}
-                  //TODO onClick in sprint 2 this is just a view
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </td> */}
-              <td>
-                <button
-                  className="btn btn-sm btn-primary"
-                  onClick={() => handleViewDetails(request._id)}
-                >
-                  Details
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        {doctors.map(
+          (request, index) =>
+            index % 3 === 0 && (
+              <Row gutter={16} key={index}>
+                {doctors.slice(index, index + 3).map((request, subIndex) => (
+                  <Col span={8} key={subIndex}>
+                    <div>
+                      <Card
+                        style={{
+                          width: "27rem",
+                          marginTop: "3rem",
+                          height: "14rem",
+                        }}
+                        loading={loadingList}
+                        hoverable
+                        className="hover-card"
+                        onClick={() => handleViewDetails(request._id)}
+                        >
+                        <Meta
+                          avatar={
+                            <Avatar
+                              src="https://xsgames.co/randomusers/avatar.php?g=pixel"
+                              style={{ width: 75, height: 75}}
+                            />
+                          }
+                          
+                          title={
+                            <div style={{ fontSize: "20px"}}>
+                              {"Doctor's Name:" + request.Name}
+                            </div>
+                          }
+                          description={
+                            <div>
+                              
+                                <strong>Specialty:</strong> {request.Specialty}
+                              
+                              <br>
+                              </br>
+                              <br>
+                              </br>
+                                <strong>Status:</strong>{' '}
+                                {request.AdminAccept? 
+                              request.DoctorReject? (<i style={{color: "red"}}>Employment Contract Rejected</i>) :
+                              (<i style={{color: "green"}}>Employment Contract Sent. Pending Doctor Approval</i>) : 
+                              (<i>Pending</i>) }
+                                                
+                            </div>
+                          }
+                        />
+                      </Card>
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            )
+        )}
+      </tbody>
+       
     </div>
   );
 };
