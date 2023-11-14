@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const doctorSchema = new Schema(
+const doctorRegisterSchema = new Schema(
   {
     Username: {
       type: String,
@@ -56,14 +56,25 @@ const doctorSchema = new Schema(
         type: String,
       },
     ],
-    FirstTime: {
+    AdminAccept: {
       type: Boolean,
-      default: true
+      default: false
+    },
+    DoctorReject: {
+      type: Boolean,
+      default: false,
+    },
+    Salary: {
+      type: Number,
+      required: false
+    },
+    AcceptanceDate: {
+      type: Date,
+      required: false
     }
   },
   { timestamps: true }
 );
 
-const Doctor = mongoose.model("Doctor", doctorSchema);
-
-module.exports = Doctor;
+const DoctorRegister = mongoose.model("DoctorRegister", doctorRegisterSchema);
+module.exports = DoctorRegister;
