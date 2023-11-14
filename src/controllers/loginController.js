@@ -35,14 +35,14 @@ const login = async (req, res) => {
           { id: patient._id },
           process.env.REFRESH_TOKEN_SECRET
         );
-        res.json({
+        return res.json({
           accessToken: accessToken,
           refreshToken: refreshToken,
           id: patient._id,
           type: "Patient",
         });
       } else {
-        res.status(400).json({ error: "Password doesn't match!" });
+        return res.status(400).json({ error: "Password doesn't match!" });
       }
     } else if (doctor) {
       if (await bcrypt.compare(req.body.Password, doctor.Password)) {
@@ -55,7 +55,7 @@ const login = async (req, res) => {
           { id: doctor._id },
           process.env.REFRESH_TOKEN_SECRET
         );
-        res.json({
+        return res.json({
           accessToken: accessToken,
           refreshToken: refreshToken,
           id: doctor._id,
@@ -63,7 +63,7 @@ const login = async (req, res) => {
           user: doctor,
         });
       } else {
-        res.status(400).json({ error: "Password doesn't match!" });
+        return res.status(400).json({ error: "Password doesn't match!" });
       }
     } else if (admin) {
       if (await bcrypt.compare(req.body.Password, admin.Password)) {
@@ -76,18 +76,18 @@ const login = async (req, res) => {
           { id: admin._id },
           process.env.REFRESH_TOKEN_SECRET
         );
-        res.json({
+        return res.json({
           accessToken: accessToken,
           refreshToken: refreshToken,
           id: admin._id,
           type: "Admin",
         });
       } else {
-        res.status(400).json({ error: "Password doesn't match!" });
+        return res.status(400).json({ error: "Password doesn't match!" });
       }
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -116,9 +116,9 @@ const forgotPassword = async (req, res) => {
 
     const passwordResetOTP = await sendPasswordResetOTP(req.body.email, user);
 
-    res.status(200).json(passwordResetOTP);
+    return res.status(200).json(passwordResetOTP);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 };
 
@@ -203,12 +203,12 @@ const verifyOTP = async (req, res) => {
 
     //check if otp is correct
     if (await bcrypt.compare(otp, hashedOTP))
-      res.status(200).json({ valid: true });
+      return res.status(200).json({ valid: true });
     else 
-      res.status(400).json({ error: "Invalid OTP" });
+      return res.status(400).json({ error: "Invalid OTP" });
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -266,9 +266,9 @@ const resetPassword = async (req, res) => {
     //otp no longer needed
     await OTP.deleteOne({ email });
 
-    res.status(200).json(newUser);
+    return res.status(200).json(newUser);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -319,9 +319,9 @@ const changePassword = async (req, res) => {
     //const newAdmin = await adminModel.findByIdAndUpdate(id, {Password: hashedPass}, {new: true});
     await user.updateOne({ Password: hashedPass }, { new: true });
 
-    res.status(200).json(user);
+    return res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
