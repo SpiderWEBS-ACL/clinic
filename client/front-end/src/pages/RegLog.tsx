@@ -98,6 +98,25 @@ const RegLog: React.FC = () => {
       }
     }
   };
+  const validatePassword = (rule: any, value: string, callback: any) => {
+    const regex = /^(?=.*[A-Z])(?=.*\d).{6,}$/; 
+    if (!regex.test(value)) {
+      callback("Password must be at least 6 characters long and include one capital letter and one number.");
+    } else {
+      callback();
+    }
+  };
+
+  const validatePhoneNumber = (rule: any, value: string, callback: any) => {
+    const regex = /^[0-9]+$/;
+    if (!regex.test(value)) {
+      callback("Please enter a valid phone number.");
+    } else if (value.length !== 11) {
+      callback("Please enter a valid phone number.");
+    } else {
+      callback();
+    }
+  };
 
   const handleSignIn = async (values: any) => {
     const { password, username } = values; // Destructure the values from the form
@@ -370,6 +389,8 @@ const RegLog: React.FC = () => {
                 {
                   required: true,
                   message: "Please input your password!",
+                },{
+                  validator: validatePassword,
                 },
               ]}
               hasFeedback
@@ -403,7 +424,9 @@ const RegLog: React.FC = () => {
               name="mobile"
               label="Mobile Number"
               rules={[
-                { required: true, message: "Please input your phone number!" },
+                { required: true, message: "Please input your phone number!" },{
+                  validator: validatePhoneNumber,
+                },
               ]}
             >
               <Input
