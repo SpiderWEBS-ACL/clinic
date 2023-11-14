@@ -160,7 +160,7 @@ const UploadMedicalHistory = () => {
             </Avatar>
             <div style={{ marginLeft: "20px", flex: 1 , display: "flex", justifyContent: "left", textAlign:"left"}}>
               
-              <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
+              <div style={{ fontSize: "15px", lineHeight: "1.5"}}>
              
 
                   <strong>Type: </strong>
@@ -203,17 +203,15 @@ const UploadMedicalHistory = () => {
                   <div style={{ fontSize: "15px", lineHeight: "1.5", display: "flex", justifyContent: "space-between" } }  >
                   <div onClick={() => viewFiles(file.filename)}>
 
-    <div>
+    <div style={{ textAlign:"left"}}>
       
-      <p>
         
         <strong>File Name: </strong>
         {file.filename}
-      </p>
-      <p>
+        <br></br>
+        <br></br>
         <strong>Type: </strong>
         {file.contentType === "application/pdf" ? "PDF" : file.contentType|| file.contentType === "application/png" ? "PNG" :file.contentType}
-      </p>
     </div>
     </div>
     <div style={{ display: "flex" }}>

@@ -200,36 +200,44 @@ const AllPackagesPatient = () => {
                           }
                           description={
                             <div>
-                              <p>
+                              
                                 <strong>Subscription Price:</strong>{" "}
                                 {request.SubscriptionPrice}
-                              </p>
-                              <p>
+                                <br></br>
+                                <br></br>
+
+                              
                                 <strong>Doctor Discount:</strong>{" "}
                                 {request.DoctorDiscount}%
-                              </p>
-                              <p>
+
+                                <br></br>
+                                <br></br>
                                 <strong>Pharmacy Discount:</strong>{" "}
                                 {request.PharmacyDiscount}%
-                              </p>
-                              <p>
+                                <br></br>
+                                <br></br>
+                           
                                 <strong>Family Discount:</strong>{" "}
                                 {request.FamilyDiscount}%
-                              </p>
-                              <p> {request._id == SubscribedPackageId && subscribedPackage.Status == "Subscribed" ? 
-                                   `Renewal Date:${subscribedPackage.Date.split("T")[0]}` 
-                                  : request._id == SubscribedPackageId && subscribedPackage.Status== "Cancelled"?
-                                 `End Date:${subscribedPackage.Date.split("T")[0]}`
-                                 :""
-                                }
-                              </p>
-                              <p> {request._id == SubscribedPackageId ? (
+                                <br></br>
+                                <br></br>
+                                {request._id == SubscribedPackageId ? (
                                 `Status:
                                   ${subscribedPackage.Status}`
                                   ) : (
                                     "Status: Unsubscribed"
                                   )}
-                              </p>
+                                  <br></br>
+                                <br></br>
+                               {request._id == SubscribedPackageId && subscribedPackage.Status == "Subscribed" ? 
+                                   `Renewal Date:${subscribedPackage.Date.split("T")[0]}` 
+                                  : request._id == SubscribedPackageId && subscribedPackage.Status== "Cancelled"?
+                                 `End Date:${subscribedPackage.Date.split("T")[0]}`
+                                 :""
+                                }
+                            
+                         
+                            
                             </div>
                           }
                         />
