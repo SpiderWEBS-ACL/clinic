@@ -149,7 +149,7 @@ const AllPackagesPatient = () => {
   };
 
   const handleUnsubscribe =  () => {
-    api.delete("/patient/cancelSubscription", config)
+    api.put("/patient/cancelSubscription", {},config)
     setLoading(true);
     window.location.reload()
   }
@@ -168,11 +168,11 @@ const AllPackagesPatient = () => {
             index % 4 === 0 && (
               <Row gutter={16} key={index}>
                 {Packages.slice(index, index + 4).map((request, subIndex) => (
-                  <Col span={10} key={subIndex}>
+                  <Col span={8} key={subIndex}>
                     <div>
                       <Card
                         style={{
-                          height: "21rem",
+                          height: "23rem",
                           width: "24rem",
                           marginTop: 16,
                         }}
@@ -292,7 +292,7 @@ const AllPackagesPatient = () => {
 
       <Modal
         title="Select Payment Method"
-        visible={showPaymentModal}
+        open={showPaymentModal}
         onCancel={() => {
           setShowPaymentModal(false);
         }}

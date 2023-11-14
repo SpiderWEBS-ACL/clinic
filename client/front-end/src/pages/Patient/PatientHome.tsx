@@ -66,7 +66,8 @@ const PatientHome = () => {
       });
 
     api.get("/subscription/getSubscription", config).then((response) => {
-     setDateOf(response.data.Date+"")
+      if(response.data)
+      setDateOf(response.data.Date+"")
     });
 
     api.get("patient/showSubscribedPackage", config).then((response) => {
@@ -227,7 +228,7 @@ const PatientHome = () => {
             </Col>
           </Row>
           <Row gutter={40}>
-            <Col xs={9}>
+            <Col xl={9}>
               <Card
                 hoverable
                 title="Upcoming Appointments"
