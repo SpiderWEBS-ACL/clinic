@@ -2,27 +2,23 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import {
-  Button,
   DatePicker,
   DatePickerProps,
   Input,
   Modal,
   Row,
   Select,
-  TimePickerProps,
   message,
 } from "antd";
-import { Col } from "react-bootstrap";
-import { Card, Skeleton, Switch } from "antd";
+import { Card } from "antd";
 import { Avatar } from "@mui/material";
 import { DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { tr } from "date-fns/locale";
 import "./StyleDoctor.css";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { green } from "@mui/material/colors";
-import FolderIcon from '@mui/icons-material/Folder';
+import FolderIcon from "@mui/icons-material/Folder";
 import { headers } from "../../Middleware/authMiddleware";
-
 const ViewPatientInfo = () => {
   const { id } = useParams<{ id: string }>();
   const accessToken = localStorage.getItem("accessToken");
@@ -39,13 +35,10 @@ const ViewPatientInfo = () => {
   const [AppointmentTime, setAppointmentTime] = useState<any>();
   const [AppointmentDate, setAppointmentDate] = useState("");
   const [showDateTimeModal, setShowDateTimeModal] = useState(false);
-  const [activeTabKey1, setActiveTabKey1] = useState<string>('tab1');
+  const [activeTabKey1, setActiveTabKey1] = useState<string>("tab1");
   const [patientFiles, setPatientFiles] = useState<any[]>([]);
-
   const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
-
   const [patientInfo, setPatientInfo] = useState<any>({});
-
   const { TextArea } = Input;
   const { Meta } = Card;
   const config = {
@@ -75,12 +68,12 @@ const ViewPatientInfo = () => {
   };
   const tabList = [
     {
-      key: 'tab1',
-      tab: 'Health Records',
+      key: "tab1",
+      tab: "Health Records",
     },
     {
-      key: 'tab2',
-      tab: 'Medical History',
+      key: "tab2",
+      tab: "Medical History",
     },
   ];
 
@@ -192,9 +185,8 @@ const ViewPatientInfo = () => {
     setLoadingHealth(true);
     setIsModalOpen2(true);
     const response = await api.get(`/doctor/viewHealthRecords/${id}`, config);
-      setHealthRecords(response.data);
-      setLoadingHealth(false);
-   
+    setHealthRecords(response.data);
+    setLoadingHealth(false);
   };
   const handleFamilyMembers = async () => {
     setIsFamilyMembersModalOpen(true);
@@ -218,7 +210,7 @@ const ViewPatientInfo = () => {
   const getFiles = async () => {
     try {
       const response = await api.get(`/doctor/viewPatientFiles/${id}`, config);
-      console.log(response)
+      console.log(response);
       if (response.data) {
         setPatientFiles(response.data);
         setLoadingHealth(false);
@@ -232,102 +224,101 @@ const ViewPatientInfo = () => {
   };
   const onTab1Change = (key: string) => {
     setActiveTabKey1(key);
-    if(key=="tab2"){
+    if (key == "tab2") {
       setLoadingHealth(true);
       getFiles();
-
     }
   };
   const viewFiles = (filename: String) => {
-
     const pdfPath = `http://localhost:8000/uploads/${filename}`;
 
-    window.open(pdfPath, '_blank');
-  }
-  const contentList : Record<string, React.ReactNode> = {
+    window.open(pdfPath, "_blank");
+  };
+  const contentList: Record<string, React.ReactNode> = {
     tab1: (
       <p>
-          <div style={{ maxHeight: '230px', overflowY: 'auto' }}>
-
-        {healthRecords.map((record, index) => (
-          <div
-            key={index}
-            style={{
-              display: "flex",
-              borderBottom: "0.5px solid #333",
-              paddingBottom: "10px",
-              marginTop: 20
-            }}
-          >
-            <Avatar sx={{ bgcolor: green[500]}}>
-              <AssignmentIcon />
-            </Avatar>
-            <div style={{ marginLeft: "20px", flex: 1 }}>
-              
-              <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
-                <p>
-                  <strong>Type: </strong>
-                  {record.Type}
-                </p>
-                <p>
-                  <strong>Description: </strong>
-                  {record.Description}
-                </p>
+        <div style={{ maxHeight: "230px", overflowY: "auto" }}>
+          {healthRecords.map((record, index) => (
+            <div
+              key={index}
+              style={{
+                display: "flex",
+                borderBottom: "0.5px solid #333",
+                paddingBottom: "10px",
+                marginTop: 20,
+              }}
+            >
+              <Avatar sx={{ bgcolor: green[500] }}>
+                <AssignmentIcon />
+              </Avatar>
+              <div style={{ marginLeft: "20px", flex: 1 }}>
+                <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
+                  <p>
+                    <strong>Type: </strong>
+                    {record.Type}
+                  </p>
+                  <p>
+                    <strong>Description: </strong>
+                    {record.Description}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
         </div>
       </p>
     ),
-    tab2: <p>
-                <div style={{ maxHeight: '230px', overflowY: 'auto' }}>
-
-       {patientFiles.map((file, index) => (
-<div
-    style={{
-      display: "flex",
-      borderBottom: "0.5px solid #333",
-      paddingBottom: "10px",
-      marginTop: 20
-    }}
-  >
-   <Avatar>
-                  
-                    <FolderIcon />
-                  </Avatar>
-                  <div style={{ marginLeft: "20px", flex: 1 }}>
-                  <div style={{ fontSize: "15px", lineHeight: "1.5", display: "flex", justifyContent: "space-between" } }  >
+    tab2: (
+      <p>
+        <div style={{ maxHeight: "230px", overflowY: "auto" }}>
+          {patientFiles.map((file, index) => (
+            <div
+              style={{
+                display: "flex",
+                borderBottom: "0.5px solid #333",
+                paddingBottom: "10px",
+                marginTop: 20,
+              }}
+            >
+              <Avatar>
+                <FolderIcon />
+              </Avatar>
+              <div style={{ marginLeft: "20px", flex: 1 }}>
+                <div
+                  style={{
+                    fontSize: "15px",
+                    lineHeight: "1.5",
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <div onClick={() => viewFiles(file.filename)}>
-
-    <div>
-      
-      <p>
-        
-        <strong>File Name: </strong>
-        {file.filename}
+                    <div>
+                      <p>
+                        <strong>File Name: </strong>
+                        {file.filename}
+                      </p>
+                      <p>
+                        <strong>Type: </strong>
+                        {file.contentType === "application/pdf"
+                          ? "PDF"
+                          : file.contentType ||
+                            file.contentType === "application/png"
+                          ? "PNG"
+                          : file.contentType}
+                      </p>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex" }}></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </p>
-      <p>
-        <strong>Type: </strong>
-        {file.contentType === "application/pdf" ? "PDF" : file.contentType|| file.contentType === "application/png" ? "PNG" :file.contentType}
-      </p>
-    </div>
-    </div>
-    <div style={{ display: "flex" }}>
-       </div>
- 
-
-  </div>
-</div>
-
-  </div>
-       ))}
-       
-  </div>
-  
-  </p>,
+    ),
   };
-  
+
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
@@ -345,7 +336,6 @@ const ViewPatientInfo = () => {
         hoverable
         className="hover-card"
       >
-        
         <div
           style={{
             display: "flex",
@@ -420,7 +410,6 @@ const ViewPatientInfo = () => {
             Schedule a follow up
           </button>
         </Row>
-        
       </Card>
 
       <Modal
@@ -465,23 +454,24 @@ const ViewPatientInfo = () => {
         width={600}
       >
         {" "}
-          <div>
-            <Card
-        tabList={tabList}
-        
-        style={{ height: 350, width: 500, marginTop: 16 }}
-        loading={loadingHealth}
-        bodyStyle={{height: "380px" ,maxHeight: "300px", overflowY: "auto" }}
-        hoverable
-        className="hover-card"
-        activeTabKey={activeTabKey1}
-        onTabChange={onTab1Change}
-        
-      >
-                {contentList[activeTabKey1]}
-
-</Card>
-      {/* </Card>
+        <div>
+          <Card
+            tabList={tabList}
+            style={{ height: 350, width: 500, marginTop: 16 }}
+            loading={loadingHealth}
+            bodyStyle={{
+              height: "380px",
+              maxHeight: "300px",
+              overflowY: "auto",
+            }}
+            hoverable
+            className="hover-card"
+            activeTabKey={activeTabKey1}
+            onTabChange={onTab1Change}
+          >
+            {contentList[activeTabKey1]}
+          </Card>
+          {/* </Card>
             <Card
               loading={loadingHealth}
               className="hover-card"
@@ -497,7 +487,7 @@ const ViewPatientInfo = () => {
                 description={"Description: " + record.Description}
               />
             </Card> */}
-          </div>
+        </div>
       </Modal>
       <Modal
         title={patientInfo.Name + "'s Family Members"}
@@ -509,8 +499,7 @@ const ViewPatientInfo = () => {
           setIsFamilyMembersModalOpen(false);
         }}
         width={500}
-        bodyStyle={{maxHeight: "400px", overflowY: "auto" }}
-
+        bodyStyle={{ maxHeight: "400px", overflowY: "auto" }}
       >
         {" "}
         {patientInfo.FamilyMembers?.map((member: any) => (
@@ -523,7 +512,6 @@ const ViewPatientInfo = () => {
               <Meta
                 avatar={<Avatar style={{ width: 100, height: 100 }} />}
                 title={member.Name}
-                
                 description={`${member.RelationToPatient}: ${member.Age} Years old`}
               />
             </Card>

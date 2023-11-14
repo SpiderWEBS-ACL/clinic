@@ -60,7 +60,6 @@ const {
   uploadLicenses,
   uploadPersonalID,
   uploadMedicalDegree,
-  getDoctorTimeSlotsForDoctor,
   checkDoctorAvailablityForDoctor,
   viewPatientMedicalRecords,
   scheduleFollowUp,
@@ -80,7 +79,8 @@ const {
   subscribeWithStripe,
   deleteOneSubscription,
   subscribeWithWallet,
-  getSubscription
+  getSubscription,
+  getSubscriptionPriceForFamilyMember
 } = require("./controllers/SubscriptionController");
 
 const {
@@ -203,7 +203,6 @@ app.post("/doctor/checkDoctor", DoctorProtect, checkDoctorAvailablityForDoctor);
 app.get("/doctor/viewHealthRecords/:id", DoctorProtect, viewHealthRecordsDoctor);
 app.post("/doctor/addHealthRecordForPatient/:id", DoctorProtect, addHealthRecordForPatient);
 app.post("/doctor/scheduleFollowup/", DoctorProtect, scheduleFollowUp);
-app.get("/doctor/doctorTimeSlots/",DoctorProtect,getDoctorTimeSlotsForDoctor);
 app.put("/doctor/loggedInFirstTime",DoctorProtect,loggedInFirstTime);
 app.get("/doctor/viewPatientFiles/:id",DoctorProtect, viewPatientMedicalRecords);
 app.put("/doctor/getTimeSlotDate",DoctorProtect,getTimeSlotsOfDateDoctor);
@@ -277,11 +276,12 @@ app.get("/appointment/filterAppointment",PatientProtect, filterAppointmentPatien
 app.get("/appointment/filterAppointmentDoctor", DoctorProtect, filterAppointmentDoctor);
 
 //Subscription Endpoints
-app.post("/subscription/subscribe/:id",subscribeWithStripe);
+app.post("/subscription/subscribe/:id",PatientProtect,subscribeWithStripe);
 app.post("/subscription/subscribeWallet/:id",PatientProtect,subscribeWithWallet);
 app.post("/subscription/add",PatientProtect,addSubscription);
 app.delete("/subscription/deleteDuplicate/",PatientProtect,deleteOneSubscription);
 app.get("/subscription/getSubscription",PatientProtect,getSubscription);
+app.get("/subscription/getSubscriptionFamilyMemberPrice/:id",PatientProtect,getSubscriptionPriceForFamilyMember);
 
 
 //Prescription Endpoints

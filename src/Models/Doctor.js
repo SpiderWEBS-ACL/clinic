@@ -51,11 +51,6 @@ const doctorSchema = new Schema(
       type: String,
       required: true,
     },
-    AvailableTimeSlots : [
-      {
-        type: String,
-      },
-    ],
     FirstTime: {
       type: Boolean,
       default: true

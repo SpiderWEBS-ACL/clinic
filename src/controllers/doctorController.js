@@ -682,7 +682,6 @@ module.exports = {
   uploadLicenses,
   uploadPersonalID,
   uploadMedicalDegree,
-  getDoctorTimeSlotsForDoctor,
   checkDoctorAvailablityForDoctor,
   viewPatientMedicalRecords,
   scheduleFollowUp,

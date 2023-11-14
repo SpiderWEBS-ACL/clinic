@@ -155,23 +155,6 @@ const ViewAllDoctors = () => {
       console.error(error);
     }
   };
-  const addAppointment = async () => {
-    const response = await api
-      .post(
-        "appointment/add",
-        {
-          Doctor: DoctorId,
-          AppointmentDate: `${AppointmentDate}T${AppointmentTime}:00.000Z`,
-          FamilyMember: FamilyMember,
-        },
-        { headers: headers }
-      )
-      .then((response) => {
-        console.log(response.data);
-        message.success("Appointment added Successfully!");
-        navigate("/patient/allAppointments");
-      });
-  };
   const payWithWallet = async () => {
     try {
       sessionStorage.setItem("DoctorId", DoctorId);
