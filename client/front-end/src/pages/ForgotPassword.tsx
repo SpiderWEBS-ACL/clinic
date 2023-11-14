@@ -13,7 +13,7 @@ import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import Input from "@material-ui/core/Input";
 import { Grid, Button } from "@mui/material";
 
-
+import ImportedFooter from "../footer";
 import { Layout, Menu } from "antd";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -374,6 +374,7 @@ const ForgotPassword = () => {
           </div>
         </div>
       </Content>
+      <ImportedFooter />
     </Layout>
   );
 };
