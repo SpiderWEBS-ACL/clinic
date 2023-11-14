@@ -27,6 +27,9 @@ const EmploymentContract = () => {
   });
 
   useEffect(() => {
+    console.log(currentUrl);
+    console.log(id);
+    localStorage.clear();
     api
       .get(`/doctor/registrationRequest/${id}`, config)
       .then((response) => {
@@ -48,10 +51,10 @@ const EmploymentContract = () => {
 
   const handleAccept = async () => {
     try {
-      await api.post("doctor/acceptContract/" + id, config);
+      const response = await api.post("doctor/acceptContract/" + id, config);
       message.success("Employment Contract Accepted! Welcome Aboard!");
       setTimeout(() => {
-        navigate("/doctor/timeSlots");
+        navigate("/");
         window.location.reload();
       }, 1500);
     } catch (error) {

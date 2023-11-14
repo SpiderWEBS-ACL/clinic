@@ -63,11 +63,8 @@ const ChangePassword = () => {
 
       //logout
       localStorage.clear();
-      setTimeout(()=> {
-        navigate("/");
-       }, 1000);
-      window.location.reload;
-    
+      navigate("/");
+      window.location.reload();
     } catch (error) {
       console.error("Error:", error);
 

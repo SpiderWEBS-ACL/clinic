@@ -321,11 +321,13 @@ const viewPatients = async (req, res) => {
          patients.push(patient);
     }
 
-    if (patients.length == 0) {
+    if (!patients) {
       return res.status(400).json({ error: "You have no patients" });
     }
-    console.log(patients)
-    res.status(200).json(patients);
+    if(patients){
+      res.status(200).json(patients);
+
+    }
   } catch (error) {
     res.status(500).json({ error: "no patients available" });
   }
@@ -575,6 +577,12 @@ const scheduleFollowUp = async(req,res) =>{
     }
 }
 
+const loggedInFirstTime = async (req,res) => {
+  const id = req.user.id;
+  await doctorModel.findByIdAndUpdate(id, {FirstTime: false});
+  return res.status(200).json("Logged in first time");
+}
+
 module.exports = {
   registerDoctor,
   searchPatientByName,
@@ -597,5 +605,6 @@ module.exports = {
   uploadMedicalDegree,
   getDoctorTimeSlotsForDoctor,
   checkDoctorAvailablityForDoctor,
-  scheduleFollowUp
+  scheduleFollowUp,
+  loggedInFirstTime
 };

@@ -131,9 +131,9 @@ const ViewPatientAppointments = () => {
           onChange={setStatus}
         >
           <Option value="Upcoming">Upcoming</Option>
-          <Option value="Attended">Attended</Option>
+          <Option value="Completed">Completed</Option>
           <Option value="Cancelled">Cancelled</Option>
-          <Option value="Not-Attended">Not-Attended</Option>
+          <Option value="Rescheduled">Rescheduled</Option>
         </Select>
         <label style={{ marginRight: 8 }}>
           <strong>Date:</strong>
