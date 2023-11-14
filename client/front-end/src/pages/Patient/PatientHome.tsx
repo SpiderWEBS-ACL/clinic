@@ -363,7 +363,7 @@ const PatientHome = () => {
           </Row>
         </Content>
         <Footer style={{ textAlign: "center" }}>
-          Haysom ©2023 Created by AHIH
+          spiderWEBS ©2023 Created by AHIH
         </Footer>
       </Layout>
     </Layout>
