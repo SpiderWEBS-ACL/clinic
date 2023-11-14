@@ -942,7 +942,6 @@ const linkFamily = async (req,res) => {
 }
 
 const cancelSubscription = async (req,res) => {
-
   const id = req.user.id;
   try {
     if(!id){
@@ -950,9 +949,8 @@ const cancelSubscription = async (req,res) => {
     }
     if(id){
       const sub = await subscriptionModel.findOne({Patient: id})
-       subscriptionModel.findByIdAndUpdate(sub.id,{
-        Status: "Cancelled"
-      });
+      await subscriptionModel.findByIdAndUpdate(sub.id,{Status: "Cancelled"});
+      return res.status(200).json('Subscription cancelled successfully')
     }
   }
   catch (error) {

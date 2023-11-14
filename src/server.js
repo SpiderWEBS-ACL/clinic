@@ -259,7 +259,7 @@ app.get("/patient/allPackages", PatientProtect, getAllPackagesPatient);
 app.get("/patient/getBalance", PatientProtect, getBalance);
 app.get("/patient/getDoctorDiscount", PatientProtect, doctorDiscount);
 app.post("/patient/linkfamily",PatientProtect, linkFamily);
-app.delete("/patient/cancelSubscription",PatientProtect, cancelSubscription);
+app.put("/patient/cancelSubscription",PatientProtect, cancelSubscription);
 app.get("/patient/showSubscribedPackage", PatientProtect, showSubscribedPackage);
 app.post("/patient/getTimeSlotsDoctorDate", PatientProtect, getTimeSlotsOfDate);
 
