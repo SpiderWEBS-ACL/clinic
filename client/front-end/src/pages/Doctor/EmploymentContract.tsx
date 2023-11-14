@@ -195,7 +195,7 @@ const EmploymentContract = () => {
             &emsp; a. The Parties hereby agree that the Employee will be paid an
             hourly rate of{" "}
             <u>
-              <b style={{ fontFamily: "serif" }}>{regReqDetails.Salary}</b>
+              <b style={{ fontFamily: "serif" }}>{regReqDetails.Salary} USD</b>
             </u>{" "}
             <br />
             &emsp; b. Whereas the Parties also agree that the clinic will
