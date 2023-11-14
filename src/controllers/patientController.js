@@ -783,12 +783,13 @@ const doctorDiscount = async (req, res) => {
 }
 const getAllPackagesPatient = async (req, res) => {
   try {
-    const packages = await packageModel.find({});
+    let packages = await packageModel.find({});
     return res.status(200).json(packages);
   } catch (error) {
     return res.status(500).json({ error: error.message });
-  }
+ }
 }
+
 const payAppointmentWithWallet  = async(req,res) => {
   try{
   let message = "";
@@ -942,7 +943,6 @@ const linkFamily = async (req,res) => {
 }
 
 const cancelSubscription = async (req,res) => {
-
   const id = req.user.id;
   try {
     if(!id){
@@ -950,11 +950,13 @@ const cancelSubscription = async (req,res) => {
     }
     if(id){
       const sub = await subscriptionModel.findOne({Patient: id})
-       subscriptionModel.findByIdAndUpdate(sub.id,{
+      await subscriptionModel.findByIdAndUpdate(sub.id,{
         Status: "Cancelled"
       });
     }
+    return res.status(200).json("Unsubscribed");
   }
+
   catch (error) {
     return res.status(500).json({ error: error.message });
   }

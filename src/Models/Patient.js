@@ -86,8 +86,10 @@ const patientSchema = new Schema({
         enum: ["Male", "Female"],
         requiired: true,
       },
-   
-     
+      Subscription: {
+        type: Schema.Types.ObjectId,
+        ref: 'Subscription',
+      }
     }],
     MedicalHistory:[
       {
