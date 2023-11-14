@@ -213,7 +213,7 @@ const PatientHome = () => {
             </Col>
           </Row>
           <Row gutter={40}>
-            <Col xs={9}>
+            <Col xl={9}>
               <Card
                 hoverable
                 title="Upcoming Appointments"
