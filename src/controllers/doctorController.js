@@ -4,6 +4,8 @@ const doctorRegisterRequestModel = require("../Models/DoctorRegisterRequest");
 const appointmentModel = require("../Models/Appointment");
 const { default: mongoose } = require("mongoose");
 const bcrypt = require("bcrypt");
+const fileModel = require("../Models/File");
+const fs = require("fs");
 const multer = require("multer");
 // FOR TESTING
 const addDoctor = async (req, res) => {
@@ -44,45 +46,51 @@ const registerDoctor = async (req, res) => {
   }
 };
 const storage = multer.diskStorage({
-    fileName: function (req, file, cb) {
-      cb(null, file.originalname);
-    },
-  });
-const uploadGuest = multer({ storage: storage });
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); 
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const uploadFirst = multer({ storage: storage });
+
 const uploadPersonalID = async (req, res) => {
-  uploadGuest.single('file')(req, res, async (err) => {
+  uploadFirst.single('file')(req, res, async (err) => {
     if (err) {
-      console.error(err);
       res.status(500).send('Server Error');
     } else {
-      const { id } = req.params; // assuming `id` holds the doctor's ID
-
-      if (!id) {
-        res.status(400).send('Doctor ID is missing');
-        return;
-      }
-
+      const email = req.body.DocEmail;
+      const type = req.body.docFileType;
       const file = req.file;
 
       if (!file) {
-        res.status(400).send('No file uploaded');
-        return;
+        return res.status(400).send('No file uploaded.');
       }
 
       const newFile = {
         filename: file.filename,
         originalname: file.originalname,
         path: file.path,
-        filedata: file.buffer,
-        Doctor: id,
+        docFileType: type,
+        DocEmail: email,
+        contentType: file.mimetype,
+
       };
 
       try {
         const savedFile = await fileModel.create(newFile);
-        const doctor = await doctorModel.findByIdAndUpdate(id,
-          { PersonalID: savedFile._id },
-        );
-        await doctor.save();
+
+        fs.writeFileSync(savedFile.path, fs.readFileSync(savedFile.path));
+
+        // const doctor = await doctorModel.findByIdAndUpdate(
+        //   id,
+        //   { $push: { MedicalLicenses: savedFile._id } },
+        //   { new: true }
+        // );
+        // await doctor.save();
+
         res.status(201).json(savedFile);
       } catch (err) {
         console.error(err);
@@ -91,47 +99,55 @@ const uploadPersonalID = async (req, res) => {
     }
   });
 };
+
 
 const storageSecond = multer.diskStorage({
-    fileName: function (req, file, cb) {
-      cb(null, file.originalname);
-    },
-  });
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); 
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
 const uploadDegree = multer({ storage: storageSecond });
+
 const uploadMedicalDegree = async (req, res) => {
-    uploadDegree.single('file')(req, res, async (err) => {
+  uploadDegree.single('file')(req, res, async (err) => {
     if (err) {
       console.error(err);
       res.status(500).send('Server Error');
     } else {
-      const { id } = req.params; // assuming `id` holds the doctor's ID
-
-      if (!id) {
-        res.status(400).send('Doctor ID is missing');
-        return;
-      }
-
+      const email = req.body.DocEmail;
+      const type = req.body.docFileType;
       const file = req.file;
 
       if (!file) {
-        res.status(400).send('No file uploaded');
-        return;
+        return res.status(400).send('No file uploaded.');
       }
 
       const newFile = {
         filename: file.filename,
         originalname: file.originalname,
         path: file.path,
-        filedata: file.buffer,
-        Doctor: id,
+        docFileType: type,
+        DocEmail: email,
+        contentType: file.mimetype,
+
       };
 
       try {
         const savedFile = await fileModel.create(newFile);
-        const doctor = await doctorModel.findByIdAndUpdate(id,
-          { MedicalDegree: savedFile._id },
-        );
-        await doctor.save();
+
+        fs.writeFileSync(savedFile.path, fs.readFileSync(savedFile.path));
+
+        // const doctor = await doctorModel.findByIdAndUpdate(
+        //   id,
+        //   { $push: { MedicalLicenses: savedFile._id } },
+        //   { new: true }
+        // );
+        // await doctor.save();
+
         res.status(201).json(savedFile);
       } catch (err) {
         console.error(err);
@@ -140,42 +156,61 @@ const uploadMedicalDegree = async (req, res) => {
     }
   });
 };
+
 const storageLicense = multer.diskStorage({
-    fileName: function (req, file, cb) {
-      cb(null, file.originalname);
-    },
-  });
-const uploadThree = multer({ storage: storageLicense });
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); 
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage: storageLicense });
 const uploadLicenses = async (req, res) => {
-    uploadThree.array('files')(req, res, async (err) => {
+  upload.array('files')(req, res, async (err) => {
     if (err) {
       console.error(err);
       res.status(500).send('Server Error');
     } else {
-      let newFiles=[];
-      const { id } = req.params; // assuming id holds doctor's id
-      if(id && req.files){
-        newFiles = req.files.map((file) => ({
+      let email ="";
+      if (Array.isArray(req.body.DocEmail)) {
+        email = req.body.DocEmail[0];
+      }
+      else{
+        email = req.body.DocEmail
+      }
+      let type ="";
+      if (Array.isArray(req.body.DocEmail)) {
+        type = req.body.docFileType[0];
+      }
+      else{
+        type = req.body.docFileType
+      }
+
+      
+      const newFiles = req.files.map((file) => ({
         filename: file.filename,
         originalname: file.originalname,
         path: file.path,
-        filedata: file.buffer,
-        Doctor: id,
+        docFileType: type,
+        DocEmail: email,
+        contentType: file.mimetype,
       }));
-    }
-    else{
-      res.status(404).json({error: 'No file(s) was selected'});
-    }
-  
 
       try {
         const savedFiles = await fileModel.create(newFiles);
-        const doctor = await doctorModel.findByIdAndUpdate(
-            id,
-            { $push: { MedicalLicenses: { $each: savedFiles.map(file => file._id) } } },
-            { new: true }
-          );
-          await doctor.save();
+
+        savedFiles.forEach((file) => {
+          fs.writeFileSync(file.path, fs.readFileSync(file.path));
+        });
+        
+        // const doctor = await doctorModel.findByIdAndUpdate(
+        //     id,
+        //     { $push: { MedicalLicenses: { $each: savedFiles.map(file => file._id) } } },
+        //     { new: true }
+        //   );
+        //   await doctor.save();
         res.status(201).json(savedFiles);
       } catch (err) {
         console.error(err);
@@ -412,6 +447,22 @@ const acceptContract = async (req, res) => {
     if (!regReq) {
       return res.status(404).json({ error: "Registration Request Not Found!" });
     }
+    const docFiles = await fileModel.find({DocEmail: regReq.Email})
+    let medicalLic = [];
+    let personalID = null;
+    let degree = null;
+    for(const file of docFiles){
+      if(file.docFileType ==="License"){
+        medicalLic.push(file._id);
+      }
+      else if(file.docFileType==="PersonalID"){
+        personalID = file._id;
+      }
+      else if(file.docFileType==="Degree"){
+        degree = file._id;
+      }
+    }
+
 
     const newDoctor = await doctorModel.create({
       Username: regReq.Username,
@@ -419,11 +470,19 @@ const acceptContract = async (req, res) => {
       Email: regReq.Email,
       Password: regReq.Password,
       Dob: regReq.Dob,
+      MedicalDegree: degree,
+      PersonalID: personalID,
       HourlyRate: regReq.Salary,
       Affiliation: regReq.Affiliation,
       EducationalBackground: regReq.EducationalBackground,
       Specialty: regReq.Specialty,
     });
+    const createdDoctor = await doctorModel.findById(newDoctor._id);
+
+    createdDoctor.MedicalLicenses.push(...medicalLic);
+
+  
+    await createdDoctor.save();
     if (!newDoctor) {
       return res
         .status(404)
@@ -510,6 +569,22 @@ const addHealthRecordForPatient = async(req,res) =>{
       }
     } catch (error) {
       return res.status(500).json({ error: error.message });
+    }
+  };
+  const viewPatientMedicalRecords = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const files = await fileModel.find({ Patient: id });
+      if (!files) {
+        return res.status(404).json({ error: 'No files found' });
+      }
+      if(files){
+        res.status(200).json(files);
+
+  
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   };
  const getDoctorTimeSlotsForDoctor = async (req, res) => {
@@ -605,6 +680,7 @@ module.exports = {
   uploadMedicalDegree,
   getDoctorTimeSlotsForDoctor,
   checkDoctorAvailablityForDoctor,
+  viewPatientMedicalRecords,
   scheduleFollowUp,
   loggedInFirstTime
 };

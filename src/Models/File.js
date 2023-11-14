@@ -16,6 +16,12 @@ const fileSchema = new Schema(
       type: String,
       required: true
     },
+    DocEmail:{
+      type: String,
+    },
+    docFileType:{
+      type: String,
+    },
     contentType:{
       type:String,
       required:true

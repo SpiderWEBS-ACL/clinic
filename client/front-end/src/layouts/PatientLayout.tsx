@@ -58,6 +58,11 @@ const PatientLayout: React.FC = () => {
       key: "/patient/viewalldoctors",
     },
     {
+      label: "Health Records",
+      icon: <FileOutlined />,
+      key: "/patient/viewhealthrecords",
+    },
+    {
       label: "Prescriptions",
       key: "/patient/viewPrescriptions",
       icon: <FileOutlined />,
