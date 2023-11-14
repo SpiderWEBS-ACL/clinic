@@ -98,6 +98,25 @@ const RegLog: React.FC = () => {
       }
     }
   };
+  const validatePassword = (rule: any, value: string, callback: any) => {
+    const regex = /^(?=.*[A-Z])(?=.*\d).{6,}$/; 
+    if (!regex.test(value)) {
+      callback("Password must be at least 6 characters long and include one capital letter and one number.");
+    } else {
+      callback();
+    }
+  };
+
+  const validatePhoneNumber = (rule: any, value: string, callback: any) => {
+    const regex = /^[0-9]+$/;
+    if (!regex.test(value)) {
+      callback("Please enter a valid phone number.");
+    } else if (value.length !== 11) {
+      callback("Please enter a valid phone number.");
+    } else {
+      callback();
+    }
+  };
 
   const handleSignIn = async (values: any) => {
     const { password, username } = values; // Destructure the values from the form
@@ -246,8 +265,16 @@ const RegLog: React.FC = () => {
             <Input.Password />
           </Form.Item>
 
+          <a
+          href="/forgotPassword"
+          className="forgot-pass text-right"
+          style={{ display: "block", textAlign: "center", marginBottom: 17 }}
+        >
+          Forgot Password?
+        </a>
+       
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit">
+            <Button style={{margin: "auto"}} type="primary" htmlType="submit">
               Sign in
             </Button>
           </Form.Item>
@@ -294,124 +321,6 @@ const RegLog: React.FC = () => {
           </div>
         </div>
         <div className="form sign-up">
-          {/* <div className="input_wrap">
-            <InputField2
-              id="Username"
-              label="Username"
-              type="text"
-              value={Username}
-              onChange={setUsername}
-              onBlur={() => handleBlur("username")}
-              isValid={validateUsername(Username)}
-              errorMessage="Username must be at least 3 characters long."
-              touched={touchedFields.username}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="Password"
-              label="Password"
-              type="password"
-              value={Password}
-              onChange={setPassword}
-              onBlur={() => handleBlur("password")}
-              isValid={validatePassword(Password)}
-              errorMessage="Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, and one digit."
-              touched={touchedFields.password}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="Email"
-              label="Email"
-              type="text"
-              value={Email}
-              onChange={setEmail}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="Name"
-              label="Name"
-              type="text"
-              value={Name}
-              onChange={setName}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <label className="label">
-              <span className="span">Date Of Birth</span>
-              <input
-                className="input"
-                value={Dob !== undefined ? Dob.toISOString().split("T")[0] : ""}
-                onChange={handleDobChange}
-                type="date"
-              />
-            </label>
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="Gender"
-              label="Gender"
-              type="select"
-              options={["Male", "Female"]}
-              value={Gender}
-              onChange={setGender}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="MobileNo"
-              label="Mobile Number"
-              type="tel"
-              value={Mobile !== undefined ? Mobile.toString() : ""}
-              onChange={setMobile}
-              isValid={Mobile !== undefined ? validateMobile(Mobile) : true}
-              errorMessage="Invalid Mobile Number! Accepted Format: +201234567890 OR 0123456789"
-              touched={true}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="EmergencyContName"
-              label="Emergency Contact Name"
-              type="text"
-              value={EmergencyContactName}
-              onChange={setEmergencyContactName}
-              required={true}
-            />
-          </div>
-
-          <div className="input_wrap">
-            <InputField2
-              id="EmergencyContMobile"
-              label="Emergency Contact Mobile"
-              type="tel"
-              value={
-                EmergencyContactMobile !== undefined
-                  ? EmergencyContactMobile.toString()
-                  : ""
-              }
-              onChange={setEmergencyContactMobile}
-              isValid={validateMobile(EmergencyContactMobile)}
-              errorMessage="Invalid Mobile Number! Accepted Format: +201234567890 OR 0123456789"
-              touched={true}
-              required={true}
-            />
-          </div> */}
           <Form
             {...formItemLayout}
             form={form}
@@ -480,6 +389,8 @@ const RegLog: React.FC = () => {
                 {
                   required: true,
                   message: "Please input your password!",
+                },{
+                  validator: validatePassword,
                 },
               ]}
               hasFeedback
@@ -513,7 +424,9 @@ const RegLog: React.FC = () => {
               name="mobile"
               label="Mobile Number"
               rules={[
-                { required: true, message: "Please input your phone number!" },
+                { required: true, message: "Please input your phone number!" },{
+                  validator: validatePhoneNumber,
+                },
               ]}
             >
               <Input

@@ -132,12 +132,12 @@ const ViewAllPatients = () => {
     message.success("Cleared!");
   };
 
-  return (
+    return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
         <strong>Patients</strong>
       </h2>
-      <div style={rowStyle}>
+      <div style={{ /* Add your rowStyle styles here */ }}>
         <span>
           <label style={{ marginRight: 8, marginLeft: 250 }}>
             <strong>Appointments:</strong>
@@ -149,10 +149,7 @@ const ViewAllPatients = () => {
             onChange={handleChange}
             options={[
               { value: "All", label: "All" },
-              {
-                value: "Upcoming",
-                label: "Upcoming",
-              },
+              { value: "Upcoming", label: "Upcoming" },
             ]}
           />
           <label style={{ marginRight: 8, marginLeft: 10 }}>
@@ -184,6 +181,7 @@ const ViewAllPatients = () => {
         </span>
       </div>
       <br />
+
       <tbody>
         {patients.map(
           (patient, index) =>
@@ -217,19 +215,23 @@ const ViewAllPatients = () => {
                           }
                           description={
                             <div>
-                              <p>
+                            
                                 <strong>Email:</strong> {patient.Email}
-                              </p>
-                              <p>
-                                <strong>Date of birth:</strong>{" "}
+                              
+                                <br></br>
+                                <br></br>
+
+                                <strong>Date of birth:</strong>{' '}
                                 {patient.Dob.substring(0, 10)}
-                              </p>
-                              <p>
+                                <br></br>
+                                <br></br>
+                              
                                 <strong>Gender:</strong> {patient.Gender}
-                              </p>
-                              <p>
+                              
+                                <br></br>
+                                <br></br>
                                 <strong>Mobile:</strong> {patient.Mobile}
-                              </p>
+                              
                             </div>
                           }
                         />

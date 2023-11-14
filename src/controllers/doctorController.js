@@ -65,6 +65,7 @@ const uploadPersonalID = async (req, res) => {
       const email = req.body.DocEmail;
       const type = req.body.docFileType;
       const file = req.file;
+      console.log(email)
 
       if (!file) {
         return res.status(400).send('No file uploaded.');
@@ -649,7 +650,6 @@ const getTimeSlotsOfDateDoctor = async (req, res) => {
 
 const getAvailableTimeSlots = async(req,res) => {
   const DoctorId = req.user.id;
-  console.log(DoctorId)
   const Saturday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Saturday" })
   const Sunday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Sunday" })
   const Monday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Monday" })
@@ -657,8 +657,10 @@ const getAvailableTimeSlots = async(req,res) => {
   const Wednesday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Wednesday" })
   const Thursday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Thursday" })
   const Friday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Friday" })
+  
   return res.status(200).json({Saturday: Saturday.slots,Sunday:Sunday.slots,Monday:Monday.slots,Tuesday:Tuesday.slots,Wednesday:Wednesday.slots,Thursday:Thursday.slots,Friday:Friday.slots})
 }
+
 
 module.exports = {
   registerDoctor,

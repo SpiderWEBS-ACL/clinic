@@ -950,9 +950,10 @@ const cancelSubscription = async (req,res) => {
     }
     if(id){
       const sub = await subscriptionModel.findOne({Patient: id})
-      await subscriptionModel.findByIdAndUpdate(sub.id,{
-        Status: "Cancelled"
-      });
+
+      await subscriptionModel.findByIdAndUpdate(sub.id,{Status: "Cancelled"});
+      return res.status(200).json('Subscription cancelled successfully')
+
     }
     return res.status(200).json("Unsubscribed");
   }

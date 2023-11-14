@@ -327,7 +327,7 @@ const ViewPatientInfo = () => {
 
       <Card
         style={{
-          height: "27rem",
+          height: "28rem",
           width: "50rem",
           marginTop: "2rem",
           marginLeft: "12rem",
@@ -352,34 +352,38 @@ const ViewPatientInfo = () => {
               {patientInfo.Name}
             </div>
             <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
-              <p>
                 <strong>Email: </strong>
                 {patientInfo.Email}
-              </p>
-              <p>
+             <br></br>
+             <br></br>
+
                 <strong>Date of birth: </strong>
                 {String(patientInfo.Dob).substring(0, 10)}
-              </p>
-              <p>
+                <br></br>
+             <br></br>
+
                 <strong>Gender: </strong>
                 {patientInfo.Gender}
-              </p>
-              <p>
+                <br></br>
+             <br></br>
+
                 <strong>Mobile: </strong>
                 {patientInfo.Mobile}
-              </p>
-              <p>
+                <br></br>
+             <br></br>
+
                 <strong>Age: </strong>
                 {age}
-              </p>
-              <p>
+                <br></br>
+             <br></br>
+
                 <strong>Health Records: </strong>
                 <InfoCircleOutlined onClick={handleHealth} />
-              </p>
-              <p>
+                <br></br>
+             <br></br>
+
                 <strong>Family Members: </strong>
                 <InfoCircleOutlined onClick={handleFamilyMembers} />
-              </p>
             </div>
           </div>
         </div>
@@ -414,13 +418,13 @@ const ViewPatientInfo = () => {
         onOk={handleOk}
         onCancel={handleCancel}
         width={500}
-        style={{ height: "900px" }}
+        style={{ height: "900px"}}
       >
         <p>
           <Select
             defaultValue="Type"
             value={selectedOption}
-            style={{ width: 150 }}
+            style={{ width: 150, marginRight: "20rem" }}
             onChange={handleChange}
             options={[
               { value: "Surgical", label: "Surgical" },

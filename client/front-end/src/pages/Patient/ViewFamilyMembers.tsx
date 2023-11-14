@@ -19,6 +19,11 @@ const ViewFamilyMembers = () => {
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
+  const config = {
+    headers: {
+      Authorization: "Bearer " + accessToken,
+    },
+  };
   useEffect(() => {
     const config = {
       headers: {
@@ -56,7 +61,7 @@ const ViewFamilyMembers = () => {
     setShowPopup(true);
   };
 
-  const handleFormSubmit = () => {
+  const handleFormSubmit = async() => {
     try {
       const data = {
         emailInput,
@@ -67,8 +72,8 @@ const ViewFamilyMembers = () => {
       const headers = {
         Authorization: "Bearer " + accessToken,
       };
-      if ((emailInput != "" || phoneInput != "") && RelationToPatient != "") {
-        api
+      if ((emailInput != "" || phoneInput != "") && RelationToPatient != "Relation") {
+       await api
           .post(`/patient/linkFamily`, data, { headers })
           .then((response) => {
             message.success("Family Member Linked Successfuly");
@@ -77,6 +82,17 @@ const ViewFamilyMembers = () => {
           .catch((error) => {
             message.error(`${error.response.data.error}`);
           });
+          setLoading(true);
+          api
+      .get(`/patient/viewFamilyMembers`,  config)
+      .then((response) => {
+        setFamilyMembers(response.data);
+        setLoading(false);
+        setHasFamilyMembers(response.data.length > 0);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
       } else {
         message.warning("Please fill in the fields  ");
       }
