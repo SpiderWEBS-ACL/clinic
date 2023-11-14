@@ -187,41 +187,63 @@ const ViewAllPatients = () => {
       </div>
       <br />
 
-        <tbody>
-        {patients.map((patient, index) => (
-      index % 3 === 0  && (
-        <Row gutter={16} key={index}>
-          {patients.slice(index, index + 3).map((patient, subIndex) => (
-            <Col span={8} key={subIndex}>
-              <div>
-              <Card
-                style={{width: 400, marginTop: 16 , height: 1200}}
-                loading={loadingList}
-                hoverable
-                className="hover-card"
-                onClick={() => handleRedirection(patient._id)}
-
-              >
-                <Meta
-              avatar={<Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel"  style={{width:75, height:75}}/>}
-               title={<div style={{ fontSize: '20px' }}>{patient.Name}</div>}
-                  description={  <div>
-                    <p><strong>Email:</strong> {patient.Email}</p>
-                    <p><strong>Date of birth:</strong> {patient.Dob.substring(0,10)}</p>
-                    <p><strong>Gender:</strong> {patient.Gender}</p>
-                    <p><strong>Mobile:</strong> {patient.Mobile}</p>
-                  </div>}
-                  />
-              </Card>
-              </div>
-
-            </Col>
-          ))}
-        </Row>
-      )
-    ))}
-                     
-        </tbody>
+      <tbody>
+        {patients.map(
+          (patient, index) =>
+            index % 3 === 0 && (
+              <Row gutter={16} key={index}>
+                {patients.slice(index, index + 3).map((patient, subIndex) => (
+                  <Col span={8} key={subIndex}>
+                    <div>
+                      <Card
+                        style={{
+                          width: "27rem",
+                          marginTop: "3rem",
+                          height: "14rem",
+                        }}
+                        loading={loadingList}
+                        hoverable
+                        className="hover-card"
+                        onClick={() => handleRedirection(patient._id)}
+                      >
+                        <Meta
+                          avatar={
+                            <Avatar
+                              src="https://xsgames.co/randomusers/avatar.php?g=pixel"
+                              style={{ width: 75, height: 75 }}
+                            />
+                          }
+                          title={
+                            <div style={{ fontSize: "20px" }}>
+                              {patient.Name}
+                            </div>
+                          }
+                          description={
+                            <div>
+                              <p>
+                                <strong>Email:</strong> {patient.Email}
+                              </p>
+                              <p>
+                                <strong>Date of birth:</strong>{" "}
+                                {patient.Dob.substring(0, 10)}
+                              </p>
+                              <p>
+                                <strong>Gender:</strong> {patient.Gender}
+                              </p>
+                              <p>
+                                <strong>Mobile:</strong> {patient.Mobile}
+                              </p>
+                            </div>
+                          }
+                        />
+                      </Card>
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            )
+        )}
+      </tbody>
     </div>
   );
 };

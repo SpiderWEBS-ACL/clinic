@@ -16,9 +16,9 @@ const addAppointment = async (req, res) => {
           req.body.Patient = familyMember._id;
         }
         const appointment = await appointmentModel.create(req.body);
-        res.status(201).json(appointment);
+        return res.status(201).json(appointment);
     }catch(error){
-        res.status(400).json({ error: error.message });
+        return res.status(400).json({ error: error.message });
     }
  }
 
@@ -37,17 +37,17 @@ const addAppointment = async (req, res) => {
             if(doctor){
              appointments = await appointmentModel.find({"Doctor": doctor}).populate("Doctor").populate("Patient").exec();
                 if(!appointments || appointments.length === 0){
-                    res.status(404).json({error: "no appointments were found"});
+                   return res.status(404).json({error: "no appointments were found"});
                 }
                 }
                 else if(patient){
                     appointments = await appointmentModel.find({"Patient": patient}).populate("Doctor").populate("Patient").exec();
                         if(!appointments || appointments.length === 0){
-                            res.status(404).json({error: "no appointments were found"});
+                           return res.status(404).json({error: "no appointments were found"});
                         }
                         }
             }catch(error){
-            res.status(500).json({ error: error.message });
+           return res.status(500).json({ error: error.message });
         }
         
 
@@ -97,13 +97,13 @@ const filterAppointmentPatient = async (req, res) => {
             if(doctor){
              appointments = await appointmentModel.find({"Doctor": doctor}).populate("Doctor").populate("Patient").exec();
                 if(!appointments || appointments.length === 0){
-                    res.status(404).json({error: "no appointments were found"});
+                    return  res.status(404).json({error: "no appointments were found"});
                 }
                 }
                 else if(patient){
                     appointments = await appointmentModel.find({"Patient": patient}).populate("Doctor").populate("Patient").exec();
                         if(!appointments || appointments.length === 0){
-                            res.status(404).json({error: "no appointments were found"});
+                           return res.status(404).json({error: "no appointments were found"});
                         }
                         await Promise.all(
                             patient.FamilyMembers.map( async (member) => {
@@ -119,7 +119,7 @@ const filterAppointmentPatient = async (req, res) => {
                           }))
                         }
             }catch(error){
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
         
 

@@ -20,6 +20,7 @@ import { tr } from "date-fns/locale";
 import "./StyleDoctor.css";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { green } from "@mui/material/colors";
+import { headers } from "../../Middleware/authMiddleware";
 
 const ViewPatientInfo = () => {
   const { id } = useParams<{ id: string }>();
@@ -91,12 +92,30 @@ const ViewPatientInfo = () => {
       message.error("Please enter required fields");
     }
   };
+  const setTimeSlotsApi = (date: string) => {
+    api
+      .post(
+        "patient/getTimeSlotsDoctorDate",
+        {
+          date: date,
+        },
+        { headers: headers }
+      )
+      .then((response) => {
+        setTimeSlotsDoctor(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const onAppointmentDateChange: DatePickerProps["onChange"] = (
     date,
     dateString
   ) => {
     setAppointmentDate(dateString);
+    setTimeSlotsApi(dateString);
     setMessage("");
+    console.log(dateString);
   };
 
   const handleCheckAvailability = () => {
@@ -124,14 +143,6 @@ const ViewPatientInfo = () => {
   };
   const schedule = async () => {
     setShowDateTimeModal(true);
-    api
-      .get("/doctor/doctorTimeSlots/", config)
-      .then((response) => {
-        setTimeSlotsDoctor(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
   const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
@@ -208,12 +219,12 @@ const ViewPatientInfo = () => {
         loading={loadingList}
         hoverable
         className="hover-card"
-        cover={
-          <img
-            alt="example"
-            src="https://img.freepik.com/free-vector/doctor-examining-patient-clinic-illustrated_23-2148856559.jpg?w=1380&t=st=1699651650~exp=1699652250~hmac=beb4f5b10e87a92fc98a6afdbec668faa4127bf16f374383eaacb5337798e6bf"
-            />
-        }
+        // cover={
+        //   <img
+        //     alt="example"
+        //     src="https://img.freepik.com/free-vector/doctor-examining-patient-clinic-illustrated_23-2148856559.jpg?w=1380&t=st=1699651650~exp=1699652250~hmac=beb4f5b10e87a92fc98a6afdbec668faa4127bf16f374383eaacb5337798e6bf"
+        //     />
+        // }
       >
         <div
           style={{

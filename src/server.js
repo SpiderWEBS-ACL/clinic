@@ -37,7 +37,7 @@ const {
   getBalance, 
   getAllPackagesPatient,
   doctorDiscount, 
-  payAppointmentWithWallet, linkFamily, cancelSubscription,showSubscribedPackage
+  payAppointmentWithWallet, linkFamily, cancelSubscription,showSubscribedPackage, getTimeSlotsOfDate
 } = require("./controllers/patientController");
 
 const {
@@ -63,7 +63,9 @@ const {
   getDoctorTimeSlotsForDoctor,
   checkDoctorAvailablityForDoctor,
   scheduleFollowUp,
-  loggedInFirstTime
+  loggedInFirstTime,
+  getTimeSlotsOfDateDoctor,
+  getAvailableTimeSlots
 } = require("./controllers/doctorController");
 
 const {
@@ -195,6 +197,8 @@ app.post("/doctor/addHealthRecordForPatient/:id", DoctorProtect, addHealthRecord
 app.post("/doctor/scheduleFollowup/", DoctorProtect, scheduleFollowUp);
 app.get("/doctor/doctorTimeSlots/",DoctorProtect,getDoctorTimeSlotsForDoctor);
 app.put("/doctor/loggedInFirstTime",DoctorProtect,loggedInFirstTime);
+app.put("/doctor/getTimeSlotDate",DoctorProtect,getTimeSlotsOfDateDoctor);
+app.get("/doctor/getAvailableTimeSlots",DoctorProtect,getAvailableTimeSlots);
 //Patient Endpoints
 
 //Public Endpoints
@@ -227,7 +231,6 @@ app.get("/patient/selectPrescription/:id",PatientProtect,selectPrescription)
 app.get("/patient/viewDoctorsWithPrices",PatientProtect, viewDoctorsWithPrices)
 app.get("/patient/allAppointments",PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors",PatientProtect, getAllDoctorsPatient);
-
 app.get("/patient/allPackages",PatientProtect,getAllPackagesPatient);
 app.post("/patient/checkDoctor",PatientProtect,checkDoctorAvailablity);
 app.get("/patient/doctorTimeSlots/:id",PatientProtect,getDoctorTimeSlots);
@@ -255,6 +258,7 @@ app.get("/patient/getDoctorDiscount", PatientProtect, doctorDiscount);
 app.post("/patient/linkfamily",PatientProtect, linkFamily);
 app.delete("/patient/cancelSubscription",PatientProtect, cancelSubscription);
 app.get("/patient/showSubscribedPackage", PatientProtect, showSubscribedPackage);
+app.post("/patient/getTimeSlotsDoctorDate", PatientProtect, getTimeSlotsOfDate);
 
 
 

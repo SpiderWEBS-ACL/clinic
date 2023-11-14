@@ -141,14 +141,6 @@ const Calendar: React.FC = () => {
           Save
         </button>
       </div>
-      <div>
-        <h3>Selected Slots:</h3>
-        <ul>
-          {slots.map((slot) => (
-            <li key={slot}>{slot}</li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 };
