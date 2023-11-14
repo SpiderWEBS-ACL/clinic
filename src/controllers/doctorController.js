@@ -658,7 +658,7 @@ const getAvailableTimeSlots = async(req,res) => {
   const Thursday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Thursday" })
   const Friday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Friday" })
   
-  return res.status(200).json({Saturday: Saturday.slots,Sunday:Sunday.slots,Monday:Monday.slots,Tuesday:Tuesday.slots,Wednesday:Wednesday.slots,Thursday:Thursday.slots,Friday:Friday.slots})
+  return res.status(200).json({Saturday: Saturday?.slots,Sunday:Sunday?.slots,Monday:Monday?.slots,Tuesday:Tuesday?.slots,Wednesday:Wednesday?.slots,Thursday:Thursday?.slots,Friday:Friday?.slots})
 }
 
 

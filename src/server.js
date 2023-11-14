@@ -276,12 +276,12 @@ app.get("/appointment/filterAppointment",PatientProtect, filterAppointmentPatien
 app.get("/appointment/filterAppointmentDoctor", DoctorProtect, filterAppointmentDoctor);
 
 //Subscription Endpoints
-app.post("/subscription/subscribe/:id",PatientProtect,subscribeWithStripe);
+app.post("/subscription/subscribe/:id",subscribeWithStripe);
 app.post("/subscription/subscribeWallet/:id",PatientProtect,subscribeWithWallet);
 app.post("/subscription/add",PatientProtect,addSubscription);
 app.delete("/subscription/deleteDuplicate/",PatientProtect,deleteOneSubscription);
 app.get("/subscription/getSubscription",PatientProtect,getSubscription);
-app.get("/subscription/getSubscriptionFamilyMemberPrice/:id",PatientProtect,getSubscriptionPriceForFamilyMember);
+// app.get("/subscription/getSubscriptionFamilyMemberPrice/:id",PatientProtect,getSubscriptionPriceForFamilyMember);
 
 
 //Prescription Endpoints
