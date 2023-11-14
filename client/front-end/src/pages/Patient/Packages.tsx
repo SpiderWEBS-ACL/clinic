@@ -165,10 +165,10 @@ const AllPackagesPatient = () => {
       <tbody>
         {Packages.map(
           (request, index) =>
-            index % 3 === 0 && (
+            index % 4 === 0 && (
               <Row gutter={16} key={index}>
-                {Packages.slice(index, index + 3).map((request, subIndex) => (
-                  <Col span={8} key={subIndex}>
+                {Packages.slice(index, index + 4).map((request, subIndex) => (
+                  <Col span={10} key={subIndex}>
                     <div>
                       <Card
                         style={{
@@ -206,15 +206,15 @@ const AllPackagesPatient = () => {
                               </p>
                               <p>
                                 <strong>Doctor Discount:</strong>{" "}
-                                {request.DoctorDiscount}
+                                {request.DoctorDiscount}%
                               </p>
                               <p>
                                 <strong>Pharmacy Discount:</strong>{" "}
-                                {request.PharmacyDiscount}
+                                {request.PharmacyDiscount}%
                               </p>
                               <p>
                                 <strong>Family Discount:</strong>{" "}
-                                {request.FamilyDiscount}
+                                {request.FamilyDiscount}%
                               </p>
                               <p> {request._id == SubscribedPackageId && subscribedPackage.Status == "Subscribed" ? 
                                    `Renewal Date:${subscribedPackage.Date.split("T")[0]}` 

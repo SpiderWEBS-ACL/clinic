@@ -11,6 +11,7 @@ const fileModel = require("../Models/File");
 const path = require('path');
 
 const prescriptionModel = require("../Models/Prescription");
+const timeSlotModel = require("../Models/TimeSlot");
 const subscriptionModel = require('../Models/Subscription');
 const { fileLoader } = require("ejs");
 const multer = require('multer');
@@ -27,15 +28,15 @@ const addPatient = async (req, res) => {
     if(!exists && !exists2){
         req.body.Password = await bcrypt.hash(req.body.Password,10);
         var newPatient = await patientModel.create(req.body);
-        res.status(201).json(newPatient);
+        return res.status(201).json(newPatient);
     }
     else if(exists){
-        res.status(400).json({error:  "Username already taken!" });
+        return res.status(400).json({error:  "Username already taken!" });
     }else{
-        res.status(400).json({error:  "Email already registered!" });
+        return res.status(400).json({error:  "Email already registered!" });
     }
 }catch(error){
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
 }
 };
 
@@ -48,9 +49,9 @@ const getPatient = async (req,res) => {
     if (!Patient) {
         return res.status(404).json({ error: 'Patient not found' });
    }
-   res.status(200).json(Patient);
+   return res.status(200).json(Patient);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 
 }
@@ -73,9 +74,9 @@ const login = async(req, res) => {
         }
         accessToken = generateAccessToken(user);
         refreshToken = jwt.sign({id: patient._id}, process.env.REFRESH_TOKEN_SECRET);
-        res.json({ accessToken: accessToken, refreshToken: refreshToken, id: patient._id, type:"Patient"});
+        return res.json({ accessToken: accessToken, refreshToken: refreshToken, id: patient._id, type:"Patient"});
       } else {
-        res.status(400).json({ error: "Password doesn't match!" });
+        return res.status(400).json({ error: "Password doesn't match!" });
       }
     }
     else if(doctor){
@@ -86,9 +87,9 @@ const login = async(req, res) => {
         }
         accessToken = generateAccessToken(user);
         refreshToken = jwt.sign({id: doctor._id}, process.env.REFRESH_TOKEN_SECRET);
-        res.json({ accessToken: accessToken, refreshToken: refreshToken, id: doctor._id, type:"Doctor" });
+        return res.json({ accessToken: accessToken, refreshToken: refreshToken, id: doctor._id, type:"Doctor" });
       } else {
-        res.status(400).json({ error: "Password doesn't match!" });
+        return res.status(400).json({ error: "Password doesn't match!" });
       }
     }
     else if(admin){
@@ -99,14 +100,14 @@ const login = async(req, res) => {
         }
         accessToken = generateAccessToken(user);
         refreshToken = jwt.sign({id: admin._id}, process.env.REFRESH_TOKEN_SECRET);
-        res.json({accessToken: accessToken, refreshToken: refreshToken, id: admin._id,type:"Admin" });
+        return res.json({accessToken: accessToken, refreshToken: refreshToken, id: admin._id,type:"Admin" });
       } else {
-        res.status(400).json({ error: "Password doesn't match!" });
+        return res.status(400).json({ error: "Password doesn't match!" });
       }
     }
    
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
 
@@ -141,9 +142,9 @@ const selectDoctor = async (req, res) => {
     if (!doctor) {
       return res.status(404).json({ error: "Doctor Not Found" });
     }    
-    res.status(200).json(doctor);
+    return res.status(200).json(doctor);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -165,7 +166,7 @@ const viewDoctorDetails = async (req, res) => {
       return res.status(200).json(doctorInfo)
     }
   } catch (error){
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
 
@@ -255,16 +256,16 @@ const filterPrescriptions = async (req, res) => {
      return res.status(200).json(presc);
     
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while searching for this prescription'});
+    return res.status(500).json({ error: 'An error occurred while searching for this prescription'});
   }
 
 };
 const addPrescription = async (req,res) => {
   try {
       const newPrescription = await prescriptionModel.create(req.body);
-      res.status(201).json(newPrescription);
+      return res.status(201).json(newPrescription);
   }catch(error){
-      res.status(400).json({ error: error.message });
+      return res.status(400).json({ error: error.message });
   }
 }
 
@@ -276,11 +277,11 @@ const selectPrescription = async (req, res) =>{
       return res.status(404).json({ error: "Prescription not found" });
     }
     else{
-      res.status(200).json(prescription);
+      return res.status(200).json(prescription);
 
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
 
@@ -299,10 +300,10 @@ const viewFamilyMembers = async (req, res) => {
           return res.status(404).json({ error: "You have no registered family members" });
         }
 
-        res.status(200).json(familyMembers)
+        return res.status(200).json(familyMembers)
     }
     catch(error){
-        res.status(500).json({error: error.message})
+        return res.status(500).json({error: error.message})
     }
 };
 
@@ -366,9 +367,9 @@ const filterDoctors = async (req, res) => {
       return res.status(404).json({ error: "No Doctors Found"});
     }
     
-    res.status(200).json(doctors);
+    return res.status(200).json(doctors);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -393,12 +394,12 @@ const filterPatientAppointments = async(req,res) =>{
   try{
       const appointments = await appointmentModel.find(query).populate("Doctor").exec();
       if(!appointments || appointments.length === 0){
-          res.status(404).json({error: "No appointments were found"});
+          return res.status(404).json({error: "No appointments were found"});
       }
       else
-          res.status(200).json(appointments);
+          return res.status(200).json(appointments);
       }catch(error){
-      res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: error.message });
   }
 }
 
@@ -426,9 +427,9 @@ const searchForDoctor = async (req, res) => {
       return res.status(404).json({ error: 'No doctors found matching the criteria' });
     }
 
-    res.status(200).json(doctors);
+    return res.status(200).json(doctors);
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while searching for doctors' });
+    return res.status(500).json({ error: 'An error occurred while searching for doctors' });
   }
 };
 
@@ -472,9 +473,9 @@ const filterDoctorsByNameSpecialtyAvailability = async (req, res) => {
     const filteredAvailableDoctors = availableDoctors.filter((doctor) => doctor !== null);
 
 
-    res.status(200).json(filteredAvailableDoctors);
+    return res.status(200).json(filteredAvailableDoctors);
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while searching for doctors' });
+    return res.status(500).json({ error: 'An error occurred while searching for doctors' });
   }
 };
 
@@ -513,9 +514,9 @@ const viewDoctorsWithPrices = async (req, res) => {
       };
     });
 
-    res.status(200).json(doctorsWithPrices);
+    return res.status(200).json(doctorsWithPrices);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -539,22 +540,22 @@ const viewAllPatientAppointments = async(req,res) => {
                 // })
               }))
                   if(!appointments || appointments.length === 0){
-                      res.status(404).json({error: "no appointments were found"});
+                    return res.status(404).json({error: "no appointments were found"});
                   }
                   else
                       return res.status(200).json(appointments);
                   }
       }catch(error){
-      res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: error.message });
   }
 }
 
 const getAllDoctorsPatient = async (req,res) =>{
   try{
       const Doctors = await doctorModel.find({});
-      res.status(200).json(Doctors);
+      return res.status(200).json(Doctors);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
 
@@ -573,7 +574,7 @@ const uploadMedicalDocuments = async (req, res) => {
   upload.array('files')(req, res, async (err) => {
     if (err) {
       console.error(err);
-      res.status(500).send('Server Error');
+      return res.status(500).send('Server Error');
     } else {
       const id = req.user.id;
       const newFiles = req.files.map((file) => ({
@@ -596,10 +597,10 @@ const uploadMedicalDocuments = async (req, res) => {
           { new: true }
         );
         await currPatient.save();
-        res.status(201).json(savedFiles);
+        return res.status(201).json(savedFiles);
       } catch (err) {
         console.error(err);
-        res.status(500).send('Server Error');
+        return res.status(500).send('Server Error');
       }
     }
   });
@@ -627,7 +628,7 @@ const deleteMedicalDocuments = async (req, res) => {
       await updatedPatient.save();
       res.status(200).json({ message: 'Files deleted' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 const viewMedicalDocuments = async (req, res) => {
@@ -639,11 +640,11 @@ const viewMedicalDocuments = async (req, res) => {
       return res.status(404).json({ error: 'No files found' });
     }
     if(files){
-      res.status(200).json(files);
+      return res.status(200).json(files);
 
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 const viewHealthRecords = async(req,res) =>{
@@ -651,15 +652,15 @@ const viewHealthRecords = async(req,res) =>{
   try{
     const {HealthRecords} = await patientModel.findById(id).populate("HealthRecords.Doctor");
     if (HealthRecords) {
-          res.status(200).json(HealthRecords);
+          return res.status(200).json(HealthRecords);
           
     }
     else{
-      res.status(404).json({ error: 'Health records not found' });
+      return res.status(404).json({ error: 'Health records not found' });
     }
 
   } catch(error) {
-    res.status(500).json({error: error.message});
+    return res.status(500).json({error: error.message});
   }
 }
 const subscribeToHealthPackage = async(req,res) => {
@@ -668,20 +669,8 @@ const subscribeToHealthPackage = async(req,res) => {
   try{
     const currPatient = patientModel.findById(id);
     if(!currPatient){
-      res.status(404).json({error: 'No patient found!'});
+      return res.status(404).json({error: 'No patient found!'});
     }
-    // if(currPatient.FamilyMembers.length>0){
-    //   for (const familyMember of currPatient.FamilyMembers) {
-    //       if(familyMember.MemberID){
-    //         const newSubscription = new subscriptionModel({
-    //           Patient: familyMember.MemberID,
-    //           Package: packageId,
-    //         });
-    //         await newSubscription.save();
-            
-    //       }
-    //   }
-    // }
     const newSubscription = new subscriptionModel({
       Patient: id,
       Package: packageId,
@@ -689,18 +678,9 @@ const subscribeToHealthPackage = async(req,res) => {
     await newSubscription.save();
 
   }catch(error){
-    res.status(500).json({error: error.message});
+    return res.status(500).json({error: error.message});
   }
 }
-
-
-  
-  
-  
-  
-  
-  
-  
   
 const checkDoctorAvailablity = async (req, res) => {
 
@@ -723,19 +703,57 @@ const checkDoctorAvailablity = async (req, res) => {
     return res.status(400).json({error: error.message});
     }
 }
+const getTimeSlotsOfDate = async (req, res) => {
+  try {
+    const { date, DoctorId } = req.body;
+    const DateFormat = new Date(date);
+    const dayOfWeek = DateFormat.getDay();
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const dayString = daysOfWeek[dayOfWeek];
+    const timeSlots = await timeSlotModel.findOne({ Doctor: DoctorId, day: dayString });
+
+    if (!timeSlots) {
+      return res.status(404).json({ error: 'No time slots found for the specified day and doctor.' });
+    }
+
+    const timeSlotsUpdated = await Promise.all(timeSlots.slots.map(async (slot) => {
+      let datee = `${date}T${slot}:00.000Z`;
+      console.log(datee);
+      let query = {
+        $and: [
+          { Doctor: DoctorId },
+          { AppointmentDate: datee }
+        ]
+      };
+      let appointment = await appointmentModel.find(query);
+      console.log(appointment)
+
+      if (appointment.length === 0) {
+        return slot;
+      }
+      return null;
+    }));
+
+    return res.status(200).json(timeSlotsUpdated.filter(slot => slot !== null));
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
 const getDoctorTimeSlots = async (req, res) => {
   const {id} = req.params;
+
   const doctor = await doctorModel.findById(id);
-  res.status(200).json(doctor.AvailableTimeSlots);
+  return res.status(200).json(doctor.AvailableTimeSlots);
 }
 
 const getBalance = async(req,res) => {
   try{
   const id = req.user.id;
   const { WalletBalance } = await patientModel.findById(id);
-  res.status(200).json(WalletBalance);
+  return res.status(200).json(WalletBalance);
   }catch(error){
-    res.status(401).json({error: error});
+    return res.status(401).json({error: error});
   }
 }
 const getDoctorDiscount = async (patientId) => {
@@ -758,17 +776,17 @@ const doctorDiscount = async (req, res) => {
   try{
   const patientId = req.user.id;
   const doctorDiscount = await getDoctorDiscount(patientId);
-  res.status(200).json(doctorDiscount);
+  return res.status(200).json(doctorDiscount);
   }catch(error){
-    res.status(401).json({error: error})
+    return res.status(401).json({error: error})
   }
 }
 const getAllPackagesPatient = async (req, res) => {
   try {
     const packages = await packageModel.find({});
-    res.status(200).json(packages);
+    return res.status(200).json(packages);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
 const payAppointmentWithWallet  = async(req,res) => {
@@ -785,13 +803,13 @@ const payAppointmentWithWallet  = async(req,res) => {
     if(WalletBalance >= hourlyRate){
       const updatedPatient = await patientModel.findByIdAndUpdate(patientId, {WalletBalance: WalletBalance - hourlyRate});
       message = "Appointment Booked Successfully!"
-      res.status(200).json(message);
+      return res.status(200).json(message);
     }else{
       message = "Insufficient funds in wallet!"
-      res.status(400).json(message);
+      return res.status(400).json(message);
     }
   }catch(error){
-    res.status(401).json({error : error});
+    return res.status(401).json({error : error});
     }
   }
 const payAppointmentWithStripe = async (req,res) => {
@@ -824,9 +842,9 @@ const payAppointmentWithStripe = async (req,res) => {
       cancel_url: `${process.env.SERVER_URL}/patient/viewAllDoctors`,
       
     })
-    res.json({url: session.url})
+    return res.json({url: session.url})
   }catch(error){
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
     }
   }
 const getSubscribedPackage = async (req,res) => {
@@ -892,7 +910,7 @@ const linkFamily = async (req,res) => {
         FamilyMembers: allFamilyMembers,
       }, {new: true}
       );
-      res.status(200).json(updatedPatient);
+      return res.status(200).json(updatedPatient);
       }
     }
     if(memberEm){
@@ -915,11 +933,11 @@ const linkFamily = async (req,res) => {
         FamilyMembers: allFamilyMembers,
       }, {new: true}
       );
-      res.status(200).json(updatedPatient);
+      return res.status(200).json(updatedPatient);
     }
   }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
 
@@ -938,7 +956,7 @@ const cancelSubscription = async (req,res) => {
     }
   }
   catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
 
@@ -946,5 +964,5 @@ const cancelSubscription = async (req,res) => {
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
 filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
 viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity,
-getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription,showSubscribedPackage };
+getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription,showSubscribedPackage,getTimeSlotsOfDate };
 

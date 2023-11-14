@@ -25,9 +25,9 @@ const subscribeWithStripe = async (req,res) => {
       success_url: `${process.env.SERVER_URL}/subscription/success`,
       cancel_url: `${process.env.SERVER_URL}/patient/packages` //TODO:back to shopping cart page
     })
-    res.json({url: session.url})
+    return res.json({url: session.url})
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 }
 const subscribeWithWallet = async (req,res) => {
@@ -42,7 +42,7 @@ const subscribeWithWallet = async (req,res) => {
       return res.status(500).json("Insufficient")
     return res.status(200).json("Success");
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 }
 
@@ -58,9 +58,9 @@ const addSubscription = async (req, res) => {
         Package: packageId
       };
       const newSubscription = await subscriptionModel.create(subscription);
-      res.status(201).json({ message: 'Subscription added successfully', newSubscription });
+      return res.status(201).json({ message: 'Subscription added successfully', newSubscription });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      return res.status(400).json({ error: error.message });
     }
   }
 
@@ -70,7 +70,7 @@ const addSubscription = async (req, res) => {
       if(subscriptions.length == 2)
         var deletedSubscription = await subscriptionModel.deleteOne({Patient: req.user.id});
     }catch (error) {
-      res.status(400).json({ error: error.message });
+      return res.status(400).json({ error: error.message });
     }
   }
   const getSubscription = async (req,res) => {

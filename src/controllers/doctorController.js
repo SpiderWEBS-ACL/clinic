@@ -2,6 +2,7 @@ const doctorModel = require("../Models/Doctor");
 const patientModel = require("../Models/Patient");
 const doctorRegisterRequestModel = require("../Models/DoctorRegisterRequest");
 const appointmentModel = require("../Models/Appointment");
+const timeSlotModel = require("../Models/TimeSlot");
 const { default: mongoose } = require("mongoose");
 const bcrypt = require("bcrypt");
 const fileModel = require("../Models/File");
@@ -12,9 +13,9 @@ const addDoctor = async (req, res) => {
   try {
     req.body.Password = await bcrypt.hash(req.body.Password, 10);
     const newDoctor = await doctorModel.create(req.body);
-    res.status(201).json(newDoctor);
+    return res.status(201).json(newDoctor);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 };
 
@@ -35,14 +36,14 @@ const registerDoctor = async (req, res) => {
     if (!exists && !exists2 && !exists3 && !exists4) {
       req.body.Password = await bcrypt.hash(req.body.Password, 10);
       var newDoctor = await doctorRegisterRequestModel.create(req.body);
-      res.status(201).json(newDoctor);
+      return res.status(201).json(newDoctor);
     } else if (exists || exists2) {
-      res.status(400).json({ error: "Username already taken!" });
+      return res.status(400).json({ error: "Username already taken!" });
     } else {
-      res.status(400).json({ error: "Email already registered!" });
+      return res.status(400).json({ error: "Email already registered!" });
     }
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 };
 const storage = multer.diskStorage({
@@ -59,7 +60,7 @@ const uploadFirst = multer({ storage: storage });
 const uploadPersonalID = async (req, res) => {
   uploadFirst.single('file')(req, res, async (err) => {
     if (err) {
-      res.status(500).send('Server Error');
+      return res.status(500).send('Server Error');
     } else {
       const email = req.body.DocEmail;
       const type = req.body.docFileType;
@@ -81,20 +82,11 @@ const uploadPersonalID = async (req, res) => {
 
       try {
         const savedFile = await fileModel.create(newFile);
-
         fs.writeFileSync(savedFile.path, fs.readFileSync(savedFile.path));
-
-        // const doctor = await doctorModel.findByIdAndUpdate(
-        //   id,
-        //   { $push: { MedicalLicenses: savedFile._id } },
-        //   { new: true }
-        // );
-        // await doctor.save();
-
         res.status(201).json(savedFile);
       } catch (err) {
         console.error(err);
-        res.status(500).send('Server Error');
+        return res.status(500).send('Server Error');
       }
     }
   });
@@ -116,7 +108,7 @@ const uploadMedicalDegree = async (req, res) => {
   uploadDegree.single('file')(req, res, async (err) => {
     if (err) {
       console.error(err);
-      res.status(500).send('Server Error');
+      return res.status(500).send('Server Error');
     } else {
       const email = req.body.DocEmail;
       const type = req.body.docFileType;
@@ -138,20 +130,11 @@ const uploadMedicalDegree = async (req, res) => {
 
       try {
         const savedFile = await fileModel.create(newFile);
-
         fs.writeFileSync(savedFile.path, fs.readFileSync(savedFile.path));
-
-        // const doctor = await doctorModel.findByIdAndUpdate(
-        //   id,
-        //   { $push: { MedicalLicenses: savedFile._id } },
-        //   { new: true }
-        // );
-        // await doctor.save();
-
         res.status(201).json(savedFile);
       } catch (err) {
         console.error(err);
-        res.status(500).send('Server Error');
+        return res.status(500).send('Server Error');
       }
     }
   });
@@ -171,7 +154,7 @@ const uploadLicenses = async (req, res) => {
   upload.array('files')(req, res, async (err) => {
     if (err) {
       console.error(err);
-      res.status(500).send('Server Error');
+      return res.status(500).send('Server Error');
     } else {
       let email ="";
       if (Array.isArray(req.body.DocEmail)) {
@@ -204,61 +187,14 @@ const uploadLicenses = async (req, res) => {
         savedFiles.forEach((file) => {
           fs.writeFileSync(file.path, fs.readFileSync(file.path));
         });
-        
-        // const doctor = await doctorModel.findByIdAndUpdate(
-        //     id,
-        //     { $push: { MedicalLicenses: { $each: savedFiles.map(file => file._id) } } },
-        //     { new: true }
-        //   );
-        //   await doctor.save();
         res.status(201).json(savedFiles);
       } catch (err) {
         console.error(err);
-        res.status(500).send('Server Error');
+        return res.status(500).send('Server Error');
       }
     }
   });
 };
-
-
-// const changePasswordDoctor = async (req, res) => {
-//     try {
-//       const { id } = req.user;
-//       const { currPass, newPass, newPassConfirm } = req.body;
-
-//       if (!(currPass && newPass && newPassConfirm)) {
-//         return res.status(404).json({ error: "Please fill out all required fields" });
-//       }
-
-//       //find doctor to update password
-//       const doctor = await doctorModel.findById(id);
-
-//       //Current password entered incorrect
-//       if (!(await bcrypt.compare(currPass, doctor.Password))) {
-//         return res.status(400).json("Current Password is Incorrect");
-//       }
-
-//       //confirm password not matching
-//       if (newPass !== newPassConfirm) {
-//         return res.status(400).json("The passwords do not match.");
-//       }
-
-//        //new password same as old
-//        if(await bcrypt.compare(newPass, doctor.Password)){
-//         return res.status(400).json("New password cannot be the same as your current password.");
-//       }
-
-//       //hash new Password
-//       const hashedPass = await bcrypt.hash(newPass, 10);
-
-//       //update password
-//       const newDoctor = await doctorModel.findByIdAndUpdate(id, { Password: hashedPass }, {new:true});
-
-//       res.status(200).json(newDoctor);
-//     } catch (error) {
-//       res.status(500).json({ error: error.message });
-//     }
-//   };
 
 const searchPatientByName = async (req, res) => {
   const { Name } = req.params;
@@ -269,9 +205,9 @@ const searchPatientByName = async (req, res) => {
     const patients = await patientModel.find({
       Name: { $regex: Name, $options: "i" },
     }); // $options : "i" to make it case insensitive
-    res.status(200).json(patients);
+    return res.status(200).json(patients);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while searching" });
+    return res.status(500).json({ error: "An error occurred while searching" });
   }
 };
 
@@ -282,9 +218,9 @@ const selectPatient = async (req, res) => {
     if (!patient) {
       return res.status(404).json({ error: "Patient not found" });
     }
-    res.status(200).json(patient);
+    return res.status(200).json(patient);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -296,9 +232,9 @@ const updateDoctor = async (req, res) => {
     if (!updatedDoctor) {
       return res.status(404).json({ error: "Doctor not found " });
     }
-    res.status(200).json(updateDoctor);
+    return res.status(200).json(updateDoctor);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 const getDoctor = async (req, res) => {
@@ -308,15 +244,16 @@ const getDoctor = async (req, res) => {
     if (!Doctor) {
       return res.status(404).json({ error: "Doctor not found" });
     }
-    res.status(200).json(Doctor);
+    return res.status(200).json(Doctor);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
 const upcomingAppointments = async (req, res) => {
   const doctorId = req.user.id;
   const currentDate = new Date();
+  let appointmentsArray = [];
   try {
     const appointments = await appointmentModel
       .find({
@@ -333,10 +270,15 @@ const upcomingAppointments = async (req, res) => {
         .status(404)
         .json({ error: "You have no upcoming appointments" });
     }
+    for(let i = 0 ; i < appointments.length; i++){
+      const currentAppointment = appointments[i];
+    
 
-    res.status(200).json(appointments);
+    }
+
+    return res.status(200).json(appointmentsArray);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -360,11 +302,11 @@ const viewPatients = async (req, res) => {
       return res.status(400).json({ error: "You have no patients" });
     }
     if(patients){
-      res.status(200).json(patients);
+      return res.status(200).json(patients);
 
     }
   } catch (error) {
-    res.status(500).json({ error: "no patients available" });
+    return res.status(500).json({ error: "no patients available" });
   }
 };
 
@@ -373,9 +315,9 @@ const viewPatientInfo = async (req, res) => {
   const { id } = req.params;
   const patient = await patientModel.findById(id);
   if (!patient) {
-    res.status(500).json({ error: "No such Patient" });
+    return res.status(500).json({ error: "No such Patient" });
   } else {
-    res.status(200).json(patient);
+    return res.status(200).json(patient);
   }
 };
 
@@ -400,20 +342,28 @@ const filterDoctorAppointments = async (req, res) => {
       .populate("Patient")
       .exec();
     if (!appointments || appointments.length === 0) {
-      res.status(404).json({ error: "No appointments were found" });
-    } else res.status(200).json(appointments);
+      return res.status(404).json({ error: "No appointments were found" });
+    } else return res.status(200).json(appointments);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
 const AddAvailableTimeSlots = async (req, res) => {
-  const slots = req.body.slots;
+  const slots = req.body;
   const id = req.user.id;
-  const updatedDoctor = await doctorModel.findByIdAndUpdate(id, {
-    AvailableTimeSlots: slots,
-  });
-  return res.status(200).json(updatedDoctor);
+  await timeSlotModel.deleteMany({
+    Doctor: id
+  })
+  const daysOfWeek = ['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday']
+  for(let i = 0; i < daysOfWeek.length;i++){
+    await timeSlotModel.create({
+      Doctor: id,
+      day: daysOfWeek[i],
+      slots: slots[i]
+    })
+  }
+  return res.status(200).json("Added Time Slots");
 };
 
 const viewAllDoctorAppointments = async (req, res) => {
@@ -429,7 +379,7 @@ const viewAllDoctorAppointments = async (req, res) => {
       return res.status(200).json(appointments);
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -491,9 +441,9 @@ const acceptContract = async (req, res) => {
 
     await doctorRegisterRequestModel.findByIdAndDelete(id);
 
-    res.status(200).json(newDoctor);
+    return res.status(200).json(newDoctor);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -510,9 +460,9 @@ const rejectContract = async (req, res) => {
       return res.status(404).json({ error: "Registration Request Not Found!" });
     }
 
-    res.status(200).json("Contract Rejected");
+    return res.status(200).json("Contract Rejected");
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -536,7 +486,7 @@ const addHealthRecordForPatient = async(req,res) =>{
         currPatient.HealthRecords = currPatient.HealthRecords || []; // Ensure HealthRecords is initialized as an array
         currPatient.HealthRecords = currPatient.HealthRecords.concat(healthRecord);
         await currPatient.save();
-        res.status(200).json(currPatient.HealthRecords);
+        return res.status(200).json(currPatient.HealthRecords);
 
         
 
@@ -590,7 +540,7 @@ const addHealthRecordForPatient = async(req,res) =>{
  const getDoctorTimeSlotsForDoctor = async (req, res) => {
     const id = req.user.id;
     const doctor = await doctorModel.findById(id);
-    res.status(200).json(doctor.AvailableTimeSlots);
+    return res.status(200).json(doctor.AvailableTimeSlots);
   }
   const checkDoctorAvailablityForDoctor = async (req, res) => {
 
@@ -643,7 +593,7 @@ const scheduleFollowUp = async(req,res) =>{
           
             
     
-        res.status(200).json(newFollowup);
+        return res.status(200).json(newFollowup);
     
   
 
@@ -656,6 +606,58 @@ const loggedInFirstTime = async (req,res) => {
   const id = req.user.id;
   await doctorModel.findByIdAndUpdate(id, {FirstTime: false});
   return res.status(200).json("Logged in first time");
+}
+
+const getTimeSlotsOfDateDoctor = async (req, res) => {
+  try {
+    const DoctorId = req.user.id;
+    const { date } = req.body;
+    const DateFormat = new Date(date);
+    const dayOfWeek = DateFormat.getDay();
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const dayString = daysOfWeek[dayOfWeek];
+    const timeSlots = await timeSlotModel.findOne({ Doctor: DoctorId, day: dayString });
+
+    if (!timeSlots) {
+      return res.status(404).json({ error: 'No time slots found for the specified day and doctor.' });
+    }
+
+    const timeSlotsUpdated = await Promise.all(timeSlots.slots.map(async (slot) => {
+      let datee = `${date}T${slot}:00.000Z`;
+      console.log(datee);
+      let query = {
+        $and: [
+          { Doctor: DoctorId },
+          { AppointmentDate: datee }
+        ]
+      };
+      let appointment = await appointmentModel.find(query);
+      console.log(appointment)
+
+      if (appointment.length === 0) {
+        return slot;
+      }
+      return null;
+    }));
+
+    return res.status(200).json(timeSlotsUpdated.filter(slot => slot !== null));
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const getAvailableTimeSlots = async(req,res) => {
+  const DoctorId = req.user.id;
+  console.log(DoctorId)
+  const Saturday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Saturday" })
+  const Sunday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Sunday" })
+  const Monday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Monday" })
+  const Tuesday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Tuesday" })
+  const Wednesday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Wednesday" })
+  const Thursday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Thursday" })
+  const Friday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Friday" })
+  return res.status(200).json({Saturday: Saturday.slots,Sunday:Sunday.slots,Monday:Monday.slots,Tuesday:Tuesday.slots,Wednesday:Wednesday.slots,Thursday:Thursday.slots,Friday:Friday.slots})
 }
 
 module.exports = {
@@ -682,5 +684,7 @@ module.exports = {
   checkDoctorAvailablityForDoctor,
   viewPatientMedicalRecords,
   scheduleFollowUp,
-  loggedInFirstTime
+  loggedInFirstTime,
+  getTimeSlotsOfDateDoctor,
+  getAvailableTimeSlots
 };
