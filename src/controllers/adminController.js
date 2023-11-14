@@ -4,6 +4,8 @@ const doctorModel = require("../Models/Doctor");
 const patientModel = require("../Models/Patient");
 const packageModel = require("../Models/Package");
 const appointmentModel = require("../Models/Appointment");
+const fileModel = require("../Models/File");
+
 const doctorRegisterRequestModel = require("../Models/DoctorRegisterRequest");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
@@ -326,12 +328,51 @@ const deletePackage = async (req, res) => {
   }
 };
 
+
+const getPersonalID = async(req, res) => {
+  const { id } = req.params;
+  const currDoctor = await doctorRegisterRequestModel.findById(id);
+  const currFile = await fileModel.find({DocEmail: currDoctor.Email})
+  for(const file of currFile){
+    if(file.docFileType === "PersonalID"){
+      return res.status(200).json(file);
+    }
+  }
+}
+
+const getMedicalDegree = async(req, res) => {
+  const { id } = req.params;
+  const currDoctor = await doctorRegisterRequestModel.findById(id);
+  const currFile = await fileModel.find({DocEmail: currDoctor.Email})
+  for(const file of currFile){
+    if(file.docFileType === "Degree"){
+      return res.status(200).json(file);
+    }
+  }
+}
+
+const getLicenses = async(req, res) => {
+  const { id } = req.params;
+  const currDoctor = await doctorRegisterRequestModel.findById(id);
+  const currFile = await fileModel.find({DocEmail: currDoctor.Email})
+  let licenses = [];
+  for(const file of currFile){
+    if(file.docFileType === "License"){
+      licenses.push(file);
+  }
+  }
+  return res.status(200).json(licenses);
+}
+
 module.exports = {
   acceptRegistrationRequest,
   rejectRegistrationRequest,
   getAdmin,
   addAdmin,
+  getMedicalDegree,
+  getPersonalID,
   removeDoctor,
+  getLicenses,
   removePatient,
   removeAdmin,
   getAllDoctrsRegistrationReqs,

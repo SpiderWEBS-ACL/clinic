@@ -101,6 +101,9 @@ const {
   getAdmin,
   acceptRegistrationRequest,
   rejectRegistrationRequest,
+  getPersonalID,
+  getMedicalDegree,
+  getLicenses,
 } = require("./controllers/adminController");
 
 const {
@@ -161,6 +164,10 @@ app.delete("/admin/removeAdmin/:id", AdminProtect, removeAdmin);
 app.get( "/admin/registrationRequests", AdminProtect, getAllDoctrsRegistrationReqs);
 app.get("/admin/registrationRequest/:id", AdminProtect, getDoctrRegistrationReqDetails);
 app.get("/admin/package/:id", AdminProtect, getPackage);
+app.get("/admin/getPersonalID/:id", AdminProtect, getPersonalID);
+app.get("/admin/getDegree/:id", AdminProtect, getMedicalDegree);
+app.get("/admin/getLicenses/:id", AdminProtect, getLicenses);
+
 app.post("/admin/addPackage", AdminProtect, addPackage);
 app.put("/admin/updatePackage/:id", AdminProtect, updatePackage);
 app.delete("/admin/deletePackage/:id", AdminProtect, deletePackage);

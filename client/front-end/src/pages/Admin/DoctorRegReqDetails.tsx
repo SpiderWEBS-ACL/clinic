@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { Spin, message } from "antd";
-import Button from "../../components/Button";
+import { Avatar, Button, Card, Modal, Row, Spin, message } from "antd";
 import InputField from "../../components/InputField";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import FolderIcon from '@mui/icons-material/Folder';
+
 
 const RegistrationRequestDetails = () => {
   const accessToken = localStorage.getItem("accessToken");
@@ -11,6 +13,13 @@ const RegistrationRequestDetails = () => {
   const [registrationDetails, setRegistrationDetails] = useState<any>("");
   const [loading, setLoading] = useState(true);
   const [salary, setSalary] = useState<Number>();
+  const [loadingList, setLoadingList] = useState(true);
+  const [personalName, setPersonalName] = useState("");
+  const [loadingHealth, setLoadingHealth] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [licFiles, setLicFiles] = useState<any[]>([]);
+
+
   const api = axios.create({
     baseURL: "http://localhost:8000",
   });
@@ -58,123 +67,241 @@ const RegistrationRequestDetails = () => {
       .get("/admin/registrationRequest/" + id, { headers })
       .then((response) => {
         setRegistrationDetails(response.data);
-        setLoading(false);
+        setLoadingList(false);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   }, [id]);
-  console.log(registrationDetails);
 
-  if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
   const handleBack = async () => {
     navigate("/admin/registrationRequests");
   };
+  const getPersonalID = async () =>{  
+    const response = await api.get(`/admin/getPersonalID/`+ id , { headers });
+    
+    const pdfPath = `http://localhost:8000/uploads/${response.data.filename}`;
+
+    window.open(pdfPath, '_blank');
+
+  }
+  const getMedicalDegree = async () =>{  
+    const response = await api.get(`/admin/getDegree/`+ id , { headers });
+    
+    const pdfPath = `http://localhost:8000/uploads/${response.data.filename}`;
+
+    window.open(pdfPath, '_blank');
+
+  }
+  const getLicenses = async () =>{  
+    const response = await api.get(`/admin/getLicenses/`+ id , { headers });
+
+    setLicFiles(response.data);
+    setLoadingHealth(false);
+  }
+
+
+
+  const showModal = () => {
+    setIsModalOpen(true);
+    getLicenses();
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+  const  viewFiles = (filename: String) => {
+    const pdfPath = `http://localhost:8000/uploads/${filename}`;
+
+    window.open(pdfPath, '_blank');
+  }
 
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">Registration Request Details</h2>
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Dob</th>
-            <th>HourlyRate</th>
-            <th>Affiliation</th>
-            <th>Specialty</th>
-            <th>Education</th>
-            <th>Accept</th>
-            <th>Reject</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr key={registrationDetails._id}>
-            <td>{registrationDetails.Name}</td>
-            <td>{registrationDetails.Affiliation}</td>
-            <td>{registrationDetails.Email}</td>
-            <td>
-              {registrationDetails.Dob == null
+      <Card
+        style={{
+          height: "41rem",
+          width: "50rem",
+          marginTop: "2rem",
+          marginLeft: "12rem",
+        }}
+        loading={loadingList}
+        hoverable
+        className="hover-card"
+      >
+        
+        <div
+          style={{
+            display: "flex",
+            borderBottom: "2px solid #333",
+            paddingBottom: "10px",
+          }}
+        >
+          <Avatar
+            src="https://xsgames.co/randomusers/avatar.php?g=pixel"
+            style={{ width: 100, height: 100 }}
+          />
+          <div style={{ marginLeft: "20px", flex: 1 }}>
+            <div style={{ fontSize: "22px", marginBottom: "10px" }}>
+             <strong>{registrationDetails.Name}</strong>
+            </div>
+            <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
+                <strong>Username: </strong>
+                {registrationDetails.Username}
+                <br></br>
+                <br></br>
+                <strong>Email: </strong>
+                {registrationDetails.Email}
+                <br></br>
+                <br></br>
+                <strong>Date of Birth: </strong>
+                {registrationDetails.Dob == null
                 ? registrationDetails.Dob
                 : registrationDetails.Dob.substring(0, 10)}
-            </td>
-            <td>{registrationDetails.HourlyRate}</td>
-            <td>{registrationDetails.Affiliation}</td>
-            <td>{registrationDetails.Specialty}</td>
-            <td>{registrationDetails.EducationalBackground}</td>
-            <td>
-              <button
-                className="btn btn-sm btn-success"
-                style={{
-                  padding: "4px 8px",
-                  fontSize: "12px",
-                  borderRadius: "5px",
-                }}
-                disabled={registrationDetails.AdminAccept? true : false}
-                onClick={() => handleAccept(registrationDetails._id)}
-              >
-                <span aria-hidden="true" style={{ color: "white" }}>
-                  &#10003;
-                </span>
-              </button>
-            </td>
-
-            <td>
-              <button
-                className="btn btn-sm btn-danger"
-                style={{
-                  padding: "4px 8px",
-                  fontSize: "12px",
-                  borderRadius: "5px",
-                }}
-                disabled={registrationDetails.AdminAccept? true : false}
-                onClick={() => handleReject(registrationDetails._id)}
-                //TODO onClick in sprint 2 this is just a view
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-        <div style={{display: "flex", float: "right"}}>
-        {registrationDetails.AdminAccept? registrationDetails.DoctorReject? 
-            (<i style={{color: "red"}}>Employment Contract Rejected</i>) :
-            (<i style={{color: "green"}}>Employment Contract Sent. Pending Doctor Approval</i>): 
-            (<InputField
-                id="salary"
-                label="Offered Hourly Rate"
-                type="Number"
-                value={salary}
-                onChange={setSalary}
-                required={true}
-                style={{borderWidth: 2, borderColor: "darkgray"}}
-              />
-            )}
+                <br></br>
+                <br></br>
+                <strong>Hourly Rate: </strong>
+                {registrationDetails.HourlyRate}
+                <br></br>
+                <br></br>
+                <strong>Affiliation: </strong>
+                {registrationDetails.Affiliation}
+                <br></br>
+                <br></br>
+                <strong>Specialty: </strong>
+                {registrationDetails.Specialty}
+                <br></br>
+                <br></br>
+                <strong>Education: </strong>
+                {registrationDetails.EducationalBackground}
+                <br></br>
+                <br></br>
+                <strong>Personal ID: </strong>
+                <InfoCircleOutlined  onClick={getPersonalID} />
+                <br></br>
+                <br></br>
+                <strong>Medical Licenses: </strong>
+                <InfoCircleOutlined  onClick={showModal}/>
+                <br></br>
+                <br></br>
+                <strong>Medical Degree: </strong>
+               <InfoCircleOutlined onClick={getMedicalDegree}  />
+          
+              
             </div>
+          </div>
+        </div>
+
+        <Row
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: 25,
+          }}
+        >
+    
+          <Button
+            className="btn btn-sm btn-success"
+            onClick={() => handleAccept(registrationDetails._id)}
+            style={{ marginLeft: 200, width: 150 }}
+          >
+            Accept
+          </Button>
+          <Button
+                onClick={() => handleReject(registrationDetails._id)}
+                style={{ marginRight: 200, width: 150}}
+          >
+            Reject
+          </Button>
       
-      <Button
-        style={{ marginRight: "10px", marginTop: "10px" }}
-        color="primary"
-        onClick={handleBack}
+        </Row>
+        <div style={{display: "flex",justifyContent: "center", marginTop: 20}}>
+
+{registrationDetails.AdminAccept? registrationDetails.DoctorReject? 
+      (<i style={{color: "red"}}>Employment Contract Rejected</i>) :
+      (<i style={{color: "green"}}>Employment Contract Sent. Pending Doctor Approval</i>): 
+      (<InputField
+          id="salary"
+          label="Offered Hourly Rate"
+          type="Number"
+          value={salary}
+          onChange={setSalary}
+          required={true}
+          style={{borderWidth: 2, borderColor: "darkgray", width: 500}}
+        />
+      )}
+      </div>
+
+       
+      </Card>
+
+      <Modal
+        title={registrationDetails.Name + "'s Medical Licenses"}
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        width={600}
       >
-        Back
-      </Button>
+            <Card
+        
+        style={{ height: 350, width: 500, marginTop: 16 }}
+        loading={loadingHealth}
+        bodyStyle={{height: "380px" ,maxHeight: "300px", overflowY: "auto" }}
+        hoverable
+        className="hover-card"
+        
+      >
+<div style={{ maxHeight: '230px', overflowY: 'auto' }}>
+
+{licFiles.map((file, index) => (
+<div
+style={{
+display: "flex",
+borderBottom: "0.5px solid #333",
+paddingBottom: "10px",
+marginTop: 20
+}}
+>
+<Avatar>
+           
+             <FolderIcon />
+           </Avatar>
+           <div style={{ marginLeft: "20px", flex: 1 }}>
+           <div style={{ fontSize: "15px", lineHeight: "1.5", display: "flex", justifyContent: "space-between" } }  >
+           <div onClick={() => viewFiles(file.filename)}>
+
+<div>
+
+<p>
+ 
+ <strong>File Name: </strong>
+ {file.filename}
+</p>
+<p>
+ <strong>Type: </strong>
+ {file.contentType === "application/pdf" ? "PDF" : file.contentType|| file.contentType === "application/png" ? "PNG" :file.contentType}
+</p>
+</div>
+</div>
+<div style={{ display: "flex" }}>
+</div>
+
+
+</div>
+</div>
+
+</div>
+))}
+</div>
+
+
+</Card>
+</Modal>
+
+    
     </div>
   );
 };
