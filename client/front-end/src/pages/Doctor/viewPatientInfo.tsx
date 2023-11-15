@@ -102,7 +102,7 @@ const ViewPatientInfo = () => {
   const setTimeSlotsApi = (date: string) => {
     api
       .post(
-        "patient/getTimeSlotsDoctorDate",
+        "doctor/getTimeSlotDate",
         {
           date: date,
         },
@@ -192,7 +192,9 @@ const ViewPatientInfo = () => {
     setIsFamilyMembersModalOpen(true);
   };
   const followup = async () => {
-    const date = AppointmentDate.concat("T" + AppointmentTime + ".000" + "Z");
+    const date = AppointmentDate.concat(
+      "T" + AppointmentTime + ":00.000" + "Z"
+    );
     const response = await api.post(
       `/doctor/scheduleFollowup/`,
       {
@@ -352,38 +354,38 @@ const ViewPatientInfo = () => {
               {patientInfo.Name}
             </div>
             <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
-                <strong>Email: </strong>
-                {patientInfo.Email}
-             <br></br>
-             <br></br>
+              <strong>Email: </strong>
+              {patientInfo.Email}
+              <br></br>
+              <br></br>
 
-                <strong>Date of birth: </strong>
-                {String(patientInfo.Dob).substring(0, 10)}
-                <br></br>
-             <br></br>
+              <strong>Date of birth: </strong>
+              {String(patientInfo.Dob).substring(0, 10)}
+              <br></br>
+              <br></br>
 
-                <strong>Gender: </strong>
-                {patientInfo.Gender}
-                <br></br>
-             <br></br>
+              <strong>Gender: </strong>
+              {patientInfo.Gender}
+              <br></br>
+              <br></br>
 
-                <strong>Mobile: </strong>
-                {patientInfo.Mobile}
-                <br></br>
-             <br></br>
+              <strong>Mobile: </strong>
+              {patientInfo.Mobile}
+              <br></br>
+              <br></br>
 
-                <strong>Age: </strong>
-                {age}
-                <br></br>
-             <br></br>
+              <strong>Age: </strong>
+              {age}
+              <br></br>
+              <br></br>
 
-                <strong>Health Records: </strong>
-                <InfoCircleOutlined onClick={handleHealth} />
-                <br></br>
-             <br></br>
+              <strong>Health Records: </strong>
+              <InfoCircleOutlined onClick={handleHealth} />
+              <br></br>
+              <br></br>
 
-                <strong>Family Members: </strong>
-                <InfoCircleOutlined onClick={handleFamilyMembers} />
+              <strong>Family Members: </strong>
+              <InfoCircleOutlined onClick={handleFamilyMembers} />
             </div>
           </div>
         </div>
@@ -418,7 +420,7 @@ const ViewPatientInfo = () => {
         onOk={handleOk}
         onCancel={handleCancel}
         width={500}
-        style={{ height: "900px"}}
+        style={{ height: "900px" }}
       >
         <p>
           <Select
@@ -549,20 +551,6 @@ const ViewPatientInfo = () => {
             }))}
           />
         </Select>
-
-        <button
-          className="btn btn-sm btn-primary"
-          style={{
-            marginBlock: "1rem",
-            padding: "4px 8px",
-            fontSize: "12px",
-            borderRadius: "5px",
-          }}
-          onClick={() => handleCheckAvailability()}
-        >
-          <span aria-hidden="true"></span>
-          Check Availability
-        </button>
         <button
           className="btn btn-sm btn-success"
           style={{
@@ -572,7 +560,6 @@ const ViewPatientInfo = () => {
             fontSize: "12px",
             borderRadius: "5px",
           }}
-          disabled={Message === "available" ? false : true}
           onClick={followup}
         >
           <span aria-hidden="true"></span>

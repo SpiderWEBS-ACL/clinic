@@ -205,7 +205,7 @@ app.post("/doctor/addHealthRecordForPatient/:id", DoctorProtect, addHealthRecord
 app.post("/doctor/scheduleFollowup/", DoctorProtect, scheduleFollowUp);
 app.put("/doctor/loggedInFirstTime",DoctorProtect,loggedInFirstTime);
 app.get("/doctor/viewPatientFiles/:id",DoctorProtect, viewPatientMedicalRecords);
-app.put("/doctor/getTimeSlotDate",DoctorProtect,getTimeSlotsOfDateDoctor);
+app.post("/doctor/getTimeSlotDate",DoctorProtect,getTimeSlotsOfDateDoctor);
 app.get("/doctor/getAvailableTimeSlots",DoctorProtect,getAvailableTimeSlots);
 //Patient Endpoints
 
