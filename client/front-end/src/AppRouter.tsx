@@ -50,6 +50,8 @@ import AppointmentSuccess from "./pages/Patient/AppointmentSuccess";
 import EmploymentContract from "./pages/Doctor/EmploymentContract";
 import Calendarr from "./pages/Calendar";
 import UploadMedicalHistory from "./pages/Patient/UploadMedicalHistory";
+import ViewDoctorDetails from "./pages/Patient/ViewDoctorDetails";
+
 
 export interface JwtPayload {
   id: string;
@@ -116,7 +118,7 @@ const AppRouter: React.FC = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
-  } else if (role == "Patient") {
+  } else if (role === "Patient") {
     return (
       <Routes>
         <Route path="/" element={<RegLog />} />
@@ -125,6 +127,7 @@ const AppRouter: React.FC = () => {
           path="/patient/viewhealthrecords"
           element={<UploadMedicalHistory />}
         />
+        <Route path="/patient/doctordetails/:id" element={<ViewDoctorDetails />} />
 
         <Route path="/patient/addFamilyMember" element={<AddFamilyMember />} />
         <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
@@ -150,6 +153,8 @@ const AppRouter: React.FC = () => {
         <Route path="/patient/packages" element={<AllPackagesPatient />} />
         <Route path="/patient/subscribe/options" element={<PaymentPage />} />
         <Route path="/checkout" element={<CheckoutButton />} />
+        <Route path="/appointment/success" element={<AppointmentSuccess />} />
+
         <Route
           path="/patient/changePassword"
           element={<ChangePasswordPatient />}
@@ -169,6 +174,7 @@ const AppRouter: React.FC = () => {
     navigate(-1);
     return (
       <Routes>
+
         <Route
           path="/employmentContract/:id"
           element={<EmploymentContract />}

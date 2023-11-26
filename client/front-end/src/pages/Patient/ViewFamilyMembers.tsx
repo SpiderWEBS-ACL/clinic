@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { Spin, Modal, Input, Select, message } from "antd";
+import { Spin, Modal, Input, Select, message, Card, Avatar, Button} from "antd";
 import { Divider } from "@chakra-ui/react";
+import { Col, Row } from "react-bootstrap";
+import { LinkOutlined } from "@ant-design/icons";
+import { FloatButton } from 'antd';
+
 const ViewFamilyMembers = () => {
   const accessToken = localStorage.getItem("accessToken");
   const { id } = useParams<{ id: string }>();
-  const [familyMembers, setFamilyMembers] = useState([]);
+  const [familyMembers, setFamilyMembers] =  useState<any[]>([]);
   const [hasFamilyMembers, setHasFamilyMembers] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
@@ -15,6 +19,9 @@ const ViewFamilyMembers = () => {
   const [phoneInput, setPhoneInput] = useState("");
   const { Option } = Select;
   const [RelationToPatient, setRelationToPatient] = useState("Relation");
+  const { Meta } = Card;
+  const [loadingList, setLoadingList] = useState(true);
+
 
   const api = axios.create({
     baseURL: "http://localhost:8000/",
@@ -40,23 +47,10 @@ const ViewFamilyMembers = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
-    setLoading(false);
+    setLoadingList(false);
   }, [id]);
 
-  if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
+ 
   const openModal = () => {
     setShowPopup(true);
   };
@@ -122,13 +116,14 @@ const ViewFamilyMembers = () => {
       <h2 className="text-center mt-4 mb-4">
         <strong>Family Members</strong>
       </h2>
-      <button
-        className="btn btn-primary"
-        style={{ marginTop: "10px" }}
-        onClick={() => openModal()}
-      >
-        Link a registered family member
-      </button>
+      <FloatButton
+      icon={<LinkOutlined style={{fontSize: 20}}/>}
+      tooltip={<div>Link a registered family member</div>}
+      onClick={() => openModal()}
+      style={{width: 75, height:75}}
+
+/>
+
 
       <Modal
         title="Link a Registered Family Member"
@@ -187,34 +182,67 @@ const ViewFamilyMembers = () => {
           <Option value="Daughter">Daughter</Option>
         </Select>
       </Modal>
+<tbody>
+        {familyMembers.map(
+          (member, index) =>
+            index % 3 === 0 && (
+              <Row gutter={16} key={index}>
+                {familyMembers.slice(index, index + 3).map((member, subIndex) => (
+                  <Col span={8} key={subIndex} style={{maxWidth: "27rem"}}>
+                    <div>
+                      <Card
+                        style={{
+                          width: "25rem",
+                          marginTop: "3rem",
+                          height: "15rem",
+                        }}
+                        loading={loadingList}
+                        hoverable
+                        className="hover-card"
+                       // onClick={() => handleRedirection(patient._id)}
+                      >
+                        <Meta
+                          avatar={
+                            <Avatar
+                              src="https://xsgames.co/randomusers/avatar.php?g=pixel"
+                              style={{ width: 75, height: 75 }}
+                            />
+                          }
+                          title={
+                            <div style={{ fontSize: "20px" }}>
+                              {member.Name}
+                            </div>
+                          }
+                          description={
+                            <div>
+                            
+                                <strong>Relation:</strong> {member.RelationToPatient}
+                              
+                                <br></br>
+                                <br></br>
 
-      <Divider borderColor="#052c65" borderWidth="1px" />
-
-      <table className="table">
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Name</th>
-            <th>Relation</th>
-            <th>National ID</th>
-            <th>Age</th>
-            <th>Gender</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {familyMembers.map((member: any, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{member.Name}</td>
-              <td>{member.RelationToPatient}</td>
-              <td>{member.NationalID || "N/A"}</td>
-              <td>{member.Age || "N/A"}</td>
-              <td>{member.Gender}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                                <strong>Age: </strong>
+                                {member.Age}
+                                <br></br>
+                                <br></br>
+                              
+                                <strong>Gender:</strong> {member.Gender}
+                              
+                                <br></br>
+                                <br></br>
+                                <strong>National ID:</strong> {member.NationalID || "N/A"}
+                              
+                            </div>
+                          }
+                        />
+                      </Card>
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            )
+        )}
+      </tbody>
     </div>
   );
 };

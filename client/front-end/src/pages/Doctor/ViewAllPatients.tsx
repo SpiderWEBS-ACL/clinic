@@ -192,9 +192,9 @@ const ViewAllPatients = () => {
                     <div>
                       <Card
                         style={{
-                          width: "27rem",
+                          width: "26rem",
                           marginTop: "3rem",
-                          height: "14rem",
+                          height: "15rem",
                         }}
                         loading={loadingList}
                         hoverable

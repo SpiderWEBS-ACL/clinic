@@ -12,15 +12,18 @@ import {
   message,
   Row,
   Col,
+  Card,
+  Avatar,
 } from "antd";
 import { config, headers } from "../../Middleware/authMiddleware";
-import { CreditCardFilled, WalletFilled } from "@ant-design/icons";
+import { ArrowDownOutlined, ArrowRightOutlined, CreditCardFilled, WalletFilled } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { Center } from "@chakra-ui/react";
 const { Option } = Select;
 
 const ViewAllDoctors = () => {
   const accessToken = localStorage.getItem("accessToken");
-  const [Doctors, setDoctors] = useState([]);
+  const [Doctors, setDoctors] =  useState<any[]>([]);
   const [AllDoctors, setAllDoctors] = useState([]);
   const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -47,6 +50,10 @@ const ViewAllDoctors = () => {
   const [SessionPrice, setSessionPrice] = useState("");
   const [hasFamily, setHasFamily] = useState<boolean>();
   const navigate = useNavigate();
+  const [loadingList, setLoadingList] = useState(true);
+  const { Meta } = Card;
+  const [expanded, setExpanded] = useState(false);
+  const [expIndex, setExpIndex] = useState<number>(0);
 
   const timeSlots = [];
 
@@ -78,6 +85,10 @@ const ViewAllDoctors = () => {
         console.error("Error:", error);
       });
   };
+  const handleRedirection = (item: any) => {
+    navigate(`/patient/doctordetails/${item}`);
+  };
+
   const doctorDiscount = () => {
     api
       .get("patient/getDoctorDiscount", config)
@@ -112,23 +123,9 @@ const ViewAllDoctors = () => {
     getFamilyMembers();
     getAllDoctors();
     doctorDiscount();
-    setLoading(false);
+    setLoadingList(false);
   }, []);
 
-  if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
 
   const redirectToStripe = async () => {
     try {
@@ -307,6 +304,7 @@ const ViewAllDoctors = () => {
     setShowPaymentModal(false);
   };
 
+
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
@@ -370,19 +368,71 @@ const ViewAllDoctors = () => {
           </button>
         </span>
       </div>
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Specialty</th>
-            <th>{SessionPrice}</th>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
+
 
         <tbody>
+        {Doctors.map(
+          (request, index) =>
+            index % 3 === 0 && (
+              <Row gutter={16} key={index}>
+                {Doctors.slice(index, index + 3).map((request, subIndex) => (
+                  <Col span={8} key={subIndex} style={{maxWidth: "27rem"}}>
+                    <div>
+                      <Card
+                        style={{
+                          width: "25rem",
+                          marginTop: "3rem",
+                          height: "12rem",
+                          
+                        }}
+                        loading={loadingList}
+                        hoverable
+                        className="hover-card"
+                      onClick={() => handleRedirection(request._id)}
+                      >
+                        <Meta
+                          avatar={
+                            <Avatar
+                              src="https://xsgames.co/randomusers/avatar.php?g=pixel"
+                              style={{ width: 75, height: 75 }}
+                            />
+                          }
+                          title={
+                            <div style={{ fontSize: "20px" }}>
+                              {request.Name}
+                            </div>
+                          }
+                          description={
+                            <div>
+
+                                <strong>Specialty: </strong> {request.Specialty}
+                              
+                                <br></br>
+                                <br></br>
+
+                                <strong>Affiliation: </strong> {request.Affiliation}
+                              
+                              <br></br>
+                              <br></br>
+                              
+
+                     
+                                 
+                                 <ArrowRightOutlined style={{marginLeft:"13rem"}}></ArrowRightOutlined>
+          
+                                              </div>
+                          }
+                        />
+                      </Card>
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            )
+        )}
+      </tbody>
+
+        {/* <tbody>
           {Doctors.map((request: any, index) => (
             <tr key={request._id}>
               <td>{request.Name}</td>
@@ -444,8 +494,7 @@ const ViewAllDoctors = () => {
               </td>
             </tr>
           ))}
-        </tbody>
-      </table>
+        </tbody> */}
       {showPopup && selectedDoctor && (
         <div className="popup">
           <h3>Doctor Details</h3>

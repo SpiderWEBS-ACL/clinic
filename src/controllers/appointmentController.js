@@ -6,6 +6,7 @@ const { upcomingAppointments } = require('./doctorController');
 
 const addAppointment = async (req, res) => {
     try{
+        console.log(req);
         if(req.body.FamilyMember == null)
             req.body.Patient = req.user.id;
         else{

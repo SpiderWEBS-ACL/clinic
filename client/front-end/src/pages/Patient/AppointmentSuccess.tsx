@@ -3,6 +3,7 @@ import axios from "axios";
 import { headers } from "../../Middleware/authMiddleware";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const AppointmentSuccess = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const AppointmentSuccess = () => {
 
   const addAppointment = async () => {
     try {
+      console.log(sessionStorage.getItem("DoctorId"));
       const response = await api.post(
         "appointment/add",
         {

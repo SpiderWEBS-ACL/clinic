@@ -79,8 +79,7 @@ const {
   subscribeWithStripe,
   deleteOneSubscription,
   subscribeWithWallet,
-  getSubscription,
-  getSubscriptionPriceForFamilyMember
+  getSubscription
 } = require("./controllers/SubscriptionController");
 
 const {
@@ -281,7 +280,7 @@ app.post("/subscription/subscribeWallet/:id",PatientProtect,subscribeWithWallet)
 app.post("/subscription/add",PatientProtect,addSubscription);
 app.delete("/subscription/deleteDuplicate/",PatientProtect,deleteOneSubscription);
 app.get("/subscription/getSubscription",PatientProtect,getSubscription);
-app.get("/subscription/getSubscriptionFamilyMemberPrice/:id",PatientProtect,getSubscriptionPriceForFamilyMember);
+//app.get("/subscription/getSubscriptionFamilyMemberPrice/:id",PatientProtect,getSubscriptionPriceForFamilyMember);
 
 
 //Prescription Endpoints
