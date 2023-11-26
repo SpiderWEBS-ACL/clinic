@@ -188,8 +188,8 @@ const ViewAllPatients = () => {
             index % 3 === 0 && (
               <Row gutter={16} key={index}>
                 {patients.slice(index, index + 3).map((patient, subIndex) => (
-                  <Col span={8} key={subIndex}>
-                    <div>
+                  <Col span={8} key={subIndex} style={{maxWidth: "27rem"}}>
+                  <div>
                       <Card
                         style={{
                           width: "26rem",

@@ -241,7 +241,7 @@ const ViewAllDoctors = () => {
     console.log(familyMember);
   };
   const handleFilter = async () => {
-    setLoading(true);
+    setLoadingList(true);
     try {
       const response = await api.get("patient/filterDoctorsCriteria", {
         params: {
@@ -254,7 +254,7 @@ const ViewAllDoctors = () => {
       });
 
       setDoctors(response.data);
-      setLoading(false);
+      setLoadingList(false);
     } catch (error) {
       console.error(error);
     }
@@ -265,11 +265,14 @@ const ViewAllDoctors = () => {
   };
 
   const handleClearFilters = async () => {
+    setLoadingList(true);
     setName("");
     setSpecialty("");
     setDate("");
     setTime("");
     setDoctors(AllDoctors);
+    setLoadingList(false);
+
   };
 
   const getBalanceApi = async () => {
