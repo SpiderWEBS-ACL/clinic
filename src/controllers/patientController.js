@@ -176,8 +176,11 @@ const viewDoctorDetails = async (req, res) => {
 const viewMyPrescriptions = async (req, res) => {
   try {
     const  id  = req.user.id;
-    const prescriptions = await prescriptionModel.find({Patient: id});
-    if(!prescriptions){
+    const prescriptions = await prescriptionModel
+    .find({ Patient: id }) 
+    .populate('Doctor')
+    .exec();   
+     if(!prescriptions){
       return res.status(404).json({error: "You do not have any prescriptions yet"})
     }
     else{
@@ -273,9 +276,12 @@ const addPrescription = async (req,res) => {
 }
 
 const selectPrescription = async (req, res) =>{
-    const prescID = req.params.id;
+    const id = req.params.id;
+    console.log(11111111111)
+    console.log(id);
   try {
-    const prescription = await prescriptionModel.findById(prescID);
+    const prescription = await prescriptionModel.findById(id).populate('Doctor').exec();
+    console.log(prescription)
     if (!prescription) {
       return res.status(404).json({ error: "Prescription not found" });
     }

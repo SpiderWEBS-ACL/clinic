@@ -50,6 +50,8 @@ import AppointmentSuccess from "./pages/Patient/AppointmentSuccess";
 import EmploymentContract from "./pages/Doctor/EmploymentContract";
 import Calendarr from "./pages/Calendar";
 import UploadMedicalHistory from "./pages/Patient/UploadMedicalHistory";
+import PresInfo from "./pages/Patient/PrescInfo";
+
 import ViewDoctorDetails from "./pages/Patient/ViewDoctorDetails";
 
 
@@ -136,6 +138,10 @@ const AppRouter: React.FC = () => {
           element={<ViewPrescriptions />}
         />
 
+<Route
+          path="/patient/viewPrescriptionDetails/:id"
+          element={<PresInfo />}
+        />
         <Route
           path="/patient/viewfamilyMembers"
           element={<ViewFamilyMembers />}
