@@ -9,7 +9,7 @@ import Visibility from "@material-ui/icons/Visibility";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import Input from "@material-ui/core/Input";
-import { changePasswordPatientApi } from "../../apis/Patient/changePassword";
+import { changePasswordPatientApi } from "../../apis/Patient/ChangePassword";
 
 const ChangePassword = () => {
   const [currPass, setCurrPass] = useState<string>("");
