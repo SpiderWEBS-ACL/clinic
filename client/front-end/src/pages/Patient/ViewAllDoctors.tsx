@@ -15,6 +15,7 @@ import {
   Card,
   Avatar,
 } from "antd";
+
 import { headers } from "../../Middleware/authMiddleware";
 import {
   ArrowRightOutlined,
@@ -33,7 +34,7 @@ import { getTimeSlotsDoctorDate } from "../../apis/Patient/Doctors/GetTimeSlotsD
 const { Option } = Select;
 
 const ViewAllDoctors = () => {
-  const [Doctors, setDoctors] = useState<any[]>([]);
+  const [Doctors, setDoctors] = useState<any[]>([])
   const [AllDoctors, setAllDoctors] = useState([]);
   const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -62,6 +63,8 @@ const ViewAllDoctors = () => {
   const navigate = useNavigate();
   const [loadingList, setLoadingList] = useState(true);
   const { Meta } = Card;
+  const [expanded, setExpanded] = useState(false);
+  const [expIndex, setExpIndex] = useState<number>(0);
 
   const timeSlots = [];
 
@@ -113,6 +116,7 @@ const ViewAllDoctors = () => {
   };
 
   useEffect(() => {
+
     const fetchData = async () => {
       getFamilyMembers();
       getAllDoctors();
@@ -121,7 +125,7 @@ const ViewAllDoctors = () => {
     fetchData();
     setLoadingList(false);
   }, []);
-
+  
   const redirectToStripe = async () => {
     try {
       try {
@@ -212,11 +216,11 @@ const ViewAllDoctors = () => {
     console.log(familyMember);
   };
   const handleFilter = async () => {
-    setLoading(true);
+    setLoadingList(true);
     try {
       const response = await filterDoctorsCriteria(Name, Specialty, Date, Time);
       setDoctors(response.data);
-      setLoading(false);
+      setLoadingList(false);
     } catch (error) {
       console.error(error);
     }
@@ -227,11 +231,14 @@ const ViewAllDoctors = () => {
   };
 
   const handleClearFilters = async () => {
+    setLoadingList(true);
     setName("");
     setSpecialty("");
     setDate("");
     setTime("");
     setDoctors(AllDoctors);
+    setLoadingList(false);
+
   };
 
   const getBalanceApi = async () => {
@@ -263,6 +270,7 @@ const ViewAllDoctors = () => {
     console.log("Selected payment method: ", paymentMethod);
     setShowPaymentModal(false);
   };
+
 
   return (
     <div className="container">
@@ -327,7 +335,6 @@ const ViewAllDoctors = () => {
           </button>
         </span>
       </div>
-
       <tbody>
         {Doctors.map(
           (request, index) =>

@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
+      
 import {
   Button,
   Col,
@@ -14,6 +16,7 @@ import {
 } from "antd";
 import { Card } from "antd";
 import { Avatar } from "@mui/material";
+
 import { CreditCardFilled, WalletFilled } from "@ant-design/icons";
 import { RangePickerProps } from "antd/es/date-picker";
 import { getBalance } from "../../apis/Patient/GetBalance";
@@ -26,6 +29,8 @@ import { getSelectedDoctor } from "../../apis/Patient/Doctors/GetSelectedDoctor"
 const ViewDoctorDetails = () => {
   const { id } = useParams<{ id: string }>();
   const accessToken = localStorage.getItem("accessToken");
+  const [SessionPrice, setSessionPrice] = useState("");
+
   const [loadingList, setLoadingList] = useState(true);
   const [docInfo, setDocInfo] = useState<any>({});
   const [FamilyMembers, setFamilyMembers] = useState<string[]>([]);
@@ -41,10 +46,12 @@ const ViewDoctorDetails = () => {
   const [AppointmentTime, setAppointmentTime] = useState("");
   const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
   const [DoctorDiscount, setDoctorDiscount] = useState<number>(0);
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<any | null>(null);
+  const [DoctorDiscount, setDoctorDiscount] = useState<number>(0);
   const navigate = useNavigate();
 
   const { Option } = Select;
-
   const timeSlots: string[] = [];
 
   for (let hours = 0; hours < 12; hours++) {
@@ -82,6 +89,7 @@ const ViewDoctorDetails = () => {
       console.log(error);
     }
   };
+        
   const handleBookAppointment = async (doctor: any, HourlyRate: any) => {
     setHourlyRate(HourlyRate);
     setShowDateTimeModal(true);
@@ -132,7 +140,6 @@ const ViewDoctorDetails = () => {
         sessionStorage.setItem("FamilyMember", FamilyMember);
       try {
         const response = await payAppointmentWallet(id);
-        navigate("/appointment/success");
       } catch (error) {
         console.log(error);
       }
@@ -146,6 +153,7 @@ const ViewDoctorDetails = () => {
   ) => {
     setAppointmentDate(dateString);
     setTimeSlotsApi(dateString);
+
   };
   const setTimeSlotsApi = async (date: string) => {
     try {
@@ -157,12 +165,15 @@ const ViewDoctorDetails = () => {
       console.log(error);
     }
   };
+  
   const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
     setAppointmentTime(selectedTimeSlot);
   };
+  
   const handleAppointmentFamilyChange = (familyMember: string) => {
     setFamilyMember(familyMember);
   };
+  
   const handlePaymentSelection = (paymentMethod: string) => {
     if (paymentMethod === "Card") {
       redirectToStripe();
