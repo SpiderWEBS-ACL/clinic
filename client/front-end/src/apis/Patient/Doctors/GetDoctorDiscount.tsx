@@ -1,0 +1,8 @@
+import axios from "axios";
+import { BASE_URL } from "../../BaseUrl";
+import { config } from "../../../Middleware/authMiddleware";
+
+export const getDoctorDiscount = async () => {
+  const response = axios.get(`${BASE_URL}/patient/getDoctorDiscount`, config);
+  return response;
+};

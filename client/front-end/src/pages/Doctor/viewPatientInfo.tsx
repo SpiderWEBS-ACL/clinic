@@ -13,7 +13,6 @@ import {
 import { Card } from "antd";
 import { Avatar } from "@mui/material";
 import { DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { tr } from "date-fns/locale";
 import "./StyleDoctor.css";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { green } from "@mui/material/colors";

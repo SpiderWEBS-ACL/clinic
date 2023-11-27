@@ -34,7 +34,6 @@ import ViewPatientAppointments from "./pages/Patient/Appointments";
 import jwt_decode from "jwt-decode";
 import Cookies from "js-cookie";
 import NotFound from "./pages/NotFound";
-import AddAvailableTimeSolts from "./pages/Doctor/AddAvailableTimeSolts";
 import Calendar from "./pages/Doctor/AddAvailableTimeSolts";
 import CheckoutButton from "./pages/CheckoutButton";
 import AllPackagesPatient from "./pages/Patient/Packages";
@@ -42,14 +41,13 @@ import ChangePasswordDoctor from "./pages/Doctor/ChangePassword";
 import ChangePasswordAdmin from "./pages/Admin/ChangePassword";
 import ChangePasswordPatient from "./pages/Patient/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
-import PaymentPage from "./pages/Patient/PaymentChoices";
-import AppointmentBookingPage from "./pages/Patient/AppointmentBookingPage";
 import SubscriptionSuccess from "./pages/Patient/SubscriptionSuccess";
 import Wallet from "./pages/Patient/Wallet";
 import AppointmentSuccess from "./pages/Patient/AppointmentSuccess";
 import EmploymentContract from "./pages/Doctor/EmploymentContract";
 import Calendarr from "./pages/Calendar";
 import UploadMedicalHistory from "./pages/Patient/UploadMedicalHistory";
+import ViewDoctorDetails from "./pages/Patient/ViewDoctorDetails";
 
 export interface JwtPayload {
   id: string;
@@ -116,7 +114,7 @@ const AppRouter: React.FC = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
-  } else if (role == "Patient") {
+  } else if (role === "Patient") {
     return (
       <Routes>
         <Route path="/" element={<RegLog />} />
@@ -148,7 +146,6 @@ const AppRouter: React.FC = () => {
         />
         <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
         <Route path="/patient/packages" element={<AllPackagesPatient />} />
-        <Route path="/patient/subscribe/options" element={<PaymentPage />} />
         <Route path="/checkout" element={<CheckoutButton />} />
         <Route
           path="/patient/changePassword"
@@ -159,8 +156,8 @@ const AppRouter: React.FC = () => {
         <Route path="/appointment/success" element={<AppointmentSuccess />} />
         <Route path="/patient/calendar" element={<Calendarr />} />
         <Route
-          path="/patient/appointment/booking"
-          element={<AppointmentBookingPage />}
+          path="/patient/doctordetails/:id"
+          element={<ViewDoctorDetails />}
         />
         <Route path="*" element={<NotFound />} />
       </Routes>

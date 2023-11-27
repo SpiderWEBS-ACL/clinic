@@ -276,8 +276,8 @@ app.get("/appointment/filterAppointment",PatientProtect, filterAppointmentPatien
 app.get("/appointment/filterAppointmentDoctor", DoctorProtect, filterAppointmentDoctor);
 
 //Subscription Endpoints
-app.post("/subscription/subscribe/:id",subscribeWithStripe);
-app.post("/subscription/subscribeWallet/:id",PatientProtect,subscribeWithWallet);
+app.post("/subscription/subscribeStripe/",PatientProtect,subscribeWithStripe);
+app.post("/subscription/subscribeWallet/",PatientProtect,subscribeWithWallet);
 app.post("/subscription/add",PatientProtect,addSubscription);
 app.delete("/subscription/deleteDuplicate/",PatientProtect,deleteOneSubscription);
 app.get("/subscription/getSubscription",PatientProtect,getSubscription);

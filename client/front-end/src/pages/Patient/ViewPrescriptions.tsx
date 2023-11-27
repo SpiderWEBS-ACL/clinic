@@ -4,6 +4,9 @@ import { set, setDate } from "date-fns";
 import { useParams } from "react-router-dom";
 import { DatePicker, DatePickerProps, Input, Select } from "antd";
 import "./error-box.css";
+import { getMyPrescription } from "../../apis/Patient/Prescriptions/GetMyPrescription";
+import { filterPrescriptions } from "../../apis/Patient/Prescriptions/FilterPrescriptions";
+import { getSelectedPrescription } from "../../apis/Patient/Prescriptions/GetSelectedPrescription";
 
 const ViewPrescriptions = () => {
   const accessToken = localStorage.getItem("accessToken");
@@ -15,25 +18,18 @@ const ViewPrescriptions = () => {
   );
 
   const { Option } = Select;
-  const api = axios.create({
-    baseURL: "http://localhost:8000/patient",
-  });
   const { id } = useParams<{ id: string }>();
 
+  const fetchPrescription = async () => {
+    try {
+      const prescription = await getMyPrescription();
+      setPrescriptions(prescription.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
-    };
-    api
-      .get(`/viewMyPrescriptions`, config)
-      .then((response) => {
-        setPrescriptions(response.data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    fetchPrescription();
   }, [id]);
 
   const [Doctor, setDoctor] = useState("");
@@ -49,14 +45,7 @@ const ViewPrescriptions = () => {
 
   const filter = async () => {
     try {
-      const response = await api.get("/filterPrescriptions", {
-        params: {
-          Doctor: Doctor,
-          Filled: Filled,
-          Date: Date,
-          Patient: id,
-        },
-      });
+      const response = await filterPrescriptions(Doctor, Filled, Date, id);
       const data = response.data;
       if (data.length == 0) {
         console.log("no data");
@@ -72,7 +61,7 @@ const ViewPrescriptions = () => {
 
   const clearFilter = async () => {
     try {
-      const response = await api.get(`/viewMyPrescriptions/${id}`);
+      const response = await getMyPrescription();
       setDoctor("");
       setFilled("");
       setError(false);
@@ -83,7 +72,7 @@ const ViewPrescriptions = () => {
   };
   const viewDetails = async (prescId: String) => {
     try {
-      const response = await api.get(`/selectPrescription/${prescId}`);
+      const response = await getSelectedPrescription(prescId);
       setShowPopup(true);
       setSelectedPrescription(response.data);
     } catch (error) {
