@@ -3,6 +3,8 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { Spin, Modal, Input, Select, message, Card, Avatar, Button} from "antd";
 import { Divider } from "@chakra-ui/react";
+import { getPatientFamilyMembers } from "../../apis/Patient/Family Members/getFamilyMembers";
+import { linkFamilyMember } from "../../apis/Patient/Family Members/LinkFamilyMember";
 import { Col, Row } from "react-bootstrap";
 import { LinkOutlined } from "@ant-design/icons";
 import { FloatButton } from 'antd';
@@ -11,7 +13,6 @@ const ViewFamilyMembers = () => {
   const accessToken = localStorage.getItem("accessToken");
   const { id } = useParams<{ id: string }>();
   const [familyMembers, setFamilyMembers] =  useState<any[]>([]);
-  const [hasFamilyMembers, setHasFamilyMembers] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string>("");
@@ -23,31 +24,19 @@ const ViewFamilyMembers = () => {
   const [loadingList, setLoadingList] = useState(true);
 
 
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
-  const config = {
-    headers: {
-      Authorization: "Bearer " + accessToken,
-    },
+  const fetchFamilyMembers = async () => {
+    const response = await getPatientFamilyMembers();
+    setFamilyMembers(response.data);
   };
+
   useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
-    };
-    api
-      .get(`/patient/viewFamilyMembers`, config)
-      .then((response) => {
-        setFamilyMembers(response.data);
-        setLoading(false);
-        setHasFamilyMembers(response.data.length > 0);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-    setLoadingList(false);
+    try {
+      fetchFamilyMembers();
+      setLoading(false);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+    setLoading(false);
   }, [id]);
 
  
@@ -55,38 +44,31 @@ const ViewFamilyMembers = () => {
     setShowPopup(true);
   };
 
-  const handleFormSubmit = async() => {
+  const handleFormSubmit = async () => {
     try {
       const data = {
         emailInput,
         phoneInput,
         RelationToPatient,
       };
-
-      const headers = {
-        Authorization: "Bearer " + accessToken,
-      };
-      if ((emailInput != "" || phoneInput != "") && RelationToPatient != "Relation") {
-       await api
-          .post(`/patient/linkFamily`, data, { headers })
-          .then((response) => {
-            message.success("Family Member Linked Successfuly");
-            handleModalClose();
-          })
-          .catch((error) => {
-            message.error(`${error.response.data.error}`);
-          });
-          setLoading(true);
-          api
-      .get(`/patient/viewFamilyMembers`,  config)
-      .then((response) => {
-        setFamilyMembers(response.data);
-        setLoading(false);
-        setHasFamilyMembers(response.data.length > 0);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+      if (
+        (emailInput != "" || phoneInput != "") &&
+        RelationToPatient != "Relation"
+      ) {
+        try {
+          await linkFamilyMember(data);
+          message.success("Family Member Linked Successfuly");
+          handleModalClose();
+        } catch (error) {
+          message.error(`${error}`);
+        }
+        setLoading(true);
+        try {
+          fetchFamilyMembers();
+          setLoading(false);
+        } catch (error) {
+          console.error("Error:", error);
+        }
       } else {
         message.warning("Please fill in the fields  ");
       }
@@ -95,17 +77,13 @@ const ViewFamilyMembers = () => {
     }
   };
 
-  const handleModalClose = () => {
-    api
-      .get(`/patient/viewFamilyMembers`)
-      .then((response) => {
-        setFamilyMembers(response.data);
-        setLoading(false);
-        setHasFamilyMembers(response.data.length > 0);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+  const handleModalClose = async () => {
+    try {
+      fetchFamilyMembers();
+      setLoading(false);
+    } catch (error) {
+      console.error("Error:", error);
+    }
     setLoading(false);
     setShowPopup(false);
     setSelectedOption("");

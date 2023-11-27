@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import dayjs from "dayjs";
+      
 import {
   Button,
   Col,
   DatePicker,
   DatePickerProps,
-  Input,
   Modal,
   Row,
   Select,
@@ -14,46 +16,42 @@ import {
 } from "antd";
 import { Card } from "antd";
 import { Avatar } from "@mui/material";
-import { CreditCardFilled, DeleteOutlined, InfoCircleOutlined, WalletFilled } from "@ant-design/icons";
-import { tr } from "date-fns/locale";
-import AssignmentIcon from "@mui/icons-material/Assignment";
-import { green } from "@mui/material/colors";
-import FolderIcon from "@mui/icons-material/Folder";
-import { headers } from "../../Middleware/authMiddleware";
+
+import { CreditCardFilled, WalletFilled } from "@ant-design/icons";
+import { RangePickerProps } from "antd/es/date-picker";
+import { getBalance } from "../../apis/Patient/GetBalance";
+import { getDoctorDiscount } from "../../apis/Patient/Doctors/GetDoctorDiscount";
+import { payAppointmentStripe } from "../../apis/Patient/Appointments/PayAppointmentStripe";
+import { payAppointmentWallet } from "../../apis/Patient/Appointments/PayAppointmentWallet";
+import { getTimeSlotsDoctorDate } from "../../apis/Patient/Doctors/GetTimeSlotsDoctorDate";
+import { getPatientFamilyMembers } from "../../apis/Patient/Family Members/getFamilyMembers";
+import { getSelectedDoctor } from "../../apis/Patient/Doctors/GetSelectedDoctor";
 const ViewDoctorDetails = () => {
   const { id } = useParams<{ id: string }>();
   const accessToken = localStorage.getItem("accessToken");
   const [SessionPrice, setSessionPrice] = useState("");
+
   const [loadingList, setLoadingList] = useState(true);
   const [docInfo, setDocInfo] = useState<any>({});
   const [FamilyMembers, setFamilyMembers] = useState<string[]>([]);
   const [FamilyMember, setFamilyMember] = useState("");
   const [hasFamily, setHasFamily] = useState<boolean>();
-  const [WalletMessage, setWalletMessage] = useState("");
-  const [DoctorId, setDoctorId] = useState("");
   const [HourlyRate, setHourlyRate] = useState<number>(0);
   const [balance, setBalance] = useState<number>(0);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showPaymentFamilyModal, setShowPaymentFamilyModal] = useState(false);
   const [showDateTimeModal, setShowDateTimeModal] = useState(false);
   const [showDateTimeFamilyModal, setShowDateTimeFamilyModal] = useState(false);
-  const [Date, setDate] = useState("");
   const [AppointmentDate, setAppointmentDate] = useState("");
-  const [Time, setTime] = useState("");
   const [AppointmentTime, setAppointmentTime] = useState("");
   const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
-
+  const [DoctorDiscount, setDoctorDiscount] = useState<number>(0);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<any | null>(null);
   const [DoctorDiscount, setDoctorDiscount] = useState<number>(0);
-  const [Message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const { Option } = Select;
-
-
-  const { Meta } = Card;
-
   const timeSlots: string[] = [];
 
   for (let hours = 0; hours < 12; hours++) {
@@ -61,47 +59,37 @@ const ViewDoctorDetails = () => {
       const hourStr = hours.toString().padStart(2, "0");
       const minuteStr = minutes.toString().padStart(2, "0");
       timeSlots.push(`${hourStr}:${minuteStr}:00`);
-
     }
   }
-  const config = {
-    headers: {
-      Authorization: "Bearer " + accessToken,
-    },
-  };
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
 
   useEffect(() => {
-    getDoctorInfo();
-    doctorDiscount();
-    getFamilyMembers();
-
+    const fetchData = async () => {
+      getDoctorInfo();
+      doctorDiscount();
+      getFamilyMembers();
+    };
+    fetchData();
   }, [id]);
 
   const getDoctorInfo = async () => {
-    await api
-      .get(`/patient/viewSelectedDoctor/${id}`, config)
-      .then((response) => {
-        console.log(response.data);
-        setDocInfo(response.data);
-        setLoadingList(false);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    try {
+      const response = await getSelectedDoctor(id);
+      setDocInfo(response.data);
+      setLoadingList(false);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
+
   const getBalanceApi = async () => {
-    api
-      .get("patient/getBalance", config)
-      .then((response) => {
-        setBalance(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    try {
+      const response = await getBalance();
+      setBalance(response.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
+        
   const handleBookAppointment = async (doctor: any, HourlyRate: any) => {
     setHourlyRate(HourlyRate);
     setShowDateTimeModal(true);
@@ -112,33 +100,20 @@ const ViewDoctorDetails = () => {
     setShowDateTimeFamilyModal(true);
     getBalanceApi();
   };
-  const doctorDiscount = () => {
-    api
-      .get("patient/getDoctorDiscount", config)
-      .then((response) => {
-        setDoctorDiscount(response.data);
-        setSessionPrice(
-          response.data > 0
-            ? `Discounted Sesssion Price (${response.data}% Discount)`
-            : "Sesssion Price"
-        );
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+  const doctorDiscount = async () => {
+    try {
+      const response = await getDoctorDiscount();
+      setDoctorDiscount(response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
+
   const redirectToStripe = async () => {
-    const DoctorId = id;
     try {
       try {
-        const response = await api.post(
-          "patient/payAppointmentStripe",
-          {
-            id:  DoctorId,
-          },
-          { headers: headers }
-        );
-        sessionStorage.setItem("DoctorId", DoctorId+"");
+        const response = await payAppointmentStripe(id);
+        sessionStorage.setItem("DoctorId", id + "");
         sessionStorage.setItem(
           "AppointmentDate",
           `${AppointmentDate}T${AppointmentTime}:00.000Z`
@@ -153,9 +128,10 @@ const ViewDoctorDetails = () => {
       console.error(error);
     }
   };
+
   const payWithWallet = async () => {
     try {
-      sessionStorage.setItem("DoctorId", id+"");
+      sessionStorage.setItem("DoctorId", id + "");
       sessionStorage.setItem(
         "AppointmentDate",
         `${AppointmentDate}T${AppointmentTime}:00.000Z`
@@ -163,18 +139,7 @@ const ViewDoctorDetails = () => {
       if (FamilyMember != "")
         sessionStorage.setItem("FamilyMember", FamilyMember);
       try {
-        const response = await api
-          .post(
-            "patient/payAppointmentWallet",
-            {
-              id: id,
-            },
-            { headers: headers }
-          )
-          .then((response) => {
-            setWalletMessage(response.data);
-            navigate("/appointment/success");
-          });
+        const response = await payAppointmentWallet(id);
       } catch (error) {
         console.log(error);
       }
@@ -188,34 +153,27 @@ const ViewDoctorDetails = () => {
   ) => {
     setAppointmentDate(dateString);
     setTimeSlotsApi(dateString);
-    setMessage("");
+
   };
-  const setTimeSlotsApi = (date: string) => {
-    api
-      .post(
-        "patient/getTimeSlotsDoctorDate",
-        {
-          DoctorId:  id,
-          date: date,
-        },
-        { headers: headers }
-      )
-      .then((response) => {
-        console.log("SLOTS:"+ response.data)
-        setTimeSlotsDoctor(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const setTimeSlotsApi = async (date: string) => {
+    try {
+      const response = await getTimeSlotsDoctorDate(id, date);
+      if (response.data.length == 0)
+        message.warning("No slots available on this date");
+      setTimeSlotsDoctor(response.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
+  
   const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
     setAppointmentTime(selectedTimeSlot);
-    setMessage("");
   };
+  
   const handleAppointmentFamilyChange = (familyMember: string) => {
     setFamilyMember(familyMember);
-    setMessage("");
   };
+  
   const handlePaymentSelection = (paymentMethod: string) => {
     if (paymentMethod === "Card") {
       redirectToStripe();
@@ -226,19 +184,22 @@ const ViewDoctorDetails = () => {
     setShowPaymentModal(false);
   };
 
-  const getFamilyMembers = () => {
-    api
-      .get("patient/viewFamilyMembers", config)
-      .then((response) => {
-        setHasFamily(response.data.length > 0);
-        response.data.map((member: any) => {
-          FamilyMembers.push(member.Name);
-        });
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+  const getFamilyMembers = async () => {
+    try {
+      const response = await getPatientFamilyMembers();
+      setHasFamily(response.data.length > 0);
+      response.data.map((member: any) => {
+        FamilyMembers.push(member.Name);
       });
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
+
+  const disabledDate: RangePickerProps["disabledDate"] = (current) => {
+    return current && current < dayjs().startOf("day");
+  };
+
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
@@ -272,31 +233,30 @@ const ViewDoctorDetails = () => {
               {docInfo.Name}
             </div>
             <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
-                <strong>Email: </strong>
-                {docInfo.Email}
-                <br></br>
-                <br></br>
+              <strong>Email: </strong>
+              {docInfo.Email}
+              <br></br>
+              <br></br>
 
-                <strong>Username: </strong>
-                {docInfo.Username}
-                <br></br>
-                <br></br>
+              <strong>Username: </strong>
+              {docInfo.Username}
+              <br></br>
+              <br></br>
 
-                <strong>Date of birth: </strong>
-                {String(docInfo.Dob).substring(0, 10)}
-                <br></br>
-             <br></br>
+              <strong>Date of birth: </strong>
+              {String(docInfo.Dob).substring(0, 10)}
+              <br></br>
+              <br></br>
 
-                <strong>Affiliation: </strong>
-                {docInfo.Affiliation}
-                <br></br>
-             <br></br>
+              <strong>Affiliation: </strong>
+              {docInfo.Affiliation}
+              <br></br>
+              <br></br>
 
-                <strong>Education: </strong>
-                {docInfo.EducationalBackground}
-                <br></br>
-             <br></br>
-
+              <strong>Education: </strong>
+              {docInfo.EducationalBackground}
+              <br></br>
+              <br></br>
             </div>
           </div>
         </div>
@@ -322,13 +282,10 @@ const ViewDoctorDetails = () => {
             className="btn btn-sm btn-primary"
             hidden={!hasFamily}
             onClick={() => {
-              handleBookAppointmentFamily(
-                docInfo._id,
-                docInfo.HourlyRate
-              );
+              handleBookAppointmentFamily(docInfo._id, docInfo.HourlyRate);
             }}
           >
-                  Book for family member
+            Book for family member
           </button>
         </Row>
       </Card>
@@ -415,11 +372,11 @@ const ViewDoctorDetails = () => {
         visible={showDateTimeModal}
         onCancel={() => {
           setShowDateTimeModal(false);
-          setMessage("");
         }}
         footer={null}
       >
         <DatePicker
+          disabledDate={disabledDate}
           onChange={onAppointmentDateChange}
           style={{ width: 150, marginRight: 30 }}
         />
@@ -460,11 +417,11 @@ const ViewDoctorDetails = () => {
         visible={showDateTimeFamilyModal}
         onCancel={() => {
           setShowDateTimeFamilyModal(false);
-          setMessage("");
         }}
         footer={null}
       >
         <DatePicker
+          disabledDate={disabledDate}
           onChange={onAppointmentDateChange}
           style={{ width: 207, marginRight: 30 }}
         />
@@ -494,7 +451,7 @@ const ViewDoctorDetails = () => {
           ))}
         </Select>
         <button
-        disabled={AppointmentDate == "" || AppointmentTime == ""}
+          disabled={AppointmentDate == "" || AppointmentTime == ""}
           className="btn btn-sm btn-success"
           style={{
             marginLeft: "1rem",
@@ -512,7 +469,6 @@ const ViewDoctorDetails = () => {
           Book
         </button>
       </Modal>
-   
     </div>
   );
 };

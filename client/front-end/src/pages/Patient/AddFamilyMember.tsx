@@ -1,13 +1,11 @@
-import React, { useState, useEffect, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import InputField from "../../components/InputField";
-import Button from "../../components/Button";
 import { message } from "antd";
+import { addFamilyMemberApi } from "../../apis/Patient/Family Members/AddFamilyMember";
 
 const AddFamilyMember = () => {
-  const accessToken = localStorage.getItem("accessToken");
-  const { id } = useParams<{ id: string }>();
   const [Name, setName] = useState<string>(" ");
   const Relation = {
     Husband: "Husband",
@@ -23,9 +21,6 @@ const AddFamilyMember = () => {
     Female: "Female",
   };
   const [Gender, setGender] = useState(gender.Male);
-  const api = axios.create({
-    baseURL: "http://127.0.0.1:8000/",
-  });
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -38,15 +33,8 @@ const AddFamilyMember = () => {
         Age,
         Gender,
       };
-      const headers = {
-        Authorization: "Bearer " + accessToken,
-      };
       if (Name != " " && NationalID != " " && Age != 0) {
-        const response = await axios.post(
-          "http://localhost:8000/patient/addFamilyMember/",
-          data,
-          { headers }
-        );
+        await addFamilyMemberApi(data);
         message.success("Family member added successfully!");
       } else {
         message.warning("Please fill all the required fields");

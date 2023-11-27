@@ -1,30 +1,20 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import axios from "axios";
-import { headers } from "../../Middleware/authMiddleware";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
+
+import { addAppointmentPatient } from "../../apis/Patient/Appointments/AddAppointment";
 
 const AppointmentSuccess = () => {
   const navigate = useNavigate();
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
-
+  
   const addAppointment = async () => {
     try {
-      console.log(sessionStorage.getItem("DoctorId"));
-      const response = await api.post(
-        "appointment/add",
-        {
-          Doctor: sessionStorage.getItem("DoctorId"),
-          AppointmentDate: sessionStorage.getItem("AppointmentDate"),
-          FamilyMember: sessionStorage.getItem("FamilyMember"),
-        },
-        { headers: headers }
-      );
 
-      console.log(response.data);
+      var DoctorId = sessionStorage.getItem("DoctorId");
+      var AppointmentDate = sessionStorage.getItem("AppointmentDate");
+      var FamilyMember = sessionStorage.getItem("FamilyMember");
+      await addAppointmentPatient(DoctorId, AppointmentDate, FamilyMember);
       message.success("Appointment added Successfully!");
       navigate("/patient/allAppointments");
     } catch (error) {
@@ -33,16 +23,11 @@ const AppointmentSuccess = () => {
   };
 
   useEffect(() => {
-    console.log("useEffect ran");
     addAppointment();
-    return () => {
-      console.log("Cleanup logic (useEffect cleanup)");
-    };
+    return () => {};
   }, []);
 
-  console.log("Component rendered");
-
-  return <div></div>;
+  return <></>;
 };
 
 export default AppointmentSuccess;

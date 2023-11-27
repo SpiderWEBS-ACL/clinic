@@ -204,7 +204,7 @@ app.post("/doctor/addHealthRecordForPatient/:id", DoctorProtect, addHealthRecord
 app.post("/doctor/scheduleFollowup/", DoctorProtect, scheduleFollowUp);
 app.put("/doctor/loggedInFirstTime",DoctorProtect,loggedInFirstTime);
 app.get("/doctor/viewPatientFiles/:id",DoctorProtect, viewPatientMedicalRecords);
-app.put("/doctor/getTimeSlotDate",DoctorProtect,getTimeSlotsOfDateDoctor);
+app.post("/doctor/getTimeSlotDate",DoctorProtect,getTimeSlotsOfDateDoctor);
 app.get("/doctor/getAvailableTimeSlots",DoctorProtect,getAvailableTimeSlots);
 //Patient Endpoints
 
@@ -275,12 +275,13 @@ app.get("/appointment/filterAppointment",PatientProtect, filterAppointmentPatien
 app.get("/appointment/filterAppointmentDoctor", DoctorProtect, filterAppointmentDoctor);
 
 //Subscription Endpoints
-app.post("/subscription/subscribe/:id",PatientProtect,subscribeWithStripe);
-app.post("/subscription/subscribeWallet/:id",PatientProtect,subscribeWithWallet);
+app.post("/subscription/subscribeStripe/",PatientProtect,subscribeWithStripe);
+app.post("/subscription/subscribeWallet/",PatientProtect,subscribeWithWallet);
 app.post("/subscription/add",PatientProtect,addSubscription);
 app.delete("/subscription/deleteDuplicate/",PatientProtect,deleteOneSubscription);
 app.get("/subscription/getSubscription",PatientProtect,getSubscription);
-//app.get("/subscription/getSubscriptionFamilyMemberPrice/:id",PatientProtect,getSubscriptionPriceForFamilyMember);
+// app.get("/subscription/getSubscriptionFamilyMemberPrice/:id",PatientProtect,getSubscriptionPriceForFamilyMember);
+
 
 
 //Prescription Endpoints

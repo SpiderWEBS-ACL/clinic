@@ -25,6 +25,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { format, differenceInYears } from "date-fns";
 import "./StylePatient.css";
 import moment from "moment";
+import { getSubscription } from "../../apis/Patient/Packages/GetSubscription";
+import { getPatient } from "../../apis/Patient/GetPatient";
+import { getAllAppointmentsPatientApi } from "../../apis/Patient/Appointments/GetAllAppointments";
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 
@@ -56,32 +59,25 @@ const PatientHome = () => {
         Status: "Upcoming",
       },
     };
-    api
-      .get(`/patient/getPatient`, config)
-      .then((response) => {
-        setPatientInfo(response.data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    const fetchData = async () => {
+      const patient = await getPatient();
+      setPatientInfo(patient);
 
-    api.get("/subscription/getSubscription", config).then((response) => {
-      if(response.data)
-      setDateOf(response.data.Date+"")
-    });
+      const subscription = await getSubscription();
+      if (subscription) setDateOf(subscription.Date + "");
 
-    api.get("patient/showSubscribedPackage", config).then((response) => {
-      if (response.data) setSubscription(response.data);
-    });
+      await api
+        .get("patient/showSubscribedPackage", config)
+        .then((response) => {
+          if (response.data) setSubscription(response.data);
+        });
 
-    api
-      .get(`appointment/filterAppointment`, config)
-      .then((response) => {
-        setAppointments(response.data);
-      })
-      .catch((error: any) => {});
-    setLoading(false);
-    setLoadingCard(false);
+      const patientAppointments = await getAllAppointmentsPatientApi();
+      setAppointments(patientAppointments.data);
+      setLoading(false);
+      setLoadingCard(false);
+    };
+    fetchData();
   }, [id]);
 
   var pron = "";
@@ -144,9 +140,7 @@ const PatientHome = () => {
             footer={null}
             onCancel={closeModal}
           >
-            <Card title="My Details" style={{ marginBottom: 0 }} >
-      
-
+            <Card title="My Details" style={{ marginBottom: 0 }}>
               <List>
                 <List.Item>
                   <Title level={5}>Name: {patientInfo.Name}</Title>
@@ -207,23 +201,22 @@ const PatientHome = () => {
                 }
                 style={{ marginBottom: 16 }}
               >
-                  <Row>
-                      <Avatar
-            src="https://xsgames.co/randomusers/avatar.php?g=pixel"
-            style={{ width: 160, height: 160 }}
-          />
-          <Col>
-          
-        
-                <Title level={4}>
-                  Name: {pron}
-                  {patientInfo.Name}
-                </Title>
-                <Title level={4}>Age: {calculateAge(patientInfo.Dob)}</Title>
-                <Title level={4}>Gender {patientInfo.Gender}</Title>
-                </Col>
+                <Row>
+                  <Avatar
+                    src="https://xsgames.co/randomusers/avatar.php?g=pixel"
+                    style={{ width: 160, height: 160 }}
+                  />
+                  <Col>
+                    <Title level={4}>
+                      Name: {pron}
+                      {patientInfo.Name}
+                    </Title>
+                    <Title level={4}>
+                      Age: {calculateAge(patientInfo.Dob)}
+                    </Title>
+                    <Title level={4}>Gender {patientInfo.Gender}</Title>
+                  </Col>
                 </Row>
-
               </Card>
             </Col>
           </Row>
@@ -239,7 +232,7 @@ const PatientHome = () => {
                     onClick={appointmentsRedirect}
                   />
                 }
-                style={{ marginBottom: 16, minHeight: 335}}
+                style={{ marginBottom: 16, minHeight: 335 }}
               >
                 <Row>
                   <Col>
@@ -286,7 +279,6 @@ const PatientHome = () => {
               <Card
                 hoverable
                 title="My Subscriptions"
-
                 loading={loadingCard}
                 extra={
                   <InfoCircleTwoTone
@@ -310,12 +302,9 @@ const PatientHome = () => {
                   </Col>
 
                   <Col style={{ marginLeft: 40 }}>
-                    <List header = {<Title level={4}>Expiry: </Title>}>
-                      
+                    <List header={<Title level={4}>Expiry: </Title>}>
                       <List.Item>
-                        <Title level={5}>
-                          {dateOf.split("T")[0]}
-                        </Title>
+                        <Title level={5}>{dateOf.split("T")[0]}</Title>
                       </List.Item>
                     </List>
                   </Col>

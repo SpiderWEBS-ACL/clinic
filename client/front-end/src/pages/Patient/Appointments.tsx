@@ -1,16 +1,7 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Alert from "../../components/Alert";
-import {
-  DatePicker,
-  DatePickerProps,
-  Input,
-  Modal,
-  Select,
-  Spin,
-  TimePicker,
-} from "antd";
+import { DatePicker, DatePickerProps, Modal, Select, Spin } from "antd";
 import { message } from "antd";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -19,7 +10,8 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import bootstrap5Plugin from "@fullcalendar/bootstrap5";
 import interactionPlugin from "@fullcalendar/interaction";
-import { headers } from "../../Middleware/authMiddleware";
+import { filterAppointmentStatusDateApi } from "../../apis/Patient/Appointments/FilterAppointmentStatusDate";
+import { getAllAppointmentsPatientApi } from "../../apis/Patient/Appointments/GetAllAppointments";
 
 const ViewPatientAppointments = () => {
   const { Option } = Select;
@@ -29,10 +21,8 @@ const ViewPatientAppointments = () => {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [appointment, setAppointment] = useState<any>(null);
   const [allAppointments, setAllAppointments] = useState([]);
-  const [hasAppointments, setHasAppointments] = useState(false);
   const [status, setStatus] = useState([]);
   const [date, setDate] = useState("");
-  const accessToken = localStorage.getItem("accessToken");
   const [ShowAppointmentModal, setShowAppointmentModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const clearFilters = async () => {
@@ -41,18 +31,9 @@ const ViewPatientAppointments = () => {
     setStatus([]);
   };
   const handleFilter = async () => {
-    // setStatus([]);
-    // setDate("");
     try {
-      const response = await api.get(`appointment/filterAppointment`, {
-        params: {
-          Status: status,
-          AppointmentDate: date,
-        },
-        headers: headers,
-      });
+      const response = await filterAppointmentStatusDateApi(status, date);
       setAppointments(response.data);
-      setHasAppointments(response.data.length > 0);
     } catch (error: any) {
       if (error.response.data.error == "No appointments were found")
         setAppointments([]);
@@ -60,30 +41,20 @@ const ViewPatientAppointments = () => {
       message.error(error.response.data.error);
     }
   };
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
-
-  useEffect(() => {
-    sessionStorage.clear();
-    const config = {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
-    };
+  const fetchAppointments = async () => {
     try {
-      api.get(`/patient/allAppointments`, config).then((response) => {
-        setAppointments(response.data);
-        console.log(response.data);
-        setAllAppointments(response.data);
-        setHasAppointments(response.data.length > 0);
-        setLoading(false);
-      });
+      const response = await getAllAppointmentsPatientApi();
+      setAppointments(response.data);
+      setAllAppointments(response.data);
+      setLoading(false);
     } catch (error: any) {
       message.error(`${error.response.data.error}`);
       setLoading(false);
     }
-    setLoading(false);
+  };
+  useEffect(() => {
+    sessionStorage.clear();
+    fetchAppointments();
   }, [id]);
 
   if (loading) {
@@ -105,14 +76,11 @@ const ViewPatientAppointments = () => {
     selectedDate,
     dateString
   ) => {
-    const jsDate = selectedDate ? selectedDate.toDate() : null;
     setDate(dateString);
   };
   const handleEventClick = (info: any) => {
     setShowAppointmentModal(true);
     setAppointment(info.event._def.extendedProps);
-    console.log(info.event);
-    //info.event.title
   };
 
   return (
@@ -184,7 +152,6 @@ const ViewPatientAppointments = () => {
           ]}
           events={appointments}
           eventClick={(info) => {
-            console.log(info);
             handleEventClick(info);
           }}
           themeSystem="bootstrap5"

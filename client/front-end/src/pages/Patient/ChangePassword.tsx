@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { Spin } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
-import { config, headers } from "../../Middleware/authMiddleware";
+import { useNavigate } from "react-router-dom";
 import { validatePassword } from "../../utils/ValidationUtils";
 import Alert from "../../components/Alert";
 import IconButton from "@material-ui/core/IconButton";
@@ -11,10 +9,9 @@ import Visibility from "@material-ui/icons/Visibility";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import Input from "@material-ui/core/Input";
-import Cookies from "js-cookie";
+import { changePasswordPatientApi } from "../../apis/Patient/changePassword";
 
 const ChangePassword = () => {
-  const accessToken = localStorage.getItem("accessToken");
   const [currPass, setCurrPass] = useState<string>("");
   const [newPass, setNewPass] = useState<string>("");
   const [newPassConfirm, setNewPassConfirm] = useState<string>("");
@@ -54,9 +51,7 @@ const ChangePassword = () => {
     };
 
     try {
-      const response = await api.put("/patient/changePassword", data, {
-        headers: headers,
-      });
+      const response = await changePasswordPatientApi(data);
       console.log("Response:", response.data);
       setError(null);
 

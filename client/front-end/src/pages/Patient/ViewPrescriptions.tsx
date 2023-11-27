@@ -4,13 +4,15 @@ import { set, setDate } from "date-fns";
 import { useNavigate, useParams } from "react-router-dom";
 import {  Card, DatePicker, DatePickerProps, Input, Select, message } from "antd";
 import "./error-box.css";
+import { getMyPrescription } from "../../apis/Patient/Prescriptions/GetMyPrescription";
+import { filterPrescriptions } from "../../apis/Patient/Prescriptions/FilterPrescriptions";
+import { getSelectedPrescription } from "../../apis/Patient/Prescriptions/GetSelectedPrescription";
 import { Col, Row } from "react-bootstrap";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import FolderIcon from '@mui/icons-material/Folder';
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { Avatar } from "@mui/material";
 import { green } from "@mui/material/colors";
-
 
 const ViewPrescriptions = () => {
   const accessToken = localStorage.getItem("accessToken");
@@ -30,27 +32,18 @@ const ViewPrescriptions = () => {
   );
 
   const { Option } = Select;
-  const api = axios.create({
-    baseURL: "http://localhost:8000/patient",
-  });
   const { id } = useParams<{ id: string }>();
 
+  const fetchPrescription = async () => {
+    try {
+      const prescription = await getMyPrescription();
+      setPrescriptions(prescription.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
-    };
-    api
-      .get(`/viewMyPrescriptions`, config)
-      .then((response) => {
-        setPrescriptions(response.data);
-        setLoadingList(false);
-
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    fetchPrescription();
   }, [id]);
 
   const [Doctor, setDoctor] = useState("");
@@ -67,15 +60,7 @@ const ViewPrescriptions = () => {
   const filter = async () => {
     setLoadingList(true);
     try {
-      const response = await api.get("/filterPrescriptions", {
-        params: {
-          Doctor: Doctor,
-          Filled: Filled,
-          Date: Date,
-          Patient: id,
-        },
-        ...config, 
-      });
+      const response = await filterPrescriptions(Doctor, Filled, Date, id);
       const data = response.data;
       if (data.length == 0) {
         message.error("No data");
@@ -92,7 +77,7 @@ const ViewPrescriptions = () => {
   const clearFilter = async () => {
     setLoadingList(true)
     try {
-      const response = await api.get(`/viewMyPrescriptions`, config);
+      const response = await getMyPrescription();
       setDoctor("");
       setFilled("");
       setError(false);
@@ -104,7 +89,7 @@ const ViewPrescriptions = () => {
   };
   const viewDetails = async (prescId: String) => {
     try {
-      const response = await api.get(`/selectPrescription/${prescId}`);
+      const response = await getSelectedPrescription(prescId);
       setShowPopup(true);
       setSelectedPrescription(response.data);
     } catch (error) {

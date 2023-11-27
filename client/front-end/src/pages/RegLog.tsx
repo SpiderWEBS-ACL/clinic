@@ -99,9 +99,11 @@ const RegLog: React.FC = () => {
     }
   };
   const validatePassword = (rule: any, value: string, callback: any) => {
-    const regex = /^(?=.*[A-Z])(?=.*\d).{6,}$/; 
+    const regex = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
     if (!regex.test(value)) {
-      callback("Password must be at least 6 characters long and include one capital letter and one number.");
+      callback(
+        "Password must be at least 6 characters long and include one capital letter and one number."
+      );
     } else {
       callback();
     }
@@ -228,10 +230,11 @@ const RegLog: React.FC = () => {
   return (
     <div
       style={{
-        boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2)", // Add shadow
-        border: "1px solid #ccc", // Add border
-        maxHeight: 660,
-        margin: "auto",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        fontFamily: "'Roboto', sans-serif",
       }}
       className={`cont ${isSignUp ? "s--signup" : ""}`}
     >
@@ -266,15 +269,15 @@ const RegLog: React.FC = () => {
           </Form.Item>
 
           <a
-          href="/forgotPassword"
-          className="forgot-pass text-right"
-          style={{ display: "block", textAlign: "center", marginBottom: 17 }}
-        >
-          Forgot Password?
-        </a>
-       
+            href="/forgotPassword"
+            className="forgot-pass text-right"
+            style={{ display: "block", textAlign: "center", marginBottom: 17 }}
+          >
+            Forgot Password?
+          </a>
+
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button style={{margin: "auto"}} type="primary" htmlType="submit">
+            <Button style={{ margin: "auto" }} type="primary" htmlType="submit">
               Sign in
             </Button>
           </Form.Item>
@@ -389,7 +392,8 @@ const RegLog: React.FC = () => {
                 {
                   required: true,
                   message: "Please input your password!",
-                },{
+                },
+                {
                   validator: validatePassword,
                 },
               ]}
@@ -410,12 +414,12 @@ const RegLog: React.FC = () => {
               ]}
             >
               <DatePicker
-               value={Dob ? dayjs(Dob) : undefined}
-               onChange={(date, dateString) => {
-                 if (dateString) {
-                   setDob(dateString);
-                 }
-               }}
+                value={Dob ? dayjs(Dob) : undefined}
+                onChange={(date, dateString) => {
+                  if (dateString) {
+                    setDob(dateString);
+                  }
+                }}
                 style={{ width: "100%" }}
               />
             </Form.Item>
@@ -424,7 +428,8 @@ const RegLog: React.FC = () => {
               name="mobile"
               label="Mobile Number"
               rules={[
-                { required: true, message: "Please input your phone number!" },{
+                { required: true, message: "Please input your phone number!" },
+                {
                   validator: validatePhoneNumber,
                 },
               ]}
