@@ -367,9 +367,7 @@ const PatientHome = () => {
             </Col>
           </Row>
         </Content>
-        <Footer style={{ textAlign: "center" }}>
-          spiderWEBS ©2023 Created by AHIH
-        </Footer>
+        <Footer style={{ textAlign: "center" }}>spiderWEBS ©2023</Footer>
       </Layout>
     </Layout>
   );

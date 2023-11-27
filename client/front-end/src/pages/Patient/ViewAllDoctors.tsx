@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Input,
   Select,
   DatePicker,
   DatePickerProps,
   TimePickerProps,
-  Spin,
   Modal,
   Button,
-  message,
   Row,
   Col,
   Card,
   Avatar,
 } from "antd";
 
-import { headers } from "../../Middleware/authMiddleware";
 import {
   ArrowRightOutlined,
   CreditCardFilled,
@@ -50,21 +46,15 @@ const ViewAllDoctors = () => {
   const [Time, setTime] = useState("");
   const [AppointmentTime, setAppointmentTime] = useState("");
   const [DoctorId, setDoctorId] = useState("");
-  const [Message, setMessage] = useState("");
-  const [WalletMessage, setWalletMessage] = useState("");
-  const [loading, setLoading] = useState(true);
   const [balance, setBalance] = useState<number>(0);
   const [HourlyRate, setHourlyRate] = useState<number>(0);
   const [DoctorDiscount, setDoctorDiscount] = useState<number>(0);
   const [FamilyMembers, setFamilyMembers] = useState<string[]>([]);
   const [FamilyMember, setFamilyMember] = useState("");
   const [SessionPrice, setSessionPrice] = useState("");
-  const [hasFamily, setHasFamily] = useState<boolean>();
   const navigate = useNavigate();
   const [loadingList, setLoadingList] = useState(true);
   const { Meta } = Card;
-  const [expanded, setExpanded] = useState(false);
-  const [expIndex, setExpIndex] = useState<number>(0);
 
   const timeSlots = [];
 
@@ -106,7 +96,6 @@ const ViewAllDoctors = () => {
   const getFamilyMembers = async () => {
     try {
       const response = await getPatientFamilyMembers();
-      setHasFamily(response.data.length > 0);
       response.data.map((member: any) => {
         FamilyMembers.push(member.Name);
       });
@@ -156,7 +145,6 @@ const ViewAllDoctors = () => {
         sessionStorage.setItem("FamilyMember", FamilyMember);
       try {
         const response = await payAppointmentWallet(DoctorId);
-        setWalletMessage(response.data);
         navigate("/appointment/success");
       } catch (error) {
         console.log(error);
@@ -189,7 +177,6 @@ const ViewAllDoctors = () => {
   ) => {
     setAppointmentDate(dateString);
     setTimeSlotsApi(dateString);
-    setMessage("");
     console.log(dateString);
   };
 
@@ -207,12 +194,10 @@ const ViewAllDoctors = () => {
   };
   const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
     setAppointmentTime(selectedTimeSlot);
-    setMessage("");
     console.log(selectedTimeSlot);
   };
   const handleAppointmentFamilyChange = (familyMember: string) => {
     setFamilyMember(familyMember);
-    setMessage("");
     console.log(familyMember);
   };
   const handleFilter = async () => {
@@ -389,70 +374,6 @@ const ViewAllDoctors = () => {
             )
         )}
       </tbody>
-
-      {/* <tbody>
-          {Doctors.map((request: any, index) => (
-            <tr key={request._id}>
-              <td>{request.Name}</td>
-              <td>{request.Specialty}</td>
-              <td>
-                {Math.round((1 - DoctorDiscount / 100) * request.HourlyRate)}
-              </td>
-              <td className="text-end">
-                <button
-                  className="btn btn-sm btn-primary"
-                  style={{
-                    padding: "4px 8px",
-                    fontSize: "12px",
-                    borderRadius: "5px",
-                  }}
-                  onClick={() => viewDetails(request)}
-                >
-                  <span aria-hidden="true"></span>
-                  Details
-                </button>
-              </td>
-              <td>
-                <button
-                  key={request._id}
-                  className="btn btn-sm btn-success"
-                  style={{
-                    padding: "4px 8px",
-                    fontSize: "12px",
-                    borderRadius: "5px",
-                  }}
-                  onClick={() => {
-                    handleBookAppointment(request._id, request.HourlyRate);
-                  }}
-                >
-                  <span aria-hidden="true"></span>
-                  Book Appointment
-                </button>
-              </td>
-              <td>
-                <button
-                  key={request._id}
-                  className="btn btn-sm btn-success"
-                  hidden={!hasFamily}
-                  style={{
-                    padding: "4px 8px",
-                    fontSize: "12px",
-                    borderRadius: "5px",
-                  }}
-                  onClick={() => {
-                    handleBookAppointmentFamily(
-                      request._id,
-                      request.HourlyRate
-                    );
-                  }}
-                >
-                  <span aria-hidden="true"></span>
-                  Book for family member
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody> */}
       {showPopup && selectedDoctor && (
         <div className="popup">
           <h3>Doctor Details</h3>
@@ -583,7 +504,6 @@ const ViewAllDoctors = () => {
         visible={showDateTimeModal}
         onCancel={() => {
           setShowDateTimeModal(false);
-          setMessage("");
         }}
         footer={null}
       >
@@ -628,7 +548,6 @@ const ViewAllDoctors = () => {
         visible={showDateTimeFamilyModal}
         onCancel={() => {
           setShowDateTimeFamilyModal(false);
-          setMessage("");
         }}
         footer={null}
       >
