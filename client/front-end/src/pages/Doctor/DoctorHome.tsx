@@ -38,7 +38,6 @@ const DoctorHome = () => {
       .get(`/doctor/getDoctor/`, config)
       .then((response) => {
         setDoctorInfo(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         console.error("Error:", error);

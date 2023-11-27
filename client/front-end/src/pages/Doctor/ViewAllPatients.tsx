@@ -54,7 +54,6 @@ const ViewAllPatients = () => {
             myArray.push(array[i].Patient);
           }
           setPatients(myArray);
-          console.log(response.data);
           setLoadingList(false);
         })
         .catch((error) => {

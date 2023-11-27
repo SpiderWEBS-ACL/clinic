@@ -24,7 +24,6 @@ const AllAdmins = () => {
       .then((response) => {
         setDoctors(response.data);
         setLoading(false);
-        console.log(response.data);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -41,7 +40,6 @@ const AllAdmins = () => {
       setLoading(true);
       const response = await api.delete(`/removeAdmin/${id}`, config);
       setDeleted(!deleted);
-      console.log("Response:", response.data);
     } catch (error) {
       console.error("Error:", error);
     }

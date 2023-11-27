@@ -277,11 +277,8 @@ const addPrescription = async (req,res) => {
 
 const selectPrescription = async (req, res) =>{
     const id = req.params.id;
-    console.log(11111111111)
-    console.log(id);
   try {
     const prescription = await prescriptionModel.findById(id).populate('Doctor').exec();
-    console.log(prescription)
     if (!prescription) {
       return res.status(404).json({ error: "Prescription not found" });
     }

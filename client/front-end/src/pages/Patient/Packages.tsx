@@ -87,7 +87,6 @@ const AllPackagesPatient = () => {
     } else {
       payWithWallet(PackageId);
     }
-    console.log("Selected payment method: ", paymentMethod);
     setShowPaymentModal(false);
   };
 

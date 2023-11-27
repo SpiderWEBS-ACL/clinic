@@ -61,7 +61,6 @@ const AddAdminForm: React.FC = () => {
 
     try {
       const response = await api.post("/admin/add", data, { headers });
-      console.log("Response:", response.data);
 
       setError(null);
     } catch (error) {
