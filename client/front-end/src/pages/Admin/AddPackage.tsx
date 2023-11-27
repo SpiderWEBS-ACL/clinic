@@ -34,7 +34,6 @@ const AddPackage = () => {
         Authorization: `Bearer ${accessToken}`,
       };
       const response = await api.post(`/admin/addPackage`, data, { headers });
-      console.log("Response:", response.data);
       message.success("Package added Successfully");
     } catch (error) {
       console.error("Error:", error);

@@ -171,7 +171,6 @@ const ViewDoctorDetails = () => {
     } else {
       payWithWallet();
     }
-    console.log("Selected payment method: ", paymentMethod);
     setShowPaymentModal(false);
   };
 

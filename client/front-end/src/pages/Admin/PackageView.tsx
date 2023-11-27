@@ -60,7 +60,7 @@ const PackageView = () => {
       const response = await api.put(`/admin/updatePackage/${id}`, data, {
         headers,
       });
-      console.log("Response:", response.data);
+
       message.success("Package updated successfully");
       setAlert(true);
     } catch (error) {
@@ -77,7 +77,6 @@ const PackageView = () => {
       const response = await api.delete(`/admin/deletePackage/${id}`, {
         headers,
       });
-      console.log("Response:", response.data);
       message.success("Package deleted successfully");
       navigate("/admin/packages");
     } catch (error) {

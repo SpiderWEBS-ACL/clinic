@@ -20,7 +20,6 @@ const AllDoctors = () => {
       .then((response) => {
         setDoctors(response.data);
         setLoading(false);
-        console.log(response.data);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -35,7 +34,6 @@ const AllDoctors = () => {
       setLoading(true);
       const response = await api.delete(`/removeDoctor/${id}`, { headers });
       setDeleted(!deleted);
-      console.log("Response:", response.data);
     } catch (error) {
       console.error("Error:", error);
     }

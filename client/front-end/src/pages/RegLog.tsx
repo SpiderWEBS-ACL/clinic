@@ -51,17 +51,6 @@ const RegLog: React.FC = () => {
   });
 
   const handleSignUp = async () => {
-    console.log(
-      Name,
-      Email,
-      Password,
-      Username,
-      Dob,
-      Gender,
-      Mobile,
-      EmergencyContactName,
-      EmergencyContactMobile
-    );
     if (
       !Name ||
       !Email ||
@@ -89,7 +78,6 @@ const RegLog: React.FC = () => {
           EmergencyContactMobile,
         };
         const response = await api.post(`/patient/register`, data);
-        console.log(data);
         message.success("Congrats, you are in");
         setTimeout(toggleSignUp, 1500);
       } catch (error: any) {

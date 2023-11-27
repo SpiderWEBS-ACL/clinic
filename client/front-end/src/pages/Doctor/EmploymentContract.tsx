@@ -27,15 +27,12 @@ const EmploymentContract = () => {
   });
 
   useEffect(() => {
-    console.log(currentUrl);
-    console.log(id);
     localStorage.clear();
     api
       .get(`/doctor/registrationRequest/${id}`, config)
       .then((response) => {
         setRegReqDetails(response.data);
         getDate(response.data.AcceptanceDate);
-        console.log(response.data);
       })
       .catch((error) => {
         console.error("Error:", error);

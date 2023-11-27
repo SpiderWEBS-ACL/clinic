@@ -58,7 +58,6 @@ const ForgotPassword = () => {
           headers: headers,
         }
       );
-      console.log("Response:", response.data);
       setError(null);
       setOTPVisible(true);
       setAlertVisibility(false);
@@ -91,7 +90,6 @@ const ForgotPassword = () => {
           headers: headers,
         }
       );
-      console.log("Response:", response.data);
       setError(null);
       setMessage("OTP Verified!");
       setAlertVisibility(true);
@@ -145,7 +143,6 @@ const ForgotPassword = () => {
       const response = await api.put("/resetPassword", data, {
         headers: headers,
       });
-      console.log("Response:", response.data);
       setError(null);
       setMessage("Password Updated Successfully.");
 

@@ -50,7 +50,6 @@ const Calendar: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const getTimeSlotsApi = () => {
     api.get("doctor/getAvailableTimeSlots", config).then((response) => {
-      console.log(response.data);
       setSelectedSlots(response.data);
     });
     setLoading(false);
@@ -83,8 +82,6 @@ const Calendar: React.FC = () => {
     }
   }
   const handleSave = () => {
-    console.log(selectedSlots);
-    console.log(selectedSlots["Monday"]);
     api
       .put(
         "/doctor/addTimeSlots",

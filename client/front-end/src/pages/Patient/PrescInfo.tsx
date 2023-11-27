@@ -42,7 +42,6 @@ const PrescInfo = () => {
     await api
       .get(`/patient/selectPrescription/${id}`, config)
       .then((response) => {
-        console.log(response.data);
         setPrescInfo(response.data);
         setLoadingList(false);
       })

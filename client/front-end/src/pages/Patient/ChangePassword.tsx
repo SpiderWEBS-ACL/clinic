@@ -52,7 +52,6 @@ const ChangePassword = () => {
 
     try {
       const response = await changePasswordPatientApi(data);
-      console.log("Response:", response.data);
       setError(null);
 
       //logout

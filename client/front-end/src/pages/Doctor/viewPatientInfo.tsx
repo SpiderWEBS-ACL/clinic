@@ -57,7 +57,6 @@ const ViewPatientInfo = () => {
     await api
       .get(`/doctor/viewPatientInfo/${id}`, config)
       .then((response) => {
-        console.log(response.data);
         setPatientInfo(response.data);
         setLoadingList(false);
       })
@@ -121,7 +120,6 @@ const ViewPatientInfo = () => {
     setAppointmentDate(dateString);
     setTimeSlotsApi(dateString);
     setMessage("");
-    console.log(dateString);
   };
 
   const handleCheckAvailability = () => {
@@ -154,7 +152,6 @@ const ViewPatientInfo = () => {
   const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
     setAppointmentTime(selectedTimeSlot);
     setMessage("");
-    console.log(selectedTimeSlot);
   };
   const handleOk2 = async () => {
     setIsModalOpen2(false);
@@ -211,7 +208,6 @@ const ViewPatientInfo = () => {
   const getFiles = async () => {
     try {
       const response = await api.get(`/doctor/viewPatientFiles/${id}`, config);
-      console.log(response);
       if (response.data) {
         setPatientFiles(response.data);
         setLoadingHealth(false);

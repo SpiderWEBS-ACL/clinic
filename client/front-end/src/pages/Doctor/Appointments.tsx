@@ -158,7 +158,6 @@ const ViewPatientAppointments = () => {
         ]}
         events={appointments}
         eventClick={(info) => {
-          console.log(info);
           handleEventClick(info);
         }}
         themeSystem="bootstrap5"

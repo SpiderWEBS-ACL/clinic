@@ -84,7 +84,6 @@ function RegisterDoctor() {
       };
 
       const response = await api.post(`/doctor/register`, data);
-      console.log("Response:", response.data);
       setActiveForm(4);
     
     } catch (error) {

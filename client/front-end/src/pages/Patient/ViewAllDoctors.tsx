@@ -177,7 +177,6 @@ const ViewAllDoctors = () => {
   ) => {
     setAppointmentDate(dateString);
     setTimeSlotsApi(dateString);
-    console.log(dateString);
   };
 
   const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,11 +193,9 @@ const ViewAllDoctors = () => {
   };
   const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
     setAppointmentTime(selectedTimeSlot);
-    console.log(selectedTimeSlot);
   };
   const handleAppointmentFamilyChange = (familyMember: string) => {
     setFamilyMember(familyMember);
-    console.log(familyMember);
   };
   const handleFilter = async () => {
     setLoadingList(true);
@@ -252,7 +249,6 @@ const ViewAllDoctors = () => {
     } else {
       payWithWallet();
     }
-    console.log("Selected payment method: ", paymentMethod);
     setShowPaymentModal(false);
   };
 

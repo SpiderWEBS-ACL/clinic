@@ -58,7 +58,6 @@ const ChangePassword = () => {
       const response = await api.put("/doctor/changePassword", data, {
         headers: headers,
       });
-      console.log("Response:", response.data);
       setError(null);
 
       //logout
