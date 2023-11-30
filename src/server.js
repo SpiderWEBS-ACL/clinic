@@ -1,11 +1,18 @@
 const express = require("express");
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
 const cors = require('cors');
 require('dotenv').config();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const packageModel = require("./Models/Package");
 const path = require('path');
+const app = express();
+const http = require("http");
+const socketIo = require("socket.io");
+const server = http.createServer(app);
+const io = socketIo(server);
+app.use(cors());
+app.use(express.json())
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+const port = process.env.PORT || "8000";
+const MongoURI = process.env.ATLAS_MONGO_URI;
 
 const {
   addPatient,
@@ -119,17 +126,7 @@ const {
   changePassword,
 } = require("./controllers/loginController");
 
-require("dotenv").config();
 mongoose.set("strictQuery", false);
-const MongoURI = process.env.ATLAS_MONGO_URI;
-
-const app = express();
-app.use(cors());
-app.use(express.json())
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
-const port = process.env.PORT || "8000";
-
 // configurations
 // Mongo DB
 mongoose
@@ -138,7 +135,7 @@ mongoose
     console.log("MongoDB is now connected!");
     // Starting server
     app.listen(port, () => {
-      console.log(`Listening to requests on http://localhost:${port}`);
+      console.log(`Listening to requests on  ://localhost:${port}`);
     });
   })
   .catch((err) => console.log(err));

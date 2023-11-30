@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Input, Select, message } from "antd";
 import { Col, Row } from "react-bootstrap";
-import { Card, Skeleton, Switch, Avatar } from "antd";
+import { Card, Avatar } from "antd";
+import { getMyPatients } from "../../apis/Doctor/Patients/GetMyPatients";
+import { upcomingAppointments } from "../../apis/Doctor/Appointments/UpcomigAppointments";
+import { searchPatient } from "../../apis/Doctor/Patients/SearchPatient";
 
 const ViewAllPatients = () => {
-  const accessToken = localStorage.getItem("accessToken");
   const [name, setName] = useState("");
   const [selectedOption, setSelectedOption] = useState("All");
   const { Meta } = Card;
@@ -14,17 +15,8 @@ const ViewAllPatients = () => {
   const [AllPatients, setAllPatients] = useState<any[]>([]);
   const [loadingList, setLoadingList] = useState(true);
 
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
-  const config = {
-    headers: {
-      Authorization: "Bearer " + accessToken,
-    },
-  };
-  useEffect(() => {
-    api
-      .get(`/doctor/viewPatients/`, config)
+  const fetchPatients = async () => {
+    await getMyPatients()
       .then((response) => {
         setPatients(response.data);
         setLoadingList(false);
@@ -33,6 +25,9 @@ const ViewAllPatients = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+  };
+  useEffect(() => {
+    fetchPatients();
   }, []);
 
   const navigate = useNavigate();
@@ -41,12 +36,11 @@ const ViewAllPatients = () => {
     navigate(`/doctor/viewPatientInfo/${item}`);
   };
 
-  const handleChange = (value: string) => {
+  const handleChange = async (value: string) => {
     setLoadingList(true);
     if (value === "Upcoming") {
       setSelectedOption("Upcoming");
-      api
-        .get(`/doctor/upcomingAppointments/`, config)
+      await upcomingAppointments()
         .then((response) => {
           const array = response.data;
           const myArray: any[] = [];
@@ -67,19 +61,7 @@ const ViewAllPatients = () => {
         });
     } else {
       setSelectedOption("All");
-
-      api
-        .get(`/doctor/viewPatients/`, config)
-        .then((response) => {
-          setPatients(response.data);
-          setLoadingList(false);
-        })
-        .catch((error) => {
-          setLoadingList(false);
-          message.error(error);
-
-          console.error("Error:", error);
-        });
+      fetchPatients();
     }
   };
 
@@ -105,10 +87,9 @@ const ViewAllPatients = () => {
     setName(event.target.value);
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     setLoadingList(true);
-    api
-      .get(`/doctor/searchPatient/${name}`, config)
+    await searchPatient(name)
       .then((response) => {
         setPatients(response.data);
         setLoadingList(false);
@@ -131,12 +112,12 @@ const ViewAllPatients = () => {
     message.success("Cleared!");
   };
 
-    return (
+  return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
         <strong>Patients</strong>
       </h2>
-      <div style={{ /* Add your rowStyle styles here */ }}>
+      <div>
         <span>
           <label style={{ marginRight: 8, marginLeft: 250 }}>
             <strong>Appointments:</strong>
@@ -187,11 +168,11 @@ const ViewAllPatients = () => {
             index % 3 === 0 && (
               <Row gutter={16} key={index}>
                 {patients.slice(index, index + 3).map((patient, subIndex) => (
-                  <Col span={8} key={subIndex} style={{maxWidth: "27rem"}}>
-                  <div>
+                  <Col span={8} key={subIndex} style={{ maxWidth: "25rem" }}>
+                    <div>
                       <Card
                         style={{
-                          width: "26rem",
+                          width: "24rem",
                           marginTop: "3rem",
                           height: "15rem",
                         }}
@@ -214,23 +195,17 @@ const ViewAllPatients = () => {
                           }
                           description={
                             <div>
-                            
-                                <strong>Email:</strong> {patient.Email}
-                              
-                                <br></br>
-                                <br></br>
-
-                                <strong>Date of birth:</strong>{' '}
-                                {patient.Dob.substring(0, 10)}
-                                <br></br>
-                                <br></br>
-                              
-                                <strong>Gender:</strong> {patient.Gender}
-                              
-                                <br></br>
-                                <br></br>
-                                <strong>Mobile:</strong> {patient.Mobile}
-                              
+                              <strong>Email:</strong> {patient.Email}
+                              <br></br>
+                              <br></br>
+                              <strong>Date of birth:</strong>{" "}
+                              {patient.Dob.substring(0, 10)}
+                              <br></br>
+                              <br></br>
+                              <strong>Gender:</strong> {patient.Gender}
+                              <br></br>
+                              <br></br>
+                              <strong>Mobile:</strong> {patient.Mobile}
                             </div>
                           }
                         />
