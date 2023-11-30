@@ -1,47 +1,31 @@
-import React, { useState, useEffect } from "react";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
+import { useState, useEffect } from "react";
 import {
   ChakraProvider,
   Container,
   Heading,
-  List,
-  ListItem,
-  UnorderedList,
   VStack,
   HStack,
   Divider,
   Flex,
 } from "@chakra-ui/react";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import "./StyleDoctor.css";
-import Cookies from "js-cookie";
+import { getDoctor } from "../../apis/Doctor/GetDoctor";
 const DoctorHome = () => {
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
   const { id } = useParams<{ id: string }>();
   const [doctorInfo, setDoctorInfo] = useState<any>({});
-  const accessToken = Cookies.get("accessToken");
 
-  useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
-    };
-    api
-      .get(`/doctor/getDoctor/`, config)
+  const fetchDoctor = async () => {
+    await getDoctor()
       .then((response) => {
         setDoctorInfo(response.data);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
+  };
+  useEffect(() => {
+    fetchDoctor();
   }, [id]);
 
   const [patientData, setPatientData] = useState({
@@ -69,24 +53,14 @@ const DoctorHome = () => {
     navigate(`/doctor/viewPatients`);
   };
 
-  // const getDrDetails = async ()=>{
-  //   try{
-  //   const doctor = await api.get(`/doctor/getDoctor/${id}`)
-  //   setDoctorName(doctor.data.Name);
-  //   }catch(error){`
-  //     console.error(error);
-  //   }
-
-  // };
-
   return (
     <div>
       <ChakraProvider cssVarsRoot={undefined}>
         <Container
           marginTop="5"
-          boxShadow="lg" // Add shadow
-          borderRadius="lg" // Add border radius for curved edges
-          border="3px solid #052c65" // Add border
+          boxShadow="lg"
+          borderRadius="lg"
+          border="3px solid #052c65"
           p={6}
           maxW="container.xl"
         >

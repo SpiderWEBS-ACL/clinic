@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Layout, message } from "antd";
 const { Header } = Layout;
 import Typography from "@mui/material/Typography";
@@ -8,13 +8,13 @@ import {
   Heading,
   HStack,
   Divider,
-  Flex,
-  useQuery,
 } from "@chakra-ui/react";
 import axios from "axios";
 import "./StyleDoctor.css";
-import { config } from "../../Middleware/authMiddleware";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { getRegistrationRequest } from "../../apis/Doctor/Registration/GetRegistrationRequest";
+import { acceptEmploymentContract } from "../../apis/Doctor/Registration/AcceptEmploymentContract";
+import { rejectEmploymentContract } from "../../apis/Doctor/Registration/RejectEmploymentContract";
 
 const EmploymentContract = () => {
   const currentUrl = window.location.href;
@@ -22,14 +22,8 @@ const EmploymentContract = () => {
   const [regReqDetails, setRegReqDetails] = useState<any>({});
   const [date, setDate] = useState<string>("");
 
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
-
-  useEffect(() => {
-    localStorage.clear();
-    api
-      .get(`/doctor/registrationRequest/${id}`, config)
+  const fetchRegistrationRequest = async () => {
+    await getRegistrationRequest(id)
       .then((response) => {
         setRegReqDetails(response.data);
         getDate(response.data.AcceptanceDate);
@@ -37,6 +31,10 @@ const EmploymentContract = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+  };
+  useEffect(() => {
+    localStorage.clear();
+    fetchRegistrationRequest();
   }, [id]);
 
   const navigate = useNavigate();
@@ -48,7 +46,7 @@ const EmploymentContract = () => {
 
   const handleAccept = async () => {
     try {
-      const response = await api.post("doctor/acceptContract/" + id, config);
+      const response = await acceptEmploymentContract(id);
       message.success("Employment Contract Accepted! Welcome Aboard!");
       setTimeout(() => {
         navigate("/");
@@ -66,7 +64,7 @@ const EmploymentContract = () => {
 
   const handleReject = async () => {
     try {
-      await api.post("doctor/rejectContract/" + id, config);
+      await rejectEmploymentContract(id);
       message.success(
         "Employment Contract Rejected! We're sorry you Couldn't join us."
       );

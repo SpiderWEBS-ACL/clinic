@@ -1,15 +1,7 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../../components/Alert";
-import {
-  DatePicker,
-  DatePickerProps,
-  Input,
-  Modal,
-  Select,
-  TimePicker,
-} from "antd";
+import { DatePicker, DatePickerProps, Modal, Select } from "antd";
 import { message } from "antd";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -18,7 +10,8 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import bootstrap5Plugin from "@fullcalendar/bootstrap5";
 import interactionPlugin from "@fullcalendar/interaction";
-import { headers } from "../../Middleware/authMiddleware";
+import { allAppoimtmentsDoctor } from "../../apis/Doctor/Appointments/AllAppointmentsDoctor";
+import { filterAppointmentsDoctor } from "../../apis/Doctor/Appointments/FilterAppointmentsDoctor";
 
 const ViewPatientAppointments = () => {
   const { Option } = Select;
@@ -28,7 +21,6 @@ const ViewPatientAppointments = () => {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [appointment, setAppointment] = useState<any>(null);
   const [allAppointments, setAllAppointments] = useState([]);
-  const [hasAppointments, setHasAppointments] = useState(false);
   const [status, setStatus] = useState([]);
   const [date, setDate] = useState("");
   const accessToken = localStorage.getItem("accessToken");
@@ -41,15 +33,8 @@ const ViewPatientAppointments = () => {
   };
   const handleFilter = async () => {
     try {
-      const response = await api.get(`appointment/filterAppointmentDoctor`, {
-        params: {
-          Status: status,
-          AppointmentDate: date,
-        },
-        headers: headers,
-      });
+      const response = await filterAppointmentsDoctor(status, date);
       setAppointments(response.data);
-      setHasAppointments(response.data.length > 0);
     } catch (error: any) {
       if (error.response.data.error == "No appointments were found")
         setAppointments([]);
@@ -57,26 +42,20 @@ const ViewPatientAppointments = () => {
       message.error(error.response.data.error);
     }
   };
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
-
-  useEffect(() => {
-    sessionStorage.clear();
-    const config = {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
-    };
+  const fetchAppointments = async () => {
     try {
-      api.get(`/doctor/allAppointments`, config).then((response) => {
+      await allAppoimtmentsDoctor().then((response) => {
         setAppointments(response.data);
         setAllAppointments(response.data);
-        setHasAppointments(response.data.length > 0);
       });
     } catch (error: any) {
       message.error(`${error.response.data.error}`);
     }
+  };
+
+  useEffect(() => {
+    sessionStorage.clear();
+    fetchAppointments();
   }, [id]);
 
   const onDateChange: DatePickerProps["onChange"] = (

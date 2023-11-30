@@ -1,42 +1,30 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 import InputField from "../../components/InputField";
-import Button from "../../components/Button";
 import { Spin } from "antd";
 import { message } from "antd";
+import { getDoctor } from "../../apis/Doctor/GetDoctor";
+import { editDoctor } from "../../apis/Doctor/EditDoctor";
 
 const EditDoctor = () => {
-  const accessToken = localStorage.getItem("accessToken");
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [Username, setUsername] = useState<string>("");
   const [Email, setEmail] = useState<string>("");
   const [Name, setName] = useState<string>("");
-  const [Password, setPassword] = useState<string>("");
   const [Dob, setDob] = useState(new Date());
   const [HourlyRate, setHourlyRate] = useState<number>(0);
   const [Affiliation, setAffiliation] = useState<string>("");
   const [EducationalBackground, setEducationalBackground] =
     useState<string>("");
   const [Specialty, setSpecialty] = useState<string>("");
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
 
-  useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
-    };
-    api
-      .get(`/doctor/getDoctor/`, config)
+  const fetchDoctor = async () => {
+    await getDoctor()
       .then((response) => {
         setUsername(response.data.Username);
         setName(response.data.Name);
         setEmail(response.data.Email);
-        setPassword(response.data.Password);
         setDob(new Date(response.data.Dob));
         setHourlyRate(response.data.HourlyRate);
         setAffiliation(response.data.Affiliation);
@@ -46,6 +34,9 @@ const EditDoctor = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+  };
+  useEffect(() => {
+    fetchDoctor();
     setLoading(false);
   }, [id]);
 
@@ -57,8 +48,8 @@ const EditDoctor = () => {
         HourlyRate,
         Affiliation,
       };
-      const response = await api.put(`/doctor/update/${id}`, data);
-      message.success("Your info was updated successfully");
+      const response = await editDoctor(data);
+      message.success("Your info was updated successfully!");
     } catch (error) {
       console.error("Error:", error);
       message.error("Failed to update your info");

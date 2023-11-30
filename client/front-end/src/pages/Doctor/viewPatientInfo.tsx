@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import dayjs from "dayjs";
 import {
   DatePicker,
   DatePickerProps,
@@ -12,17 +12,21 @@ import {
 } from "antd";
 import { Card } from "antd";
 import { Avatar } from "@mui/material";
-import { DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import "./StyleDoctor.css";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { green } from "@mui/material/colors";
 import FolderIcon from "@mui/icons-material/Folder";
-import { headers } from "../../Middleware/authMiddleware";
+import { RangePickerProps } from "antd/es/date-picker";
+import { getPatientInfoApi } from "../../apis/Doctor/Patients/GetPatientInfo";
+import { addPatientHealthRecord } from "../../apis/Doctor/Patients/AddPatientHealthRecord";
+import { getTimeSlotsAtDate } from "../../apis/Doctor/Time Slots/GetTimeSlotsAtDate";
+import { getPatientsHealthRecords } from "../../apis/Doctor/Patients/GetPatientsHealthRecords";
+import { scheduleFollowup } from "../../apis/Doctor/Patients/ScheduleFollowUp";
+import { getPatientsFiles } from "../../apis/Doctor/Patients/GetPatientsFiles";
 const ViewPatientInfo = () => {
   const { id } = useParams<{ id: string }>();
-  const accessToken = localStorage.getItem("accessToken");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [Message, setMessage] = useState("");
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [isFamilyMembersModalOpen, setIsFamilyMembersModalOpen] =
     useState(false);
@@ -40,22 +44,14 @@ const ViewPatientInfo = () => {
   const [patientInfo, setPatientInfo] = useState<any>({});
   const { TextArea } = Input;
   const { Meta } = Card;
-  const config = {
-    headers: {
-      Authorization: "Bearer " + accessToken,
-    },
-  };
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
+  const navigate = useNavigate();
 
   useEffect(() => {
     getPatientInfo();
   }, [id]);
 
   const getPatientInfo = async () => {
-    await api
-      .get(`/doctor/viewPatientInfo/${id}`, config)
+    await getPatientInfoApi(id)
       .then((response) => {
         setPatientInfo(response.data);
         setLoadingList(false);
@@ -88,24 +84,13 @@ const ViewPatientInfo = () => {
       setIsModalOpen(false);
       message.success("Health record added");
 
-      const response = await api.post(
-        `/doctor/addHealthRecordForPatient/${id}`,
-        data,
-        config
-      );
+      await addPatientHealthRecord(id, data);
     } else {
       message.error("Please enter required fields");
     }
   };
-  const setTimeSlotsApi = (date: string) => {
-    api
-      .post(
-        "doctor/getTimeSlotDate",
-        {
-          date: date,
-        },
-        { headers: headers }
-      )
+  const setTimeSlotsApi = async (date: string) => {
+    await getTimeSlotsAtDate(date)
       .then((response) => {
         setTimeSlotsDoctor(response.data);
       })
@@ -118,32 +103,8 @@ const ViewPatientInfo = () => {
     dateString
   ) => {
     setAppointmentDate(dateString);
+    setAppointmentTime("");
     setTimeSlotsApi(dateString);
-    setMessage("");
-  };
-
-  const handleCheckAvailability = () => {
-    if (AppointmentDate && AppointmentTime) {
-      api
-        .post(
-          "doctor/checkDoctor",
-          {
-            Date: AppointmentDate,
-            Time: AppointmentTime,
-          },
-          config
-        )
-        .then((response) => {
-          setMessage(response.data.message);
-          if (response.data.message === "available") {
-            message.success("Available");
-          } else {
-            message.error("You are not available at this time");
-          }
-        });
-    } else {
-      message.error("Please enter required fields");
-    }
   };
   const schedule = async () => {
     setShowDateTimeModal(true);
@@ -151,7 +112,6 @@ const ViewPatientInfo = () => {
 
   const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
     setAppointmentTime(selectedTimeSlot);
-    setMessage("");
   };
   const handleOk2 = async () => {
     setIsModalOpen2(false);
@@ -180,7 +140,7 @@ const ViewPatientInfo = () => {
   const handleHealth = async () => {
     setLoadingHealth(true);
     setIsModalOpen2(true);
-    const response = await api.get(`/doctor/viewHealthRecords/${id}`, config);
+    const response = await getPatientsHealthRecords(id);
     setHealthRecords(response.data);
     setLoadingHealth(false);
   };
@@ -191,23 +151,16 @@ const ViewPatientInfo = () => {
     const date = AppointmentDate.concat(
       "T" + AppointmentTime + ":00.000" + "Z"
     );
-    const response = await api.post(
-      `/doctor/scheduleFollowup/`,
-      {
-        Patient: id,
-        appDate: date,
-        followUp: true,
-        status: "Upcoming",
-      },
-      config
-    );
+    await scheduleFollowup(id, date);
+    message.success("Appointment Booked Successfully!");
+    navigate("/doctor/allAppointments");
     setShowDateTimeModal(false);
     setAppointmentTime("");
     setAppointmentDate("");
   };
   const getFiles = async () => {
     try {
-      const response = await api.get(`/doctor/viewPatientFiles/${id}`, config);
+      const response = await getPatientsFiles(id);
       if (response.data) {
         setPatientFiles(response.data);
         setLoadingHealth(false);
@@ -314,6 +267,9 @@ const ViewPatientInfo = () => {
         </div>
       </p>
     ),
+  };
+  const disabledDate: RangePickerProps["disabledDate"] = (current) => {
+    return current && current < dayjs().startOf("day");
   };
 
   return (
@@ -468,22 +424,6 @@ const ViewPatientInfo = () => {
           >
             {contentList[activeTabKey1]}
           </Card>
-          {/* </Card>
-            <Card
-              loading={loadingHealth}
-              className="hover-card"
-            >
-              <Meta
-                avatar={
-                  <Avatar sx={{ bgcolor: green[500] }}>
-                    {" "}
-                    <AssignmentIcon />{" "}
-                  </Avatar>
-                }
-                title={"Type: " + record.Type}
-                description={"Description: " + record.Description}
-              />
-            </Card> */}
         </div>
       </Modal>
       <Modal
@@ -521,11 +461,11 @@ const ViewPatientInfo = () => {
         visible={showDateTimeModal}
         onCancel={() => {
           setShowDateTimeModal(false);
-          setMessage("");
         }}
         footer={null}
       >
         <DatePicker
+          disabledDate={disabledDate}
           onChange={onAppointmentDateChange}
           style={{ width: 150, marginRight: 30 }}
         />
@@ -555,6 +495,7 @@ const ViewPatientInfo = () => {
             fontSize: "12px",
             borderRadius: "5px",
           }}
+          disabled={AppointmentDate == "" || AppointmentTime == ""}
           onClick={followup}
         >
           <span aria-hidden="true"></span>
