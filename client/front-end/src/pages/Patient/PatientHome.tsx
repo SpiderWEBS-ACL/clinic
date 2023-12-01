@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Layout,
-  Menu,
   Breadcrumb,
   Card,
   Typography,
@@ -10,27 +9,17 @@ import {
   Col,
   Spin,
   Modal,
-  message,
-  Switch,
   Avatar,
 } from "antd";
-import {
-  DesktopOutlined,
-  FileOutlined,
-  InfoCircleTwoTone,
-  TeamOutlined,
-} from "@ant-design/icons";
+import { InfoCircleTwoTone } from "@ant-design/icons";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { format, differenceInYears } from "date-fns";
+import { differenceInYears } from "date-fns";
 import "./StylePatient.css";
-import moment from "moment";
 import { getSubscription } from "../../apis/Patient/Packages/GetSubscription";
 import { getPatient } from "../../apis/Patient/GetPatient";
 import { getAllAppointmentsPatientApi } from "../../apis/Patient/Appointments/GetAllAppointments";
-const { Header, Content, Footer, Sider } = Layout;
-const { SubMenu } = Menu;
-
+const { Content, Footer } = Layout;
 const { Title } = Typography;
 
 const PatientHome = () => {
@@ -80,9 +69,9 @@ const PatientHome = () => {
     fetchData();
   }, [id]);
 
-  var pron = "";
-  if (patientInfo.Gender == "Male") pron = "Mr.";
-  else if (patientInfo.Gender == "Male") pron = "Ms.";
+  var title = "";
+  if (patientInfo.Gender == "Male") title = "Mr.";
+  else if (patientInfo.Gender == "Male") title = "Ms.";
 
   if (loading) {
     return (
@@ -208,13 +197,12 @@ const PatientHome = () => {
                   />
                   <Col>
                     <Title level={4}>
-                      Name: {pron}
-                      {patientInfo.Name}
+                      {title} {patientInfo.Name}
                     </Title>
                     <Title level={4}>
-                      Age: {calculateAge(patientInfo.Dob)}
+                      {calculateAge(patientInfo.Dob)} years old
                     </Title>
-                    <Title level={4}>Gender {patientInfo.Gender}</Title>
+                    <Title level={4}>{patientInfo.Gender}</Title>
                   </Col>
                 </Row>
               </Card>

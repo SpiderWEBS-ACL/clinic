@@ -1,22 +1,14 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import { Spin } from "antd";
 import { useNavigate } from "react-router-dom";
+import { getAllPackagesAdmin } from "../../apis/Admin/GetAllPackages";
 
 const AllPackages = () => {
-  const accessToken = localStorage.getItem("accessToken");
   const [Packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const api = axios.create({
-    baseURL: "http://localhost:8000/admin",
-  });
 
-  useEffect(() => {
-    const headers = {
-      Authorization: "Bearer " + accessToken,
-    };
-    api
-      .get("/allPackages", { headers })
+  const fetchPackages = async () => {
+    await getAllPackagesAdmin()
       .then((response) => {
         setPackages(response.data);
         setLoading(false);
@@ -24,6 +16,9 @@ const AllPackages = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+  };
+  useEffect(() => {
+    fetchPackages();
   }, []);
 
   const navigate = useNavigate();

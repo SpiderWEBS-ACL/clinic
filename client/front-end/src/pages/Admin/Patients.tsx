@@ -1,22 +1,15 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import { Spin } from "antd";
+import { getAllPatients } from "../../apis/Admin/GetAllPatients";
+import { deletePatient } from "../../apis/Admin/DeletePatient";
 
 const Patients = () => {
-  const accessToken = localStorage.getItem("accessToken");
   const [patients, setPatients] = useState([]);
   const [deleted, setDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
-  const api = axios.create({
-    baseURL: "http://localhost:8000/admin",
-  });
 
-  useEffect(() => {
-    const headers = {
-      Authorization: "Bearer " + accessToken,
-    };
-    api
-      .get("/allPatients", { headers })
+  const fetchPatients = async () => {
+    await getAllPatients()
       .then((response) => {
         setPatients(response.data);
         setLoading(false);
@@ -24,15 +17,15 @@ const Patients = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+  };
+  useEffect(() => {
+    fetchPatients();
   }, [deleted]);
 
   const handleDelete = async (id: string) => {
-    const headers = {
-      Authorization: "Bearer " + accessToken,
-    };
     try {
       setLoading(true);
-      const response = await api.delete(`/removePatient/${id}`, { headers });
+      await deletePatient(id);
       setDeleted(!deleted);
     } catch (error) {
       console.error("Error:", error);

@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { Spin } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
-import { config, headers } from "../../Middleware/authMiddleware";
+
+import { useNavigate } from "react-router-dom";
 import { validatePassword } from "../../utils/ValidationUtils";
 import Alert from "../../components/Alert";
 import IconButton from "@material-ui/core/IconButton";
@@ -11,10 +10,9 @@ import Visibility from "@material-ui/icons/Visibility";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import Input from "@material-ui/core/Input";
+import { changePasswordAdmin } from "../../apis/Admin/ChangePasswordAdmin";
 
 const ChangePassword = () => {
-  const accessToken = localStorage.getItem("accessToken");
-  // const id = localStorage.getItem("id");
   const [currPass, setCurrPass] = useState<string>("");
   const [newPass, setNewPass] = useState<string>("");
   const [newPassConfirm, setNewPassConfirm] = useState<string>("");
@@ -25,10 +23,6 @@ const ChangePassword = () => {
   const [alertVisible, setAlertVisibility] = useState(false);
 
   const navigate = useNavigate();
-
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,9 +48,7 @@ const ChangePassword = () => {
     };
 
     try {
-      const response = await api.put("/admin/changePassword", data, {
-        headers: headers,
-      });
+      await changePasswordAdmin(data);
       setError(null);
 
       //logout

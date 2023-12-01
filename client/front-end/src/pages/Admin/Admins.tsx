@@ -1,26 +1,16 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import { Spin } from "antd";
-import { useParams } from "react-router-dom";
+import { getAllAdmins } from "../../apis/Admin/GetAllAdmins";
+import { deleteAdmin } from "../../apis/Admin/DeleteAdmin";
 
 const AllAdmins = () => {
-  const accessToken = localStorage.getItem("accessToken");
   const [doctors, setDoctors] = useState([]);
   const [deleted, setDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const id = localStorage.getItem("id");
-  const api = axios.create({
-    baseURL: "http://localhost:8000/admin",
-  });
 
-  useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
-    };
-    api
-      .get("/allAdmins", config)
+  const fetchAdmins = async () => {
+    await getAllAdmins()
       .then((response) => {
         setDoctors(response.data);
         setLoading(false);
@@ -28,17 +18,16 @@ const AllAdmins = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+  };
+
+  useEffect(() => {
+    fetchAdmins();
   }, [deleted]);
 
   const handleDelete = async (id: string) => {
-    const config = {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
-    };
     try {
       setLoading(true);
-      const response = await api.delete(`/removeAdmin/${id}`, config);
+      await deleteAdmin(id);
       setDeleted(!deleted);
     } catch (error) {
       console.error("Error:", error);
@@ -82,9 +71,7 @@ const AllAdmins = () => {
                   ? request.Username + " (You)"
                   : request.Username}
               </td>
-              <td>
-                {request.Email}
-              </td>
+              <td>{request.Email}</td>
               <td>
                 <button
                   disabled={id == request._id ? true : false}
