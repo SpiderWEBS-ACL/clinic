@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import { Spin } from "antd";
 import { message } from "antd";
-import { Navigate } from "react-router-dom";
+import { getPackageDetails } from "../../apis/Admin/GetPackageDetails";
+import { updatePackage } from "../../apis/Admin/UpdatePackage";
+import { deletePackage } from "../../apis/Admin/DeletePackage";
 
 const PackageView = () => {
-  const accessToken = localStorage.getItem("accessToken");
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [Name, setName] = useState<string>("");
@@ -18,19 +18,10 @@ const PackageView = () => {
     number | undefined
   >();
   const [FamilyDiscount, setFamilyDiscount] = useState<number | undefined>();
-  const [Message, setMessage] = useState("");
-  const [Alert, setAlert] = useState(false);
   const navigate = useNavigate();
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
 
-  useEffect(() => {
-    const headers = {
-      Authorization: "Bearer " + accessToken,
-    };
-    api
-      .get(`/admin/package/${id}`, { headers })
+  const fetchPackageDetails = async () => {
+    await getPackageDetails(id)
       .then((response) => {
         setName(response.data.Name);
         setSubscriptionPrice(response.data.SubscriptionPrice);
@@ -41,13 +32,13 @@ const PackageView = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+  };
+  useEffect(() => {
+    fetchPackageDetails();
     setLoading(false);
   }, [id]);
 
   const handleSubmit = async (event: React.FormEvent) => {
-    const headers = {
-      Authorization: "Bearer " + accessToken,
-    };
     event.preventDefault();
     try {
       const data = {
@@ -57,12 +48,8 @@ const PackageView = () => {
         PharmacyDiscount,
         FamilyDiscount,
       };
-      const response = await api.put(`/admin/updatePackage/${id}`, data, {
-        headers,
-      });
-
+      await updatePackage(id, data);
       message.success("Package updated successfully");
-      setAlert(true);
     } catch (error) {
       console.error("Error:", error);
       message.error("Failed to update package");
@@ -70,13 +57,8 @@ const PackageView = () => {
   };
 
   const handleDelete = async () => {
-    const headers = {
-      Authorization: "Bearer " + accessToken,
-    };
     try {
-      const response = await api.delete(`/admin/deletePackage/${id}`, {
-        headers,
-      });
+      await deletePackage(id);
       message.success("Package deleted successfully");
       navigate("/admin/packages");
     } catch (error) {

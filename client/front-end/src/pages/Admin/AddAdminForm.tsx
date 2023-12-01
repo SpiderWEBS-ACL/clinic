@@ -1,17 +1,13 @@
 import React, { useState } from "react";
-import axios from "axios";
 import Alert from "../../components/Alert";
 import InputField from "../../components/InputField";
 import {
   validateUsername,
   validatePassword,
 } from "../../utils/ValidationUtils";
-import { Button, Form, Input, Select } from "antd";
-
-const { Option } = Select;
+import { addAdmin } from "../../apis/Admin/AddAdmin";
 
 const AddAdminForm: React.FC = () => {
-  const accessToken = localStorage.getItem("accessToken");
   const [Username, setUsername] = useState<string>("");
   const [Password, setPassword] = useState<string>("");
   const [Email, setEmail] = useState<string>("");
@@ -21,11 +17,6 @@ const AddAdminForm: React.FC = () => {
     username: false,
     password: false,
   });
-
-  const api = axios.create({
-    baseURL: "http://127.0.0.1:8000",
-  });
-
   const handleBlur = (fieldName: string) => {
     setTouchedFields({
       ...touchedFields,
@@ -37,7 +28,7 @@ const AddAdminForm: React.FC = () => {
     e.preventDefault();
     setAlertVisibility(true);
 
-    if(!(Username && Password && Email)){
+    if (!(Username && Password && Email)) {
       setError("Please fill in all required fields");
       return;
     }
@@ -53,25 +44,16 @@ const AddAdminForm: React.FC = () => {
     const data = {
       Username,
       Password,
-      Email
-    };
-    const headers = {
-      Authorization: `Bearer ${accessToken}`,
+      Email,
     };
 
     try {
-      const response = await api.post("/admin/add", data, { headers });
+      await addAdmin(data);
 
       setError(null);
     } catch (error) {
       console.error("Error:", error);
-
-      if (axios.isAxiosError(error) && error.response) {
-        const apiError = error.response.data.error;
-        setError(apiError);
-      } else {
-        setError("An error occurred");
-      }
+      setError("An error occurred");
     }
   };
 
