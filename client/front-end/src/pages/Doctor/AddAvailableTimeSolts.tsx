@@ -1,7 +1,8 @@
 import { Button, Select, Spin, message } from "antd";
-import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { config, headers } from "../../Middleware/authMiddleware";
+import { getAvailableTimeSlots } from "../../apis/Doctor/Time Slots/GetAvailableTimeSlots";
+import { editAvailableTimeSlots } from "../../apis/Doctor/Time Slots/EditAvailableTimeSlots";
+import { firstTimeLogin } from "../../apis/Doctor/Registration/FirstTimeLogIn";
 const { Option } = Select;
 const daysOfWeek = [
   "Saturday",
@@ -12,9 +13,6 @@ const daysOfWeek = [
   "Thursday",
   "Friday",
 ];
-const api = axios.create({
-  baseURL: "http://localhost:8000/",
-});
 
 const timeSlots = [
   "00:00",
@@ -48,11 +46,13 @@ const Calendar: React.FC = () => {
     {}
   );
   const [loading, setLoading] = useState(true);
-  const getTimeSlotsApi = () => {
-    api.get("doctor/getAvailableTimeSlots", config).then((response) => {
-      console.log(response.data);
+  const getTimeSlotsApi = async () => {
+    try {
+      const response = await getAvailableTimeSlots();
       setSelectedSlots(response.data);
-    });
+    } catch (error) {
+      console.log(error);
+    }
     setLoading(false);
   };
 
@@ -82,39 +82,25 @@ const Calendar: React.FC = () => {
       }
     }
   }
-  const handleSave = () => {
-    console.log(selectedSlots);
-    console.log(selectedSlots["Monday"]);
-    api
-      .put(
-        "/doctor/addTimeSlots",
-        [
-          selectedSlots["Saturday"],
-          selectedSlots["Sunday"],
-          selectedSlots["Monday"],
-          selectedSlots["Tuesday"],
-          selectedSlots["Wednesday"],
-          selectedSlots["Thursday"],
-          selectedSlots["Friday"],
-        ],
-        { headers: headers }
-      )
+  const handleSave = async () => {
+    await editAvailableTimeSlots(
+      selectedSlots["Saturday"],
+      selectedSlots["Sunday"],
+      selectedSlots["Monday"],
+      selectedSlots["Tuesday"],
+      selectedSlots["Wednesday"],
+      selectedSlots["Thursday"],
+      selectedSlots["Friday"]
+    )
       .then(() => {
         message.success("Time slots added successfully!");
       })
       .catch(() => {
         message.error("an error has occurred");
       });
-    api.put("doctor/loggedInFirstTime", [], { headers: headers }).catch(() => {
+    await firstTimeLogin().catch(() => {
       message.error("an error has occurred");
     });
-  };
-  const buttonStyle = {
-    backgroundColor: "#f0f0f0",
-    border: "1px solid #ccc",
-    margin: "5px",
-    padding: "5px 10px",
-    cursor: "pointer",
   };
 
   const handleTimeSlotSelect = (day: string, selectedValues: string[]) => {
@@ -132,13 +118,13 @@ const Calendar: React.FC = () => {
   };
 
   const dayStyle = {
-    color: "#1890ff",
+    color: "#000000",
     fontSize: "1rem",
   };
 
   return (
     <div style={{ textAlign: "center", marginTop: "20px" }}>
-      <h2>
+      <h2 style={{ color: "#1890ff" }}>
         <strong>Select your weekly time slots</strong>
       </h2>
       {daysOfWeek.map((day) => (

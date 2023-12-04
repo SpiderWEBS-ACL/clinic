@@ -8,15 +8,17 @@ import {
   IoAlertCircle,
   IoClose,
 } from "react-icons/io5";
-import { config, headers } from "../../Middleware/authMiddleware";
 
-import { DatePicker, DatePickerProps, message, Button, Upload } from "antd";
+import { DatePicker, DatePickerProps, message, Button } from "antd";
 import InputField from "../../components/InputField";
 import {
   validatePassword,
   validateUsername,
 } from "../../utils/ValidationUtils";
-import { UploadOutlined } from "@ant-design/icons";
+import { registerDoctor } from "../../apis/Doctor/Registration/RegisterDoctor";
+import { uploadLisence } from "../../apis/Doctor/Registration/UploadLisence";
+import { uploadMedicalDegree } from "../../apis/Doctor/Registration/UploadMedicalDegree";
+import { uploadPersonalIdDoctor } from "../../apis/Doctor/Registration/UploadPersonalID";
 
 const steps = [
   { id: 1, title: "Account Info", fields: ["Username", "Password", "Email"] },
@@ -54,10 +56,6 @@ function RegisterDoctor() {
     password: false,
   });
 
-  const api = axios.create({
-    baseURL: "http://localhost:8000",
-  });
-
   const navigate = useNavigate();
 
   const handleSignUp = async (event: React.FormEvent) => {
@@ -83,10 +81,8 @@ function RegisterDoctor() {
         Specialty,
       };
 
-      const response = await api.post(`/doctor/register`, data);
-      console.log("Response:", response.data);
+      await registerDoctor(data);
       setActiveForm(4);
-    
     } catch (error) {
       console.error("Error:", error);
       if (axios.isAxiosError(error) && error.response) {
@@ -134,21 +130,20 @@ function RegisterDoctor() {
         return;
       }
     }
-    if(activeForm == 4){
-      if(licenseFiles && personalIDFile && degreeFile){
-          uploadLicenses();
-          uploadPersonalID();
-          uploadDegree();
-          setError(null);
-         setModalActive(true);
+    if (activeForm == 4) {
+      if (licenseFiles && personalIDFile && degreeFile) {
+        uploadLicenses();
+        uploadPersonalID();
+        uploadDegree();
+        setError(null);
+        setModalActive(true);
         setTimeout(() => {
-        closeModal; 
-        navigate("/");
-        window.location.reload();
-      }, 1500);
-      }
-      else{
-        message.error("Please upload required field(s)!")
+          closeModal;
+          navigate("/");
+          window.location.reload();
+        }, 1500);
+      } else {
+        message.error("Please upload required field(s)!");
       }
     }
 
@@ -169,99 +164,83 @@ function RegisterDoctor() {
     // window.location.reload();
   };
 
-  const personalIDFileChange =  (e: ChangeEvent<HTMLInputElement>) => {
-    setPersonalIDFile(e.target.files)
-  }
-  const licensesFileChange =  (e: ChangeEvent<HTMLInputElement>) => { 
-    setLicenseFiles(e.target.files)
-  }
-  const degreeFileChange =  (e: ChangeEvent<HTMLInputElement>) => {
-    setDegreeFile(e.target.files)
-  }
+  const personalIDFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setPersonalIDFile(e.target.files);
+  };
+  const licensesFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setLicenseFiles(e.target.files);
+  };
+  const degreeFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setDegreeFile(e.target.files);
+  };
 
-  const uploadLicenses = async() =>{
+  const uploadLicenses = async () => {
     if (licenseFiles) {
       const formData = new FormData();
-  
+
       for (let i = 0; i < licenseFiles.length; i++) {
         const file = licenseFiles[i];
-  
-        formData.append('files', file); 
-        formData.append('filename', file.name); 
-        formData.append('originalname', file.name); 
-       formData.append('contentType', file.type); 
-       formData.append('DocEmail', Email);
-       formData.append('docFileType', 'License');
 
-
+        formData.append("files", file);
+        formData.append("filename", file.name);
+        formData.append("originalname", file.name);
+        formData.append("contentType", file.type);
+        formData.append("DocEmail", Email);
+        formData.append("docFileType", "License");
       }
-      
+
       try {
-        const response = await api.post(`/doctor/uploadLicense`, formData);
-  
+        await uploadLisence(formData);
       } catch (error) {
-        console.error('Error uploading files:', error);
+        console.error("Error uploading files:", error);
       }
-    }
-    else{
-        message.error("Please select file(s) to upload!")
+    } else {
+      message.error("Please select file(s) to upload!");
     }
   };
 
-  const uploadDegree = async() =>{
-  if (degreeFile) {
+  const uploadDegree = async () => {
+    if (degreeFile) {
       const formData = new FormData();
-  
-        const file = degreeFile[0];
-  
-        formData.append('file', file); 
-        formData.append('filename', file.name); 
-        formData.append('originalname', file.name); 
-       formData.append('contentType', file.type); 
-       formData.append('DocEmail', Email);
-       formData.append('docFileType', 'Degree');
 
+      const file = degreeFile[0];
 
-      
-      
+      formData.append("file", file);
+      formData.append("filename", file.name);
+      formData.append("originalname", file.name);
+      formData.append("contentType", file.type);
+      formData.append("DocEmail", Email);
+      formData.append("docFileType", "Degree");
+
       try {
-        const response = await api.post(`/doctor/uploadMedicalDegree`, formData);
-  
+        const response = uploadMedicalDegree(formData);
       } catch (error) {
-        console.error('Error uploading files:', error);
+        console.error("Error uploading files:", error);
       }
-    }
-    else{
-        message.error("Please select file(s) to upload!")
+    } else {
+      message.error("Please select file(s) to upload!");
     }
   };
-  
-  
-  const uploadPersonalID = async()=>{
 
+  const uploadPersonalID = async () => {
     if (personalIDFile) {
       const formData = new FormData();
-        const file = personalIDFile[0];
-  
-        formData.append('file', file); 
-        formData.append('filename', file.name); 
-        formData.append('originalname', file.name); 
-       formData.append('contentType', file.type); 
-       formData.append('DocEmail', Email);
-       formData.append('docFileType', 'PersonalID');
+      const file = personalIDFile[0];
 
+      formData.append("file", file);
+      formData.append("filename", file.name);
+      formData.append("originalname", file.name);
+      formData.append("contentType", file.type);
+      formData.append("DocEmail", Email);
+      formData.append("docFileType", "PersonalID");
 
-      
-      
       try {
-        const response = await api.post(`/doctor/uploadPersonalID`, formData);
-  
+        const response = await uploadPersonalIdDoctor(formData);
       } catch (error) {
-        console.error('Error uploading files:', error);
+        console.error("Error uploading files:", error);
       }
-    }
-    else{
-        message.error("Please select file(s) to upload!")
+    } else {
+      message.error("Please select file(s) to upload!");
     }
   };
 
@@ -332,9 +311,6 @@ function RegisterDoctor() {
               </div>
             </li>
           </ul>
-         
-
-
         </div>
 
         <div className="form_wrap">
@@ -437,11 +413,8 @@ function RegisterDoctor() {
                 </div>
               </div>
             </form>
-            
           </div>
         </div>
-
-
 
         <div className="form_wrap">
           <div
@@ -484,13 +457,8 @@ function RegisterDoctor() {
                     required={true}
                   />
                 </div>
-               
-                
-           
-           </div>
-
+              </div>
             </form>
-            
           </div>
         </div>
 
@@ -503,36 +471,55 @@ function RegisterDoctor() {
             <h2>{"Upload Your Documents"}</h2>
             <form>
               <div className="form_container">
-              <div key="4" className="input_wrap">
-              <div className="input_wrap">
-               <label style={{fontSize: 16, fontFamily: "Open Sans"}}>
-                   <strong>Personal ID:</strong>
-               <input type="file" accept=".pdf, .jpeg, .jpg, .png" onChange={personalIDFileChange} />
-             </label>
-            </div>
+                <div key="4" className="input_wrap">
+                  <div className="input_wrap">
+                    <label style={{ fontSize: 16, fontFamily: "Open Sans" }}>
+                      <strong>Personal ID:</strong>
+                      <input
+                        type="file"
+                        accept=".pdf, .jpeg, .jpg, .png"
+                        onChange={personalIDFileChange}
+                      />
+                    </label>
+                  </div>
 
-            <div style={{ margin: '30px' }} />
+                  <div style={{ margin: "30px" }} />
 
-           <div className="input_wrap">
-            <label style={{fontSize: 16, fontFamily: "Open Sans"}}>
-          <strong>Medical License(s):</strong>
-          <input type="file" accept=".pdf, .jpeg, .jpg, .png"  onChange={licensesFileChange} multiple />
-        </label>
-     </div>
+                  <div className="input_wrap">
+                    <label style={{ fontSize: 16, fontFamily: "Open Sans" }}>
+                      <strong>Medical License(s):</strong>
+                      <input
+                        type="file"
+                        accept=".pdf, .jpeg, .jpg, .png"
+                        onChange={licensesFileChange}
+                        multiple
+                      />
+                    </label>
+                  </div>
 
-     <div style={{ margin: '30px' }} />
+                  <div style={{ margin: "30px" }} />
 
-      <div className="input_wrap">
-      <label style={{fontSize: 16, fontFamily: "Open Sans", marginRight: 50}}>
-          <strong>Degree:</strong>
-          <input type="file" accept=".pdf, .jpeg, .jpg, .png" onChange={degreeFileChange}  />
-        </label>
-      </div>
+                  <div className="input_wrap">
+                    <label
+                      style={{
+                        fontSize: 16,
+                        fontFamily: "Open Sans",
+                        marginRight: 50,
+                      }}
+                    >
+                      <strong>Degree:</strong>
+                      <input
+                        type="file"
+                        accept=".pdf, .jpeg, .jpg, .png"
+                        onChange={degreeFileChange}
+                      />
+                    </label>
+                  </div>
                 </div>
-                </div>
-                </form>
-                </div>
-                </div>
+              </div>
+            </form>
+          </div>
+        </div>
 
         <div className="btns_wrap" style={{ marginTop: 20 }}>
           <div className={`common_btns form_${activeForm}_btns`}>

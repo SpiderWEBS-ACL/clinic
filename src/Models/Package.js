@@ -21,7 +21,12 @@ const packageSchema = new Schema({
     FamilyDiscount: {
         type: Number,
         required: true,
-    }
+    },
+    FamilyPrice: {
+        type: Number,
+        default: function () {
+            return this.SubscriptionPrice * (1 - this.FamilyDiscount/100);
+        }},
 
 }, { timestamps: true });
 

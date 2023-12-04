@@ -1,11 +1,18 @@
 const express = require("express");
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
 const cors = require('cors');
 require('dotenv').config();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const packageModel = require("./Models/Package");
 const path = require('path');
+const app = express();
+const http = require("http");
+const socketIo = require("socket.io");
+const server = http.createServer(app);
+const io = socketIo(server);
+app.use(cors());
+app.use(express.json())
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+const port = process.env.PORT || "8000";
+const MongoURI = process.env.ATLAS_MONGO_URI;
 
 const {
   addPatient,
@@ -60,7 +67,6 @@ const {
   uploadLicenses,
   uploadPersonalID,
   uploadMedicalDegree,
-  getDoctorTimeSlotsForDoctor,
   checkDoctorAvailablityForDoctor,
   viewPatientMedicalRecords,
   scheduleFollowUp,
@@ -120,17 +126,7 @@ const {
   changePassword,
 } = require("./controllers/loginController");
 
-require("dotenv").config();
 mongoose.set("strictQuery", false);
-const MongoURI = process.env.ATLAS_MONGO_URI;
-
-const app = express();
-app.use(cors());
-app.use(express.json())
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
-const port = process.env.PORT || "8000";
-
 // configurations
 // Mongo DB
 mongoose
@@ -139,7 +135,7 @@ mongoose
     console.log("MongoDB is now connected!");
     // Starting server
     app.listen(port, () => {
-      console.log(`Listening to requests on http://localhost:${port}`);
+      console.log(`Listening to requests on  ://localhost:${port}`);
     });
   })
   .catch((err) => console.log(err));
@@ -203,10 +199,9 @@ app.post("/doctor/checkDoctor", DoctorProtect, checkDoctorAvailablityForDoctor);
 app.get("/doctor/viewHealthRecords/:id", DoctorProtect, viewHealthRecordsDoctor);
 app.post("/doctor/addHealthRecordForPatient/:id", DoctorProtect, addHealthRecordForPatient);
 app.post("/doctor/scheduleFollowup/", DoctorProtect, scheduleFollowUp);
-app.get("/doctor/doctorTimeSlots/",DoctorProtect,getDoctorTimeSlotsForDoctor);
 app.put("/doctor/loggedInFirstTime",DoctorProtect,loggedInFirstTime);
 app.get("/doctor/viewPatientFiles/:id",DoctorProtect, viewPatientMedicalRecords);
-app.put("/doctor/getTimeSlotDate",DoctorProtect,getTimeSlotsOfDateDoctor);
+app.post("/doctor/getTimeSlotDate",DoctorProtect,getTimeSlotsOfDateDoctor);
 app.get("/doctor/getAvailableTimeSlots",DoctorProtect,getAvailableTimeSlots);
 //Patient Endpoints
 
@@ -277,11 +272,13 @@ app.get("/appointment/filterAppointment",PatientProtect, filterAppointmentPatien
 app.get("/appointment/filterAppointmentDoctor", DoctorProtect, filterAppointmentDoctor);
 
 //Subscription Endpoints
-app.post("/subscription/subscribe/:id",subscribeWithStripe);
-app.post("/subscription/subscribeWallet/:id",PatientProtect,subscribeWithWallet);
+app.post("/subscription/subscribeStripe/",PatientProtect,subscribeWithStripe);
+app.post("/subscription/subscribeWallet/",PatientProtect,subscribeWithWallet);
 app.post("/subscription/add",PatientProtect,addSubscription);
 app.delete("/subscription/deleteDuplicate/",PatientProtect,deleteOneSubscription);
 app.get("/subscription/getSubscription",PatientProtect,getSubscription);
+// app.get("/subscription/getSubscriptionFamilyMemberPrice/:id",PatientProtect,getSubscriptionPriceForFamilyMember);
+
 
 
 //Prescription Endpoints

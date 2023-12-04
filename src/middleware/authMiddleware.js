@@ -25,9 +25,7 @@ const AdminProtect = async (req,res,next) => {
 
      next();
     }catch(error){
-        console.log(error)
-        res.status(401)
-        res.status(401).json({error: "Not Authorized"});
+        return res.status(401).json({error: "Not Authorized"});
 
     }
     }
@@ -52,15 +50,12 @@ const PatientProtect = async (req,res,next) => {
 
      next();
     }catch(error){
-        console.log(error)
-        res.status(401)
-        res.status(401).json({error: "Not Authorized"});
+        return res.status(401).json({error: "Not Authorized"});
 
     }
     }
     if(!token){
-        res.status(401)
-        res.status(401).json({error: "No Token"});
+        return res.status(401).json({error: "No Token"});
     }
     }
 const DoctorProtect = async (req,res,next) => {
@@ -79,12 +74,11 @@ const DoctorProtect = async (req,res,next) => {
 
      next();
     }catch(error){
-        console.log(error)
-        res.status(401).json({error: "Not Authorized"});
+        return res.status(401).json({error: "Not Authorized"});
     }
     }
     if(!token){
-        res.status(401).json({error: "No Token"});
+        return res.status(401).json({error: "No Token"});
     }
     }
 

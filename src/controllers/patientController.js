@@ -160,8 +160,11 @@ const viewDoctorDetails = async (req, res) => {
         Name: doctor.Name,
         Email: doctor.Email,
         Specialty: doctor.Specialty,
+        HourlyRate: doctor.HourlyRate,
         Affiliation: doctor.Affiliation,
-        EducationalBackground: doctor.EducationalBackground
+        EducationalBackground: doctor.EducationalBackground,
+        Dob: doctor.Dob,
+        Username: doctor.Username,
       }
       return res.status(200).json(doctorInfo)
     }
@@ -173,8 +176,11 @@ const viewDoctorDetails = async (req, res) => {
 const viewMyPrescriptions = async (req, res) => {
   try {
     const  id  = req.user.id;
-    const prescriptions = await prescriptionModel.find({Patient: id});
-    if(!prescriptions){
+    const prescriptions = await prescriptionModel
+    .find({ Patient: id }) 
+    .populate('Doctor')
+    .exec();   
+     if(!prescriptions){
       return res.status(404).json({error: "You do not have any prescriptions yet"})
     }
     else{
@@ -270,9 +276,9 @@ const addPrescription = async (req,res) => {
 }
 
 const selectPrescription = async (req, res) =>{
-    const prescID = req.params.id;
+    const id = req.params.id;
   try {
-    const prescription = await prescriptionModel.findById(prescID);
+    const prescription = await prescriptionModel.findById(id).populate('Doctor').exec();
     if (!prescription) {
       return res.status(404).json({ error: "Prescription not found" });
     }
@@ -718,7 +724,6 @@ const getTimeSlotsOfDate = async (req, res) => {
 
     const timeSlotsUpdated = await Promise.all(timeSlots.slots.map(async (slot) => {
       let datee = `${date}T${slot}:00.000Z`;
-      console.log(datee);
       let query = {
         $and: [
           { Doctor: DoctorId },
@@ -726,7 +731,6 @@ const getTimeSlotsOfDate = async (req, res) => {
         ]
       };
       let appointment = await appointmentModel.find(query);
-      console.log(appointment)
 
       if (appointment.length === 0) {
         return slot;
@@ -783,12 +787,13 @@ const doctorDiscount = async (req, res) => {
 }
 const getAllPackagesPatient = async (req, res) => {
   try {
-    const packages = await packageModel.find({});
+    let packages = await packageModel.find({});
     return res.status(200).json(packages);
   } catch (error) {
     return res.status(500).json({ error: error.message });
-  }
+ }
 }
+
 const payAppointmentWithWallet  = async(req,res) => {
   try{
   let message = "";
@@ -840,7 +845,6 @@ const payAppointmentWithStripe = async (req,res) => {
       }],
       success_url: `${process.env.SERVER_URL}/appointment/success`,
       cancel_url: `${process.env.SERVER_URL}/patient/viewAllDoctors`,
-      
     })
     return res.json({url: session.url})
   }catch(error){
@@ -949,10 +953,14 @@ const cancelSubscription = async (req,res) => {
     }
     if(id){
       const sub = await subscriptionModel.findOne({Patient: id})
+
       await subscriptionModel.findByIdAndUpdate(sub.id,{Status: "Cancelled"});
       return res.status(200).json('Subscription cancelled successfully')
+
     }
+    return res.status(200).json("Unsubscribed");
   }
+
   catch (error) {
     return res.status(500).json({ error: error.message });
   }

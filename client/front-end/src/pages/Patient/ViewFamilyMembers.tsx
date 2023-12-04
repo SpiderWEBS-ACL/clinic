@@ -1,98 +1,65 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Spin, Modal, Input, Select, message } from "antd";
-import { Divider } from "@chakra-ui/react";
+import { Modal, Input, Select, message, Card, Avatar } from "antd";
+import { getPatientFamilyMembers } from "../../apis/Patient/Family Members/getFamilyMembers";
+import { linkFamilyMember } from "../../apis/Patient/Family Members/LinkFamilyMember";
+import { Col, Row } from "react-bootstrap";
+import { LinkOutlined } from "@ant-design/icons";
+import { FloatButton } from "antd";
+
 const ViewFamilyMembers = () => {
-  const accessToken = localStorage.getItem("accessToken");
   const { id } = useParams<{ id: string }>();
-  const [familyMembers, setFamilyMembers] = useState([]);
-  const [hasFamilyMembers, setHasFamilyMembers] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [familyMembers, setFamilyMembers] = useState<any[]>([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [emailInput, setEmailInput] = useState("");
   const [phoneInput, setPhoneInput] = useState("");
   const { Option } = Select;
   const [RelationToPatient, setRelationToPatient] = useState("Relation");
+  const { Meta } = Card;
+  const [loadingList, setLoadingList] = useState(true);
 
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
-  const config = {
-    headers: {
-      Authorization: "Bearer " + accessToken,
-    },
+  const fetchFamilyMembers = async () => {
+    const response = await getPatientFamilyMembers();
+    setFamilyMembers(response.data);
   };
+
   useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
-    };
-    api
-      .get(`/patient/viewFamilyMembers`, config)
-      .then((response) => {
-        setFamilyMembers(response.data);
-        setLoading(false);
-        setHasFamilyMembers(response.data.length > 0);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-    setLoading(false);
+    try {
+      fetchFamilyMembers();
+      setLoadingList(false);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   }, [id]);
 
-  if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
   const openModal = () => {
     setShowPopup(true);
   };
 
-  const handleFormSubmit = async() => {
+  const handleFormSubmit = async () => {
     try {
       const data = {
         emailInput,
         phoneInput,
         RelationToPatient,
       };
-
-      const headers = {
-        Authorization: "Bearer " + accessToken,
-      };
-      if ((emailInput != "" || phoneInput != "") && RelationToPatient != "Relation") {
-       await api
-          .post(`/patient/linkFamily`, data, { headers })
-          .then((response) => {
-            message.success("Family Member Linked Successfuly");
-            handleModalClose();
-          })
-          .catch((error) => {
-            message.error(`${error.response.data.error}`);
-          });
-          setLoading(true);
-          api
-      .get(`/patient/viewFamilyMembers`,  config)
-      .then((response) => {
-        setFamilyMembers(response.data);
-        setLoading(false);
-        setHasFamilyMembers(response.data.length > 0);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+      if (
+        (emailInput != "" || phoneInput != "") &&
+        RelationToPatient != "Relation"
+      ) {
+        try {
+          await linkFamilyMember(data);
+          message.success("Family Member Linked Successfuly");
+          handleModalClose();
+        } catch (error) {
+          message.error(`${error}`);
+        }
+        try {
+          fetchFamilyMembers();
+        } catch (error) {
+          console.error("Error:", error);
+        }
       } else {
         message.warning("Please fill in the fields  ");
       }
@@ -101,18 +68,12 @@ const ViewFamilyMembers = () => {
     }
   };
 
-  const handleModalClose = () => {
-    api
-      .get(`/patient/viewFamilyMembers`)
-      .then((response) => {
-        setFamilyMembers(response.data);
-        setLoading(false);
-        setHasFamilyMembers(response.data.length > 0);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-    setLoading(false);
+  const handleModalClose = async () => {
+    try {
+      fetchFamilyMembers();
+    } catch (error) {
+      console.error("Error:", error);
+    }
     setShowPopup(false);
     setSelectedOption("");
   };
@@ -122,13 +83,12 @@ const ViewFamilyMembers = () => {
       <h2 className="text-center mt-4 mb-4">
         <strong>Family Members</strong>
       </h2>
-      <button
-        className="btn btn-primary"
-        style={{ marginTop: "10px" }}
+      <FloatButton
+        icon={<LinkOutlined style={{ fontSize: 20 }} />}
+        tooltip={<div>Link a registered family member</div>}
         onClick={() => openModal()}
-      >
-        Link a registered family member
-      </button>
+        style={{ width: 75, height: 75 }}
+      />
 
       <Modal
         title="Link a Registered Family Member"
@@ -187,34 +147,64 @@ const ViewFamilyMembers = () => {
           <Option value="Daughter">Daughter</Option>
         </Select>
       </Modal>
-
-      <Divider borderColor="#052c65" borderWidth="1px" />
-
-      <table className="table">
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Name</th>
-            <th>Relation</th>
-            <th>National ID</th>
-            <th>Age</th>
-            <th>Gender</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {familyMembers.map((member: any, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{member.Name}</td>
-              <td>{member.RelationToPatient}</td>
-              <td>{member.NationalID || "N/A"}</td>
-              <td>{member.Age || "N/A"}</td>
-              <td>{member.Gender}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <tbody>
+        {familyMembers.map(
+          (member, index) =>
+            index % 3 === 0 && (
+              <Row gutter={16} key={index}>
+                {familyMembers
+                  .slice(index, index + 3)
+                  .map((member, subIndex) => (
+                    <Col span={8} key={subIndex} style={{ maxWidth: "25rem" }}>
+                      <div>
+                        <Card
+                          style={{
+                            width: "24rem",
+                            marginTop: "3rem",
+                            height: "15rem",
+                          }}
+                          loading={loadingList}
+                          hoverable
+                          className="hover-card"
+                        >
+                          <Meta
+                            avatar={
+                              <Avatar
+                                src="https://xsgames.co/randomusers/avatar.php?g=pixel"
+                                style={{ width: 75, height: 75 }}
+                              />
+                            }
+                            title={
+                              <div style={{ fontSize: "20px" }}>
+                                {member.Name}
+                              </div>
+                            }
+                            description={
+                              <div>
+                                <strong>Relation:</strong>{" "}
+                                {member.RelationToPatient}
+                                <br></br>
+                                <br></br>
+                                <strong>Age: </strong>
+                                {member.Age}
+                                <br></br>
+                                <br></br>
+                                <strong>Gender:</strong> {member.Gender}
+                                <br></br>
+                                <br></br>
+                                <strong>National ID:</strong>{" "}
+                                {member.NationalID || "N/A"}
+                              </div>
+                            }
+                          />
+                        </Card>
+                      </div>
+                    </Col>
+                  ))}
+              </Row>
+            )
+        )}
+      </tbody>
     </div>
   );
 };

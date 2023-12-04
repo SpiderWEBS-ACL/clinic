@@ -1,12 +1,9 @@
-import React, { useState, useEffect, FormEvent } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useState, FormEvent } from "react";
 import InputField from "../../components/InputField";
-import Button from "../../components/Button";
 import { message } from "antd";
+import { addPackage } from "../../apis/Admin/AddPackage";
 
 const AddPackage = () => {
-  const accessToken = localStorage.getItem("accessToken");
   const [Name, setName] = useState<string>("");
   const [SubscriptionPrice, setSubscriptionPrice] = useState<
     number | undefined
@@ -16,9 +13,6 @@ const AddPackage = () => {
     number | undefined
   >();
   const [FamilyDiscount, setFamilyDiscount] = useState<number | undefined>();
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -30,11 +24,8 @@ const AddPackage = () => {
         PharmacyDiscount,
         FamilyDiscount,
       };
-      const headers = {
-        Authorization: `Bearer ${accessToken}`,
-      };
-      const response = await api.post(`/admin/addPackage`, data, { headers });
-      console.log("Response:", response.data);
+
+      await addPackage(data);
       message.success("Package added Successfully");
     } catch (error) {
       console.error("Error:", error);

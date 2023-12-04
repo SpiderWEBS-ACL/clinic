@@ -65,7 +65,6 @@ const uploadPersonalID = async (req, res) => {
       const email = req.body.DocEmail;
       const type = req.body.docFileType;
       const file = req.file;
-      console.log(email)
 
       if (!file) {
         return res.status(400).send('No file uploaded.');
@@ -584,13 +583,11 @@ const scheduleFollowUp = async(req,res) =>{
         await newFollowup.save();
 
         const timeSlot = appDate.substring(11,19);
-        console.log(timeSlot)
         const doc = await  doctorModel.findByIdAndUpdate(
             id,
             { $pull: { AvailableTimeSlots: timeSlot}},
             { new: true }
           )
-          console.log(doc)
           
             
     
@@ -625,7 +622,6 @@ const getTimeSlotsOfDateDoctor = async (req, res) => {
 
     const timeSlotsUpdated = await Promise.all(timeSlots.slots.map(async (slot) => {
       let datee = `${date}T${slot}:00.000Z`;
-      console.log(datee);
       let query = {
         $and: [
           { Doctor: DoctorId },
@@ -633,7 +629,6 @@ const getTimeSlotsOfDateDoctor = async (req, res) => {
         ]
       };
       let appointment = await appointmentModel.find(query);
-      console.log(appointment)
 
       if (appointment.length === 0) {
         return slot;
@@ -658,7 +653,7 @@ const getAvailableTimeSlots = async(req,res) => {
   const Thursday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Thursday" })
   const Friday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Friday" })
   
-  return res.status(200).json({Saturday: Saturday.slots,Sunday:Sunday.slots,Monday:Monday.slots,Tuesday:Tuesday.slots,Wednesday:Wednesday.slots,Thursday:Thursday.slots,Friday:Friday.slots})
+  return res.status(200).json({Saturday: Saturday?.slots,Sunday:Sunday?.slots,Monday:Monday?.slots,Tuesday:Tuesday?.slots,Wednesday:Wednesday?.slots,Thursday:Thursday?.slots,Friday:Friday?.slots})
 }
 
 
@@ -682,7 +677,6 @@ module.exports = {
   uploadLicenses,
   uploadPersonalID,
   uploadMedicalDegree,
-  getDoctorTimeSlotsForDoctor,
   checkDoctorAvailablityForDoctor,
   viewPatientMedicalRecords,
   scheduleFollowUp,

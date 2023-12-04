@@ -1,33 +1,32 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import dayjs from "dayjs";
 import {
-  Button,
   DatePicker,
   DatePickerProps,
   Input,
   Modal,
   Row,
   Select,
-  TimePickerProps,
   message,
 } from "antd";
-import { Col } from "react-bootstrap";
-import { Card, Skeleton, Switch } from "antd";
+import { Card } from "antd";
 import { Avatar } from "@mui/material";
-import { DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { tr } from "date-fns/locale";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import "./StyleDoctor.css";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { green } from "@mui/material/colors";
-import FolderIcon from '@mui/icons-material/Folder';
-import { headers } from "../../Middleware/authMiddleware";
-
+import FolderIcon from "@mui/icons-material/Folder";
+import { RangePickerProps } from "antd/es/date-picker";
+import { getPatientInfoApi } from "../../apis/Doctor/Patients/GetPatientInfo";
+import { addPatientHealthRecord } from "../../apis/Doctor/Patients/AddPatientHealthRecord";
+import { getTimeSlotsAtDate } from "../../apis/Doctor/Time Slots/GetTimeSlotsAtDate";
+import { getPatientsHealthRecords } from "../../apis/Doctor/Patients/GetPatientsHealthRecords";
+import { scheduleFollowup } from "../../apis/Doctor/Patients/ScheduleFollowUp";
+import { getPatientsFiles } from "../../apis/Doctor/Patients/GetPatientsFiles";
 const ViewPatientInfo = () => {
   const { id } = useParams<{ id: string }>();
-  const accessToken = localStorage.getItem("accessToken");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [Message, setMessage] = useState("");
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [isFamilyMembersModalOpen, setIsFamilyMembersModalOpen] =
     useState(false);
@@ -39,33 +38,21 @@ const ViewPatientInfo = () => {
   const [AppointmentTime, setAppointmentTime] = useState<any>();
   const [AppointmentDate, setAppointmentDate] = useState("");
   const [showDateTimeModal, setShowDateTimeModal] = useState(false);
-  const [activeTabKey1, setActiveTabKey1] = useState<string>('tab1');
+  const [activeTabKey1, setActiveTabKey1] = useState<string>("tab1");
   const [patientFiles, setPatientFiles] = useState<any[]>([]);
-
   const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
-
   const [patientInfo, setPatientInfo] = useState<any>({});
-
   const { TextArea } = Input;
   const { Meta } = Card;
-  const config = {
-    headers: {
-      Authorization: "Bearer " + accessToken,
-    },
-  };
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
+  const navigate = useNavigate();
 
   useEffect(() => {
     getPatientInfo();
   }, [id]);
 
   const getPatientInfo = async () => {
-    await api
-      .get(`/doctor/viewPatientInfo/${id}`, config)
+    await getPatientInfoApi(id)
       .then((response) => {
-        console.log(response.data);
         setPatientInfo(response.data);
         setLoadingList(false);
       })
@@ -75,12 +62,12 @@ const ViewPatientInfo = () => {
   };
   const tabList = [
     {
-      key: 'tab1',
-      tab: 'Health Records',
+      key: "tab1",
+      tab: "Health Records",
     },
     {
-      key: 'tab2',
-      tab: 'Medical History',
+      key: "tab2",
+      tab: "Medical History",
     },
   ];
 
@@ -97,24 +84,13 @@ const ViewPatientInfo = () => {
       setIsModalOpen(false);
       message.success("Health record added");
 
-      const response = await api.post(
-        `/doctor/addHealthRecordForPatient/${id}`,
-        data,
-        config
-      );
+      await addPatientHealthRecord(id, data);
     } else {
       message.error("Please enter required fields");
     }
   };
-  const setTimeSlotsApi = (date: string) => {
-    api
-      .post(
-        "patient/getTimeSlotsDoctorDate",
-        {
-          date: date,
-        },
-        { headers: headers }
-      )
+  const setTimeSlotsApi = async (date: string) => {
+    await getTimeSlotsAtDate(date)
       .then((response) => {
         setTimeSlotsDoctor(response.data);
       })
@@ -127,33 +103,8 @@ const ViewPatientInfo = () => {
     dateString
   ) => {
     setAppointmentDate(dateString);
+    setAppointmentTime("");
     setTimeSlotsApi(dateString);
-    setMessage("");
-    console.log(dateString);
-  };
-
-  const handleCheckAvailability = () => {
-    if (AppointmentDate && AppointmentTime) {
-      api
-        .post(
-          "doctor/checkDoctor",
-          {
-            Date: AppointmentDate,
-            Time: AppointmentTime,
-          },
-          config
-        )
-        .then((response) => {
-          setMessage(response.data.message);
-          if (response.data.message === "available") {
-            message.success("Available");
-          } else {
-            message.error("You are not available at this time");
-          }
-        });
-    } else {
-      message.error("Please enter required fields");
-    }
   };
   const schedule = async () => {
     setShowDateTimeModal(true);
@@ -161,8 +112,6 @@ const ViewPatientInfo = () => {
 
   const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
     setAppointmentTime(selectedTimeSlot);
-    setMessage("");
-    console.log(selectedTimeSlot);
   };
   const handleOk2 = async () => {
     setIsModalOpen2(false);
@@ -191,34 +140,27 @@ const ViewPatientInfo = () => {
   const handleHealth = async () => {
     setLoadingHealth(true);
     setIsModalOpen2(true);
-    const response = await api.get(`/doctor/viewHealthRecords/${id}`, config);
-      setHealthRecords(response.data);
-      setLoadingHealth(false);
-   
+    const response = await getPatientsHealthRecords(id);
+    setHealthRecords(response.data);
+    setLoadingHealth(false);
   };
   const handleFamilyMembers = async () => {
     setIsFamilyMembersModalOpen(true);
   };
   const followup = async () => {
-    const date = AppointmentDate.concat("T" + AppointmentTime + ".000" + "Z");
-    const response = await api.post(
-      `/doctor/scheduleFollowup/`,
-      {
-        Patient: id,
-        appDate: date,
-        followUp: true,
-        status: "Upcoming",
-      },
-      config
+    const date = AppointmentDate.concat(
+      "T" + AppointmentTime + ":00.000" + "Z"
     );
+    await scheduleFollowup(id, date);
+    message.success("Appointment Booked Successfully!");
+    navigate("/doctor/allAppointments");
     setShowDateTimeModal(false);
     setAppointmentTime("");
     setAppointmentDate("");
   };
   const getFiles = async () => {
     try {
-      const response = await api.get(`/doctor/viewPatientFiles/${id}`, config);
-      console.log(response)
+      const response = await getPatientsFiles(id);
       if (response.data) {
         setPatientFiles(response.data);
         setLoadingHealth(false);
@@ -232,102 +174,104 @@ const ViewPatientInfo = () => {
   };
   const onTab1Change = (key: string) => {
     setActiveTabKey1(key);
-    if(key=="tab2"){
+    if (key == "tab2") {
       setLoadingHealth(true);
       getFiles();
-
     }
   };
   const viewFiles = (filename: String) => {
-
     const pdfPath = `http://localhost:8000/uploads/${filename}`;
 
-    window.open(pdfPath, '_blank');
-  }
-  const contentList : Record<string, React.ReactNode> = {
+    window.open(pdfPath, "_blank");
+  };
+  const contentList: Record<string, React.ReactNode> = {
     tab1: (
       <p>
-          <div style={{ maxHeight: '230px', overflowY: 'auto' }}>
-
-        {healthRecords.map((record, index) => (
-          <div
-            key={index}
-            style={{
-              display: "flex",
-              borderBottom: "0.5px solid #333",
-              paddingBottom: "10px",
-              marginTop: 20
-            }}
-          >
-            <Avatar sx={{ bgcolor: green[500]}}>
-              <AssignmentIcon />
-            </Avatar>
-            <div style={{ marginLeft: "20px", flex: 1 }}>
-              
-              <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
-                <p>
-                  <strong>Type: </strong>
-                  {record.Type}
-                </p>
-                <p>
-                  <strong>Description: </strong>
-                  {record.Description}
-                </p>
+        <div style={{ maxHeight: "230px", overflowY: "auto" }}>
+          {healthRecords.map((record, index) => (
+            <div
+              key={index}
+              style={{
+                display: "flex",
+                borderBottom: "0.5px solid #333",
+                paddingBottom: "10px",
+                marginTop: 20,
+              }}
+            >
+              <Avatar sx={{ bgcolor: green[500] }}>
+                <AssignmentIcon />
+              </Avatar>
+              <div style={{ marginLeft: "20px", flex: 1 }}>
+                <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
+                  <p>
+                    <strong>Type: </strong>
+                    {record.Type}
+                  </p>
+                  <p>
+                    <strong>Description: </strong>
+                    {record.Description}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
         </div>
       </p>
     ),
-    tab2: <p>
-                <div style={{ maxHeight: '230px', overflowY: 'auto' }}>
-
-       {patientFiles.map((file, index) => (
-<div
-    style={{
-      display: "flex",
-      borderBottom: "0.5px solid #333",
-      paddingBottom: "10px",
-      marginTop: 20
-    }}
-  >
-   <Avatar>
-                  
-                    <FolderIcon />
-                  </Avatar>
-                  <div style={{ marginLeft: "20px", flex: 1 }}>
-                  <div style={{ fontSize: "15px", lineHeight: "1.5", display: "flex", justifyContent: "space-between" } }  >
+    tab2: (
+      <p>
+        <div style={{ maxHeight: "230px", overflowY: "auto" }}>
+          {patientFiles.map((file, index) => (
+            <div
+              style={{
+                display: "flex",
+                borderBottom: "0.5px solid #333",
+                paddingBottom: "10px",
+                marginTop: 20,
+              }}
+            >
+              <Avatar>
+                <FolderIcon />
+              </Avatar>
+              <div style={{ marginLeft: "20px", flex: 1 }}>
+                <div
+                  style={{
+                    fontSize: "15px",
+                    lineHeight: "1.5",
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <div onClick={() => viewFiles(file.filename)}>
-
-    <div>
-      
-      <p>
-        
-        <strong>File Name: </strong>
-        {file.filename}
+                    <div>
+                      <p>
+                        <strong>File Name: </strong>
+                        {file.filename}
+                      </p>
+                      <p>
+                        <strong>Type: </strong>
+                        {file.contentType === "application/pdf"
+                          ? "PDF"
+                          : file.contentType ||
+                            file.contentType === "application/png"
+                          ? "PNG"
+                          : file.contentType}
+                      </p>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex" }}></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </p>
-      <p>
-        <strong>Type: </strong>
-        {file.contentType === "application/pdf" ? "PDF" : file.contentType|| file.contentType === "application/png" ? "PNG" :file.contentType}
-      </p>
-    </div>
-    </div>
-    <div style={{ display: "flex" }}>
-       </div>
- 
-
-  </div>
-</div>
-
-  </div>
-       ))}
-       
-  </div>
-  
-  </p>,
+    ),
   };
-  
+  const disabledDate: RangePickerProps["disabledDate"] = (current) => {
+    return current && current < dayjs().startOf("day");
+  };
+
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
@@ -345,7 +289,6 @@ const ViewPatientInfo = () => {
         hoverable
         className="hover-card"
       >
-        
         <div
           style={{
             display: "flex",
@@ -362,38 +305,38 @@ const ViewPatientInfo = () => {
               {patientInfo.Name}
             </div>
             <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
-                <strong>Email: </strong>
-                {patientInfo.Email}
-             <br></br>
-             <br></br>
+              <strong>Email: </strong>
+              {patientInfo.Email}
+              <br></br>
+              <br></br>
 
-                <strong>Date of birth: </strong>
-                {String(patientInfo.Dob).substring(0, 10)}
-                <br></br>
-             <br></br>
+              <strong>Date of birth: </strong>
+              {String(patientInfo.Dob).substring(0, 10)}
+              <br></br>
+              <br></br>
 
-                <strong>Gender: </strong>
-                {patientInfo.Gender}
-                <br></br>
-             <br></br>
+              <strong>Gender: </strong>
+              {patientInfo.Gender}
+              <br></br>
+              <br></br>
 
-                <strong>Mobile: </strong>
-                {patientInfo.Mobile}
-                <br></br>
-             <br></br>
+              <strong>Mobile: </strong>
+              {patientInfo.Mobile}
+              <br></br>
+              <br></br>
 
-                <strong>Age: </strong>
-                {age}
-                <br></br>
-             <br></br>
+              <strong>Age: </strong>
+              {age}
+              <br></br>
+              <br></br>
 
-                <strong>Health Records: </strong>
-                <InfoCircleOutlined onClick={handleHealth} />
-                <br></br>
-             <br></br>
+              <strong>Health Records: </strong>
+              <InfoCircleOutlined onClick={handleHealth} />
+              <br></br>
+              <br></br>
 
-                <strong>Family Members: </strong>
-                <InfoCircleOutlined onClick={handleFamilyMembers} />
+              <strong>Family Members: </strong>
+              <InfoCircleOutlined onClick={handleFamilyMembers} />
             </div>
           </div>
         </div>
@@ -420,7 +363,6 @@ const ViewPatientInfo = () => {
             Schedule a follow up
           </button>
         </Row>
-        
       </Card>
 
       <Modal
@@ -429,7 +371,7 @@ const ViewPatientInfo = () => {
         onOk={handleOk}
         onCancel={handleCancel}
         width={500}
-        style={{ height: "900px"}}
+        style={{ height: "900px" }}
       >
         <p>
           <Select
@@ -465,39 +407,24 @@ const ViewPatientInfo = () => {
         width={600}
       >
         {" "}
-          <div>
-            <Card
-        tabList={tabList}
-        
-        style={{ height: 350, width: 500, marginTop: 16 }}
-        loading={loadingHealth}
-        bodyStyle={{height: "380px" ,maxHeight: "300px", overflowY: "auto" }}
-        hoverable
-        className="hover-card"
-        activeTabKey={activeTabKey1}
-        onTabChange={onTab1Change}
-        
-      >
-                {contentList[activeTabKey1]}
-
-</Card>
-      {/* </Card>
-            <Card
-              loading={loadingHealth}
-              className="hover-card"
-            >
-              <Meta
-                avatar={
-                  <Avatar sx={{ bgcolor: green[500] }}>
-                    {" "}
-                    <AssignmentIcon />{" "}
-                  </Avatar>
-                }
-                title={"Type: " + record.Type}
-                description={"Description: " + record.Description}
-              />
-            </Card> */}
-          </div>
+        <div>
+          <Card
+            tabList={tabList}
+            style={{ height: 350, width: 500, marginTop: 16 }}
+            loading={loadingHealth}
+            bodyStyle={{
+              height: "380px",
+              maxHeight: "300px",
+              overflowY: "auto",
+            }}
+            hoverable
+            className="hover-card"
+            activeTabKey={activeTabKey1}
+            onTabChange={onTab1Change}
+          >
+            {contentList[activeTabKey1]}
+          </Card>
+        </div>
       </Modal>
       <Modal
         title={patientInfo.Name + "'s Family Members"}
@@ -509,8 +436,7 @@ const ViewPatientInfo = () => {
           setIsFamilyMembersModalOpen(false);
         }}
         width={500}
-        bodyStyle={{maxHeight: "400px", overflowY: "auto" }}
-
+        bodyStyle={{ maxHeight: "400px", overflowY: "auto" }}
       >
         {" "}
         {patientInfo.FamilyMembers?.map((member: any) => (
@@ -523,7 +449,6 @@ const ViewPatientInfo = () => {
               <Meta
                 avatar={<Avatar style={{ width: 100, height: 100 }} />}
                 title={member.Name}
-                
                 description={`${member.RelationToPatient}: ${member.Age} Years old`}
               />
             </Card>
@@ -536,11 +461,11 @@ const ViewPatientInfo = () => {
         visible={showDateTimeModal}
         onCancel={() => {
           setShowDateTimeModal(false);
-          setMessage("");
         }}
         footer={null}
       >
         <DatePicker
+          disabledDate={disabledDate}
           onChange={onAppointmentDateChange}
           style={{ width: 150, marginRight: 30 }}
         />
@@ -561,20 +486,6 @@ const ViewPatientInfo = () => {
             }))}
           />
         </Select>
-
-        <button
-          className="btn btn-sm btn-primary"
-          style={{
-            marginBlock: "1rem",
-            padding: "4px 8px",
-            fontSize: "12px",
-            borderRadius: "5px",
-          }}
-          onClick={() => handleCheckAvailability()}
-        >
-          <span aria-hidden="true"></span>
-          Check Availability
-        </button>
         <button
           className="btn btn-sm btn-success"
           style={{
@@ -584,7 +495,7 @@ const ViewPatientInfo = () => {
             fontSize: "12px",
             borderRadius: "5px",
           }}
-          disabled={Message === "available" ? false : true}
+          disabled={AppointmentDate == "" || AppointmentTime == ""}
           onClick={followup}
         >
           <span aria-hidden="true"></span>

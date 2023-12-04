@@ -11,10 +11,10 @@ const timeSlotSchema = new Schema({
     type: String,
     required: true
   },
-  slots:[ {
-    type: String,
-    required: true,
-  }],
+  slots: {
+    type: [String],
+    default: [],  
+  },
 });
 
 const TimeSlot = mongoose.model('TimeSlot', timeSlotSchema);

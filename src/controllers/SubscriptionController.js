@@ -9,7 +9,6 @@ const subscribeWithStripe = async (req,res) => {
   try {
     const { packageId } = req.body; 
     const package = await packageModel.findById(packageId);
-    console.log(package);
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment', //or subscription
@@ -34,8 +33,6 @@ const subscribeWithWallet = async (req,res) => {
   try {
     const { packageId } = req.body; 
     const package = await packageModel.findById(packageId);
-    console.log(package);
-    console.log(req.user);
     if(req.user.WalletBalance >= package.SubscriptionPrice)
       var updatePatient = await patientModel.findByIdAndUpdate(req.user.id, {WalletBalance: req.user.WalletBalance - package.SubscriptionPrice} )
     else
@@ -48,7 +45,6 @@ const subscribeWithWallet = async (req,res) => {
 
 const addSubscription = async (req, res) => {
     try {
-      console.log("Here");
       const { packageId } = req.body;
       const subscribedAlready = await subscriptionModel.findOne({Patient: req.user.id}) 
       if(subscribedAlready)

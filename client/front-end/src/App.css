@@ -12,6 +12,9 @@
     color: #dc3545;
     font-size: 0.875rem;
   }
-
+h2, .mb-4 {
+  font-family: "Public Sans";
+  color: #1890ff;
+}
 
   

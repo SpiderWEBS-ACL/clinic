@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { Spin } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
-import { config, headers } from "../../Middleware/authMiddleware";
+import { useNavigate } from "react-router-dom";
 import { validatePassword } from "../../utils/ValidationUtils";
 import Alert from "../../components/Alert";
 import IconButton from "@material-ui/core/IconButton";
@@ -11,10 +9,9 @@ import Visibility from "@material-ui/icons/Visibility";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import Input from "@material-ui/core/Input";
+import { changePasswordDoctor } from "../../apis/Doctor/ChangePasswordDoctor";
 
 const ChangePassword = () => {
-  const accessToken = localStorage.getItem("accessToken");
-  // const id = localStorage.getItem("id");
   const [currPass, setCurrPass] = useState<string>("");
   const [newPass, setNewPass] = useState<string>("");
   const [newPassConfirm, setNewPassConfirm] = useState<string>("");
@@ -25,11 +22,6 @@ const ChangePassword = () => {
   const [alertVisible, setAlertVisibility] = useState(false);
 
   const navigate = useNavigate();
-
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,10 +47,7 @@ const ChangePassword = () => {
     };
 
     try {
-      const response = await api.put("/doctor/changePassword", data, {
-        headers: headers,
-      });
-      console.log("Response:", response.data);
+      await changePasswordDoctor(data);
       setError(null);
 
       //logout
@@ -76,9 +65,8 @@ const ChangePassword = () => {
       }
     }
     setAlertVisibility(true);
-
   };
-  
+
   return (
     <div
       style={{
@@ -91,7 +79,7 @@ const ChangePassword = () => {
       <div>
         <h1 className="text-center mt-4 mb-4">Change Password</h1>
         <br />
-        <form onSubmit={handleSubmit} >
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
             <div className="input-container">
               <InputLabel htmlFor="standard-adornment-password">
@@ -123,10 +111,10 @@ const ChangePassword = () => {
           <br />
 
           <div className="form-group">
-          <div className="input-container">
-            <InputLabel htmlFor="standard-adornment-password">
-              New Password
-            </InputLabel>
+            <div className="input-container">
+              <InputLabel htmlFor="standard-adornment-password">
+                New Password
+              </InputLabel>
               <Input
                 type={showNewPass ? "text" : "password"}
                 onChange={(e) => {
@@ -148,8 +136,17 @@ const ChangePassword = () => {
               />
               {!validatePassword(newPass) && (
                 <div className="text-danger" style={{ textAlign: "left" }}>
-                  <small>Password must be at least 6 characters long and contain at least </small><br />
-                    <small><b>one uppercase letter, one lowercase letter, and one digit</b> </small><br />
+                  <small>
+                    Password must be at least 6 characters long and contain at
+                    least{" "}
+                  </small>
+                  <br />
+                  <small>
+                    <b>
+                      one uppercase letter, one lowercase letter, and one digit
+                    </b>{" "}
+                  </small>
+                  <br />
                 </div>
               )}
             </div>
@@ -157,10 +154,10 @@ const ChangePassword = () => {
           <br />
 
           <div className="form-group">
-          <div className="input-container">
-            <InputLabel htmlFor="standard-adornment-password">
-              Confirm New Password
-            </InputLabel>
+            <div className="input-container">
+              <InputLabel htmlFor="standard-adornment-password">
+                Confirm New Password
+              </InputLabel>
               <Input
                 type={showNewPassConfirm ? "text" : "password"}
                 onChange={(e) => {
@@ -181,7 +178,7 @@ const ChangePassword = () => {
                 style={{ width: "300px" }}
               />
             </div>
-          </div>   
+          </div>
           <br />
           <br />
           <div
@@ -200,10 +197,9 @@ const ChangePassword = () => {
             </button>
           </div>
           <br />
-          
         </form>
-        <div> 
-        {alertVisible && (
+        <div>
+          {alertVisible && (
             <Alert
               type={error ? "danger" : "success"}
               onClose={() => setAlertVisibility(false)}
@@ -213,8 +209,6 @@ const ChangePassword = () => {
           )}
         </div>
       </div>
-  
-      
     </div>
   );
 };
