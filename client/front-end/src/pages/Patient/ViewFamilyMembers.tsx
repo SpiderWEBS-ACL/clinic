@@ -80,9 +80,7 @@ const ViewFamilyMembers = () => {
 
   return (
     <div className="container">
-      <h2 className="text-center mt-4 mb-4">
-        <strong>Family Members</strong>
-      </h2>
+      <h2 className="text-center mt-4 mb-4">Family Members</h2>
       <FloatButton
         icon={<LinkOutlined style={{ fontSize: 20 }} />}
         tooltip={<div>Link a registered family member</div>}

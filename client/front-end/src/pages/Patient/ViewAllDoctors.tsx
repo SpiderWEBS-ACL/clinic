@@ -30,7 +30,7 @@ import { getTimeSlotsDoctorDate } from "../../apis/Patient/Doctors/GetTimeSlotsD
 const { Option } = Select;
 
 const ViewAllDoctors = () => {
-  const [Doctors, setDoctors] = useState<any[]>([])
+  const [Doctors, setDoctors] = useState<any[]>([]);
   const [AllDoctors, setAllDoctors] = useState([]);
   const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -105,7 +105,6 @@ const ViewAllDoctors = () => {
   };
 
   useEffect(() => {
-
     const fetchData = async () => {
       getFamilyMembers();
       getAllDoctors();
@@ -114,7 +113,7 @@ const ViewAllDoctors = () => {
     fetchData();
     setLoadingList(false);
   }, []);
-  
+
   const redirectToStripe = async () => {
     try {
       try {
@@ -220,7 +219,6 @@ const ViewAllDoctors = () => {
     setTime("");
     setDoctors(AllDoctors);
     setLoadingList(false);
-
   };
 
   const getBalanceApi = async () => {
@@ -252,12 +250,9 @@ const ViewAllDoctors = () => {
     setShowPaymentModal(false);
   };
 
-
   return (
     <div className="container">
-      <h2 className="text-center mt-4 mb-4">
-        <strong>Doctors</strong>
-      </h2>
+      <h2 className="text-center mt-4 mb-4">Doctors</h2>
       <div className="mb-3">
         <span>
           <label style={{ marginRight: 8, marginLeft: 10 }}>

@@ -24,7 +24,8 @@
     "vite": "^4.4.11"
   },
   "scripts": {
-    "start": "nodemon ./src/server.js"
+    "start": "nodemon ./src/server.js",
+    "startVideo": "nodemon ./src/videoChatServer.js"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.246"

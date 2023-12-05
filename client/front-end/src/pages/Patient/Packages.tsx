@@ -143,9 +143,7 @@ const AllPackagesPatient = () => {
   };
   return (
     <div className="container">
-      <h2 className="text-center mt-4 mb-4">
-        <strong>Health Packages</strong>
-      </h2>
+      <h2 className="text-center mt-4 mb-4">Health Package</h2>
 
       <tbody>
         {Packages.map(

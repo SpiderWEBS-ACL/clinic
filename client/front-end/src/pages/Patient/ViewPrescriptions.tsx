@@ -1,15 +1,19 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
-import axios from "axios";
-import { set, setDate } from "date-fns";
+import { useState, useEffect, ChangeEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {  Card, DatePicker, DatePickerProps, Input, Select, message } from "antd";
+import {
+  Card,
+  DatePicker,
+  DatePickerProps,
+  Input,
+  Select,
+  message,
+} from "antd";
 import "./error-box.css";
 import { getMyPrescription } from "../../apis/Patient/Prescriptions/GetMyPrescription";
 import { filterPrescriptions } from "../../apis/Patient/Prescriptions/FilterPrescriptions";
 import { getSelectedPrescription } from "../../apis/Patient/Prescriptions/GetSelectedPrescription";
 import { Col, Row } from "react-bootstrap";
 import { ArrowRightOutlined } from "@ant-design/icons";
-import FolderIcon from '@mui/icons-material/Folder';
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { Avatar } from "@mui/material";
 import { green } from "@mui/material/colors";
@@ -75,23 +79,14 @@ const ViewPrescriptions = () => {
   };
 
   const clearFilter = async () => {
-    setLoadingList(true)
+    setLoadingList(true);
     try {
       const response = await getMyPrescription();
       setDoctor("");
       setFilled("");
       setError(false);
       setPrescriptions(response.data);
-      setLoadingList(false)
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  const viewDetails = async (prescId: String) => {
-    try {
-      const response = await getSelectedPrescription(prescId);
-      setShowPopup(true);
-      setSelectedPrescription(response.data);
+      setLoadingList(false);
     } catch (error) {
       console.error(error);
     }
@@ -104,9 +99,7 @@ const ViewPrescriptions = () => {
 
   return (
     <div className="container">
-      <h2 className="text-center mt-4 mb-4">
-        <strong>Prescriptions</strong>
-      </h2>
+      <h2 className="text-center mt-4 mb-4">Prescriptions</h2>
       <span>
         <label style={{ marginRight: 4, marginBottom: 20 }}>
           <strong>Doctor Name:</strong>
@@ -162,65 +155,55 @@ const ViewPrescriptions = () => {
           (presc, index) =>
             index % 3 === 0 && (
               <Row gutter={16} key={index}>
-                {prescriptions.slice(index, index + 3).map((presc, subIndex) => (
-                  <Col span={8} key={subIndex} style={{maxWidth: "27rem"}}>
-                    <div>
-                      <Card
-                        style={{
-                          width: "25rem",
-                          marginTop: "3rem",
-                          height: "12rem",
-                          
-                        }}
-                        loading={loadingList}
-                        hoverable
-                        className="hover-card"
-                      onClick={() => handleRedirection(presc._id)}
-                      >
-                        <Meta
-                          avatar={
-                            <Avatar sx={{ bgcolor: green[500]}}>
-                            <AssignmentIcon />
-                          </Avatar>
-                          }
-                          title={
-                            <div style={{ fontSize: "20px" }}>
-                              Prescription #{subIndex + 1}
-                            </div>
-                          }
-                          description={
-                            <div>
-
+                {prescriptions
+                  .slice(index, index + 3)
+                  .map((presc, subIndex) => (
+                    <Col span={8} key={subIndex} style={{ maxWidth: "27rem" }}>
+                      <div>
+                        <Card
+                          style={{
+                            width: "25rem",
+                            marginTop: "3rem",
+                            height: "12rem",
+                          }}
+                          loading={loadingList}
+                          hoverable
+                          className="hover-card"
+                          onClick={() => handleRedirection(presc._id)}
+                        >
+                          <Meta
+                            avatar={
+                              <Avatar sx={{ bgcolor: green[500] }}>
+                                <AssignmentIcon />
+                              </Avatar>
+                            }
+                            title={
+                              <div style={{ fontSize: "20px" }}>
+                                Prescription #{subIndex + 1}
+                              </div>
+                            }
+                            description={
+                              <div>
                                 <strong>By Doctor: </strong> {presc.Doctor.Name}
-                              
                                 <br></br>
                                 <br></br>
-
                                 <strong>Date: </strong> {presc.Date}
-                              
-                              <br></br>
-                              <br></br>
-                              
-
-                     
-                                 
-                                 <ArrowRightOutlined style={{marginLeft:"13rem"}}></ArrowRightOutlined>
-          
-                                              </div>
-                          }
-                        />
-                      </Card>
-                    </div>
-                  </Col>
-                ))}
+                                <br></br>
+                                <br></br>
+                                <ArrowRightOutlined
+                                  style={{ marginLeft: "13rem" }}
+                                ></ArrowRightOutlined>
+                              </div>
+                            }
+                          />
+                        </Card>
+                      </div>
+                    </Col>
+                  ))}
               </Row>
             )
         )}
       </tbody>
-    
-
-         
-      
     </div>
   );
 };

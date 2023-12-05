@@ -13,24 +13,23 @@ const prescriptionSchema = new Schema(
       ref: "Patient",
       required: true,
     },
-    Medication: {
+    Medications: [
+      {Medicine: {
         type: String,
-        required: true,
-    },
-    Dosage: {
+      },
+      Dosage: {
         type: Number,
-        required: true,
       },
-    Instructions: {
+      Instructions: {
         type: String,
-        required: true,
-      },
+      }}],
       Date: {
         type: Date,
         default: Date.now,
       },
       Filled: {
         type: String,
+        default: "Unfilled",
         //enum: ["Filled,Unfilled"]
       }
   },
