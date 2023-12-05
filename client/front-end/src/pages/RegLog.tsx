@@ -139,6 +139,7 @@ const RegLog: React.FC = () => {
 
   const handleRedirection = (item: any) => {
     if (item.type == "Patient") {
+      
       navigate(`/patient/Home`);
     } else if (item.type == "Doctor" && item.user.FirstTime == true) {
       navigate(`/doctor/timeSlots`);

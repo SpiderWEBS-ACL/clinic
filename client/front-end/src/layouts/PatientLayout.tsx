@@ -14,12 +14,9 @@ import {
   PoweroffOutlined,
   WalletOutlined,
   CalendarOutlined,
-  SettingOutlined,
 } from "@ant-design/icons";
 import AppRouter from "../AppRouter";
 import {
-  IoPeople,
-  IoPeopleCircleOutline,
   IoPeopleOutline,
 } from "react-icons/io5";
 

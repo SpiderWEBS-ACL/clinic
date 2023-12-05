@@ -85,9 +85,7 @@ const ViewPatientAppointments = () => {
 
   return (
     <div className="container">
-      <h2 className="text-center mt-4 mb-4">
-        <strong>Appointments</strong>
-      </h2>
+      <h2 className="text-center mt-4 mb-4">Appointments</h2>
 
       <span>
         <label style={{ marginLeft: devicePixelRatio * 90, marginRight: 8 }}>
@@ -151,7 +149,7 @@ const ViewPatientAppointments = () => {
             interactionPlugin,
           ]}
           events={appointments}
-          eventClick={(info) => {
+          eventClick={(info: any) => {
             handleEventClick(info);
           }}
           themeSystem="bootstrap5"

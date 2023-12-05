@@ -49,7 +49,8 @@ import Calendarr from "./pages/Calendar";
 import UploadMedicalHistory from "./pages/Patient/UploadMedicalHistory";
 import PresInfo from "./pages/Patient/PrescInfo";
 import ViewDoctorDetails from "./pages/Patient/ViewDoctorDetails";
-
+import VideoChat from "./pages/Patient/VideoChat";
+import VideoChatDoctor from "./pages/Doctor/VideoChatDoctor";
 
 export interface JwtPayload {
   id: string;
@@ -113,6 +114,7 @@ const AppRouter: React.FC = () => {
           path="/doctor/changePassword"
           element={<ChangePasswordDoctor />}
         />
+        <Route path="/doctor/videoChat/:id" element={<VideoChatDoctor />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
@@ -125,7 +127,10 @@ const AppRouter: React.FC = () => {
           path="/patient/viewhealthrecords"
           element={<UploadMedicalHistory />}
         />
-        <Route path="/patient/doctordetails/:id" element={<ViewDoctorDetails />} />
+        <Route
+          path="/patient/doctordetails/:id"
+          element={<ViewDoctorDetails />}
+        />
 
         <Route path="/patient/addFamilyMember" element={<AddFamilyMember />} />
         <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
@@ -134,7 +139,7 @@ const AppRouter: React.FC = () => {
           element={<ViewPrescriptions />}
         />
 
-<Route
+        <Route
           path="/patient/viewPrescriptionDetails/:id"
           element={<PresInfo />}
         />
@@ -168,6 +173,7 @@ const AppRouter: React.FC = () => {
           path="/patient/doctordetails/:id"
           element={<ViewDoctorDetails />}
         />
+        <Route path="/patient/videoChat/" element={<VideoChat />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
@@ -175,7 +181,6 @@ const AppRouter: React.FC = () => {
     navigate(-1);
     return (
       <Routes>
-
         <Route
           path="/employmentContract/:id"
           element={<EmploymentContract />}

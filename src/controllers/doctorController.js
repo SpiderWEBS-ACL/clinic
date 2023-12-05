@@ -656,6 +656,11 @@ const getAvailableTimeSlots = async(req,res) => {
   return res.status(200).json({Saturday: Saturday?.slots,Sunday:Sunday?.slots,Monday:Monday?.slots,Tuesday:Tuesday?.slots,Wednesday:Wednesday?.slots,Thursday:Thursday?.slots,Friday:Friday?.slots})
 }
 
+// const getPatientVideoSocketId = async (req,res) => {
+//   const patientId = req.params.id;
+//   const { VideoSocketId }
+// }
+
 
 module.exports = {
   registerDoctor,

@@ -136,7 +136,7 @@ const ViewPatientAppointments = () => {
           interactionPlugin,
         ]}
         events={appointments}
-        eventClick={(info) => {
+        eventClick={(info: any) => {
           handleEventClick(info);
         }}
         themeSystem="bootstrap5"

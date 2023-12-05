@@ -109,6 +109,9 @@ const ViewPatientInfo = () => {
   const schedule = async () => {
     setShowDateTimeModal(true);
   };
+  const handleVideoCall = async () => {
+    navigate(`/doctor/videoChat/${id}`);
+  };
 
   const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
     setAppointmentTime(selectedTimeSlot);
@@ -361,6 +364,13 @@ const ViewPatientInfo = () => {
             className="btn btn-sm btn-primary"
           >
             Schedule a follow up
+          </button>
+          <button
+            onClick={handleVideoCall}
+            style={{ marginRight: 200 }}
+            className="btn btn-sm btn-primary"
+          >
+            Video Call
           </button>
         </Row>
       </Card>
