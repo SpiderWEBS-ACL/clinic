@@ -7,6 +7,8 @@ import { BrowserRouter, BrowserRouter as Router } from "react-router-dom";
 import AddAdminForm from "./pages/Admin/AddAdminForm";
 import RegLog from "./pages/RegLog";
 
+
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <BrowserRouter>
     <App />

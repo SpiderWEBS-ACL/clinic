@@ -7,6 +7,7 @@ import {
   Col,
   DatePicker,
   DatePickerProps,
+  FloatButton,
   Modal,
   Row,
   Select,
@@ -14,7 +15,11 @@ import {
 } from "antd";
 import { Card } from "antd";
 import { Avatar } from "@mui/material";
-import { CreditCardFilled, WalletFilled } from "@ant-design/icons";
+import {
+  CommentOutlined,
+  CreditCardFilled,
+  WalletFilled,
+} from "@ant-design/icons";
 import { RangePickerProps } from "antd/es/date-picker";
 import { getBalance } from "../../apis/Patient/GetBalance";
 import { getDoctorDiscount } from "../../apis/Patient/Doctors/GetDoctorDiscount";
@@ -193,7 +198,6 @@ const ViewDoctorDetails = () => {
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">Doctor Information</h2>
-
       <Card
         style={{
           height: "25rem",
@@ -257,7 +261,7 @@ const ViewDoctorDetails = () => {
           }}
         >
           <button
-            style={{ marginLeft: 200 }}
+            style={{ marginLeft: 0 }}
             className="btn btn-sm btn-primary"
             onClick={() => {
               handleBookAppointment(docInfo._id, docInfo.HourlyRate);
@@ -266,7 +270,7 @@ const ViewDoctorDetails = () => {
             Book Appointment
           </button>
           <button
-            style={{ marginRight: 200 }}
+            style={{ marginRight: 0 }}
             className="btn btn-sm btn-primary"
             hidden={!hasFamily}
             onClick={() => {
@@ -274,6 +278,15 @@ const ViewDoctorDetails = () => {
             }}
           >
             Book for family member
+          </button>
+          <button
+            style={{ marginRight: 0 }}
+            className="btn btn-sm btn-primary"
+            onClick={() => {
+              navigate(`/patient/chat/${id}`);
+            }}
+          >
+            Chat
           </button>
         </Row>
       </Card>
