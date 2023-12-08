@@ -99,6 +99,9 @@ const patientSchema = new Schema({
     WalletBalance: {
       type: Number,
       default: 0
+    },
+    VideoSocketId: {
+      type: String,
     }
 }, { timestamps: true });
 

@@ -966,9 +966,21 @@ const cancelSubscription = async (req,res) => {
   }
 }
 
+const saveVideoSocketId = async (req, res) => {
+  const id = req.user.id;
+  try{
+  await patientModel.findByIdAndUpdate(id, {VideoSocketId : req.body.videoSocketId});
+  return res.status(200).json("Saved Successfully!");
+  }catch(error){
+    return res.status(500).json({ error: error.message });
+  }
+
+  
+}
+
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
 filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
 viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity,
-getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription,showSubscribedPackage,getTimeSlotsOfDate };
+getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription,showSubscribedPackage,getTimeSlotsOfDate, saveVideoSocketId };
 

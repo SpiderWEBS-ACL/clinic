@@ -14,7 +14,6 @@ import {
 } from "antd";
 import { Card } from "antd";
 import { Avatar } from "@mui/material";
-import { Navigate } from "react-router-dom";
 import { CreditCardFilled, WalletFilled } from "@ant-design/icons";
 import { RangePickerProps } from "antd/es/date-picker";
 import { getBalance } from "../../apis/Patient/GetBalance";
@@ -144,6 +143,7 @@ const ViewDoctorDetails = () => {
     dateString
   ) => {
     setAppointmentDate(dateString);
+    setAppointmentTime("");
     setTimeSlotsApi(dateString);
   };
   const setTimeSlotsApi = async (date: string) => {
@@ -192,9 +192,7 @@ const ViewDoctorDetails = () => {
 
   return (
     <div className="container">
-      <h2 className="text-center mt-4 mb-4">
-        <strong>Doctor Information</strong>
-      </h2>
+      <h2 className="text-center mt-4 mb-4">Doctor Information</h2>
 
       <Card
         style={{
@@ -362,6 +360,8 @@ const ViewDoctorDetails = () => {
         visible={showDateTimeModal}
         onCancel={() => {
           setShowDateTimeModal(false);
+          setAppointmentDate("");
+          setAppointmentTime("");
         }}
         footer={null}
       >
@@ -372,6 +372,7 @@ const ViewDoctorDetails = () => {
         />
         <label style={{ marginRight: 8 }}></label>
         <Select
+          disabled={AppointmentDate == ""}
           value={AppointmentTime}
           onChange={handleAppointmentTimeSlotChange}
           style={{ width: 150, marginRight: 30 }}
@@ -407,6 +408,8 @@ const ViewDoctorDetails = () => {
         visible={showDateTimeFamilyModal}
         onCancel={() => {
           setShowDateTimeFamilyModal(false);
+          setAppointmentDate("");
+          setAppointmentTime("");
         }}
         footer={null}
       >
@@ -417,6 +420,7 @@ const ViewDoctorDetails = () => {
         />
         <label style={{ marginRight: 8 }}></label>
         <Select
+          disabled={AppointmentDate == ""}
           value={AppointmentTime}
           onChange={handleAppointmentTimeSlotChange}
           style={{ width: 207 }}

@@ -233,9 +233,7 @@ const UploadMedicalHistory = () => {
 
   return (
     <div className="container">
-      <h2 className="text-center mt-4 mb-4">
-        <strong>Health Records</strong>
-      </h2>
+      <h2 className="text-center mt-4 mb-4">Health Records</h2>
       <Card
         tabList={tabList}
         style={{ height: 400, width: 800, marginTop: 16, marginLeft: 220 }}

@@ -1,18 +1,41 @@
 const express = require("express");
 const mongoose = require('mongoose');
-const cors = require('cors');
 require('dotenv').config();
 const path = require('path');
 const app = express();
 const http = require("http");
-const socketIo = require("socket.io");
 const server = http.createServer(app);
-const io = socketIo(server);
+const cors = require('cors');
 app.use(cors());
+const io = require("socket.io")(server, {
+  cors: {
+    origin: ["http://localhost:5173"],
+    methods: ["GET", "POST"],
+    credentials: true 
+  }
+});
 app.use(express.json())
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 const port = process.env.PORT || "8000";
 const MongoURI = process.env.ATLAS_MONGO_URI;
+
+
+io.on("connection", (socket) => {
+	socket.emit("me", socket.id)
+  console.log(socket.id)
+
+	socket.on("disconnect", () => {
+		socket.broadcast.emit("callEnded")
+	})
+
+	socket.on("callUser", (data) => {
+		io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
+	})
+
+	socket.on("answerCall", (data) => {
+		io.to(data.to).emit("callAccepted", data.signal)
+	})
+})
 
 const {
   addPatient,
@@ -44,7 +67,7 @@ const {
   getBalance, 
   getAllPackagesPatient,
   doctorDiscount, 
-  payAppointmentWithWallet, linkFamily, cancelSubscription,showSubscribedPackage, getTimeSlotsOfDate
+  payAppointmentWithWallet, linkFamily, cancelSubscription,showSubscribedPackage, getTimeSlotsOfDate, saveVideoSocketId
 } = require("./controllers/patientController");
 
 const {
@@ -134,8 +157,8 @@ mongoose
   .then(() => {
     console.log("MongoDB is now connected!");
     // Starting server
-    app.listen(port, () => {
-      console.log(`Listening to requests on  ://localhost:${port}`);
+    server.listen(port, () => {
+      console.log(`Listening to requests on http://localhost:${port}`);
     });
   })
   .catch((err) => console.log(err));
@@ -263,6 +286,7 @@ app.post("/patient/linkfamily",PatientProtect, linkFamily);
 app.put("/patient/cancelSubscription",PatientProtect, cancelSubscription);
 app.get("/patient/showSubscribedPackage", PatientProtect, showSubscribedPackage);
 app.post("/patient/getTimeSlotsDoctorDate", PatientProtect, getTimeSlotsOfDate);
+app.put("/patient/saveVideoSocketId", PatientProtect, saveVideoSocketId);
 
 
 
