@@ -12,7 +12,7 @@ import {
 } from "antd";
 import { Card } from "antd";
 import { Avatar } from "@mui/material";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, VideoCameraFilled } from "@ant-design/icons";
 import "./StyleDoctor.css";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { green } from "@mui/material/colors";
@@ -24,6 +24,7 @@ import { getTimeSlotsAtDate } from "../../apis/Doctor/Time Slots/GetTimeSlotsAtD
 import { getPatientsHealthRecords } from "../../apis/Doctor/Patients/GetPatientsHealthRecords";
 import { scheduleFollowup } from "../../apis/Doctor/Patients/ScheduleFollowUp";
 import { getPatientsFiles } from "../../apis/Doctor/Patients/GetPatientsFiles";
+import { IoChatbox } from "react-icons/io5";
 const ViewPatientInfo = () => {
   const { id } = useParams<{ id: string }>();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -351,26 +352,26 @@ const ViewPatientInfo = () => {
             marginTop: 25,
           }}
         >
-          <button
-            onClick={showModal}
-            style={{ marginLeft: 200 }}
-            className="btn btn-sm btn-primary"
-          >
+          <button onClick={showModal} className="btn btn-sm btn-primary">
             Add Health Record
           </button>
           <button
+            style={{ marginRight: 100 }}
             onClick={schedule}
-            style={{ marginRight: 200 }}
             className="btn btn-sm btn-primary"
           >
             Schedule a follow up
           </button>
+          <button onClick={handleVideoCall} className="btn btn-sm btn-primary">
+            <VideoCameraFilled />
+          </button>
           <button
-            onClick={handleVideoCall}
-            style={{ marginRight: 200 }}
+            onClick={() => {
+              navigate(`/doctor/chat/${id}`);
+            }}
             className="btn btn-sm btn-primary"
           >
-            Video Call
+            <IoChatbox />
           </button>
         </Row>
       </Card>

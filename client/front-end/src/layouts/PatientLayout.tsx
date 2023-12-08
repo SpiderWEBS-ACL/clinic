@@ -6,7 +6,7 @@ import {
   Routes,
   useNavigate,
 } from "react-router-dom";
-import { Layout, Menu } from "antd";
+import { FloatButton, Layout, Menu } from "antd";
 import {
   HomeOutlined,
   FileOutlined,
@@ -14,11 +14,12 @@ import {
   PoweroffOutlined,
   WalletOutlined,
   CalendarOutlined,
+  CommentOutlined,
+  VideoCameraOutlined,
+  BellOutlined,
 } from "@ant-design/icons";
 import AppRouter from "../AppRouter";
-import {
-  IoPeopleOutline,
-} from "react-icons/io5";
+import { IoPeopleOutline } from "react-icons/io5";
 
 const { Header, Content, Footer, Sider } = Layout;
 const id = localStorage.getItem("id");
@@ -113,8 +114,34 @@ const PatientLayout: React.FC = () => {
         ></Menu>
       </Sider>
       <Layout>
-        <Content style={{ margin: "0 16px" }}>
-          <AppRouter />
+        <Content style={{ margin: "0 16px", overflow: "hidden" }}>
+          <div style={{ overflowY: "auto", maxHeight: "100vh" }}>
+            <AppRouter />
+          </div>
+          <FloatButton
+            style={{
+              fontSize: "50vh",
+              right: "4vh",
+              bottom: "94vh",
+            }}
+            icon={<BellOutlined />}
+          />
+          <FloatButton
+            style={{
+              fontSize: "50vh",
+              right: "12vh",
+              bottom: "94vh",
+            }}
+            icon={<CommentOutlined />}
+          />
+          <FloatButton
+            style={{
+              fontSize: "50vh",
+              right: "18vh",
+              bottom: "94vh",
+            }}
+            icon={<VideoCameraOutlined />}
+          />
         </Content>
       </Layout>
     </Layout>

@@ -88,8 +88,10 @@ const DoctorLayout: React.FC = () => {
         ></Menu>
       </Sider>
       <Layout>
-        <Content style={{ margin: "0 16px" }}>
-          <AppRouter />
+        <Content style={{ margin: "0 16px", overflow: "hidden" }}>
+          <div style={{ overflowY: "auto", maxHeight: "100vh" }}>
+            <AppRouter />
+          </div>
         </Content>
       </Layout>
     </Layout>

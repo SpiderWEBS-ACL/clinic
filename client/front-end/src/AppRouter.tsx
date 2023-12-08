@@ -51,6 +51,8 @@ import PresInfo from "./pages/Patient/PrescInfo";
 import ViewDoctorDetails from "./pages/Patient/ViewDoctorDetails";
 import VideoChat from "./pages/Patient/VideoChat";
 import VideoChatDoctor from "./pages/Doctor/VideoChatDoctor";
+import Chat from "./pages/Patient/Chat";
+import ChatDoctor from "./pages/Doctor/ChatDoctor";
 
 export interface JwtPayload {
   id: string;
@@ -115,6 +117,7 @@ const AppRouter: React.FC = () => {
           element={<ChangePasswordDoctor />}
         />
         <Route path="/doctor/videoChat/:id" element={<VideoChatDoctor />} />
+        <Route path="/doctor/chat/:id" element={<ChatDoctor />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
@@ -174,6 +177,7 @@ const AppRouter: React.FC = () => {
           element={<ViewDoctorDetails />}
         />
         <Route path="/patient/videoChat/" element={<VideoChat />} />
+        <Route path="/patient/chat/:id" element={<Chat />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );

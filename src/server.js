@@ -6,36 +6,44 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const cors = require('cors');
+const socketServerCreate = require("./socket/socketServer")
 app.use(cors());
-const io = require("socket.io")(server, {
-  cors: {
-    origin: ["http://localhost:5173"],
-    methods: ["GET", "POST"],
-    credentials: true 
-  }
-});
+// const io = require("socket.io")(server, {
+//   cors: {
+//     origin: ["http://localhost:5173"],
+//     methods: ["GET", "POST"],
+//     credentials: true 
+//   }
+// });
 app.use(express.json())
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 const port = process.env.PORT || "8000";
 const MongoURI = process.env.ATLAS_MONGO_URI;
 
 
-io.on("connection", (socket) => {
-	socket.emit("me", socket.id)
-  console.log(socket.id)
+socketServerCreate(server);
 
-	socket.on("disconnect", () => {
-		socket.broadcast.emit("callEnded")
-	})
 
-	socket.on("callUser", (data) => {
-		io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
-	})
+// io.on("connection", (socket) => {
+// 	socket.emit("me", socket.id)
+//   console.log(socket.id)
 
-	socket.on("answerCall", (data) => {
-		io.to(data.to).emit("callAccepted", data.signal)
-	})
-})
+// 	socket.on("disconnect", () => {
+// 		socket.broadcast.emit("callEnded")
+// 	})
+
+// 	socket.on("callUser", (data) => {
+// 		io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
+// 	})
+
+// 	socket.on("answerCall", (data) => {
+// 		io.to(data.to).emit("callAccepted", data.signal)
+// 	})
+
+//   socket.on("sendMessage", (data) => {
+//     io.to(data.userToMessage).emit("sendMessage", {})
+//   })
+// })
 
 const {
   addPatient,
