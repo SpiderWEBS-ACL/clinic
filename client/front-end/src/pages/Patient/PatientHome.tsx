@@ -34,7 +34,6 @@ const PatientHome = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [dateOf, setDateOf] = useState(String);
   const navigate = useNavigate();
-
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });

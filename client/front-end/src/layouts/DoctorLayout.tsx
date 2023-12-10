@@ -34,7 +34,7 @@ const DoctorLayout: React.FC = () => {
       key: "parent1",
       children: [
         {
-          label: "View Patients",
+          label: "My Patients",
           key: "/doctor/viewPatients",
         },
       ],

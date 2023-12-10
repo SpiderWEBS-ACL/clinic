@@ -3,7 +3,8 @@ const newConnectionHandler = require("../socketControllers/newConnectionHandler"
 const requireSocketAuth  = require("../middleware/requireSocketAuth")
 const directChatHistoryHandler = require("../socketControllers/directChatHistoryHandler")
 const {setServerSocketInstance} = require("./connectedUsers")
-
+const callRequestHandler  = require("../socketControllers/callRequestHandler")
+const callResponseHandler  = require("../socketControllers/callResponseHandler")
 const socket = require("socket.io");
 
 const socketServerCreate = (server) => {
@@ -37,13 +38,13 @@ const socketServerCreate = (server) => {
         //     notifyTypingHandler(socket, io, data);
         // });
 
-        // socket.on("call-request", (data) => {
-        //     callRequestHandler(socket, data);
-        // })
+        socket.on("call-request", (data) => {
+            callRequestHandler(socket, data);
+        })
 
-        // socket.on("call-response", (data) => {
-        //     callResponseHandler(socket, data);
-        // })
+        socket.on("call-response", (data) => {
+            callResponseHandler(socket, data);
+        })
 
         // socket.on("notify-chat-left", (data) => {
         //     notifyChatLeft(socket, data);
@@ -53,8 +54,22 @@ const socketServerCreate = (server) => {
         //     console.log(`Connected socket disconnected: ${socket.id}`);
         //     disconnectHandler(socket, io);
         // });
-    });
+        socket.on("me", () => {
+            socket.emit("me", socket.id)
+            console.log(socket.id)
+        }) 	
+        socket.on("disconnect", () => {
+            socket.broadcast.emit("callEnded")
+        })
 
+        socket.on("callUser", (data) => {
+            io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
+        })
+
+        socket.on("answerCall", (data) => {
+            io.to(data.to).emit("callAccepted", data.signal)
+        })
+    });
 };
 
 

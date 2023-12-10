@@ -1,11 +1,11 @@
 import { io, Socket } from "socket.io-client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input, Button, List, Avatar, Row, Col, Spin } from "antd";
 import Cookies from "js-cookie";
 import { useParams } from "react-router-dom";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import DateSeparator from "../../components/DateSeperator";
-import Message from "../../components/message";
+import Message from "../../components/Message";
 
 const { TextArea } = Input;
 
@@ -21,6 +21,7 @@ const Chat = () => {
   );
   const [messages, setMessages] = useState<any[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { id } = useParams<{ id: string }>();
   const socket: Socket = io("http://localhost:8000", {
@@ -68,11 +69,19 @@ const Chat = () => {
       };
       setMessages((prevMessages) => [...prevMessages, message]);
     });
-
+    scrollToBottom();
     return () => {
       socket.disconnect();
     };
   }, []);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   const sendMessage = () => {
     if (inputValue.trim() !== "" && token) {
@@ -121,7 +130,6 @@ const Chat = () => {
                 {(!isSameDay || index === 0) && (
                   <DateSeparator date={message.createdAt} />
                 )}
-
                 <Message
                   content={message.message}
                   username={message.author}
@@ -136,19 +144,26 @@ const Chat = () => {
             style={{
               position: "fixed",
               bottom: 0,
-              maxWidth: "200vh",
+              width: "145vh",
               alignItems: "center",
               padding: "10px",
               backgroundColor: "#eee",
+              borderRadius: "2rem",
             }}
           >
             <TextArea
               rows={1}
+              bordered={true}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyPress}
-              style={{ marginRight: "10px", width: "135vh" }}
+              style={{
+                marginRight: "10px",
+                width: "135vh",
+                borderRadius: "1rem",
+              }}
             />
+
             <Button
               icon={<ArrowRightOutlined />}
               type="primary"

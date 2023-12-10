@@ -5,7 +5,8 @@ import Cookies from "js-cookie";
 import { useParams } from "react-router-dom";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import DateSeparator from "../../components/DateSeperator";
-import Message from "../../components/message";
+import Message from "../../components/Message";
+import ChatTilte from "../../components/ChatTitle";
 
 const { TextArea } = Input;
 
@@ -16,7 +17,7 @@ interface Message {
 }
 
 const ChatDoctor = () => {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("accessToken") || null
   );
@@ -139,20 +140,27 @@ const ChatDoctor = () => {
               alignItems: "center",
               padding: "10px",
               backgroundColor: "#eee",
+              borderRadius: "2rem",
             }}
           >
             <TextArea
               rows={1}
+              bordered={true}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyPress}
-              style={{ marginRight: "10px", width: "135vh" }}
+              style={{
+                marginRight: "10px",
+                width: "135vh",
+                borderRadius: "1rem",
+              }}
             />
             <Button
               icon={<ArrowRightOutlined />}
               type="primary"
               style={{ marginRight: "10px" }}
               onClick={sendMessage}
+              shape="circle"
             ></Button>
           </div>
         </>

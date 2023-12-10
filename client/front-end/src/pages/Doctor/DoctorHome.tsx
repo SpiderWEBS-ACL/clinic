@@ -26,6 +26,7 @@ const DoctorHome = () => {
   };
   useEffect(() => {
     fetchDoctor();
+    localStorage.setItem("Name", doctorInfo.Name);
   }, [id]);
 
   const [patientData, setPatientData] = useState({

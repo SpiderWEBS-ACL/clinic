@@ -27,9 +27,11 @@ import { payAppointmentWallet } from "../../apis/Patient/Appointments/PayAppoint
 import { getBalance } from "../../apis/Patient/GetBalance";
 import { filterDoctorsCriteria } from "../../apis/Patient/Doctors/FilterDoctorsCriteria";
 import { getTimeSlotsDoctorDate } from "../../apis/Patient/Doctors/GetTimeSlotsDoctorDate";
+import { getMyDoctors } from "../../apis/Patient/Doctors/GetMyDoctors";
+import { IoChatbox } from "react-icons/io5";
 const { Option } = Select;
 
-const ViewAllDoctors = () => {
+const ViewMyDoctors = () => {
   const [Doctors, setDoctors] = useState<any[]>([]);
   const [AllDoctors, setAllDoctors] = useState([]);
   const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
@@ -68,16 +70,15 @@ const ViewAllDoctors = () => {
 
   const getAllDoctors = async () => {
     try {
-      const response = await getDoctors();
+      const response = await getMyDoctors();
       setDoctors(response.data);
-      console.log("Doctors", response.data);
       setAllDoctors(response.data);
     } catch (error) {
       console.error("Error:", error);
     }
   };
   const handleRedirection = (item: any) => {
-    navigate(`/patient/doctordetails/${item}`);
+    navigate(`/patient/chat/${item}`);
   };
 
   const doctorDiscount = async () => {
@@ -230,18 +231,6 @@ const ViewAllDoctors = () => {
       console.log(error);
     }
   };
-  const handleBookAppointment = async (doctor: any, HourlyRate: any) => {
-    setDoctorId(doctor);
-    setHourlyRate(HourlyRate);
-    setShowDateTimeModal(true);
-    getBalanceApi();
-  };
-  const handleBookAppointmentFamily = async (doctor: any, HourlyRate: any) => {
-    setDoctorId(doctor);
-    setHourlyRate(HourlyRate);
-    setShowDateTimeFamilyModal(true);
-    getBalanceApi();
-  };
   const handlePaymentSelection = (paymentMethod: string) => {
     if (paymentMethod === "Card") {
       redirectToStripe();
@@ -329,7 +318,9 @@ const ViewAllDoctors = () => {
                         loading={loadingList}
                         hoverable
                         className="hover-card"
-                        onClick={() => handleRedirection(request._id)}
+                        onClick={() => {
+                          handleRedirection(request._id);
+                        }}
                       >
                         <Meta
                           avatar={
@@ -352,9 +343,13 @@ const ViewAllDoctors = () => {
                               {request.Affiliation}
                               <br></br>
                               <br></br>
-                              <ArrowRightOutlined
+                              <button
                                 style={{ marginLeft: "13rem" }}
-                              ></ArrowRightOutlined>
+                                className="btn btn-sm btn-success"
+                                onClick={() => handleRedirection(request._id)}
+                              >
+                                <IoChatbox />
+                              </button>
                             </div>
                           }
                         />
@@ -595,4 +590,4 @@ const ViewAllDoctors = () => {
   );
 };
 
-export default ViewAllDoctors;
+export default ViewMyDoctors;
