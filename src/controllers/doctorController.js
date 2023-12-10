@@ -3,11 +3,13 @@ const patientModel = require("../Models/Patient");
 const doctorRegisterRequestModel = require("../Models/DoctorRegisterRequest");
 const appointmentModel = require("../Models/Appointment");
 const timeSlotModel = require("../Models/TimeSlot");
+const prescriptionModel = require("../Models/Prescription")
 const { default: mongoose } = require("mongoose");
 const bcrypt = require("bcrypt");
 const fileModel = require("../Models/File");
 const fs = require("fs");
 const multer = require("multer");
+const Medicine = require("../Models/Medicine");
 // FOR TESTING
 const addDoctor = async (req, res) => {
   try {
@@ -661,6 +663,24 @@ const getAvailableTimeSlots = async(req,res) => {
 //   const { VideoSocketId }
 // }
 
+const addPrescription = async (req,res) => {
+  try {
+      const newPrescription = await prescriptionModel.create(req.body);
+      return res.status(201).json(newPrescription);
+  }catch(error){
+      return res.status(400).json({ error: error.message });
+  }
+}
+
+const getAllMedicines = async (req,res) => {
+  try{
+    const medicines = await Medicine.find({});
+    return res.status(201).json(medicines);
+  }catch(error){
+      return res.status(400).json({ error: error.message });
+  }
+}
+
 
 module.exports = {
   registerDoctor,
@@ -687,5 +707,7 @@ module.exports = {
   scheduleFollowUp,
   loggedInFirstTime,
   getTimeSlotsOfDateDoctor,
-  getAvailableTimeSlots
+  getAvailableTimeSlots,
+  addPrescription,
+  getAllMedicines,
 };

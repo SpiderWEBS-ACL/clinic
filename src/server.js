@@ -59,7 +59,6 @@ const {
   selectPrescription,
   viewDoctorsWithPrices,
   filterDoctorsByNameSpecialtyAvailability,
-  addPrescription,
   getPatient,
   viewAllPatientAppointments,
   getAllDoctorsPatient,
@@ -75,7 +74,7 @@ const {
   getBalance, 
   getAllPackagesPatient,
   doctorDiscount, 
-  payAppointmentWithWallet, linkFamily, cancelSubscription,showSubscribedPackage, getTimeSlotsOfDate, saveVideoSocketId
+  payAppointmentWithWallet, linkFamily, cancelSubscription,showSubscribedPackage, getTimeSlotsOfDate, saveVideoSocketId, getMyDoctors
 } = require("./controllers/patientController");
 
 const {
@@ -103,7 +102,9 @@ const {
   scheduleFollowUp,
   loggedInFirstTime,
   getTimeSlotsOfDateDoctor,
-  getAvailableTimeSlots
+  getAvailableTimeSlots,
+  addPrescription,
+  getAllMedicines
 } = require("./controllers/doctorController");
 
 const {
@@ -234,6 +235,8 @@ app.put("/doctor/loggedInFirstTime",DoctorProtect,loggedInFirstTime);
 app.get("/doctor/viewPatientFiles/:id",DoctorProtect, viewPatientMedicalRecords);
 app.post("/doctor/getTimeSlotDate",DoctorProtect,getTimeSlotsOfDateDoctor);
 app.get("/doctor/getAvailableTimeSlots",DoctorProtect,getAvailableTimeSlots);
+app.post("/doctor/addPrescription", DoctorProtect, addPrescription);
+app.get("/doctor/getAllMedicines",DoctorProtect, getAllMedicines);
 //Patient Endpoints
 
 //Public Endpoints
@@ -246,7 +249,7 @@ app.post("/patient/register", addPatient);
 app.get("/patient/getPatient/", PatientProtect, getPatient);
 app.put("/patient/changePassword", PatientProtect, changePassword);
 app.post("/patient/addFamilyMember",PatientProtect,addFamilyMember);//TODO: fix in frontend was taking id
-app.post("/patient/addPrescription",PatientProtect,addPrescription);
+// app.post("/patient/addPrescription",PatientProtect,addPrescription);
 app.get("/patient/selectDoctor/:id",PatientProtect, selectDoctor);
 app.get("/patient/searchForDoctor",PatientProtect,searchForDoctor);
 app.get("/patient/filterDoctorsCriteria",PatientProtect,filterDoctorsByNameSpecialtyAvailability);
@@ -260,9 +263,9 @@ app.post("/patient/uploadMedicalDocuments",PatientProtect, uploadMedicalDocument
 app.delete("/patient/removeMedicalDocument",PatientProtect, deleteMedicalDocuments);
 app.post("/patient/subscribeToHealthPackage/:id",PatientProtect, subscribeToHealthPackage);
 app.get("/patient/viewMyMedicalDocument",PatientProtect, viewMedicalDocuments);
-app.get("/patient/viewMyPrescriptions",PatientProtect,viewMyPrescriptions)
-app.get("/patient/filterPrescriptions",PatientProtect,filterPrescriptions)
-app.get("/patient/selectPrescription/:id",PatientProtect,selectPrescription)
+app.get("/patient/viewMyPrescriptions",PatientProtect,viewMyPrescriptions) //TODO:will probably need to be changed
+app.get("/patient/filterPrescriptions",PatientProtect,filterPrescriptions)//TODO:will probably need to be changed
+app.get("/patient/selectPrescription/:id",selectPrescription)//TODO:will probably need to be changed
 app.get("/patient/viewDoctorsWithPrices",PatientProtect, viewDoctorsWithPrices)
 app.get("/patient/allAppointments",PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors",PatientProtect, getAllDoctorsPatient);
@@ -273,7 +276,7 @@ app.post("/patient/payAppointmentStripe",PatientProtect,payAppointmentWithStripe
 app.post("/patient/payAppointmentWallet",PatientProtect,payAppointmentWithWallet);
 app.get("/patient/subscribedPackage",PatientProtect,getSubscribedPackage);
 app.post("/patient/addFamilyMember", PatientProtect, addFamilyMember); //TODO: fix in frontend was taking id
-app.post("/patient/addPrescription", PatientProtect, addPrescription);
+// app.post("/patient/addPrescription", PatientProtect, addPrescription);
 app.get("/patient/selectDoctor/:id", PatientProtect, selectDoctor);
 app.get("/patient/searchForDoctor", PatientProtect, searchForDoctor);
 app.get("/patient/filterDoctorsCriteria", PatientProtect, filterDoctorsByNameSpecialtyAvailability);
@@ -281,9 +284,6 @@ app.get("/patient/viewFamilyMembers", PatientProtect, viewFamilyMembers);
 app.get("/patient/filterDoctors", PatientProtect, filterDoctors);
 app.get("/patient/filterAppointments", PatientProtect, filterPatientAppointments);
 app.get("/patient/viewSelectedDoctor/:id", PatientProtect, viewDoctorDetails);
-app.get("/patient/viewMyPrescriptions", PatientProtect, viewMyPrescriptions);
-app.get("/patient/filterPrescriptions", PatientProtect, filterPrescriptions);
-app.get("/patient/selectPrescription/:id", PatientProtect, selectPrescription);
 app.get("/patient/viewDoctorsWithPrices", PatientProtect, viewDoctorsWithPrices);
 app.get("/patient/allAppointments", PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors", PatientProtect, getAllDoctorsPatient);
@@ -295,6 +295,7 @@ app.put("/patient/cancelSubscription",PatientProtect, cancelSubscription);
 app.get("/patient/showSubscribedPackage", PatientProtect, showSubscribedPackage);
 app.post("/patient/getTimeSlotsDoctorDate", PatientProtect, getTimeSlotsOfDate);
 app.put("/patient/saveVideoSocketId", PatientProtect, saveVideoSocketId);
+app.get("/patient/myDoctors", PatientProtect, getMyDoctors);
 
 
 

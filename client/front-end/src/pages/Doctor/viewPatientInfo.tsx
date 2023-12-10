@@ -25,6 +25,7 @@ import { getPatientsHealthRecords } from "../../apis/Doctor/Patients/GetPatients
 import { scheduleFollowup } from "../../apis/Doctor/Patients/ScheduleFollowUp";
 import { getPatientsFiles } from "../../apis/Doctor/Patients/GetPatientsFiles";
 import { IoChatbox } from "react-icons/io5";
+import AddPrescriptionModal from "./AddPrescription";
 const ViewPatientInfo = () => {
   const { id } = useParams<{ id: string }>();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,6 +47,24 @@ const ViewPatientInfo = () => {
   const { TextArea } = Input;
   const { Meta } = Card;
   const navigate = useNavigate();
+
+  const [isAddPrescriptionModalVisible, setIsAddPrescriptionModalVisible] =
+    useState(false);
+
+  const showAddPrescriptionModal = () => {
+    setIsAddPrescriptionModalVisible(true);
+  };
+
+  const closeAddPrescriptionModal = () => {
+    setIsAddPrescriptionModalVisible(false);
+  };
+
+  const handleAddPrescription = async (prescription: any) => {
+    // Logic to add prescription using your API request
+    // Call your API endpoint to add prescription
+    // Example: await addPrescriptionApi(prescription);
+    // Handle the API call and state changes accordingly
+  };
 
   useEffect(() => {
     getPatientInfo();
@@ -356,11 +375,19 @@ const ViewPatientInfo = () => {
             Add Health Record
           </button>
           <button
-            style={{ marginRight: 100 }}
+            // style={{ marginRight: 100 }}
             onClick={schedule}
             className="btn btn-sm btn-primary"
           >
             Schedule a follow up
+          </button>
+          <button
+            onClick={() => {
+              navigate(`/doctor/addPrescription/${id}`);
+            }}
+            className="btn btn-sm btn-primary"
+          >
+            Add Prescription
           </button>
           <button onClick={handleVideoCall} className="btn btn-sm btn-primary">
             <VideoCameraFilled />
@@ -468,7 +495,7 @@ const ViewPatientInfo = () => {
       </Modal>
 
       <Modal
-        title="Select FollowUp Time"
+        title="Schedule Follow Up"
         visible={showDateTimeModal}
         onCancel={() => {
           setShowDateTimeModal(false);

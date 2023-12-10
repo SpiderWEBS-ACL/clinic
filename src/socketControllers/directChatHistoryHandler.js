@@ -1,5 +1,5 @@
 const Conversation = require("../Models/Conversation");
-const { getServerSocketInstance } = require("../socket/connectedUsers");
+const { getServerSocketInstance, getActiveConnections } = require("../socket/connectedUsers");
 const { updateChatHistory } = require("./notifyConnectedSockets");
 
 
@@ -15,6 +15,15 @@ const directChatHistoryHandler = async (socket, receiverUserId) => {
         console.log(conversation)
 
         if (!conversation) {
+            const io = getServerSocketInstance();
+            console.log("In !conversation")
+            const activeConnections = getActiveConnections(senderUserId.toString());
+            activeConnections.forEach((socketId) => {
+            io.to(socketId).emit("direct-chat-history", {
+                messages: [],
+                participants: []
+            });
+        });
             return;
         }
 

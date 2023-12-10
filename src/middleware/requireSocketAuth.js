@@ -7,7 +7,7 @@ const requireSocketAuth = (socket, next) => {
     console.log(socket.handshake)
     console.log("entered auth")
     if (!token) {
-        return res.status(403).send("A token is required for authentication");
+        return;
     }
     try {
 
