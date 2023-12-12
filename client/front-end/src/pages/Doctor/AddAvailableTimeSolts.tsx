@@ -110,6 +110,7 @@ const Calendar: React.FC = () => {
     }));
   };
   const boxStyle = {
+    marginTop: "1rem",
     marginBottom: "0.6rem",
     padding: "0.75rem",
     border: "1px solid #ccc",
@@ -124,8 +125,8 @@ const Calendar: React.FC = () => {
 
   return (
     <div style={{ textAlign: "center", marginTop: "20px" }}>
-      <h2 style={{ color: "#1890ff" }}>
-        <strong>Select your weekly time slots</strong>
+      <h2 style={{ color: "#1890ff", marginBottom:"2rem" }}>
+        Select your weekly time slots
       </h2>
       {daysOfWeek.map((day) => (
         <div key={day} style={boxStyle}>

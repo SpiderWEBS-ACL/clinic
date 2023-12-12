@@ -11,7 +11,7 @@ import {
   Modal,
   Avatar,
 } from "antd";
-import { InfoCircleTwoTone } from "@ant-design/icons";
+import { InfoCircleTwoTone, SettingOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { differenceInYears } from "date-fns";
@@ -176,14 +176,14 @@ const PatientHome = () => {
           </Modal>
 
           <Row gutter={35}>
-            <Col xs={30} sm={30} md={24} lg={30} xl={30}>
+            <Col xs={25} sm={30} md={24} lg={30} xl={30}>
               <Card
                 hoverable
                 title="My Details"
                 loading={loadingCard}
                 extra={
-                  <InfoCircleTwoTone
-                    style={{ width: 50, height: 50 }}
+                  <SettingOutlined
+                    style={{ width: 50, height: 50, marginLeft: 300 }}
                     onClick={openModal}
                   />
                 }
@@ -207,24 +207,18 @@ const PatientHome = () => {
               </Card>
             </Col>
           </Row>
-          <Row gutter={40}>
+          <Row gutter={30}>
             <Col xl={9}>
               <Card
                 hoverable
                 title="Upcoming Appointments"
                 loading={loadingCard}
-                extra={
-                  <InfoCircleTwoTone
-                    style={{ width: 50, height: 50 }}
-                    onClick={appointmentsRedirect}
-                  />
-                }
                 style={{ marginBottom: 16, minHeight: 335 }}
               >
                 <Row>
                   <Col>
                     <List
-                      header={<Title level={4}>Doctor: </Title>}
+                      header={<Title level={5}>Doctor </Title>}
                       dataSource={appointments}
                       renderItem={(item: any) => (
                         <List.Item>
@@ -235,7 +229,7 @@ const PatientHome = () => {
                   </Col>
                   <Col style={{ marginLeft: 30 }}>
                     <List
-                      header={<Title level={4}>Date: </Title>}
+                      header={<Title level={5}>Date </Title>}
                       dataSource={appointments}
                       renderItem={(item: any) => (
                         <List.Item>
@@ -248,7 +242,7 @@ const PatientHome = () => {
                   </Col>
                   <Col style={{ marginLeft: 30 }}>
                     <List
-                      header={<Title level={4}>Time: </Title>}
+                      header={<Title level={5}>Time </Title>}
                       dataSource={appointments}
                       renderItem={(item: any) => (
                         <List.Item>
@@ -267,18 +261,12 @@ const PatientHome = () => {
                 hoverable
                 title="My Subscriptions"
                 loading={loadingCard}
-                extra={
-                  <InfoCircleTwoTone
-                    style={{ width: 50, height: 50 }}
-                    onClick={subscriptionsRedirect}
-                  />
-                }
                 style={{ marginBottom: 16, minHeight: 335 }}
               >
                 <Row>
                   <Col>
                     <List
-                      header={<Title level={4}>Name: </Title>}
+                      header={<Title level={5}>Name </Title>}
                       dataSource={subscription}
                       renderItem={(item: any) => (
                         <List.Item>
@@ -288,8 +276,8 @@ const PatientHome = () => {
                     />
                   </Col>
 
-                  <Col style={{ marginLeft: 40 }}>
-                    <List header={<Title level={4}>Expiry: </Title>}>
+                  <Col style={{ marginLeft: 0 }}>
+                    <List header={<Title level={5}>Expiry </Title>}>
                       <List.Item>
                         <Title level={5}>{dateOf.split("T")[0]}</Title>
                       </List.Item>
@@ -303,19 +291,13 @@ const PatientHome = () => {
                 hoverable
                 title="My Prescriptions"
                 loading={loadingCard}
-                extra={
-                  <InfoCircleTwoTone
-                    style={{ width: 50, height: 50 }}
-                    onClick={prescriptionsRedirect}
-                  />
-                }
                 style={{ marginBottom: 16 }}
               >
                 <Row>
                   <Col>
                     <List
                       dataSource={prescriptions}
-                      header={<Title level={4}>Medication: </Title>}
+                      header={<Title level={5}>Medication </Title>}
                       renderItem={(item: any) => (
                         <List.Item>
                           <Title level={5}>{item.Medication}</Title>
@@ -323,12 +305,12 @@ const PatientHome = () => {
                       )}
                     />
                   </Col>
-                  <Col style={{ marginLeft: 30 }}>
+                  <Col style={{ marginLeft: 10 }}>
                     <List
                       dataSource={prescriptions}
                       header={
-                        <Title style={{ marginLeft: 15 }} level={4}>
-                          Dose:{" "}
+                        <Title style={{ marginLeft: 15 }} level={5}>
+                          Dose{" "}
                         </Title>
                       }
                       renderItem={(item: any) => (
@@ -338,9 +320,9 @@ const PatientHome = () => {
                       )}
                     />
                   </Col>
-                  <Col style={{ marginLeft: 30 }}>
+                  <Col style={{ marginLeft: 10 }}>
                     <List
-                      header={<Title level={4}>Instruction: </Title>}
+                      header={<Title level={5}>Instruction </Title>}
                       dataSource={prescriptions}
                       renderItem={(item: any) => (
                         <List.Item>

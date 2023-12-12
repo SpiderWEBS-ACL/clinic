@@ -136,7 +136,7 @@ const ChatDoctor = () => {
             style={{
               position: "fixed",
               bottom: 0,
-              width: "145vh",
+              width: "135vh",
               alignItems: "center",
               padding: "10px",
               backgroundColor: "#eee",
@@ -150,15 +150,14 @@ const ChatDoctor = () => {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyPress}
               style={{
-                marginRight: "10px",
-                width: "135vh",
+                marginRight: "2.5vh",
+                width: "125vh",
                 borderRadius: "1rem",
               }}
             />
             <Button
               icon={<ArrowRightOutlined />}
               type="primary"
-              style={{ marginRight: "10px" }}
               onClick={sendMessage}
               shape="circle"
             ></Button>

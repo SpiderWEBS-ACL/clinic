@@ -3,7 +3,7 @@ const patientModel = require("../Models/Patient");
 const doctorRegisterRequestModel = require("../Models/DoctorRegisterRequest");
 const appointmentModel = require("../Models/Appointment");
 const timeSlotModel = require("../Models/TimeSlot");
-const prescriptionModel = require("../Models/Prescription")
+const prescriptionModel = require("../Models/Prescription");
 const { default: mongoose } = require("mongoose");
 const bcrypt = require("bcrypt");
 const fileModel = require("../Models/File");
@@ -50,7 +50,7 @@ const registerDoctor = async (req, res) => {
 };
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); 
+    cb(null, "uploads/");
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -60,16 +60,16 @@ const storage = multer.diskStorage({
 const uploadFirst = multer({ storage: storage });
 
 const uploadPersonalID = async (req, res) => {
-  uploadFirst.single('file')(req, res, async (err) => {
+  uploadFirst.single("file")(req, res, async (err) => {
     if (err) {
-      return res.status(500).send('Server Error');
+      return res.status(500).send("Server Error");
     } else {
       const email = req.body.DocEmail;
       const type = req.body.docFileType;
       const file = req.file;
 
       if (!file) {
-        return res.status(400).send('No file uploaded.');
+        return res.status(400).send("No file uploaded.");
       }
 
       const newFile = {
@@ -79,7 +79,6 @@ const uploadPersonalID = async (req, res) => {
         docFileType: type,
         DocEmail: email,
         contentType: file.mimetype,
-
       };
 
       try {
@@ -88,16 +87,15 @@ const uploadPersonalID = async (req, res) => {
         res.status(201).json(savedFile);
       } catch (err) {
         console.error(err);
-        return res.status(500).send('Server Error');
+        return res.status(500).send("Server Error");
       }
     }
   });
 };
 
-
 const storageSecond = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); 
+    cb(null, "uploads/");
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -107,17 +105,17 @@ const storageSecond = multer.diskStorage({
 const uploadDegree = multer({ storage: storageSecond });
 
 const uploadMedicalDegree = async (req, res) => {
-  uploadDegree.single('file')(req, res, async (err) => {
+  uploadDegree.single("file")(req, res, async (err) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Server Error');
+      return res.status(500).send("Server Error");
     } else {
       const email = req.body.DocEmail;
       const type = req.body.docFileType;
       const file = req.file;
 
       if (!file) {
-        return res.status(400).send('No file uploaded.');
+        return res.status(400).send("No file uploaded.");
       }
 
       const newFile = {
@@ -127,7 +125,6 @@ const uploadMedicalDegree = async (req, res) => {
         docFileType: type,
         DocEmail: email,
         contentType: file.mimetype,
-
       };
 
       try {
@@ -136,7 +133,7 @@ const uploadMedicalDegree = async (req, res) => {
         res.status(201).json(savedFile);
       } catch (err) {
         console.error(err);
-        return res.status(500).send('Server Error');
+        return res.status(500).send("Server Error");
       }
     }
   });
@@ -144,7 +141,7 @@ const uploadMedicalDegree = async (req, res) => {
 
 const storageLicense = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); 
+    cb(null, "uploads/");
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -153,27 +150,24 @@ const storageLicense = multer.diskStorage({
 
 const upload = multer({ storage: storageLicense });
 const uploadLicenses = async (req, res) => {
-  upload.array('files')(req, res, async (err) => {
+  upload.array("files")(req, res, async (err) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Server Error');
+      return res.status(500).send("Server Error");
     } else {
-      let email ="";
+      let email = "";
       if (Array.isArray(req.body.DocEmail)) {
         email = req.body.DocEmail[0];
+      } else {
+        email = req.body.DocEmail;
       }
-      else{
-        email = req.body.DocEmail
-      }
-      let type ="";
+      let type = "";
       if (Array.isArray(req.body.DocEmail)) {
         type = req.body.docFileType[0];
-      }
-      else{
-        type = req.body.docFileType
+      } else {
+        type = req.body.docFileType;
       }
 
-      
       const newFiles = req.files.map((file) => ({
         filename: file.filename,
         originalname: file.originalname,
@@ -192,7 +186,7 @@ const uploadLicenses = async (req, res) => {
         res.status(201).json(savedFiles);
       } catch (err) {
         console.error(err);
-        return res.status(500).send('Server Error');
+        return res.status(500).send("Server Error");
       }
     }
   });
@@ -261,8 +255,7 @@ const upcomingAppointments = async (req, res) => {
       .find({
         Doctor: doctorId,
         AppointmentDate: { $gte: currentDate }, //$gte = Greater Than or Equal
-        Status: "Upcoming"
-
+        Status: "Upcoming",
       })
       .populate("Patient")
       .exec();
@@ -272,10 +265,8 @@ const upcomingAppointments = async (req, res) => {
         .status(404)
         .json({ error: "You have no upcoming appointments" });
     }
-    for(let i = 0 ; i < appointments.length; i++){
+    for (let i = 0; i < appointments.length; i++) {
       const currentAppointment = appointments[i];
-    
-
     }
 
     return res.status(200).json(appointmentsArray);
@@ -296,16 +287,15 @@ const viewPatients = async (req, res) => {
     const patients = [];
     for (const appointment of appointments) {
       const patient = appointment.Patient;
-      if(!patients.includes(patient) && patient != null)
-         patients.push(patient);
+      if (!patients.includes(patient) && patient != null)
+        patients.push(patient);
     }
 
     if (!patients) {
       return res.status(400).json({ error: "You have no patients" });
     }
-    if(patients){
+    if (patients) {
       return res.status(200).json(patients);
-
     }
   } catch (error) {
     return res.status(500).json({ error: "no patients available" });
@@ -355,15 +345,23 @@ const AddAvailableTimeSlots = async (req, res) => {
   const slots = req.body;
   const id = req.user.id;
   await timeSlotModel.deleteMany({
-    Doctor: id
-  })
-  const daysOfWeek = ['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday']
-  for(let i = 0; i < daysOfWeek.length;i++){
+    Doctor: id,
+  });
+  const daysOfWeek = [
+    "Saturday",
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+  ];
+  for (let i = 0; i < daysOfWeek.length; i++) {
     await timeSlotModel.create({
       Doctor: id,
       day: daysOfWeek[i],
-      slots: slots[i]
-    })
+      slots: slots[i],
+    });
   }
   return res.status(200).json("Added Time Slots");
 };
@@ -377,7 +375,7 @@ const viewAllDoctorAppointments = async (req, res) => {
         .find({ Doctor: id })
         .populate("Patient")
         .exec();
-      
+
       return res.status(200).json(appointments);
     }
   } catch (error) {
@@ -399,22 +397,19 @@ const acceptContract = async (req, res) => {
     if (!regReq) {
       return res.status(404).json({ error: "Registration Request Not Found!" });
     }
-    const docFiles = await fileModel.find({DocEmail: regReq.Email})
+    const docFiles = await fileModel.find({ DocEmail: regReq.Email });
     let medicalLic = [];
     let personalID = null;
     let degree = null;
-    for(const file of docFiles){
-      if(file.docFileType ==="License"){
+    for (const file of docFiles) {
+      if (file.docFileType === "License") {
         medicalLic.push(file._id);
-      }
-      else if(file.docFileType==="PersonalID"){
+      } else if (file.docFileType === "PersonalID") {
         personalID = file._id;
-      }
-      else if(file.docFileType==="Degree"){
+      } else if (file.docFileType === "Degree") {
         degree = file._id;
       }
     }
-
 
     const newDoctor = await doctorModel.create({
       Username: regReq.Username,
@@ -433,7 +428,6 @@ const acceptContract = async (req, res) => {
 
     createdDoctor.MedicalLicenses.push(...medicalLic);
 
-  
     await createdDoctor.save();
     if (!newDoctor) {
       return res
@@ -468,145 +462,131 @@ const rejectContract = async (req, res) => {
   }
 };
 
-const addHealthRecordForPatient = async(req,res) =>{
-    const { id } = req.params;
-    const description = req.body.Description;
-    const type = req.body.Type;
-    try{
-        const currPatient = await patientModel.findById(id);
-        if(!currPatient){
-            return res.status(404).json({error: 'Patient not found!'});
-        }
-        const healthRecord = {
-            Doctor: req.user.id,
-            Description: description,
-            Type: type,
-          };
-          if(!currPatient.HealthRecords){
-            return res.status(404).json({error: 'Health records not found!'});
-			  }
-        currPatient.HealthRecords = currPatient.HealthRecords || []; // Ensure HealthRecords is initialized as an array
-        currPatient.HealthRecords = currPatient.HealthRecords.concat(healthRecord);
-        await currPatient.save();
-        return res.status(200).json(currPatient.HealthRecords);
-
-        
-
-    } catch(error){
-        return res.status(500).json({error: error.message});
+const addHealthRecordForPatient = async (req, res) => {
+  const { id } = req.params;
+  const description = req.body.Description;
+  const type = req.body.Type;
+  try {
+    const currPatient = await patientModel.findById(id);
+    if (!currPatient) {
+      return res.status(404).json({ error: "Patient not found!" });
     }
- }
- const viewHealthRecordsDoctor = async (req, res) => {
-    const { id } = req.params;
-    const doctorid = req.user.id;
-  
-    try {
-      const doctor = await doctorModel.findById(doctorid) ;
-      const currPatient = await patientModel.findById(id); 
-  
-      if (!doctor || !currPatient) {
-        return res.status(404).json({ error: 'Doctor or patient not found' });
-      }
-  
-      const appointments = await appointmentModel
-        .find({ Doctor: doctor, Patient: currPatient }) 
-        .populate("Doctor")
-        .populate("Patient")
-        .exec();
-  
-      if (appointments.length > 0) {
-        return res.status(200).json(currPatient.HealthRecords);
-      } else {
-        return res.status(404).json({ error: 'Health records not found' });
-      }
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
+    const healthRecord = {
+      Doctor: req.user.id,
+      Description: description,
+      Type: type,
+    };
+    if (!currPatient.HealthRecords) {
+      return res.status(404).json({ error: "Health records not found!" });
     }
-  };
-  const viewPatientMedicalRecords = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const files = await fileModel.find({ Patient: id });
-      if (!files) {
-        return res.status(404).json({ error: 'No files found' });
-      }
-      if(files){
-        res.status(200).json(files);
-
-  
-      }
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
- const getDoctorTimeSlotsForDoctor = async (req, res) => {
-    const id = req.user.id;
-    const doctor = await doctorModel.findById(id);
-    return res.status(200).json(doctor.AvailableTimeSlots);
+    currPatient.HealthRecords = currPatient.HealthRecords || []; // Ensure HealthRecords is initialized as an array
+    currPatient.HealthRecords = currPatient.HealthRecords.concat(healthRecord);
+    await currPatient.save();
+    return res.status(200).json(currPatient.HealthRecords);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
-  const checkDoctorAvailablityForDoctor = async (req, res) => {
+};
+const viewHealthRecordsDoctor = async (req, res) => {
+  const { id } = req.params;
+  const doctorid = req.user.id;
 
-    const Date = req.body.Date;
-    const Time = req.body.Time;
-    const {AvailableTimeSlots} = await doctorModel.findById(req.user.id);
-    let date =  Date+"T"+Time+".000Z";
-    if(!AvailableTimeSlots.includes(Time))
-        return res.status(200).json({message: "not available"});
-    const query = {
-        $and:[
-            {Doctor: req.user.id},
-            { AppointmentDate: date }
-            ]}
-    try{
-    const appointment = await appointmentModel.findOne(query)
-    if(appointment == null)
-        return res.status(200).json({message: "available"});
-    return res.status(200).json({message: "not available"});
-    }catch(error){
-      return res.status(400).json({error: error.message});
+  try {
+    const doctor = await doctorModel.findById(doctorid);
+    const currPatient = await patientModel.findById(id);
+
+    if (!doctor || !currPatient) {
+      return res.status(404).json({ error: "Doctor or patient not found" });
     }
-}
-  
-const scheduleFollowUp = async(req,res) =>{
-    const id  = req.user.id;
-    const patientId = req.body.Patient;
-    const appDate = req.body.appDate;
-    const followUp= true;
-    const status = req.body.status;
-    try{
-        
-          const newFollowup = await appointmentModel.create({
-            Patient: patientId,
-            Doctor: id,
-            AppointmentDate: appDate,
-            FollowUp: followUp,
-            Status: status
-        })
-        await newFollowup.save();
 
-        const timeSlot = appDate.substring(11,19);
-        const doc = await  doctorModel.findByIdAndUpdate(
-            id,
-            { $pull: { AvailableTimeSlots: timeSlot}},
-            { new: true }
-          )
-          
-            
-    
-        return res.status(200).json(newFollowup);
-    
-  
+    const appointments = await appointmentModel
+      .find({ Doctor: doctor, Patient: currPatient })
+      .populate("Doctor")
+      .populate("Patient")
+      .exec();
 
-    }catch(error){
-        return res.status(500).json({error: error.message});
+    if (appointments.length > 0) {
+      return res.status(200).json(currPatient.HealthRecords);
+    } else {
+      return res.status(404).json({ error: "Health records not found" });
     }
-}
-
-const loggedInFirstTime = async (req,res) => {
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+const viewPatientMedicalRecords = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const files = await fileModel.find({ Patient: id });
+    if (!files) {
+      return res.status(404).json({ error: "No files found" });
+    }
+    if (files) {
+      res.status(200).json(files);
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getDoctorTimeSlotsForDoctor = async (req, res) => {
   const id = req.user.id;
-  await doctorModel.findByIdAndUpdate(id, {FirstTime: false});
+  const doctor = await doctorModel.findById(id);
+  return res.status(200).json(doctor.AvailableTimeSlots);
+};
+const checkDoctorAvailablityForDoctor = async (req, res) => {
+  const Date = req.body.Date;
+  const Time = req.body.Time;
+  const { AvailableTimeSlots } = await doctorModel.findById(req.user.id);
+  let date = Date + "T" + Time + ".000Z";
+  if (!AvailableTimeSlots.includes(Time))
+    return res.status(200).json({ message: "not available" });
+  const query = {
+    $and: [{ Doctor: req.user.id }, { AppointmentDate: date }],
+  };
+  try {
+    const appointment = await appointmentModel.findOne(query);
+    if (appointment == null)
+      return res.status(200).json({ message: "available" });
+    return res.status(200).json({ message: "not available" });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+const scheduleFollowUp = async (req, res) => {
+  const id = req.user.id;
+  const patientId = req.body.Patient;
+  const appDate = req.body.appDate;
+  const followUp = true;
+  const status = req.body.status;
+  try {
+    const newFollowup = await appointmentModel.create({
+      Patient: patientId,
+      Doctor: id,
+      AppointmentDate: appDate,
+      FollowUp: followUp,
+      Status: status,
+    });
+    await newFollowup.save();
+
+    const timeSlot = appDate.substring(11, 19);
+    const doc = await doctorModel.findByIdAndUpdate(
+      id,
+      { $pull: { AvailableTimeSlots: timeSlot } },
+      { new: true }
+    );
+
+    return res.status(200).json(newFollowup);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+const loggedInFirstTime = async (req, res) => {
+  const id = req.user.id;
+  await doctorModel.findByIdAndUpdate(id, { FirstTime: false });
   return res.status(200).json("Logged in first time");
-}
+};
 
 const getTimeSlotsOfDateDoctor = async (req, res) => {
   try {
@@ -614,73 +594,176 @@ const getTimeSlotsOfDateDoctor = async (req, res) => {
     const { date } = req.body;
     const DateFormat = new Date(date);
     const dayOfWeek = DateFormat.getDay();
-    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const daysOfWeek = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
     const dayString = daysOfWeek[dayOfWeek];
-    const timeSlots = await timeSlotModel.findOne({ Doctor: DoctorId, day: dayString });
+    const timeSlots = await timeSlotModel.findOne({
+      Doctor: DoctorId,
+      day: dayString,
+    });
 
     if (!timeSlots) {
-      return res.status(404).json({ error: 'No time slots found for the specified day and doctor.' });
+      return res.status(404).json({
+        error: "No time slots found for the specified day and doctor.",
+      });
     }
 
-    const timeSlotsUpdated = await Promise.all(timeSlots.slots.map(async (slot) => {
-      let datee = `${date}T${slot}:00.000Z`;
-      let query = {
-        $and: [
-          { Doctor: DoctorId },
-          { AppointmentDate: datee }
-        ]
-      };
-      let appointment = await appointmentModel.find(query);
+    const timeSlotsUpdated = await Promise.all(
+      timeSlots.slots.map(async (slot) => {
+        let datee = `${date}T${slot}:00.000Z`;
+        let query = {
+          $and: [{ Doctor: DoctorId }, { AppointmentDate: datee }],
+        };
+        let appointment = await appointmentModel.find(query);
 
-      if (appointment.length === 0) {
-        return slot;
-      }
-      return null;
-    }));
+        if (appointment.length === 0) {
+          return slot;
+        }
+        return null;
+      })
+    );
 
-    return res.status(200).json(timeSlotsUpdated.filter(slot => slot !== null));
+    return res
+      .status(200)
+      .json(timeSlotsUpdated.filter((slot) => slot !== null));
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
-const getAvailableTimeSlots = async(req,res) => {
+const getAvailableTimeSlots = async (req, res) => {
   const DoctorId = req.user.id;
-  const Saturday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Saturday" })
-  const Sunday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Sunday" })
-  const Monday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Monday" })
-  const Tuesday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Tuesday" })
-  const Wednesday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Wednesday" })
-  const Thursday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Thursday" })
-  const Friday =  await timeSlotModel.findOne({ Doctor: DoctorId, day: "Friday" })
-  
-  return res.status(200).json({Saturday: Saturday?.slots,Sunday:Sunday?.slots,Monday:Monday?.slots,Tuesday:Tuesday?.slots,Wednesday:Wednesday?.slots,Thursday:Thursday?.slots,Friday:Friday?.slots})
-}
+  const Saturday = await timeSlotModel.findOne({
+    Doctor: DoctorId,
+    day: "Saturday",
+  });
+  const Sunday = await timeSlotModel.findOne({
+    Doctor: DoctorId,
+    day: "Sunday",
+  });
+  const Monday = await timeSlotModel.findOne({
+    Doctor: DoctorId,
+    day: "Monday",
+  });
+  const Tuesday = await timeSlotModel.findOne({
+    Doctor: DoctorId,
+    day: "Tuesday",
+  });
+  const Wednesday = await timeSlotModel.findOne({
+    Doctor: DoctorId,
+    day: "Wednesday",
+  });
+  const Thursday = await timeSlotModel.findOne({
+    Doctor: DoctorId,
+    day: "Thursday",
+  });
+  const Friday = await timeSlotModel.findOne({
+    Doctor: DoctorId,
+    day: "Friday",
+  });
+
+  return res.status(200).json({
+    Saturday: Saturday?.slots,
+    Sunday: Sunday?.slots,
+    Monday: Monday?.slots,
+    Tuesday: Tuesday?.slots,
+    Wednesday: Wednesday?.slots,
+    Thursday: Thursday?.slots,
+    Friday: Friday?.slots,
+  });
+};
 
 // const getPatientVideoSocketId = async (req,res) => {
 //   const patientId = req.params.id;
 //   const { VideoSocketId }
 // }
 
-const addPrescription = async (req,res) => {
+const addPrescription = async (req, res) => {
   try {
-      const newPrescription = await prescriptionModel.create(req.body);
-      return res.status(201).json(newPrescription);
-  }catch(error){
-      return res.status(400).json({ error: error.message });
-  }
-}
+    const medicines = req.body.Medicines;
 
-const getAllMedicines = async (req,res) => {
-  try{
+    const medicineNames = await Promise.all(
+      medicines.map(async (medicine) => {
+        const medicineData = await Medicine.findById(medicine.MedicineId);
+        return medicineData ? medicineData.Name : null;
+      })
+    );
+    const prescriptionData = {
+      ...req.body,
+      Medicines: medicineNames.map((name, index) => ({
+        Name: name,
+        Dosage: medicines[index].Dosage,
+        Instructions: medicines[index].Instructions,
+      })),
+    };
+
+    const newPrescription = await prescriptionModel.create(prescriptionData);
+    return res.status(201).json(newPrescription);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+const getAllMedicines = async (req, res) => {
+  try {
     const medicines = await Medicine.find({});
     return res.status(201).json(medicines);
-  }catch(error){
-      return res.status(400).json({ error: error.message });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
   }
-}
+};
 
+const getAllPatientsPrescriptions = async (req, res) => {
+  try {
+    const DoctorId = req.user.id;
+    const PatientId = req.params.id;
+    const prescriptions = await prescriptionModel
+      .find({
+        Doctor: DoctorId,
+        Patient: PatientId,
+      })
+      .populate("Medicines.MedicineId", "Name")
+      .exec();
+    return res.status(200).json(prescriptions);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+const updateMedicineInPrescription = async (req, res) => {
+  try {
+    const prescription = req.body;
+    console.log(prescription);
+    const updatedPrescription = await prescriptionModel.findByIdAndUpdate(
+      prescription._id,
+      prescription,
+      { new: true }
+    );
+    return res.status(200).json(updatedPrescription);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+const deleteMedicineInPrescription = async (req, res) => {
+  try {
+    const prescription = req.body;
+    const updatedPrescription = await prescriptionModel.findByIdAndUpdate(
+      prescription._id,
+      prescription
+    );
+    return res.status(200).json(updatedPrescription);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
 
 module.exports = {
   registerDoctor,
@@ -710,4 +793,7 @@ module.exports = {
   getAvailableTimeSlots,
   addPrescription,
   getAllMedicines,
+  getAllPatientsPrescriptions,
+  updateMedicineInPrescription,
+  deleteMedicineInPrescription,
 };

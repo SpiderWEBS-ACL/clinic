@@ -11,6 +11,8 @@ import {
   CommentOutlined,
   VideoCameraOutlined,
   BellOutlined,
+  BoxPlotOutlined,
+  MedicineBoxOutlined,
 } from "@ant-design/icons";
 import AppRouter from "../AppRouter";
 import { IoPeopleOutline } from "react-icons/io5";
@@ -99,7 +101,7 @@ const PatientLayout: React.FC = () => {
     {
       label: "Packages",
       key: "/patient/packages",
-      icon: <FileOutlined />,
+      icon: <MedicineBoxOutlined />,
     },
     {
       label: "Wallet",
