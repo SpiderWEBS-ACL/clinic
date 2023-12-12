@@ -115,7 +115,7 @@ const ViewAllPatients = () => {
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
-        <strong>Patients</strong>
+        Patients
       </h2>
       <div>
         <span>

@@ -298,7 +298,7 @@ const ViewAllDoctors = () => {
           </Select>
           <button
             onClick={handleFilter}
-            style={{ width: 100, marginRight: 20 }}
+            style={{ width: 100, marginRight: 10 }}
             className="btn btn-sm btn-primary"
           >
             Apply filters

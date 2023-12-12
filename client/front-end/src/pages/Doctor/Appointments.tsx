@@ -72,7 +72,7 @@ const ViewPatientAppointments = () => {
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">
-        <strong>Appointments</strong>
+        Appointments
       </h2>
       <span>
         <label style={{ marginLeft: devicePixelRatio * 90, marginRight: 8 }}>

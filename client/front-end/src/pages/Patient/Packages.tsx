@@ -1,24 +1,17 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Popconfirm,
   Button,
-  Breadcrumb,
   Card,
-  Typography,
   List,
   Row,
   Col,
-  Spin,
   Modal,
   message,
-  Switch,
+  Badge,
 } from "antd";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
-import { JwtPayload } from "../../AppRouter";
-import jwt_decode from "jwt-decode";
-import { config, headers } from "../../Middleware/authMiddleware";
+
 import {
   CheckCircleOutlined,
   CreditCardFilled,
@@ -47,13 +40,6 @@ const AllPackagesPatient = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const { Meta } = Card;
   const [subscribedPackage, setSubscribedPackage] = useState<any>([]);
-
-  const api = axios.create({
-    baseURL: "http://localhost:8000/",
-  });
-  const accessToken = Cookies.get("accessToken");
-
-  let patientId = "";
 
   const redirectToStripe = async (id: string) => {
     try {
@@ -153,11 +139,13 @@ const AllPackagesPatient = () => {
                 {Packages.slice(index, index + 4).map((request, subIndex) => (
                   <Col span={8} key={subIndex}>
                     <div>
+                      {/* <Badge.Ribbon  text = "Best Value" color="red"> */}
                       <Card
                         style={{
                           height: "23rem",
                           width: "24rem",
                           marginTop: 16,
+                          marginLeft:16
                         }}
                         loading={loading}
                         hoverable
@@ -169,7 +157,7 @@ const AllPackagesPatient = () => {
                               sx={{
                                 width: 50,
                                 height: 50,
-                                bgcolor: green[500],
+                                bgcolor: green[500]
                               }}
                             >
                               {" "}
@@ -272,6 +260,7 @@ const AllPackagesPatient = () => {
                           </Popconfirm>
                         </div>
                       </Card>
+                      {/* </Badge.Ribbon>  */}
                     </div>
                   </Col>
                 ))}

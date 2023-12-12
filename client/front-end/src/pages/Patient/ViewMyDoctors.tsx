@@ -242,7 +242,7 @@ const ViewMyDoctors = () => {
 
   return (
     <div className="container">
-      <h2 className="text-center mt-4 mb-4">Doctors</h2>
+      <h2 className="text-center mt-4 mb-4">My Doctors</h2>
       <div className="mb-3">
         <span>
           <label style={{ marginRight: 8, marginLeft: 10 }}>
@@ -287,7 +287,7 @@ const ViewMyDoctors = () => {
           </Select>
           <button
             onClick={handleFilter}
-            style={{ width: 100, marginRight: 20 }}
+            style={{ width: 100, marginRight: 10}}
             className="btn btn-sm btn-primary"
           >
             Apply filters
@@ -344,7 +344,7 @@ const ViewMyDoctors = () => {
                               <br></br>
                               <br></br>
                               <button
-                                style={{ marginLeft: "13rem" }}
+                                style={{ marginLeft: "14rem" }}
                                 className="btn btn-sm btn-success"
                                 onClick={() => handleRedirection(request._id)}
                               >
