@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Input, Button, Spin } from "antd";
 import Cookies from "js-cookie";
 import { useParams } from "react-router-dom";
@@ -7,6 +7,7 @@ import { ArrowRightOutlined } from "@ant-design/icons";
 import DateSeparator from "../../components/DateSeperator";
 import Message from "../../components/Message";
 import ChatTilte from "../../components/ChatTitle";
+import { socket } from "../../layouts/PatientLayout";
 
 const { TextArea } = Input;
 
@@ -18,17 +19,19 @@ interface Message {
 
 const ChatDoctor = () => {
   const [loading, setLoading] = useState<boolean>(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("accessToken") || null
   );
   const [messages, setMessages] = useState<any[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const { id } = useParams<{ id: string }>();
-  const socket: Socket = io("http://localhost:8000", {
-    auth: {
-      token: Cookies.get("accessToken"),
-    },
-  });
+
+  useLayoutEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (!token) return;
@@ -98,6 +101,7 @@ const ChatDoctor = () => {
 
   return (
     <div
+      ref={scrollRef}
       style={{ margin: "20px", paddingBottom: "70px", position: "relative" }}
     >
       {loading ? (
@@ -136,7 +140,7 @@ const ChatDoctor = () => {
             style={{
               position: "fixed",
               bottom: 0,
-              width: "135vh",
+              width: "137vh",
               alignItems: "center",
               padding: "10px",
               backgroundColor: "#eee",
@@ -150,8 +154,8 @@ const ChatDoctor = () => {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyPress}
               style={{
-                marginRight: "2.5vh",
-                width: "125vh",
+                marginRight: "1vh",
+                width: "130vh",
                 borderRadius: "1rem",
               }}
             />

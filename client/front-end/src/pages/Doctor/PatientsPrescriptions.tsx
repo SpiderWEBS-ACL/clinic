@@ -133,116 +133,48 @@ const PatientsPrescriptions = () => {
         <div className="col-md-8">
           <h1 className="mb-4">Prescriptions</h1>
           {prescriptions.map((prescription, index) => (
-            <Accordion key={index}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls={`panel${index + 1}-content`}
-                id={`panel${index + 1}-header`}
+            <>
+              {/* <DateSeparator date={prescription.Date + ""} /> */}
+              <Accordion
+                key={index}
+                style={{ marginBottom: "1rem", marginTop: "1rem" }}
               >
-                <Typography>{`Prescription #${index + 1}`}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                {prescription.Medicines?.length != 0 && (
-                  <Typography fontStyle="italic" color={"lightgray"}>
-                    Medicine(s) available on pharmacy platform
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls={`panel${index + 1}-content`}
+                  id={`panel${index + 1}-header`}
+                >
+                  <Typography style={{ marginRight: "34rem" }}>
+                    {`Prescription #${index + 1}`}
                   </Typography>
-                )}
-                {prescription.Medicines?.map((medicine, MedicineIndex) => (
-                  <Accordion key={MedicineIndex}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls={`panel${MedicineIndex + 1}-content`}
-                      id={`panel${MedicineIndex + 1}-header`}
+                  <Typography fontSize={"14px"} color={"#b9bbbe"}>
+                    {new Date(prescription.Date + "").toDateString()}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {prescription.Medicines?.length == 0 &&
+                    prescription.UnavailableMedicines?.length == 0 && (
+                      <Alert message="No medicines" type="info" showIcon />
+                    )}
+                  {prescription.Medicines?.length != 0 && (
+                    <Typography
+                      fontStyle="italic"
+                      color={"lightgray"}
+                      style={{ marginBottom: "1rem" }}
                     >
-                      <Typography>{medicine.Name}</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <IconButton
-                        style={{
-                          position: "absolute",
-                          top: "8px",
-                          right: "40px",
-                          color: "#555",
-                        }}
-                        onClick={handleEditClick}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        style={{
-                          position: "absolute",
-                          top: "8px",
-                          right: "8px",
-                          color: "#d32f2f",
-                        }}
-                        onClick={() => {
-                          handleDeleteClick(index, MedicineIndex, true);
-                        }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                      <Box mt={2}>
-                        <Input
-                          value={medicine?.Dosage}
-                          disabled={!editMode}
-                          type="number"
-                          onChange={(e) =>
-                            handleDosageChange(
-                              parseFloat(e.target.value),
-                              index,
-                              MedicineIndex,
-                              true
-                            )
-                          }
-                        />
-                      </Box>
-                      <Box mt={2}>
-                        <Input
-                          value={medicine?.Instructions}
-                          disabled={!editMode}
-                          onChange={(e) =>
-                            handleInstructionsChange(
-                              e.target.value,
-                              index,
-                              MedicineIndex,
-                              true
-                            )
-                          }
-                        />
-                      </Box>
-                      {editMode && (
-                        <Box mt={2}>
-                          <Button
-                            type="primary"
-                            style={{ marginRight: "1rem" }}
-                            onClick={handleSubmit}
-                          >
-                            Save
-                          </Button>
-                          <Button onClick={handleCancelEdit}>Cancel</Button>
-                        </Box>
-                      )}
-                    </AccordionDetails>
-                  </Accordion>
-                ))}
-                {prescription.UnavailableMedicines?.length != 0 && (
-                  <Typography
-                    fontStyle="italic"
-                    color={"lightgray"}
-                    style={{ marginTop: "1rem" }}
-                  >
-                    Medicine(s) not available on pharmacy platform
-                  </Typography>
-                )}
-                {prescription.UnavailableMedicines?.map(
-                  (medicine, MedicineIndex) => (
+                      Medicine(s) available on pharmacy platform
+                    </Typography>
+                  )}
+                  {prescription.Medicines?.map((medicine, MedicineIndex) => (
                     <Accordion key={MedicineIndex}>
                       <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}
                         aria-controls={`panel${MedicineIndex + 1}-content`}
                         id={`panel${MedicineIndex + 1}-header`}
                       >
-                        <Typography>{medicine.Medicine}</Typography>
+                        <Typography style={{ color: "#1890ff" }}>
+                          {medicine.Name}
+                        </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
                         <IconButton
@@ -264,12 +196,13 @@ const PatientsPrescriptions = () => {
                             color: "#d32f2f",
                           }}
                           onClick={() => {
-                            handleDeleteClick(index, MedicineIndex, false);
+                            handleDeleteClick(index, MedicineIndex, true);
                           }}
                         >
                           <DeleteIcon />
                         </IconButton>
                         <Box mt={2}>
+                          <label>Dosage </label>
                           <Input
                             value={medicine?.Dosage}
                             disabled={!editMode}
@@ -279,12 +212,13 @@ const PatientsPrescriptions = () => {
                                 parseFloat(e.target.value),
                                 index,
                                 MedicineIndex,
-                                false
+                                true
                               )
                             }
                           />
                         </Box>
                         <Box mt={2}>
+                          <label>Instructions </label>
                           <Input
                             value={medicine?.Instructions}
                             disabled={!editMode}
@@ -293,7 +227,7 @@ const PatientsPrescriptions = () => {
                                 e.target.value,
                                 index,
                                 MedicineIndex,
-                                false
+                                true
                               )
                             }
                           />
@@ -303,19 +237,112 @@ const PatientsPrescriptions = () => {
                             <Button
                               type="primary"
                               style={{ marginRight: "1rem" }}
-                              // onClick={handleSubmit}
+                              onClick={handleSubmit}
                             >
-                              Submit
+                              Save
                             </Button>
                             <Button onClick={handleCancelEdit}>Cancel</Button>
                           </Box>
                         )}
                       </AccordionDetails>
                     </Accordion>
-                  )
-                )}{" "}
-              </AccordionDetails>
-            </Accordion>
+                  ))}
+                  {prescription.UnavailableMedicines?.length != 0 && (
+                    <Typography
+                      fontStyle="italic"
+                      color={"lightgray"}
+                      style={{ marginTop: "1rem", marginBottom: "1rem" }}
+                    >
+                      Medicine(s) not available on pharmacy platform
+                    </Typography>
+                  )}
+                  {prescription.UnavailableMedicines?.map(
+                    (medicine, MedicineIndex) => (
+                      <Accordion key={MedicineIndex}>
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls={`panel${MedicineIndex + 1}-content`}
+                          id={`panel${MedicineIndex + 1}-header`}
+                        >
+                          <Typography style={{ color: "#1890ff" }}>
+                            {medicine.Medicine}
+                          </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <IconButton
+                            style={{
+                              position: "absolute",
+                              top: "8px",
+                              right: "40px",
+                              color: "#555",
+                            }}
+                            onClick={handleEditClick}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            style={{
+                              position: "absolute",
+                              top: "8px",
+                              right: "8px",
+                              color: "#d32f2f",
+                            }}
+                            onClick={() => {
+                              handleDeleteClick(index, MedicineIndex, false);
+                            }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                          <Box mt={2}>
+                            <label>Dosage</label>
+                            <Input
+                              value={medicine?.Dosage}
+                              disabled={!editMode}
+                              type="number"
+                              onChange={(e) =>
+                                handleDosageChange(
+                                  parseFloat(e.target.value),
+                                  index,
+                                  MedicineIndex,
+                                  false
+                                )
+                              }
+                            />
+                          </Box>
+                          <Box mt={2}>
+                            <label>Instructions</label>
+                            <Input
+                              value={medicine?.Instructions}
+                              disabled={!editMode}
+                              onChange={(e) =>
+                                handleInstructionsChange(
+                                  e.target.value,
+                                  index,
+                                  MedicineIndex,
+                                  false
+                                )
+                              }
+                            />
+                          </Box>
+                          {editMode && (
+                            <Box mt={2}>
+                              <Button
+                                type="primary"
+                                style={{ marginRight: "1rem" }}
+                                onClick={handleSubmit}
+                              >
+                                Save
+                              </Button>
+                              <Button onClick={handleCancelEdit}>Cancel</Button>
+                            </Box>
+                          )}
+                        </AccordionDetails>
+                      </Accordion>
+                    )
+                  )}{" "}
+                </AccordionDetails>
+              </Accordion>
+            </>
           ))}
         </div>
       </div>

@@ -270,7 +270,7 @@ const ViewDoctorDetails = () => {
             Book Appointment
           </button>
           <button
-            style={{ marginRight: 0 }}
+            style={{ marginRight: 20 }}
             className="btn btn-sm btn-primary"
             hidden={!hasFamily}
             onClick={() => {
@@ -278,15 +278,6 @@ const ViewDoctorDetails = () => {
             }}
           >
             Book for family member
-          </button>
-          <button
-            style={{ marginRight: 0 }}
-            className="btn btn-sm btn-primary"
-            onClick={() => {
-              navigate(`/patient/chat/${id}`);
-            }}
-          >
-            Chat
           </button>
         </Row>
       </Card>
