@@ -1,8 +1,8 @@
 import { Form, Input, Button, Select, AutoComplete, Tag, message } from "antd";
 import { FormInstance } from "antd/lib/form";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getAllMedicines } from "../../apis/Doctor/GetAllMedicines";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { addPrescription } from "../../apis/Doctor/AddPrescription";
 
 const { Option } = Select;
@@ -12,6 +12,7 @@ interface Prescription {
   Patient: string;
   Medicines: { MedicineId: string; Dosage: number; Instructions?: string }[];
 }
+
 interface Medicine {
   _id: string;
   Name: string;
@@ -66,11 +67,6 @@ const AddPrescription = () => {
     Medicines: [],
     UnavailableMedicines: [],
   });
-
-  const options = Medicines.map((medicine) => ({
-    value: medicine._id,
-    label: medicine.Name,
-  }));
 
   const fetchMedicines = async () => {
     try {

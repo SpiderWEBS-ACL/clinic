@@ -15,7 +15,7 @@ const requireSocketAuth = (socket, next) => {
         socket.user = decoded;
     } catch (err) {
         const error = new Error("403, Not authorized");
-        return socket(error);
+        return;
     }
 
     return next();
