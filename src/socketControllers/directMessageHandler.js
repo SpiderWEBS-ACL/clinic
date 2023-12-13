@@ -1,5 +1,6 @@
 const Conversation = require("../Models/Conversation");
 const Message = require("../Models/Message");
+const { getKeyByValue, getActiveConnections } = require("../socket/connectedUsers");
 const {
     sendNewDirectMessage,
 } = require("./notifyConnectedSockets");
@@ -23,7 +24,7 @@ const directMessageHandler = async (socket, data) => {
 
             conversation.messages = [...conversation.messages, newMessage._id];
             await conversation.save();
-            sendNewDirectMessage(conversation._id.toString(), newMessage);
+            sendNewDirectMessage(conversation._id.toString(), newMessage,getActiveConnections(socket.user.id));
         } else {
             console.log("creating new conversation");
             
@@ -31,8 +32,9 @@ const directMessageHandler = async (socket, data) => {
                 participants: [senderUserId, receiverUserId],
                 messages: [newMessage._id],
                 authorType: socket.user.role
-            }); 
-            sendNewDirectMessage(newConversation._id.toString(), newMessage, socket.user.id);
+            });
+            console.log("socket.user.id",socket.user.id) 
+            sendNewDirectMessage(newConversation._id.toString(), newMessage,getActiveConnections(socket.user.id));
         }
     } catch (err) {
         console.log(err);

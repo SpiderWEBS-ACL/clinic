@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Conversation = require("../Models/Conversation");
 const doctorModel = require("../Models/Doctor");
 const patientModel = require("../Models/Patient");
-const { getActiveConnections } = require("../socket/connectedUsers");
+const { getActiveConnections, connectedUsers, getKeyByValue } = require("../socket/connectedUsers");
 const  { getServerSocketInstance } = require("../socket/connectedUsers");
 
 const updateChatHistory = async (conversationId, toSpecificSocketId=null) => {
@@ -85,12 +85,21 @@ const sendNewDirectMessage = async (conversationId, newMessage, mySocketId) => {
         );
 
         console.log(activeConnections.filter((socketId) => {socketId != mySocketId}))
+        activeConnections.forEach((value, key) => {
+            console.log("my id", mySocketId)
+            console.log(getKeyByValue(mySocketId))
+            console.log(` New connection: ${key}: ${value.userId}`);
+          });
         activeConnections.forEach((socketId) => {
+            if(!mySocketId.includes(socketId)){
             io.to(socketId).emit("direct-message", {
                 newMessage: message,
                 participants: conversation.participants,
+                from: connectedUsers.get(mySocketId)
             });
+        }
         });
+    
     });
 };
 

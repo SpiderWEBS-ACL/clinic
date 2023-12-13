@@ -42,6 +42,7 @@ const PatientLayout: React.FC = () => {
   }, []);
   socket.on("callUser", (data: any) => {
     console.log("data from: ", data.from, "data.name: ", data.Name);
+    localStorage.setItem("videoCallerSocket", data.from);
     setVideoCount(VideoCount + 1);
   });
   socket.on("direct-message", (data: any) => {

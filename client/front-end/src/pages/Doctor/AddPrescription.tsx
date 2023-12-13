@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { getAllMedicines } from "../../apis/Doctor/GetAllMedicines";
 
 import { useNavigate, useParams } from "react-router-dom";
-import { addPrescription } from "../../apis/Doctor/AddPrescriptions";
-
+import { addPrescription } from "../../apis/Doctor/Prescriptions/AddPrescription";
 
 const { Option } = Select;
 

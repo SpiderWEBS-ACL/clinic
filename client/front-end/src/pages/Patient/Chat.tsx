@@ -93,6 +93,7 @@ const Chat = () => {
         message: inputValue,
         createdAt: new Date(),
       };
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
       socket.emit("direct-message", {
         receiverUserId: id,
         message: inputValue,

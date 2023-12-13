@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  BrowserRouter as Router,
-  useNavigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, useNavigate } from "react-router-dom";
 import { FloatButton, Layout, Menu } from "antd";
 import {
   HomeOutlined,
@@ -107,7 +104,7 @@ const DoctorLayout: React.FC = () => {
         ></Menu>
       </Sider>
       <Layout>
-      <Content style={{ margin: "0 16px", overflow: "hidden" }}>
+        <Content style={{ margin: "0 16px", overflow: "hidden" }}>
           <div style={{ overflowY: "auto", maxHeight: "100vh" }}>
             <AppRouter />
           </div>

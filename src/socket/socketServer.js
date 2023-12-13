@@ -2,7 +2,7 @@ const directMessageHandler = require("../socketControllers/directMessageHandler"
 const newConnectionHandler = require("../socketControllers/newConnectionHandler")
 const requireSocketAuth  = require("../middleware/requireSocketAuth")
 const directChatHistoryHandler = require("../socketControllers/directChatHistoryHandler")
-const {setServerSocketInstance} = require("./connectedUsers")
+const {setServerSocketInstance, getActiveConnections} = require("./connectedUsers")
 const callRequestHandler  = require("../socketControllers/callRequestHandler")
 const callResponseHandler  = require("../socketControllers/callResponseHandler")
 const socket = require("socket.io");
@@ -63,11 +63,17 @@ const socketServerCreate = (server) => {
         })
 
         socket.on("callUser", (data) => {
-            io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
+            io.to(getActiveConnections(data.userToCall)).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
         })
 
         socket.on("answerCall", (data) => {
-            io.to(data.to).emit("callAccepted", data.signal)
+            io.to(getActiveConnections(data.to)).emit("callAccepted", data.signal)
+        })
+        socket.on("endCall", (data) => {
+            io.to(getActiveConnections(data.to)).emit("endCall")
+        })
+        socket.on("inLobby", (data) => {
+            socket.broadcast.emit("inLobby")
         })
     });
 };

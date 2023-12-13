@@ -19,6 +19,7 @@ const DoctorHome = () => {
     await getDoctor()
       .then((response) => {
         setDoctorInfo(response.data);
+        localStorage.setItem("DoctorName", response.data.Name);
       })
       .catch((error) => {
         console.error("Error:", error);

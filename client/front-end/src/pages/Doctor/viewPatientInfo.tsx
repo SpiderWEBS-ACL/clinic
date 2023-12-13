@@ -74,6 +74,7 @@ const ViewPatientInfo = () => {
     await getPatientInfoApi(id)
       .then((response) => {
         setPatientInfo(response.data);
+        localStorage.setItem("PatientName", response.data.Name);
         setLoadingList(false);
       })
       .catch((error) => {

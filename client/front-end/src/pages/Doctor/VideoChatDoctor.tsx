@@ -1,18 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
-import TextField from "@material-ui/core/TextField";
-import AssignmentIcon from "@material-ui/icons/Assignment";
 import PhoneIcon from "@material-ui/icons/Phone";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import Peer from "simple-peer";
 import { socket } from "../../layouts/PatientLayout";
+import { useNavigate, useParams } from "react-router-dom";
+import { message } from "antd";
 
 function videoChatDoctor() {
   const [me, setMe] = useState<string>("");
+  const [callerName, setcallerName] = useState<string>(
+    localStorage.getItem("DoctorName") + ""
+  );
+
   const [stream, setStream] = useState<MediaStream | undefined>();
-  const [remoteStream, setRemoteStream] = useState<MediaStream>();
+  const [remoteStream, setRemoteStream] = useState<MediaStream | undefined>();
   const [receivingCall, setReceivingCall] = useState<boolean>(false);
+  const [calling, setCalling] = useState<boolean>(false);
   const [caller, setCaller] = useState<string>("");
   const [callerSignal, setCallerSignal] = useState<
     Peer.SignalData | undefined
@@ -23,7 +27,9 @@ function videoChatDoctor() {
   const [name, setName] = useState<string>("");
   const myVideo = useRef<HTMLVideoElement>(null);
   const userVideo = useRef<HTMLVideoElement>(null);
-  const connectionRef = useRef<Peer.Instance | undefined>();
+  const connectionRef = useRef<Peer.Instance>();
+  const navigate = useNavigate();
+  const { id } = useParams();
 
   const handleVideoLoaded = (
     videoElement: HTMLVideoElement | null,
@@ -50,6 +56,7 @@ function videoChatDoctor() {
       });
 
     socket.on("me", (id: string) => {
+      console.log(id);
       setMe(id);
     });
 
@@ -62,9 +69,63 @@ function videoChatDoctor() {
         setCallerSignal(data.signal);
       }
     );
+    socket.on("endCall", () => {
+      console.log("in End Call");
+      setCallEnded(true);
+      message.info("Call Ended! ");
+      navigate("/doctor/Home");
+    });
+    // socket.on("inLobby", () => {
+    //   console.log("HERE???");
+    //   console.log(connectionRef);
+    //   connectionRef.current?.on("signal", (data) => {
+    //     console.log("HERE?");
+    //     socket.emit("callUser", {
+    //       userToCall: id,
+    //       signalData: data,
+    //       from: me,
+    //       name: callerName,
+    //     });
+    //   });
+    //   connectionRef.current?.on("stream", (stream) => {
+    //     console.log("userVideo.current: " + userVideo.current);
+    //     if (userVideo.current) userVideo.current.srcObject = stream;
+    //     setRemoteStream(stream);
+    //   });
+    //   socket.on("callAccepted", (signal: Peer.SignalData) => {
+    //     setCallAccepted(true);
+    //     connectionRef.current?.signal(signal);
+    //   });
+    // });
   }, []);
 
+  // useEffect(() => {
+  //   socket.on("inLobby", () => {
+  //     console.log("HERE???");
+  //     console.log(connectionRef);
+  //     connectionRef.current?.on("signal", (data) => {
+  //       console.log("HERE?");
+  //       socket.emit("callUser", {
+  //         userToCall: id,
+  //         signalData: data,
+  //         from: me,
+  //         name: callerName,
+  //       });
+  //     });
+  //     connectionRef.current?.on("stream", (stream) => {
+  //       console.log("userVideo.current: " + userVideo.current);
+  //       if (userVideo.current) userVideo.current.srcObject = stream;
+  //       setRemoteStream(stream);
+  //     });
+  //     socket.on("callAccepted", (signal: Peer.SignalData) => {
+  //       setCallAccepted(true);
+  //       connectionRef.current?.signal(signal);
+  //     });
+  //   });
+  // }, [connectionRef, id, me, callerName, userVideo]);
+
   const callUser = (id: string) => {
+    setCalling(true);
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -75,7 +136,7 @@ function videoChatDoctor() {
         userToCall: id,
         signalData: data,
         from: me,
-        name: name,
+        name: callerName,
       });
     });
     peer.on("stream", (stream) => {
@@ -99,12 +160,13 @@ function videoChatDoctor() {
       stream: stream,
     });
     peer.on("signal", (data) => {
-      socket.emit("answerCall", { signal: data, to: caller });
+      socket.emit("answerCall", { signal: data, to: id });
     });
     peer.on("stream", (stream) => {
       if (userVideo.current) {
         userVideo.current.srcObject = stream;
       }
+      setRemoteStream(stream);
     });
 
     if (callerSignal) {
@@ -118,11 +180,12 @@ function videoChatDoctor() {
     if (connectionRef.current) {
       connectionRef.current.destroy();
     }
+    socket.emit("endCall", { to: id });
   };
 
   return (
     <>
-      <h1 style={{ textAlign: "center", color: "#fff" }}>Zoomish</h1>
+      <h1 style={{ textAlign: "center", color: "#111" }}>Video Call</h1>
       <div className="container">
         <div className="video-container">
           <div className="video">
@@ -132,7 +195,7 @@ function videoChatDoctor() {
                 muted
                 ref={(ref) => handleVideoLoaded(ref, stream)}
                 autoPlay
-                style={{ width: "300px" }}
+                style={{ marginLeft: 0, width: "450px" }}
               />
             )}
           </div>
@@ -140,63 +203,41 @@ function videoChatDoctor() {
             {callAccepted && !callEnded ? (
               <video
                 playsInline
-                ref={(ref) => handleVideoLoaded(ref, remoteStream )}
+                ref={(ref) => handleVideoLoaded(ref, remoteStream)}
                 autoPlay
-                style={{ width: "300px" }}
+                style={{ width: "450px" }}
               />
             ) : null}
           </div>
         </div>
         <div className="myId">
-          <TextField
-            id="filled-basic"
-            label="Name"
-            variant="filled"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={{ marginBottom: "20px" }}
-          />
-          <CopyToClipboard text={me}>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<AssignmentIcon fontSize="large" />}
-            >
-              Copy ID
+          {callAccepted && !callEnded ? (
+            <Button variant="contained" color="secondary" onClick={leaveCall}>
+              End Call
             </Button>
-          </CopyToClipboard>
-
-          <TextField
-            id="filled-basic"
-            label="ID to call"
-            variant="filled"
-            value={idToCall}
-            onChange={(e) => setIdToCall(e.target.value)}
-          />
-          <div className="call-button">
-            {callAccepted && !callEnded ? (
-              <Button variant="contained" color="secondary" onClick={leaveCall}>
-                End Call
-              </Button>
-            ) : (
-              <IconButton
-                color="primary"
-                aria-label="call"
-                onClick={() => callUser(idToCall)}
-              >
-                <PhoneIcon fontSize="large" />
-              </IconButton>
-            )}
-            {idToCall}
-          </div>
+          ) : (
+            <IconButton
+              color="primary"
+              aria-label="call"
+              onClick={() => callUser(id + "")}
+            >
+              <PhoneIcon fontSize="large" />
+            </IconButton>
+          )}
+          {idToCall}
         </div>
         <div>
           {receivingCall && !callAccepted ? (
             <div className="caller">
-              <h1>{name} is calling...</h1>
+              <h1>{callerName} is calling...</h1>
               <Button variant="contained" color="primary" onClick={answerCall}>
                 Answer
               </Button>
+            </div>
+          ) : null}
+          {calling && !callAccepted ? (
+            <div className="caller">
+              <h1>calling {localStorage.getItem("PatientName") + "..."}</h1>
             </div>
           ) : null}
         </div>
