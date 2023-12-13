@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import Peer, { SignalData } from "simple-peer";
 import Button from "@material-ui/core/Button";
 import "../../App.css";
-import { saveVideoSocketId } from "../../apis/Patient/Video Chat/SaveVideoSocketId";
 import { socket } from "../../layouts/PatientLayout";
 
 const VideoChat: React.FC = () => {
@@ -18,7 +17,6 @@ const VideoChat: React.FC = () => {
   const [name, setName] = useState<string>("");
   const userVideo = useRef<HTMLVideoElement>(null);
   const connectionRef = useRef<Peer.Instance>();
-
   const handleVideoLoaded = (
     videoElement: HTMLVideoElement | null,
     stream: MediaStream | undefined

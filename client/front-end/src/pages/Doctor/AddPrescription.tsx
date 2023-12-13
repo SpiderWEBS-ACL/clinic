@@ -2,8 +2,10 @@ import { Form, Input, Button, Select, AutoComplete, Tag, message } from "antd";
 import { FormInstance } from "antd/lib/form";
 import { useEffect, useState } from "react";
 import { getAllMedicines } from "../../apis/Doctor/GetAllMedicines";
+
 import { useNavigate, useParams } from "react-router-dom";
-import { addPrescription } from "../../apis/Doctor/AddPrescription";
+import { addPrescription } from "../../apis/Doctor/AddPrescriptions";
+
 
 const { Option } = Select;
 
@@ -46,6 +48,8 @@ interface PrescriptionModel {
   Patient: string;
   Medicines: MedicineApi[];
   UnavailableMedicines: UnavailableMedicine[];
+  Date?: Date;
+  Filled?: string;
 }
 
 const AddPrescription = () => {
@@ -60,6 +64,7 @@ const AddPrescription = () => {
   const [DisableUnavailable, setDisableUnavailable] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<any>();
   const [filteredMedicines, setfilteredMedicines] = useState<any[]>([]);
+  const [medicineAdded, setMedicineAdded] = useState<boolean>(false);
   const navigate = useNavigate();
   const [Prescription, setPrescription] = useState<PrescriptionModel>({
     Doctor: "" + localStorage.getItem("id"),
@@ -146,13 +151,18 @@ const AddPrescription = () => {
     message.success("Added!");
     setDisableUnavailable(false);
     form.resetFields();
+    setMedicineAdded(true);
     console.log(Prescription);
   };
   const handleDoneClick = async () => {
     try {
-      const response = await addPrescription(Prescription);
-      message.success("Prescription added successfully!");
-      navigate(`/doctor/patientInfo/${id}`);
+      if (medicineAdded) {
+        await addPrescription(Prescription);
+        message.success("Prescription added successfully!");
+        navigate(`/doctor/prescriptions/${id}`);
+      } else {
+        message.error("Please add a medicine");
+      }
     } catch (error) {
       message.error("An error has occured, please try again");
       console.log(error);
@@ -209,7 +219,7 @@ const AddPrescription = () => {
             )}
 
             <Form.Item
-              label="Dosage"
+              label="Dosage (in mg)"
               name="Dosage"
               rules={[{ required: true, message: "Please enter dosage" }]}
             >

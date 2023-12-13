@@ -1,11 +1,12 @@
 import { io, Socket } from "socket.io-client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Input, Button, List, Avatar, Row, Col, Spin } from "antd";
 import Cookies from "js-cookie";
 import { useParams } from "react-router-dom";
-import { ArrowRightOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined, ArrowUpOutlined } from "@ant-design/icons";
 import DateSeparator from "../../components/DateSeperator";
 import Message from "../../components/Message";
+import { socket } from "../../layouts/PatientLayout";
 
 const { TextArea } = Input;
 
@@ -16,6 +17,7 @@ interface Message {
 
 const Chat = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("accessToken") || null
   );
@@ -24,11 +26,12 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { id } = useParams<{ id: string }>();
-  const socket: Socket = io("http://localhost:8000", {
-    auth: {
-      token: Cookies.get("accessToken"),
-    },
-  });
+
+  useLayoutEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (!token) return;
@@ -107,6 +110,7 @@ const Chat = () => {
 
   return (
     <div
+      ref={scrollRef}
       style={{ margin: "20px", paddingBottom: "70px", position: "relative" }}
     >
       {loading ? (
@@ -144,7 +148,7 @@ const Chat = () => {
             style={{
               position: "fixed",
               bottom: 0,
-              width: "145vh",
+              width: "137vh",
               alignItems: "center",
               padding: "10px",
               backgroundColor: "#eee",
@@ -158,17 +162,16 @@ const Chat = () => {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyPress}
               style={{
-                marginRight: "10px",
-                width: "135vh",
+                marginRight: "1vh",
+                width: "130vh",
                 borderRadius: "1rem",
               }}
             />
-
             <Button
               icon={<ArrowRightOutlined />}
               type="primary"
-              style={{ marginRight: "10px" }}
               onClick={sendMessage}
+              shape="circle"
             ></Button>
           </div>
         </>

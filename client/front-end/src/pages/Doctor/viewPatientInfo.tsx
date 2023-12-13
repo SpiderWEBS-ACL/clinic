@@ -375,13 +375,6 @@ const ViewPatientInfo = () => {
             Add Health Record
           </button>
           <button
-            // style={{ marginRight: 100 }}
-            onClick={schedule}
-            className="btn btn-sm btn-primary"
-          >
-            Schedule a follow up
-          </button>
-          <button
             onClick={() => {
               navigate(`/doctor/addPrescription/${id}`);
             }}
@@ -389,14 +382,21 @@ const ViewPatientInfo = () => {
           >
             Add Prescription
           </button>
-          <button onClick={handleVideoCall} className="btn btn-sm btn-primary">
+          <button
+            // style={{ marginRight: 100 }}
+            onClick={schedule}
+            className="btn btn-sm btn-primary"
+          >
+            Schedule a follow up
+          </button>
+          <button onClick={handleVideoCall} className="btn btn-sm btn-success">
             <VideoCameraFilled />
           </button>
           <button
             onClick={() => {
               navigate(`/doctor/chat/${id}`);
             }}
-            className="btn btn-sm btn-primary"
+            className="btn btn-sm btn-success"
           >
             <IoChatbox />
           </button>
