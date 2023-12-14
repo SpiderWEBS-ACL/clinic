@@ -118,7 +118,8 @@ const {
   addAppointment,
   filterAppointmentPatient,
   filterAppointmentDoctor,
-  rescheduleAppointment
+  rescheduleAppointment,
+  cancelAppointment,
 } = require("./controllers/appointmentController");
 
 const {
@@ -197,10 +198,7 @@ app.get("/admin/allDoctors", AdminProtect, getAllDoctors);
 app.delete("/admin/removeDoctor/:id", AdminProtect, removeDoctor);
 app.delete("/admin/removePatient/:id", AdminProtect, removePatient);
 app.delete("/admin/removeAdmin/:id", AdminProtect, removeAdmin);
-app.get(
-  "/admin/registrationRequests",
-  AdminProtect,
-  getAllDoctrsRegistrationReqs
+app.get("/admin/registrationRequests", AdminProtect, getAllDoctrsRegistrationReqs
 );
 app.get(
   "/admin/registrationRequest/:id",
@@ -405,6 +403,7 @@ app.get(
   DoctorProtect,
   filterAppointmentDoctor
 );
+app.put("/appointment/cancelAppointment/:id", DoctorProtect, cancelAppointment)
 
 //Subscription Endpoints
 app.post("/subscription/subscribeStripe/", PatientProtect, subscribeWithStripe);

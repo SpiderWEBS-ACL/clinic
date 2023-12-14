@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../../components/Alert";
-import { DatePicker, DatePickerProps, Modal, Select } from "antd";
+import { Button, DatePicker, DatePickerProps, Modal, Select } from "antd";
 import { message } from "antd";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -12,6 +12,7 @@ import bootstrap5Plugin from "@fullcalendar/bootstrap5";
 import interactionPlugin from "@fullcalendar/interaction";
 import { allAppoimtmentsDoctor } from "../../apis/Doctor/Appointments/AllAppointmentsDoctor";
 import { filterAppointmentsDoctor } from "../../apis/Doctor/Appointments/FilterAppointmentsDoctor";
+import { cancelAppointmentDoctor } from "../../apis/Doctor/Appointments/cancelAppointment";
 
 const ViewPatientAppointments = () => {
   const { Option } = Select;
@@ -52,6 +53,14 @@ const ViewPatientAppointments = () => {
       message.error(`${error.response.data.error}`);
     }
   };
+
+  const handleCancelAppointment = async (id: string) => {
+    try {
+      await cancelAppointmentDoctor(id);
+    }catch(error: any){
+      message.error(`${error.response.data.error}`);
+    }
+  }
 
   useEffect(() => {
     sessionStorage.clear();
@@ -152,9 +161,21 @@ const ViewPatientAppointments = () => {
         onCancel={() => {
           setShowAppointmentModal(false);
         }}
-        onOk={() => {
-          setShowAppointmentModal(false);
-        }}
+        //onOk={() => {
+         // setShowAppointmentModal(false);
+        ///}}
+        footer ={
+          <div>
+          <Button type="primary" danger onClick={() => {
+            handleCancelAppointment(appointment._id)
+            setShowAppointmentModal(false);
+          }}>Cancel Appointment</Button> 
+          <Button type="primary" onClick={() => {
+            //RESCHEDULE FUNCTIONALITY YA HAYSOOM
+          }}>Reschedule</Button> 
+          </div>
+     }
+    
       >
         <table className="table">
           <thead>
