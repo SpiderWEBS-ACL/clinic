@@ -103,6 +103,24 @@ const cancelAppointment = async (req,res) =>{
     }
 };
 
+const rescheduleAppointment = async (req, res) => {
+    const id  = req.body.id;
+    const appointmentDate = req.body.AppointmentDate+"";
+    const date = new Date(appointmentDate)
+    date.setHours(date.getHours() - 2);
+    const start = new Date(date);
+    date.setHours(date.getHours() - 1);
+    const end = new Date(date);
+    console.log(appointmentDate)
+    try{
+        const appointment = await appointmentModel.findByIdAndUpdate(id,{AppointmentDate:appointmentDate , start:start , end:end});
+        return res.status(200).json(appointment);
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+
+}
+
 const filterAppointmentPatient = async (req, res) => {
     try {
         const id = req.user.id;
@@ -172,4 +190,4 @@ const filterAppointmentPatient = async (req, res) => {
 
 
 
-module.exports = {addAppointment,filterAppointmentPatient, filterAppointmentDoctor, cancelAppointment};
+module.exports = {addAppointment,filterAppointmentPatient, filterAppointmentDoctor, cancelAppointment,rescheduleAppointment};
