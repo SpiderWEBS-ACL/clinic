@@ -13,25 +13,45 @@ const prescriptionSchema = new Schema(
       ref: "Patient",
       required: true,
     },
-    Medications: [
-      {Medicine: {
-        type: String,
+    Medicines: [
+      {
+        MedicineId: {
+          type: Schema.Types.ObjectId,
+          ref: "Medicine",
+        },
+        Name: {
+          type: String,
+        },
+        Dosage: {
+          type: Number,
+        },
+        Instructions: {
+          type: String,
+        },
       },
-      Dosage: {
-        type: Number,
+    ],
+    UnavailableMedicines: [
+      {
+        Medicine: {
+          type: String,
+        },
+        Dosage: {
+          type: Number,
+        },
+        Instructions: {
+          type: String,
+        },
       },
-      Instructions: {
-        type: String,
-      }}],
-      Date: {
-        type: Date,
-        default: Date.now,
-      },
-      Filled: {
-        type: String,
-        default: "Unfilled",
-        //enum: ["Filled,Unfilled"]
-      }
+    ],
+    Date: {
+      type: Date,
+      default: Date.now,
+    },
+    Filled: {
+      type: String,
+      default: "Unfilled",
+      //enum: ["Filled,Unfilled"]
+    },
   },
   { timestamps: true }
 );

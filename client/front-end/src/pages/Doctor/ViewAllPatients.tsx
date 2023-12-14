@@ -6,6 +6,7 @@ import { Card, Avatar } from "antd";
 import { getMyPatients } from "../../apis/Doctor/Patients/GetMyPatients";
 import { upcomingAppointments } from "../../apis/Doctor/Appointments/UpcomigAppointments";
 import { searchPatient } from "../../apis/Doctor/Patients/SearchPatient";
+import { IoChatbox } from "react-icons/io5";
 
 const ViewAllPatients = () => {
   const [name, setName] = useState("");
@@ -114,9 +115,7 @@ const ViewAllPatients = () => {
 
   return (
     <div className="container">
-      <h2 className="text-center mt-4 mb-4">
-        <strong>Patients</strong>
-      </h2>
+      <h2 className="text-center mt-4 mb-4">Patients</h2>
       <div>
         <span>
           <label style={{ marginRight: 8, marginLeft: 250 }}>
@@ -162,61 +161,69 @@ const ViewAllPatients = () => {
       </div>
       <br />
 
-      <tbody>
-        {patients.map(
-          (patient, index) =>
-            index % 3 === 0 && (
-              <Row gutter={16} key={index}>
-                {patients.slice(index, index + 3).map((patient, subIndex) => (
-                  <Col span={8} key={subIndex} style={{ maxWidth: "25rem" }}>
-                    <div>
-                      <Card
-                        style={{
-                          width: "24rem",
-                          marginTop: "3rem",
-                          height: "15rem",
-                        }}
-                        loading={loadingList}
-                        hoverable
-                        className="hover-card"
-                        onClick={() => handleRedirection(patient._id)}
-                      >
-                        <Meta
-                          avatar={
-                            <Avatar
-                              src="https://xsgames.co/randomusers/avatar.php?g=pixel"
-                              style={{ width: 75, height: 75 }}
-                            />
-                          }
-                          title={
-                            <div style={{ fontSize: "20px" }}>
-                              {patient.Name}
-                            </div>
-                          }
-                          description={
-                            <div>
-                              <strong>Email:</strong> {patient.Email}
-                              <br></br>
-                              <br></br>
-                              <strong>Date of birth:</strong>{" "}
-                              {patient.Dob.substring(0, 10)}
-                              <br></br>
-                              <br></br>
-                              <strong>Gender:</strong> {patient.Gender}
-                              <br></br>
-                              <br></br>
-                              <strong>Mobile:</strong> {patient.Mobile}
-                            </div>
-                          }
-                        />
-                      </Card>
-                    </div>
-                  </Col>
-                ))}
-              </Row>
-            )
-        )}
-      </tbody>
+      {patients.map(
+        (patient, index) =>
+          index % 3 === 0 && (
+            <Row gutter={16} key={index}>
+              {patients.slice(index, index + 3).map((patient, subIndex) => (
+                <Col span={8} key={subIndex} style={{ maxWidth: "25rem" }}>
+                  <div>
+                    <Card
+                      style={{
+                        width: "24rem",
+                        marginTop: "3rem",
+                        height: "16rem",
+                      }}
+                      loading={loadingList}
+                      hoverable
+                      className="hover-card"
+                      onClick={() => handleRedirection(patient._id)}
+                    >
+                      <Meta
+                        avatar={
+                          <Avatar
+                            src="https://xsgames.co/randomusers/avatar.php?g=pixel"
+                            style={{ width: 75, height: 75 }}
+                          />
+                        }
+                        title={
+                          <div style={{ fontSize: "20px" }}>{patient.Name}</div>
+                        }
+                        description={
+                          <div>
+                            <strong>Email:</strong> {patient.Email}
+                            <br></br>
+                            <br></br>
+                            <strong>Date of birth:</strong>{" "}
+                            {patient.Dob.substring(0, 10)}
+                            <br></br>
+                            <br></br>
+                            <strong>Gender:</strong> {patient.Gender}
+                            <br></br>
+                            <br></br>
+                            <strong>Mobile:</strong> {patient.Mobile}
+                            <button
+                              style={{
+                                marginLeft: "13rem",
+                              }}
+                              className="btn btn-sm btn-success"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/doctor/chat/${patient._id}`);
+                              }}
+                            >
+                              <IoChatbox />
+                            </button>
+                          </div>
+                        }
+                      />
+                    </Card>
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          )
+      )}
     </div>
   );
 };

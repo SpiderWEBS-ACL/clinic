@@ -1,30 +1,35 @@
 import React, { useEffect, useRef, useState } from "react";
-import Peer, { SignalData } from "simple-peer";
-import { io, Socket } from "socket.io-client";
 import Button from "@material-ui/core/Button";
-import "../../App.css";
-import { useParams } from "react-router-dom";
-import { getPatientInfoApi } from "../../apis/Doctor/Patients/GetPatientInfo";
+import IconButton from "@material-ui/core/IconButton";
+import PhoneIcon from "@material-ui/icons/Phone";
+import Peer from "simple-peer";
+import { socket } from "../../layouts/PatientLayout";
+import { useNavigate, useParams } from "react-router-dom";
+import { message } from "antd";
 
-const socket: Socket = io("http://localhost:8000");
+function videoChatDoctor() {
+  const [me, setMe] = useState<string>("");
+  const [callerName, setcallerName] = useState<string>(
+    localStorage.getItem("DoctorName") + ""
+  );
 
-const VideoChatDoctor: React.FC = () => {
-  const [stream, setStream] = useState<MediaStream>();
-  const [remoteStream, setRemoteStream] = useState<MediaStream>();
+  const [stream, setStream] = useState<MediaStream | undefined>();
+  const [remoteStream, setRemoteStream] = useState<MediaStream | undefined>();
   const [receivingCall, setReceivingCall] = useState<boolean>(false);
+  const [calling, setCalling] = useState<boolean>(false);
   const [caller, setCaller] = useState<string>("");
-  const [callerSignal, setCallerSignal] = useState<SignalData>();
+  const [callerSignal, setCallerSignal] = useState<
+    Peer.SignalData | undefined
+  >();
   const [callAccepted, setCallAccepted] = useState<boolean>(false);
   const [idToCall, setIdToCall] = useState<string>("");
   const [callEnded, setCallEnded] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
+  const myVideo = useRef<HTMLVideoElement>(null);
   const userVideo = useRef<HTMLVideoElement>(null);
   const connectionRef = useRef<Peer.Instance>();
-  const [patientInfo, setPatientInfo] = useState<any>({});
+  const navigate = useNavigate();
   const { id } = useParams();
-
-  let patientVideoSocketId = "";
-  let me = "";
 
   const handleVideoLoaded = (
     videoElement: HTMLVideoElement | null,
@@ -43,54 +48,95 @@ const VideoChatDoctor: React.FC = () => {
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
         setStream(stream);
-        setRemoteStream(stream);
+        console.log(myVideo.current);
+        if (myVideo.current) {
+          console.log(myVideo.current);
+          myVideo.current.srcObject = stream;
+        }
       });
+
     socket.on("me", (id: string) => {
-      me = id;
-      getPatientInfoAndCall(id);
+      console.log(id);
+      setMe(id);
     });
 
-    socket.on("callUser", (data: any) => {
-      console.log("calling " + data.from);
-      setReceivingCall(true);
-      setCaller(data.from);
-      setName(data.name);
-      setCallerSignal(data.signal);
-    });
-
-    return () => {
-      if (!callEnded) {
-        leaveCall();
+    socket.on(
+      "callUser",
+      (data: { from: string; name: string; signal: Peer.SignalData }) => {
+        setReceivingCall(true);
+        setCaller(data.from);
+        setName(data.name);
+        setCallerSignal(data.signal);
       }
-    };
+    );
+    socket.on("endCall", () => {
+      console.log("in End Call");
+      setCallEnded(true);
+      message.info("Call Ended! ");
+      navigate("/doctor/Home");
+    });
+    // socket.on("inLobby", () => {
+    //   console.log("HERE???");
+    //   console.log(connectionRef);
+    //   connectionRef.current?.on("signal", (data) => {
+    //     console.log("HERE?");
+    //     socket.emit("callUser", {
+    //       userToCall: id,
+    //       signalData: data,
+    //       from: me,
+    //       name: callerName,
+    //     });
+    //   });
+    //   connectionRef.current?.on("stream", (stream) => {
+    //     console.log("userVideo.current: " + userVideo.current);
+    //     if (userVideo.current) userVideo.current.srcObject = stream;
+    //     setRemoteStream(stream);
+    //   });
+    //   socket.on("callAccepted", (signal: Peer.SignalData) => {
+    //     setCallAccepted(true);
+    //     connectionRef.current?.signal(signal);
+    //   });
+    // });
   }, []);
-  const getPatientInfoAndCall = async (me: any) => {
-    await getPatientInfoApi(id)
-      .then((response) => {
-        console.log(response.data.VideoSocketId);
-        setPatientInfo(response.data);
-        patientVideoSocketId = response.data.VideoSocketId;
-        console.log(patientVideoSocketId);
-        callUser(me);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  };
-  const callUser = (me: any) => {
-    console.log("entered call user user to call: " + patientVideoSocketId);
-    console.log("me: " + me);
+
+  // useEffect(() => {
+  //   socket.on("inLobby", () => {
+  //     console.log("HERE???");
+  //     console.log(connectionRef);
+  //     connectionRef.current?.on("signal", (data) => {
+  //       console.log("HERE?");
+  //       socket.emit("callUser", {
+  //         userToCall: id,
+  //         signalData: data,
+  //         from: me,
+  //         name: callerName,
+  //       });
+  //     });
+  //     connectionRef.current?.on("stream", (stream) => {
+  //       console.log("userVideo.current: " + userVideo.current);
+  //       if (userVideo.current) userVideo.current.srcObject = stream;
+  //       setRemoteStream(stream);
+  //     });
+  //     socket.on("callAccepted", (signal: Peer.SignalData) => {
+  //       setCallAccepted(true);
+  //       connectionRef.current?.signal(signal);
+  //     });
+  //   });
+  // }, [connectionRef, id, me, callerName, userVideo]);
+
+  const callUser = (id: string) => {
+    setCalling(true);
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream: stream as MediaStream,
+      stream: stream,
     });
-    peer.on("signal", (data: SignalData) => {
+    peer.on("signal", (data) => {
       socket.emit("callUser", {
-        userToCall: patientVideoSocketId,
+        userToCall: id,
         signalData: data,
         from: me,
-        name: name,
+        name: callerName,
       });
     });
     peer.on("stream", (stream) => {
@@ -98,99 +144,106 @@ const VideoChatDoctor: React.FC = () => {
       if (userVideo.current) userVideo.current.srcObject = stream;
       setRemoteStream(stream);
     });
-    socket.on("callAccepted", (signal: SignalData) => {
-      console.log("call Answered: ");
-      setRemoteStream(stream); //TODO:
+    socket.on("callAccepted", (signal: Peer.SignalData) => {
       setCallAccepted(true);
       peer.signal(signal);
     });
-    socket.on("callEnded", () => {
-      setCallEnded(true);
-      leaveCall();
+
+    connectionRef.current = peer;
+  };
+
+  const answerCall = () => {
+    setCallAccepted(true);
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: stream,
     });
+    peer.on("signal", (data) => {
+      socket.emit("answerCall", { signal: data, to: id });
+    });
+    peer.on("stream", (stream) => {
+      if (userVideo.current) {
+        userVideo.current.srcObject = stream;
+      }
+      setRemoteStream(stream);
+    });
+
+    if (callerSignal) {
+      peer.signal(callerSignal);
+    }
     connectionRef.current = peer;
   };
 
   const leaveCall = () => {
-    socket.emit("callEnded");
     setCallEnded(true);
-    if (connectionRef.current) connectionRef.current.destroy();
-    socket.disconnect();
-    if (stream) {
-      setStream(undefined);
-      const tracks = stream.getTracks();
-      tracks.forEach((track) => track.stop());
-      setStream(undefined);
+    if (connectionRef.current) {
+      connectionRef.current.destroy();
     }
+    socket.emit("endCall", { to: id });
   };
-  return (
-    <div
-      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-    >
-      <h1 style={{ textAlign: "center", color: "#000" }}>Video Call</h1>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-around",
-          width: "100%",
-        }}
-      >
-        <div style={{ width: "450px", margin: "10px" }}>
-          {stream && (
-            <video
-              ref={(ref) => handleVideoLoaded(ref, stream)}
-              playsInline
-              muted
-              autoPlay
-              style={{ width: "100%", borderRadius: "8px" }}
-            />
-          )}
-        </div>
-        <div style={{ width: "450px", margin: "10px" }}>
-          {callAccepted && stream && !callEnded && (
-            //TODO:
-            <video
-              ref={(ref) => handleVideoLoaded(ref, stream)} //TODO:
-              playsInline
-              autoPlay
-              style={{ width: "100%", borderRadius: "8px" }}
-            />
-          )}
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          flexDirection: "column",
-        }}
-      >
-        {!callEnded && !callAccepted && (
-          <div
-            className="caller"
-            style={{ marginBottom: "20px", color: "#000" }}
-          >
-            <h1>
-              {name} calling {patientInfo.Name}...
-            </h1>
-          </div>
-        )}
-        {callAccepted && !callEnded && (
-          <Button variant="contained" color="secondary" onClick={leaveCall}>
-            End Call
-          </Button>
-        )}
-        {callEnded && (
-          <div
-            className="caller"
-            style={{ marginBottom: "20px", color: "#f00" }}
-          >
-            <h1>Call Ended</h1>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
 
-export default VideoChatDoctor;
+  return (
+    <>
+      <h1 style={{ textAlign: "center", color: "#111" }}>Video Call</h1>
+      <div className="container">
+        <div className="video-container">
+          <div className="video">
+            {stream && (
+              <video
+                playsInline
+                muted
+                ref={(ref) => handleVideoLoaded(ref, stream)}
+                autoPlay
+                style={{ marginLeft: 0, width: "450px" }}
+              />
+            )}
+          </div>
+          <div className="video">
+            {callAccepted && !callEnded ? (
+              <video
+                playsInline
+                ref={(ref) => handleVideoLoaded(ref, remoteStream)}
+                autoPlay
+                style={{ width: "450px" }}
+              />
+            ) : null}
+          </div>
+        </div>
+        <div className="myId">
+          {callAccepted && !callEnded ? (
+            <Button variant="contained" color="secondary" onClick={leaveCall}>
+              End Call
+            </Button>
+          ) : (
+            <IconButton
+              color="primary"
+              aria-label="call"
+              onClick={() => callUser(id + "")}
+            >
+              <PhoneIcon fontSize="large" />
+            </IconButton>
+          )}
+          {idToCall}
+        </div>
+        <div>
+          {receivingCall && !callAccepted ? (
+            <div className="caller">
+              <h1>{callerName} is calling...</h1>
+              <Button variant="contained" color="primary" onClick={answerCall}>
+                Answer
+              </Button>
+            </div>
+          ) : null}
+          {calling && !callAccepted ? (
+            <div className="caller">
+              <h1>calling {localStorage.getItem("PatientName") + "..."}</h1>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default videoChatDoctor;

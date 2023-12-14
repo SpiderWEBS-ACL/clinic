@@ -12,7 +12,7 @@ import {
 } from "antd";
 import { Card } from "antd";
 import { Avatar } from "@mui/material";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, VideoCameraFilled } from "@ant-design/icons";
 import "./StyleDoctor.css";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { green } from "@mui/material/colors";
@@ -24,6 +24,8 @@ import { getTimeSlotsAtDate } from "../../apis/Doctor/Time Slots/GetTimeSlotsAtD
 import { getPatientsHealthRecords } from "../../apis/Doctor/Patients/GetPatientsHealthRecords";
 import { scheduleFollowup } from "../../apis/Doctor/Patients/ScheduleFollowUp";
 import { getPatientsFiles } from "../../apis/Doctor/Patients/GetPatientsFiles";
+import { IoChatbox } from "react-icons/io5";
+import AddPrescriptionModal from "./AddPrescription";
 const ViewPatientInfo = () => {
   const { id } = useParams<{ id: string }>();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,6 +48,24 @@ const ViewPatientInfo = () => {
   const { Meta } = Card;
   const navigate = useNavigate();
 
+  const [isAddPrescriptionModalVisible, setIsAddPrescriptionModalVisible] =
+    useState(false);
+
+  const showAddPrescriptionModal = () => {
+    setIsAddPrescriptionModalVisible(true);
+  };
+
+  const closeAddPrescriptionModal = () => {
+    setIsAddPrescriptionModalVisible(false);
+  };
+
+  const handleAddPrescription = async (prescription: any) => {
+    // Logic to add prescription using your API request
+    // Call your API endpoint to add prescription
+    // Example: await addPrescriptionApi(prescription);
+    // Handle the API call and state changes accordingly
+  };
+
   useEffect(() => {
     getPatientInfo();
   }, [id]);
@@ -54,6 +74,7 @@ const ViewPatientInfo = () => {
     await getPatientInfoApi(id)
       .then((response) => {
         setPatientInfo(response.data);
+        localStorage.setItem("PatientName", response.data.Name);
         setLoadingList(false);
       })
       .catch((error) => {
@@ -351,26 +372,34 @@ const ViewPatientInfo = () => {
             marginTop: 25,
           }}
         >
-          <button
-            onClick={showModal}
-            style={{ marginLeft: 200 }}
-            className="btn btn-sm btn-primary"
-          >
+          <button onClick={showModal} className="btn btn-sm btn-primary">
             Add Health Record
           </button>
           <button
+            onClick={() => {
+              navigate(`/doctor/addPrescription/${id}`);
+            }}
+            className="btn btn-sm btn-primary"
+          >
+            Add Prescription
+          </button>
+          <button
+            // style={{ marginRight: 100 }}
             onClick={schedule}
-            style={{ marginRight: 200 }}
             className="btn btn-sm btn-primary"
           >
             Schedule a follow up
           </button>
+          <button onClick={handleVideoCall} className="btn btn-sm btn-success">
+            <VideoCameraFilled />
+          </button>
           <button
-            onClick={handleVideoCall}
-            style={{ marginRight: 200 }}
-            className="btn btn-sm btn-primary"
+            onClick={() => {
+              navigate(`/doctor/chat/${id}`);
+            }}
+            className="btn btn-sm btn-success"
           >
-            Video Call
+            <IoChatbox />
           </button>
         </Row>
       </Card>
@@ -467,7 +496,7 @@ const ViewPatientInfo = () => {
       </Modal>
 
       <Modal
-        title="Select FollowUp Time"
+        title="Schedule Follow Up"
         visible={showDateTimeModal}
         onCancel={() => {
           setShowDateTimeModal(false);

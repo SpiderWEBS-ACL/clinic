@@ -9,7 +9,7 @@ const appointmentModel = require("../Models/Appointment");
 const packageModel = require("../Models/Package");
 const fileModel = require("../Models/File");
 const path = require('path');
-
+const Medicine = require('../Models/Medicine');
 const prescriptionModel = require("../Models/Prescription");
 const timeSlotModel = require("../Models/TimeSlot");
 const subscriptionModel = require('../Models/Subscription');
@@ -266,19 +266,10 @@ const filterPrescriptions = async (req, res) => {
   }
 
 };
-const addPrescription = async (req,res) => {
-  try {
-      const newPrescription = await prescriptionModel.create(req.body);
-      return res.status(201).json(newPrescription);
-  }catch(error){
-      return res.status(400).json({ error: error.message });
-  }
-}
-
 const selectPrescription = async (req, res) =>{
     const id = req.params.id;
   try {
-    const prescription = await prescriptionModel.findById(id).populate('Doctor').exec();
+    const prescription = await prescriptionModel.findById(id).populate('Medicines.MedicineId').exec();
     if (!prescription) {
       return res.status(404).json({ error: "Prescription not found" });
     }
@@ -978,9 +969,22 @@ const saveVideoSocketId = async (req, res) => {
   
 }
 
+const getMyDoctors = async (req,res) => {
+  const id = req.user.id;
+  try{
+    const appointments = await appointmentModel.find({Patient: id}).populate("Doctor").select("Doctor");
+    const doctors = appointments.map(appointment => {
+      return  appointment.Doctor;
+  });
+    return res.status(200).json(doctors);
+  }catch(error){
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
 filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
-viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, addPrescription, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity,
-getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription,showSubscribedPackage,getTimeSlotsOfDate, saveVideoSocketId };
+viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity,
+getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription,showSubscribedPackage,getTimeSlotsOfDate, saveVideoSocketId, getMyDoctors };
 

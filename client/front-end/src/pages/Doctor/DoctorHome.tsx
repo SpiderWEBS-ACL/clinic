@@ -19,6 +19,7 @@ const DoctorHome = () => {
     await getDoctor()
       .then((response) => {
         setDoctorInfo(response.data);
+        localStorage.setItem("DoctorName", response.data.Name);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -26,6 +27,7 @@ const DoctorHome = () => {
   };
   useEffect(() => {
     fetchDoctor();
+    localStorage.setItem("Name", doctorInfo.Name);
   }, [id]);
 
   const [patientData, setPatientData] = useState({

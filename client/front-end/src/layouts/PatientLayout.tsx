@@ -1,12 +1,6 @@
-import React, { useState } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Link,
-  Routes,
-  useNavigate,
-} from "react-router-dom";
-import { Layout, Menu } from "antd";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FloatButton, Layout, Menu } from "antd";
 import {
   HomeOutlined,
   FileOutlined,
@@ -14,17 +8,48 @@ import {
   PoweroffOutlined,
   WalletOutlined,
   CalendarOutlined,
+  CommentOutlined,
+  VideoCameraOutlined,
+  BellOutlined,
+  BoxPlotOutlined,
+  MedicineBoxOutlined,
 } from "@ant-design/icons";
 import AppRouter from "../AppRouter";
-import {
-  IoPeopleOutline,
-} from "react-icons/io5";
+import { IoPeopleOutline } from "react-icons/io5";
+import { Socket, io } from "socket.io-client";
+import Cookies from "js-cookie";
+import { saveVideoSocketId } from "../apis/Patient/Video Chat/SaveVideoSocketId";
 
+export const socket: Socket = io("http://localhost:8000", {
+  auth: {
+    token: Cookies.get("accessToken"),
+  },
+});
 const { Header, Content, Footer, Sider } = Layout;
 const id = localStorage.getItem("id");
 const PatientLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [VideoCount, setVideoCount] = useState(0);
+  const [MessageCount, setMessageCount] = useState(0);
+  const [AuthorId, setAuthorId] = useState("");
 
+  useEffect(() => {
+    socket.emit("me");
+    socket.on("me", (id: string) => {
+      localStorage.setItem("socketId", id);
+      saveVideoSocketId(id);
+    });
+  }, []);
+  socket.on("callUser", (data: any) => {
+    console.log("data from: ", data.from, "data.name: ", data.Name);
+    localStorage.setItem("videoCallerSocket", data.from);
+    setVideoCount(VideoCount + 1);
+  });
+  socket.on("direct-message", (data: any) => {
+    console.log(data);
+    setAuthorId(data.newMessage.author._id);
+    setMessageCount(MessageCount + 1);
+  });
   const navigate = useNavigate();
   const items = [
     {
@@ -52,7 +77,17 @@ const PatientLayout: React.FC = () => {
     {
       label: "Doctors",
       icon: <UserOutlined />,
-      key: "/patient/viewalldoctors",
+      key: "DoctorsParent",
+      children: [
+        {
+          label: "All Doctors",
+          key: "/patient/viewalldoctors",
+        },
+        {
+          label: "My Doctors",
+          key: "/patient/myDoctors",
+        },
+      ],
     },
     {
       label: "Health Records",
@@ -67,7 +102,7 @@ const PatientLayout: React.FC = () => {
     {
       label: "Packages",
       key: "/patient/packages",
-      icon: <FileOutlined />,
+      icon: <MedicineBoxOutlined />,
     },
     {
       label: "Wallet",
@@ -113,8 +148,41 @@ const PatientLayout: React.FC = () => {
         ></Menu>
       </Sider>
       <Layout>
-        <Content style={{ margin: "0 16px" }}>
-          <AppRouter />
+        <Content style={{ margin: "0 16px", overflow: "hidden" }}>
+          <div style={{ overflowY: "auto", maxHeight: "100vh" }}>
+            <AppRouter />
+          </div>
+          <FloatButton
+            style={{
+              right: "4vh",
+              bottom: "94vh",
+            }}
+            icon={<BellOutlined />}
+          />
+          <FloatButton
+            onClick={() => {
+              if (MessageCount > 0) navigate("/patient/chat/" + AuthorId);
+              setMessageCount(0);
+            }}
+            style={{
+              right: "12vh",
+              bottom: "94vh",
+            }}
+            badge={{ count: MessageCount }}
+            icon={<CommentOutlined />}
+          />
+          <FloatButton
+            onClick={() => {
+              if (VideoCount > 0) navigate("/patient/videoChat");
+              setVideoCount(0);
+            }}
+            style={{
+              right: "18vh",
+              bottom: "94vh",
+            }}
+            badge={{ count: VideoCount }}
+            icon={<VideoCameraOutlined />}
+          />
         </Content>
       </Layout>
     </Layout>
