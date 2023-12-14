@@ -21,6 +21,31 @@ const addAppointment = async (req, res) => {
     }
  }
 
+const cancelAppointment = async (req,res) =>{
+    try{
+        id = req.params.id;
+        appointment = await appointmentModel.findById(id);
+        if(!appointment){
+            return res.status(400).json("error finding app in cancel appointment")
+        }
+        patient = await patientModel.findById(appointment.Patient);
+        if(!patient){
+            return res.status(400).json("error finding patient in cancel appointment")
+        }
+        doctor = await doctorModel.findById(appointment.Doctor);
+        if(!doctor){
+            return res.status(400).json("error finding doctor in cancel appointment")
+        }
+        patient.WalletBalance += doctor.HourlyRate;
+        await patient.save();
+
+        appointment.Status = "Cancelled"
+        await appointment.save();
+    }catch(error){
+        return res.status(400).json({ error: error.message });
+    }
+}
+
  const filterAppointmentDoctor = async (req, res) => {
     try {
         const id = req.user.id;
@@ -147,4 +172,4 @@ const filterAppointmentPatient = async (req, res) => {
 
 
 
-module.exports = {addAppointment,filterAppointmentPatient, filterAppointmentDoctor};
+module.exports = {addAppointment,filterAppointmentPatient, filterAppointmentDoctor, cancelAppointment};
