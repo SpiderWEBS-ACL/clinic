@@ -118,6 +118,7 @@ const {
   addAppointment,
   filterAppointmentPatient,
   filterAppointmentDoctor,
+  rescheduleAppointment
 } = require("./controllers/appointmentController");
 
 const {
@@ -337,6 +338,7 @@ app.get(
   PatientProtect,
   viewDoctorsWithPrices
 );
+app.put("/patient/rescheduleAppointment", PatientProtect,rescheduleAppointment)
 app.get("/patient/allAppointments", PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors", PatientProtect, getAllDoctorsPatient);
 app.get("/patient/allPackages", PatientProtect, getAllPackagesPatient);
