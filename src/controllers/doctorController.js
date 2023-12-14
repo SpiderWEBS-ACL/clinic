@@ -4,6 +4,7 @@ const doctorRegisterRequestModel = require("../Models/DoctorRegisterRequest");
 const appointmentModel = require("../Models/Appointment");
 const timeSlotModel = require("../Models/TimeSlot");
 const prescriptionModel = require("../Models/Prescription");
+const pharmacistModel = require("../Models/Pharmacist");
 const { default: mongoose } = require("mongoose");
 const bcrypt = require("bcrypt");
 const fileModel = require("../Models/File");
@@ -765,6 +766,7 @@ const deleteMedicineInPrescription = async (req, res) => {
   }
 };
 
+
 module.exports = {
   registerDoctor,
   searchPatientByName,
@@ -796,4 +798,5 @@ module.exports = {
   getAllPatientsPrescriptions,
   updateMedicineInPrescription,
   deleteMedicineInPrescription,
+  getAllPharmacists,
 };

@@ -13,7 +13,7 @@ const DateLabel = styled("span")({
   backgroundColor: "111",
   position: "absolute",
   top: "50%",
-  left: "50%",
+  left: "54%",
   transform: "translate(-50%, -50%)",
   color: "#b9bbbe",
   padding: "0 5px",

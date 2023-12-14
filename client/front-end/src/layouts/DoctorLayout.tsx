@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, useNavigate } from "react-router-dom";
 import { FloatButton, Layout, Menu } from "antd";
+import ImportedHeader from "../layouts/header";
 import {
   HomeOutlined,
   UserOutlined,
@@ -13,6 +14,7 @@ import {
 } from "@ant-design/icons";
 import AppRouter from "../AppRouter";
 import { socket } from "./PatientLayout";
+import { Chat, ChatBubbleOutline } from "@material-ui/icons";
 
 const { Content, Sider } = Layout;
 const id = localStorage.getItem("id");
@@ -71,6 +73,21 @@ const DoctorLayout: React.FC = () => {
       icon: <ClockCircleOutlined />,
     },
     {
+      label: "Chat",
+      icon: <ChatBubbleOutline />,
+      key: "parentChat",
+      children: [
+        {
+          label: "Patients",
+          key: "/doctor/viewPatients",
+        },
+        {
+          label: "Pharmacists",
+          key: "/doctor/pharmacists",
+        },
+      ],
+    },
+    {
       label: "Logout",
       key: "/",
       icon: <PoweroffOutlined />,
@@ -104,8 +121,15 @@ const DoctorLayout: React.FC = () => {
         ></Menu>
       </Sider>
       <Layout>
+        <ImportedHeader />
         <Content style={{ margin: "0 16px", overflow: "hidden" }}>
-          <div style={{ overflowY: "auto", maxHeight: "100vh" }}>
+          <div
+            style={{
+              overflowY: "auto",
+              minHeight: "86.5vh",
+              maxHeight: "100vh",
+            }}
+          >
             <AppRouter />
           </div>
           <FloatButton

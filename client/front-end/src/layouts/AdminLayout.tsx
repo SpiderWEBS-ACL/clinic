@@ -109,7 +109,13 @@ const AdminLayout: React.FC = () => {
       </Sider>
       <Layout>
         <Content style={{ margin: "0 16px", overflow: "hidden" }}>
-          <div style={{ overflowY: "auto", maxHeight: "100vh" }}>
+          <div
+            style={{
+              overflowY: "auto",
+              minHeight: "86.5vh",
+              maxHeight: "100vh",
+            }}
+          >
             <AppRouter />
           </div>
         </Content>

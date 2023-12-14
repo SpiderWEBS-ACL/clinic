@@ -112,6 +112,7 @@ const {
   getAllPatientsPrescriptions,
   updateMedicineInPrescription,
   deleteMedicineInPrescription,
+  getAllPharmacists,
 } = require("./controllers/doctorController");
 
 const {
@@ -279,6 +280,7 @@ app.delete(
   DoctorProtect,
   deleteMedicineInPrescription
 );
+app.get("/doctor/allPharmacists", DoctorProtect, getAllPharmacists);
 //Patient Endpoints
 
 //Public Endpoints
@@ -390,6 +392,7 @@ app.get(
 app.post("/patient/getTimeSlotsDoctorDate", PatientProtect, getTimeSlotsOfDate);
 app.put("/patient/saveVideoSocketId", PatientProtect, saveVideoSocketId);
 app.get("/patient/myDoctors", PatientProtect, getMyDoctors);
+app.get("/patient/allPharmacists", PatientProtect, getAllPharmacists);
 
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
