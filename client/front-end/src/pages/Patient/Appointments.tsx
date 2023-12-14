@@ -182,7 +182,7 @@ const ViewPatientAppointments = () => {
         <FullCalendar
           stickyHeaderDates
           aspectRatio={1}
-          height={"75vh"}
+          height={"70vh"}
           plugins={[
             dayGridPlugin,
             timeGridPlugin,
