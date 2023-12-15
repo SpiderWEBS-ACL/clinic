@@ -765,7 +765,14 @@ const deleteMedicineInPrescription = async (req, res) => {
     return res.status(400).json({ error: error.message });
   }
 };
-
+const getAllPharmacists = async (req, res) => {
+  try {
+    const Doctors = await pharmacistModel.find({});
+    return res.status(200).json(Doctors);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
 
 module.exports = {
   registerDoctor,

@@ -107,11 +107,6 @@ const PatientLayout: React.FC = () => {
       icon: <MedicineBoxOutlined />,
     },
     {
-      label: "Wallet",
-      key: "/patient/wallet",
-      icon: <WalletOutlined />,
-    },
-    {
       label: "Chat",
       icon: <ChatBubbleOutline />,
       key: "ChatParent",
@@ -122,6 +117,12 @@ const PatientLayout: React.FC = () => {
         },
       ],
     },
+    {
+      label: "Wallet",
+      key: "/patient/wallet",
+      icon: <WalletOutlined />,
+    },
+
     {
       label: "Logout",
       key: "/",
