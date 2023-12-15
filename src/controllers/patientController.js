@@ -709,7 +709,6 @@ const getTimeSlotsOfDate = async (req, res) => {
     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const dayString = daysOfWeek[dayOfWeek];
     const timeSlots = await timeSlotModel.findOne({ Doctor: DoctorId, day: dayString });
-    console.log("timeSlots", timeSlots)
 
     if (!timeSlots.slots) {
       return res.status(404).json({ error: 'No time slots found for the specified day and doctor.' });
@@ -967,8 +966,6 @@ const saveVideoSocketId = async (req, res) => {
   }catch(error){
     return res.status(500).json({ error: error.message });
   }
-
-  
 }
 
 const getMyDoctors = async (req,res) => {
@@ -988,7 +985,6 @@ const viewPatientNotifications = async (req, res) => {
 
   try{
     const patientId = req.user.id;
-    
     const patient = await patientModel.findById(patientId);
 
     if (!patient) {
@@ -1004,10 +1000,50 @@ const viewPatientNotifications = async (req, res) => {
   }
 };
 
+const openNotification = async(req, res) => {
+
+  try{
+    const { id } = req.params;
+    const notification = await Notification.findById(id);
+
+    if (!notification) {
+      return res.status(404).json({ error: "Notification Not Found" });
+    }
+    
+    notification.opened = true;
+    notification.save();
+
+    res.status(200).json(notification);
+
+  }catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+
+}
+
+const getPatientUnreadNotifs = async (req, res) => {
+
+  try{
+    const patientId = req.user.id;
+    const patient = await patientModel.findById(patientId);
+
+    if (!patient) {
+      return res.status(404).json({ error: "Patient Not Found" });
+    }
+    
+    const notifications = await Notification.find({Patient: patient, opened: false});
+
+    res.status(200).json(notifications);
+
+  }catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
 filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
 viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity,
-getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription,showSubscribedPackage,getTimeSlotsOfDate, saveVideoSocketId, getMyDoctors, viewPatientNotifications };
+getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription,showSubscribedPackage,getTimeSlotsOfDate, 
+saveVideoSocketId, getMyDoctors, viewPatientNotifications, openNotification, getPatientUnreadNotifs, };
 
