@@ -1,8 +1,11 @@
 const appointmentModel = require('../Models/Appointment')
 const doctorModel = require('../Models/Doctor');
 const patientModel = require('../Models/Patient');
+const notificationModel = require('../Models/Notification');
 const { default: mongoose } = require('mongoose');
 const { upcomingAppointments } = require('./doctorController');
+const Appointment = require('../Models/Appointment');
+const nodemailer = require("nodemailer");
 
 const addAppointment = async (req, res) => {
     try{
@@ -15,6 +18,9 @@ const addAppointment = async (req, res) => {
           req.body.Patient = familyMember._id;
         }
         const appointment = await appointmentModel.create(req.body);
+
+        await sendAppointmentNotification(appointment._id);
+
         return res.status(201).json(appointment);
     }catch(error){
         return res.status(400).json({ error: error.message });
@@ -146,5 +152,68 @@ const filterAppointmentPatient = async (req, res) => {
 };
 
 
+const sendAppointmentNotification = async (appointmentId) => {
+      try {
+        const appointment = await appointmentModel.findById(appointmentId).populate("Doctor").populate("Patient");    
+    
+        //set up source email
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: "spiderwebsacl@gmail.com",
+            pass: "vngs gkzg otrz vzbg",
+          },
+        });
+        
+        //format email details
+        const mailOptionsPatient = {
+          from: "spiderwebsacl@gmail.com",
+          to: appointment.Patient.Email,
+          subject: "Appointment Scheduled",
+          html: `   <p>Dear <b>${appointment.Patient.Name},</b></p>
+                    <p>Your appointment with <b>Dr. ${appointment.Doctor.Name}</b> 
+                    on <i>${appointment.AppointmentDate.toDateString()}</i> at <i>${appointment.start.toLocaleTimeString()}</i> has been scheduled successfully!</p>`
+        };
+    
+        //send email
+        transporter.sendMail(mailOptionsPatient);
 
-module.exports = {addAppointment,filterAppointmentPatient, filterAppointmentDoctor};
+         //format email details
+         const mailOptionsDoctor = {
+            from: "spiderwebsacl@gmail.com",
+            to: appointment.Doctor.Email,
+            subject: "New Appointment",
+            html: `   <p><b>Dear ${appointment.Doctor.Name},</b></p>
+                      <p><b>${appointment.Patient.Name}</b> has scheduled an appointment with you
+                      on <i>${appointment.AppointmentDate.toDateString()}</i> at <i>${appointment.start.toLocaleTimeString()}</i></p>`
+          };
+      
+          //send email
+          transporter.sendMail(mailOptionsDoctor);
+    
+
+          const notifDoctor = await notificationModel.create({
+            Doctor: appointment.Doctor,
+            Appoinment: appointment,
+            message: `${appointment.Patient.Name} has scheduled an appointment with you on ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()}`,
+            date: Date.now()
+          });
+
+          const notifPatient = await notificationModel.create({
+            Patient: appointment.Patient,
+            Appoinment: appointment,
+            message: `Your appointment with Dr. ${appointment.Doctor.Name} on ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()} has been scheduled successfully!`,
+            date: Date.now()
+          });
+    
+          return([notifPatient,notifDoctor]);
+      
+      } catch (err) {
+        throw err;
+      }
+    };
+    
+
+
+
+module.exports = {addAppointment,filterAppointmentPatient, filterAppointmentDoctor, sendAppointmentNotification};
