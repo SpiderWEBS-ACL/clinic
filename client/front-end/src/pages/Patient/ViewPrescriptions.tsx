@@ -12,10 +12,12 @@ import { getAllPatientsPrescriptions } from "../../apis/Doctor/Prescriptions/get
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Prescription } from "../../types";
-import { Alert, Button, Input, Tag, message } from "antd";
+import { Alert, Tooltip, Input, Tag, message } from "antd";
 import { useParams } from "react-router-dom";
 import { updateMedicineInPrescription } from "../../apis/Doctor/Prescriptions/UpdateMedicineInPrescription";
 import { getMyPrescription } from "../../apis/Patient/Prescriptions/GetMyPrescription";
+import { DownloadOutlined } from "@ant-design/icons";
+import jsPDF from "jspdf";
 
 const PatientsPrescriptions = () => {
   const { id } = useParams();
@@ -37,6 +39,48 @@ const PatientsPrescriptions = () => {
   useEffect(() => {
     fetchPrescriptions();
   }, []);
+
+  const handleDownloadClick = (currPresc: Prescription) => {
+    const pdfDoc = new jsPDF();
+
+    pdfDoc.setFont("helvetica", "bold");
+    pdfDoc.text("Your prescription details", 65, 30);
+    pdfDoc.text(
+      "Date: " + new Date(currPresc.Date + "").toDateString(),
+      65,
+      40
+    );
+    pdfDoc.text("Filled: " + currPresc.Filled, 65, 50);
+
+    pdfDoc.text("Medicines:", 10, 75);
+
+    pdfDoc.setFont("helvetica", "normal");
+
+    currPresc.Medicines?.forEach((medicine, MedicineIndex) => {
+      const startY = 85 + MedicineIndex * 30;
+
+      pdfDoc.text("• Name: " + medicine.Name, 10, startY);
+      pdfDoc.text("• Dosage: " + medicine.Dosage, 10, startY + 10);
+      pdfDoc.text("• Instructions: " + medicine.Instructions, 10, startY + 20);
+    });
+
+    const medicinesHeight = (currPresc.Medicines?.length || 0) * 30;
+
+    pdfDoc.setFont("helvetica", "bold");
+    pdfDoc.text("Unavailable Medicines: ", 10, 100 + medicinesHeight);
+
+    pdfDoc.setFont("helvetica", "normal");
+
+    currPresc.UnavailableMedicines?.forEach((medicine, MedicineIndex) => {
+      const startY = 110 + medicinesHeight + MedicineIndex * 30;
+
+      pdfDoc.text("• Name: " + medicine.Medicine, 10, startY);
+      pdfDoc.text("• Dosage: " + medicine.Dosage, 10, startY + 10);
+      pdfDoc.text("• Instructions: " + medicine.Instructions, 10, startY + 20);
+    });
+
+    pdfDoc.save("downloaded-pdf.pdf");
+  };
 
   const tagStyle = {
     fontSize: "12px",
@@ -167,6 +211,19 @@ const PatientsPrescriptions = () => {
                     )
                   )}{" "}
                 </AccordionDetails>
+                <div style={{ display: "flex" }}>
+                  <Tooltip title="Download selected prescription as PDF">
+                    <DownloadOutlined
+                      onClick={() => handleDownloadClick(prescription)}
+                      style={{
+                        fontSize: 20,
+                        marginLeft: "auto",
+                        marginRight: 20,
+                        marginBottom: 10,
+                      }}
+                    />
+                  </Tooltip>
+                </div>
               </Accordion>
             </>
           ))}

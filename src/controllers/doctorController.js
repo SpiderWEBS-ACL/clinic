@@ -288,7 +288,9 @@ const viewPatients = async (req, res) => {
       .exec();
     const patients = [];
     for (const appointment of appointments) {
+      console.log("ele et7to", patients);
       const patient = appointment.Patient;
+
       if (!patients.includes(patient) && patient != null)
         patients.push(patient);
     }
@@ -826,5 +828,5 @@ module.exports = {
   updateMedicineInPrescription,
   deleteMedicineInPrescription,
   viewDoctorNotifications,
-  getAllPharmacists, 
+  getAllPharmacists,
 };
