@@ -23,8 +23,9 @@ const addAppointment = async (req, res) => {
 
 const cancelAppointment = async (req,res) =>{
     try{
-        id = req.params.id;
-        appointment = await appointmentModel.findById(id);
+        const id = req.params.id;
+        const appointment = await appointmentModel.findById(id);
+
         if(!appointment){
             return res.status(400).json("error finding app in cancel appointment")
         }
@@ -41,6 +42,7 @@ const cancelAppointment = async (req,res) =>{
 
         appointment.Status = "Cancelled"
         await appointment.save();
+        return res.status(200).json("Appointment Cancelled")
     }catch(error){
         return res.status(400).json({ error: error.message });
     }
@@ -114,7 +116,7 @@ const rescheduleAppointment = async (req, res) => {
     console.log(appointmentDate)
     try{
         const appointment = await appointmentModel.findByIdAndUpdate(id,{AppointmentDate:appointmentDate , start:start , end:end});
-        return res.status(200).json(appointment);
+        return res.status(200).json("appointment rescheduled");
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }

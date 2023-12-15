@@ -7,6 +7,7 @@ import {
   DatePicker,
   DatePickerProps,
   Modal,
+  Popconfirm,
   Select,
   Spin,
 } from "antd";
@@ -24,6 +25,8 @@ import { filterAppointmentStatusDateApi } from "../../apis/Patient/Appointments/
 import { getAllAppointmentsPatientApi } from "../../apis/Patient/Appointments/GetAllAppointments";
 import { getTimeSlotsDoctorDate } from "../../apis/Patient/Doctors/GetTimeSlotsDoctorDate";
 import { handleReschedule } from "../../apis/Patient/Appointments/RescheduleAppointment";
+import { cancelAppointmentDoctor } from "../../apis/Doctor/Appointments/cancelAppointment";
+import { s } from "@fullcalendar/core/internal-common";
 
 const ViewPatientAppointments = () => {
   const { Option } = Select;
@@ -42,6 +45,9 @@ const ViewPatientAppointments = () => {
   const [AppointmentTime, setAppointmentTime] = useState("");
   const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
   const clearFilters = async () => {
     setAppointments(allAppointments);
     setDate("");
@@ -88,6 +94,23 @@ const ViewPatientAppointments = () => {
       </div>
     );
   }
+  const showPopconfirm = () => {
+    setOpen(true);
+  };
+
+  const handleOk = () => {
+    setConfirmLoading(true);
+
+    setTimeout(() => {
+      setOpen(false);
+      setConfirmLoading(false);
+      handleCancelAppointment(appointment._id);
+    }, 2000);
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+  };
 
   const onDateChange: DatePickerProps["onChange"] = (
     selectedDate,
@@ -123,6 +146,44 @@ const ViewPatientAppointments = () => {
   };
   const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
     setAppointmentTime(selectedTimeSlot);
+  };
+  const handleRescheduleClick = async () => {
+    console.log(appointment.Status);
+    if (appointment.Status == "Upcoming") {
+      await handleReschedule(
+        appointment._id,
+        `${AppointmentDate}T${AppointmentTime}:00.000Z`
+      );
+      setLoading(true);
+      await fetchAppointments();
+      setShowAppointmentModal(false);
+      message.success("appointment rescheduled");
+    } else {
+      message.error("this appointment can not be rescheduled");
+    }
+    setAppointmentDate("");
+    setAppointmentTime("");
+    setShowRescheduleModal(false);
+  };
+  const handleCancelAppointment = async (id: string) => {
+    try {
+      await cancelAppointmentDoctor(id).then((response) => {
+        setLoading(true);
+        fetchAppointments();
+        setShowAppointmentModal(false);
+        message.success(response.data);
+      });
+    } catch (error: any) {
+      message.error(`${error.response.data.error}`);
+    }
+  };
+
+  const checkStatus = () => {
+    if (appointment) {
+      if (appointment.Status != "Upcoming") {
+        return true;
+      } else return false;
+    }
   };
   return (
     <div className="container">
@@ -203,24 +264,46 @@ const ViewPatientAppointments = () => {
         />
       </div>
       <Modal
-        footer={
-          <Button
-            type="primary"
-            onClick={() => {
-              setShowRescheduleModal(true);
-
-            }}
-          >
-            Reschedule
-          </Button>
-        }
         visible={ShowAppointmentModal}
         onCancel={() => {
           setShowAppointmentModal(false);
         }}
-        onOk={() => {
-          setShowAppointmentModal(false);
-        }}
+        //onOk={() => {
+        // setShowAppointmentModal(false);
+        ///}}
+        footer={
+          <div>
+            <Popconfirm
+              title="ALERT"
+              description="Are you sure you want to unsubscribe?"
+              open={open}
+              onConfirm={handleOk}
+              okButtonProps={{ loading: confirmLoading }}
+              onCancel={handleCancel}
+            >
+              <Button
+                type="primary"
+                danger
+                disabled={checkStatus()}
+                onClick={() => {
+                  showPopconfirm();
+                }}
+              >
+                Cancel Appointment
+              </Button>
+            </Popconfirm>
+            <Button
+              type="primary"
+              disabled={checkStatus()}
+              onClick={() => {
+                setShowRescheduleModal(true);
+              }}
+            >
+              Reschedule
+            </Button>
+                 
+          </div>
+        }
       >
         <Modal
           title="Select Appointment Time"
@@ -262,13 +345,7 @@ const ViewPatientAppointments = () => {
               borderRadius: "5px",
             }}
             onClick={() => {
-              handleReschedule(
-                appointment._id,
-                `${AppointmentDate}T${AppointmentTime}:00.000Z`);
-                setLoading(true);
-              setShowRescheduleModal(false);
-              setShowAppointmentModal(false);
-              fetchAppointments();
+              handleRescheduleClick();
             }}
           >
             <span aria-hidden="true"></span>
