@@ -125,6 +125,7 @@ const {
   cancelAppointment,
   sendAppointmentNotification,
   sendCancellationNotif,
+  sendReschedulingNotif,
 } = require("./controllers/appointmentController");
 
 const {
@@ -417,7 +418,7 @@ app.put("/appointment/cancelAppointment/:id", DoctorProtect, cancelAppointment)
 
 app.post("/appointment/appNotif", sendAppointmentNotification);   //testing
 app.post("/appointment/cancelNotif", sendCancellationNotif);   //testing
-
+app.post("/appointment/rescheduleNotif", sendReschedulingNotif);   //testing
 
 
 

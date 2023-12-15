@@ -133,6 +133,9 @@ const rescheduleAppointment = async (req, res) => {
       start: start,
       end: end,
     });
+
+    await sendReschedulingNotif(appointment._id);
+
     return res.status(200).json(appointment);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -350,6 +353,74 @@ const sendCancellationNotif = async (appointmentId) => {
   }
 };
 
+
+const sendReschedulingNotif = async (appointmentId) => {
+    try {
+        const appointment = await appointmentModel
+        .findById(appointmentId)
+        .populate("Doctor")
+        .populate("Patient");
+  
+      //set up source email
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: "spiderwebsacl@gmail.com",
+          pass: "vngs gkzg otrz vzbg",
+        },
+      });
+  
+      //format email details
+      const mailOptionsPatient = {
+        from: "spiderwebsacl@gmail.com",
+        to: appointment.Patient.Email,
+        subject: "Appointment Rescheduled",
+        html: `   <p>Dear <b>${appointment.Patient.Name},</b></p>
+                        <p>Your appointment with 
+                        <b>Dr. ${appointment.Doctor.Name}</b> 
+                        has been rescheduled to 
+                        <i>${appointment.AppointmentDate.toDateString()}</i> at <i>${appointment.start.toLocaleTimeString()}</i></p>`,
+      };
+  
+      //send email
+      transporter.sendMail(mailOptionsPatient);
+  
+      //format email details
+      const mailOptionsDoctor = {
+        from: "spiderwebsacl@gmail.com",
+        to: appointment.Doctor.Email,
+        subject: "Appointment Rescheduled",
+        html: `   <p>Dear <b>Dr. ${appointment.Doctor.Name},</b></p>
+                  <p>Your appointment with <b>${appointment.Patient.Name}</b> 
+                  has been rescheduled to 
+                  <i>${appointment.AppointmentDate.toDateString()}</i> at <i>${appointment.start.toLocaleTimeString()}</i></p>`,
+      
+      };
+  
+      //send email
+      transporter.sendMail(mailOptionsDoctor);
+  
+      const notifDoctor = await notificationModel.create({
+        Doctor: appointment.Doctor,
+        Appoinment: appointment,
+        message: `Your appointment with ${appointment.Patient.Name} has been rescheduled to ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()}`,
+        date: Date.now(),
+      });
+  
+      const notifPatient = await notificationModel.create({
+        Patient: appointment.Patient,
+        Appoinment: appointment,
+        message: `Your appointment with Dr. ${appointment.Doctor.Name} has been rescheduled to ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()}`,
+        date: Date.now(),
+      });
+  
+      return [notifPatient, notifDoctor];
+  
+    } catch (err) {
+      throw err;
+    }
+  };
+
 module.exports = {
   addAppointment,
   filterAppointmentPatient,
@@ -358,4 +429,5 @@ module.exports = {
   cancelAppointment,
   rescheduleAppointment,
   sendCancellationNotif,
+  sendReschedulingNotif,
 };
