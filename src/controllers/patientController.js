@@ -1047,7 +1047,6 @@ const getMyDoctors = async (req, res) => {
 const viewPatientNotifications = async (req, res) => {
   try {
     const patientId = req.user.id;
-
     const patient = await patientModel.findById(patientId);
 
     if (!patient) {
@@ -1058,6 +1057,46 @@ const viewPatientNotifications = async (req, res) => {
 
     res.status(200).json(notifications);
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const openNotification = async(req, res) => {
+
+  try{
+    const { id } = req.params;
+    const notification = await Notification.findById(id);
+
+    if (!notification) {
+      return res.status(404).json({ error: "Notification Not Found" });
+    }
+    
+    notification.opened = true;
+    notification.save();
+
+    res.status(200).json(notification);
+
+  }catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+
+}
+
+const getPatientUnreadNotifs = async (req, res) => {
+
+  try{
+    const patientId = req.user.id;
+    const patient = await patientModel.findById(patientId);
+
+    if (!patient) {
+      return res.status(404).json({ error: "Patient Not Found" });
+    }
+    
+    const notifications = await Notification.find({Patient: patient, opened: false});
+
+    res.status(200).json(notifications);
+
+  }catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
@@ -1100,4 +1139,7 @@ module.exports = {
   saveVideoSocketId,
   getMyDoctors,
   viewPatientNotifications,
+  openNotification, 
+  getPatientUnreadNotifs, 
 };
+

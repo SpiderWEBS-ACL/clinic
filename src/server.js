@@ -55,6 +55,8 @@ const {
   saveVideoSocketId,
   getMyDoctors,
   viewPatientNotifications,
+  openNotification,
+  getPatientUnreadNotifs,
 } = require("./controllers/patientController");
 
 const {
@@ -90,6 +92,8 @@ const {
   deleteMedicineInPrescription,
   getAllPharmacists,
   viewDoctorNotifications,
+  openNotificationDoctor,
+  getDoctorUnreadNotifs,
 } = require("./controllers/doctorController");
 
 const {
@@ -101,6 +105,7 @@ const {
   sendAppointmentNotification,
   sendCancellationNotif,
   sendReschedulingNotif,
+  deleteNotifs,
 } = require("./controllers/appointmentController");
 
 const {
@@ -264,6 +269,10 @@ app.delete(
 );
 app.get("/doctor/allPharmacists", DoctorProtect, getAllPharmacists);
 app.get("/doctor/notifications", DoctorProtect, viewDoctorNotifications);
+app.put("/doctor/openNotification/:id", openNotificationDoctor);      //TO FIX: doctor protect causes unauthorized error
+app.get("/doctor/unreadNotifications", DoctorProtect, getDoctorUnreadNotifs);
+
+
 
 //Patient Endpoints
 
@@ -383,6 +392,9 @@ app.put("/patient/saveVideoSocketId", PatientProtect, saveVideoSocketId);
 app.get("/patient/myDoctors", PatientProtect, getMyDoctors);
 app.get("/patient/allPharmacists", PatientProtect, getAllPharmacists);
 app.get("/patient/notifications", PatientProtect, viewPatientNotifications);
+app.put("/patient/openNotification/:id", openNotification); //TO FIX: patient protect causes unauthorized error
+app.get("/patient/unreadNotifications", PatientProtect, getPatientUnreadNotifs);
+
 
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
@@ -418,3 +430,6 @@ app.get("/subscription/getSubscription", PatientProtect, getSubscription);
 
 //Prescription Endpoints
 app.post("/prescription/add", addPrescription);
+
+
+app.delete('/notifs/delete', deleteNotifs);

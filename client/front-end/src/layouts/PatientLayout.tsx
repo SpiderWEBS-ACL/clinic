@@ -21,6 +21,8 @@ import { Socket, io } from "socket.io-client";
 import Cookies from "js-cookie";
 import { saveVideoSocketId } from "../apis/Patient/Video Chat/SaveVideoSocketId";
 import { Chat, ChatBubbleOutline } from "@material-ui/icons";
+import { config } from "../Middleware/authMiddleware";
+import axios from "axios";
 
 export const socket: Socket = io("http://localhost:8000", {
   auth: {
@@ -33,7 +35,13 @@ const PatientLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [VideoCount, setVideoCount] = useState(0);
   const [MessageCount, setMessageCount] = useState(0);
+  const [notificationCount, setNotificationCount] = useState(0);
+
   const [AuthorId, setAuthorId] = useState("");
+
+  const api = axios.create({
+    baseURL: "http://localhost:8000/",
+  });
 
   useEffect(() => {
     socket.emit("me");
@@ -41,7 +49,18 @@ const PatientLayout: React.FC = () => {
       localStorage.setItem("socketId", id);
       saveVideoSocketId(id);
     });
-  }, []);
+
+    api.get("/patient/unreadNotifications", config)
+    .then((response) => {
+      console.log(response.data);
+      setNotificationCount(response.data.length);
+    })
+    .catch((error) => {
+      console.log("Error: " + error);
+    });
+
+  }, [notificationCount]);
+  
   socket.on("callUser", (data: any) => {
     console.log("data from: ", data.from, "data.name: ", data.Name);
     localStorage.setItem("videoCallerSocket", data.from);
@@ -52,6 +71,8 @@ const PatientLayout: React.FC = () => {
     setAuthorId(data.newMessage.author._id);
     setMessageCount(MessageCount + 1);
   });
+  
+
   const navigate = useNavigate();
   const items = [
     {
@@ -169,10 +190,15 @@ const PatientLayout: React.FC = () => {
             <AppRouter />
           </div>
           <FloatButton
+            onClick={() => {
+              navigate("/patient/notifications");
+            }}
             style={{
               right: "4vh",
               bottom: "94vh",
+              top: "4vh",
             }}
+            badge={{ count: notificationCount }}
             icon={<BellOutlined />}
           />
           <FloatButton
@@ -183,6 +209,7 @@ const PatientLayout: React.FC = () => {
             style={{
               right: "12vh",
               bottom: "94vh",
+              top: "4vh",
             }}
             badge={{ count: MessageCount }}
             icon={<CommentOutlined />}
@@ -195,6 +222,7 @@ const PatientLayout: React.FC = () => {
             style={{
               right: "18vh",
               bottom: "94vh",
+              top: "4vh",
             }}
             badge={{ count: VideoCount }}
             icon={<VideoCameraOutlined />}

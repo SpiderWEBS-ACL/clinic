@@ -57,6 +57,8 @@ import ViewMyDoctors from "./pages/Patient/ViewMyDoctors";
 import AddPrescription from "./pages/Doctor/AddPrescription";
 import PatientsPrescriptions from "./pages/Doctor/PatientsPrescriptions";
 import ViewAllPharmacists from "./pages/Doctor/ViewAllPharmacists";
+import PatientNotifications from "./pages/Patient/Notifications";
+import DoctorNotifications from "./pages/Doctor/Notifications";
 
 export interface JwtPayload {
   id: string;
@@ -131,6 +133,8 @@ const AppRouter: React.FC = () => {
           element={<PatientsPrescriptions />}
         />
         <Route path="/doctor/pharmacists/" element={<ViewAllPharmacists />} />
+        <Route path="/doctor/notifications" element={<DoctorNotifications />} />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
@@ -192,6 +196,7 @@ const AppRouter: React.FC = () => {
         <Route path="/patient/videoChat/" element={<VideoChat />} />
         <Route path="/patient/chat/:id" element={<Chat />} />
         <Route path="/patient/myDoctors" element={<ViewMyDoctors />} />
+        <Route path="/patient/notifications" element={<PatientNotifications />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
