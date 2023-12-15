@@ -113,6 +113,7 @@ const {
   getAllPatientsPrescriptions,
   updateMedicineInPrescription,
   deleteMedicineInPrescription,
+  getAllPharmacists,
   viewDoctorNotifications,
 } = require("./controllers/doctorController");
 
@@ -120,6 +121,8 @@ const {
   addAppointment,
   filterAppointmentPatient,
   filterAppointmentDoctor,
+  rescheduleAppointment,
+  cancelAppointment,
   sendAppointmentNotification,
 } = require("./controllers/appointmentController");
 
@@ -199,10 +202,7 @@ app.get("/admin/allDoctors", AdminProtect, getAllDoctors);
 app.delete("/admin/removeDoctor/:id", AdminProtect, removeDoctor);
 app.delete("/admin/removePatient/:id", AdminProtect, removePatient);
 app.delete("/admin/removeAdmin/:id", AdminProtect, removeAdmin);
-app.get(
-  "/admin/registrationRequests",
-  AdminProtect,
-  getAllDoctrsRegistrationReqs
+app.get("/admin/registrationRequests", AdminProtect, getAllDoctrsRegistrationReqs
 );
 app.get(
   "/admin/registrationRequest/:id",
@@ -282,6 +282,7 @@ app.delete(
   DoctorProtect,
   deleteMedicineInPrescription
 );
+app.get("/doctor/allPharmacists", DoctorProtect, getAllPharmacists);
 
 app.get("/doctor/notifications", DoctorProtect, viewDoctorNotifications);
 
@@ -343,6 +344,7 @@ app.get(
   PatientProtect,
   viewDoctorsWithPrices
 );
+app.put("/patient/rescheduleAppointment", PatientProtect,rescheduleAppointment)
 app.get("/patient/allAppointments", PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors", PatientProtect, getAllDoctorsPatient);
 app.get("/patient/allPackages", PatientProtect, getAllPackagesPatient);
@@ -396,6 +398,7 @@ app.get(
 app.post("/patient/getTimeSlotsDoctorDate", PatientProtect, getTimeSlotsOfDate);
 app.put("/patient/saveVideoSocketId", PatientProtect, saveVideoSocketId);
 app.get("/patient/myDoctors", PatientProtect, getMyDoctors);
+app.get("/patient/allPharmacists", PatientProtect, getAllPharmacists);
 
 app.get("/patient/notifications", PatientProtect, viewPatientNotifications);
 
@@ -411,6 +414,7 @@ app.get(
   DoctorProtect,
   filterAppointmentDoctor
 );
+app.put("/appointment/cancelAppointment/:id", DoctorProtect, cancelAppointment)
 
 
 app.post("/appointment/appNotif", sendAppointmentNotification);   //testing

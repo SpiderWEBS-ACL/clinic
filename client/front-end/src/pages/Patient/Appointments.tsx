@@ -1,17 +1,29 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Alert from "../../components/Alert";
-import { DatePicker, DatePickerProps, Modal, Select, Spin } from "antd";
+import {
+  Button,
+  Card,
+  DatePicker,
+  DatePickerProps,
+  Modal,
+  Select,
+  Spin,
+} from "antd";
 import { message } from "antd";
+import dayjs from "dayjs";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import { RangePickerProps } from "antd/es/date-picker";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import bootstrap5Plugin from "@fullcalendar/bootstrap5";
 import interactionPlugin from "@fullcalendar/interaction";
 import { filterAppointmentStatusDateApi } from "../../apis/Patient/Appointments/FilterAppointmentStatusDate";
 import { getAllAppointmentsPatientApi } from "../../apis/Patient/Appointments/GetAllAppointments";
+import { getTimeSlotsDoctorDate } from "../../apis/Patient/Doctors/GetTimeSlotsDoctorDate";
+import { handleReschedule } from "../../apis/Patient/Appointments/RescheduleAppointment";
 
 const ViewPatientAppointments = () => {
   const { Option } = Select;
@@ -23,7 +35,12 @@ const ViewPatientAppointments = () => {
   const [allAppointments, setAllAppointments] = useState([]);
   const [status, setStatus] = useState([]);
   const [date, setDate] = useState("");
+  const [showDateTimeModal, setShowDateTimeModal] = useState(false);
   const [ShowAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [ShowRescheduleModal, setShowRescheduleModal] = useState(false);
+  const [AppointmentDate, setAppointmentDate] = useState("");
+  const [AppointmentTime, setAppointmentTime] = useState("");
+  const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
   const [loading, setLoading] = useState(true);
   const clearFilters = async () => {
     setAppointments(allAppointments);
@@ -83,6 +100,30 @@ const ViewPatientAppointments = () => {
     setAppointment(info.event._def.extendedProps);
   };
 
+  const disabledDate: RangePickerProps["disabledDate"] = (current) => {
+    return current && current < dayjs().startOf("day");
+  };
+  const onAppointmentDateChange: DatePickerProps["onChange"] = (
+    date,
+    dateString
+  ) => {
+    setAppointmentDate(dateString);
+    setAppointmentTime("");
+    setTimeSlotsApi(dateString);
+  };
+  const setTimeSlotsApi = async (date: string) => {
+    try {
+      const response = await getTimeSlotsDoctorDate(appointment.Doctor, date);
+      if (response.data.length == 0)
+        message.warning("No slots available on this date");
+      setTimeSlotsDoctor(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
+    setAppointmentTime(selectedTimeSlot);
+  };
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">Appointments</h2>
@@ -141,7 +182,7 @@ const ViewPatientAppointments = () => {
         <FullCalendar
           stickyHeaderDates
           aspectRatio={1}
-          height={"75vh"}
+          height={"70vh"}
           plugins={[
             dayGridPlugin,
             timeGridPlugin,
@@ -162,6 +203,17 @@ const ViewPatientAppointments = () => {
         />
       </div>
       <Modal
+        footer={
+          <Button
+            type="primary"
+            onClick={() => {
+              setShowRescheduleModal(true);
+
+            }}
+          >
+            Reschedule
+          </Button>
+        }
         visible={ShowAppointmentModal}
         onCancel={() => {
           setShowAppointmentModal(false);
@@ -170,6 +222,59 @@ const ViewPatientAppointments = () => {
           setShowAppointmentModal(false);
         }}
       >
+        <Modal
+          title="Select Appointment Time"
+          visible={ShowRescheduleModal}
+          onCancel={() => {
+            setShowRescheduleModal(false);
+            setAppointmentDate("");
+            setAppointmentTime("");
+          }}
+          footer={null}
+        >
+          <DatePicker
+            disabledDate={disabledDate}
+            onChange={onAppointmentDateChange}
+            style={{ width: 150, marginRight: 30 }}
+          />
+          <label style={{ marginRight: 8 }}></label>
+          <Select
+            disabled={AppointmentDate == ""}
+            value={AppointmentTime}
+            onChange={handleAppointmentTimeSlotChange}
+            style={{ width: 150, marginRight: 30 }}
+          >
+            <Option value="">Select slot</Option>
+            {timeSlotsDoctor.map((slot) => (
+              <Option key={slot} value={slot}>
+                {slot}
+              </Option>
+            ))}
+          </Select>
+          <button
+            disabled={AppointmentDate == "" || AppointmentTime == ""}
+            className="btn btn-sm btn-success"
+            style={{
+              marginLeft: "1rem",
+              marginBlock: "1rem",
+              padding: "4px 8px",
+              fontSize: "12px",
+              borderRadius: "5px",
+            }}
+            onClick={() => {
+              handleReschedule(
+                appointment._id,
+                `${AppointmentDate}T${AppointmentTime}:00.000Z`);
+                setLoading(true);
+              setShowRescheduleModal(false);
+              setShowAppointmentModal(false);
+              fetchAppointments();
+            }}
+          >
+            <span aria-hidden="true"></span>
+            Reschedule
+          </button>
+        </Modal>
         <table className="table">
           <thead>
             <tr>

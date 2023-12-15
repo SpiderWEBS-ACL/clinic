@@ -4,6 +4,7 @@ const doctorRegisterRequestModel = require("../Models/DoctorRegisterRequest");
 const appointmentModel = require("../Models/Appointment");
 const timeSlotModel = require("../Models/TimeSlot");
 const prescriptionModel = require("../Models/Prescription");
+const pharmacistModel = require("../Models/Pharmacist");
 const { default: mongoose } = require("mongoose");
 const bcrypt = require("bcrypt");
 const fileModel = require("../Models/File");
@@ -765,6 +766,14 @@ const deleteMedicineInPrescription = async (req, res) => {
     return res.status(400).json({ error: error.message });
   }
 };
+const getAllPharmacists = async (req, res) => {
+  try {
+    const Doctors = await pharmacistModel.find({});
+    return res.status(200).json(Doctors);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
 
 const viewDoctorNotifications = async (req, res) => {
   try {
@@ -816,4 +825,5 @@ module.exports = {
   updateMedicineInPrescription,
   deleteMedicineInPrescription,
   viewDoctorNotifications,
+  getAllPharmacists,
 };

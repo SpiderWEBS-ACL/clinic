@@ -27,6 +27,31 @@ const addAppointment = async (req, res) => {
     }
  }
 
+ const cancelAppointment = async (req,res) =>{
+    try{
+        id = req.params.id;
+        appointment = await appointmentModel.findById(id);
+        if(!appointment){
+            return res.status(400).json("error finding app in cancel appointment")
+        }
+        patient = await patientModel.findById(appointment.Patient);
+        if(!patient){
+            return res.status(400).json("error finding patient in cancel appointment")
+        }
+        doctor = await doctorModel.findById(appointment.Doctor);
+        if(!doctor){
+            return res.status(400).json("error finding doctor in cancel appointment")
+        }
+        patient.WalletBalance += doctor.HourlyRate;
+        await patient.save();
+
+        appointment.Status = "Cancelled"
+        await appointment.save();
+    }catch(error){
+        return res.status(400).json({ error: error.message });
+    }
+}
+
  const filterAppointmentDoctor = async (req, res) => {
     try {
         const id = req.user.id;
@@ -83,6 +108,24 @@ const addAppointment = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
+
+const rescheduleAppointment = async (req, res) => {
+    const id  = req.body.id;
+    const appointmentDate = req.body.AppointmentDate+"";
+    const date = new Date(appointmentDate)
+    date.setHours(date.getHours() - 2);
+    const start = new Date(date);
+    date.setHours(date.getHours() - 1);
+    const end = new Date(date);
+    console.log(appointmentDate)
+    try{
+        const appointment = await appointmentModel.findByIdAndUpdate(id,{AppointmentDate:appointmentDate , start:start , end:end});
+        return res.status(200).json(appointment);
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+
+}
 
 const filterAppointmentPatient = async (req, res) => {
     try {
@@ -216,4 +259,4 @@ const sendAppointmentNotification = async (appointmentId) => {
 
 
 
-module.exports = {addAppointment,filterAppointmentPatient, filterAppointmentDoctor, sendAppointmentNotification};
+module.exports = {addAppointment,filterAppointmentPatient, filterAppointmentDoctor, sendAppointmentNotification, cancelAppointment,rescheduleAppointment};

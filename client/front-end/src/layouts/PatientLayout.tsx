@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FloatButton, Layout, Menu } from "antd";
+import ImportedHeader from "../layouts/header";
 import {
   HomeOutlined,
   FileOutlined,
@@ -19,6 +20,7 @@ import { IoPeopleOutline } from "react-icons/io5";
 import { Socket, io } from "socket.io-client";
 import Cookies from "js-cookie";
 import { saveVideoSocketId } from "../apis/Patient/Video Chat/SaveVideoSocketId";
+import { Chat, ChatBubbleOutline } from "@material-ui/icons";
 
 export const socket: Socket = io("http://localhost:8000", {
   auth: {
@@ -105,15 +107,22 @@ const PatientLayout: React.FC = () => {
       icon: <MedicineBoxOutlined />,
     },
     {
+      label: "Chat",
+      icon: <ChatBubbleOutline />,
+      key: "ChatParent",
+      children: [
+        {
+          label: "Doctors",
+          key: "/patient/myDoctors",
+        },
+      ],
+    },
+    {
       label: "Wallet",
       key: "/patient/wallet",
       icon: <WalletOutlined />,
     },
-    // {
-    //   label: "Settings",
-    //   key: "/patient/settings",
-    //   icon: <SettingOutlined />,
-    // },
+
     {
       label: "Logout",
       key: "/",
@@ -148,8 +157,15 @@ const PatientLayout: React.FC = () => {
         ></Menu>
       </Sider>
       <Layout>
+        <ImportedHeader />
         <Content style={{ margin: "0 16px", overflow: "hidden" }}>
-          <div style={{ overflowY: "auto", maxHeight: "100vh" }}>
+          <div
+            style={{
+              overflowY: "auto",
+              minHeight: "86.5vh",
+              maxHeight: "100vh",
+            }}
+          >
             <AppRouter />
           </div>
           <FloatButton

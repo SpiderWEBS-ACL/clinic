@@ -139,7 +139,6 @@ const RegLog: React.FC = () => {
 
   const handleRedirection = (item: any) => {
     if (item.type == "Patient") {
-      
       navigate(`/patient/Home`);
     } else if (item.type == "Doctor" && item.user.FirstTime == true) {
       navigate(`/doctor/timeSlots`);
@@ -219,261 +218,282 @@ const RegLog: React.FC = () => {
   return (
     <div
       style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        fontFamily: "'Roboto', sans-serif",
+        backgroundImage: `url('bck.jpg')`,
       }}
-      className={`cont ${isSignUp ? "s--signup" : ""}`}
     >
-      <div className="form sign-in ">
-        <Form
-          name="basic"
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
-          style={{ maxWidth: 350, margin: 70 }}
-          initialValues={{ remember: true }}
-          onFinish={handleSignIn}
-          autoComplete="off"
-        >
-          <h2 style={{ margin: 30 }} className="h2">
-            Welcome Back
-          </h2>
-          <br></br>
-          <Form.Item<FieldType>
-            label="Username"
-            name="username"
-            rules={[{ required: true, message: "Please input your username!" }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item<FieldType>
-            label="Password"
-            name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
-          >
-            <Input.Password />
-          </Form.Item>
-
-          <a
-            href="/forgotPassword"
-            className="forgot-pass text-right"
-            style={{ display: "block", textAlign: "center", marginBottom: 17 }}
-          >
-            Forgot Password?
-          </a>
-
-          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button style={{ margin: "auto" }} type="primary" htmlType="submit">
-              Sign in
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
-
-      <div className="sub-cont">
-        <div className="img">
-          <div className={`img__text m--up ${isSignUp ? "" : ""}`}>
-            <h2 className="h2">New here?</h2>
-            <p>Sign up and discover a great amount of new opportunities!</p>
-          </div>
-          <div className={`img__text m--in ${isSignUp ? "" : "m--up"}`}>
-            <h2 className="h2">One of us?</h2>
-            <p className="p">
-              If you already have an account, just sign in. We've missed you!
-            </p>
-          </div>
-          <div className="img__btn" onClick={toggleSignUp}>
-            <span className={`span m--up ${isSignUp ? "m--in" : ""}`}>
-              Sign Up
-            </span>
-            <span className={`span m--in ${isSignUp ? "" : "m--up"}`}>
-              Sign In
-            </span>
-          </div>
-          <div
-            style={{ marginTop: 20, minWidth: 140, minHeight: 60 }}
-            className="img__btn"
-            onClick={handleRegAsDoctor}
-          >
-            <span
-              style={{ textAlign: "center" }}
-              className={`span m--up ${isSignUp ? "m--in" : ""}`}
-            >
-              Sign Up as a doctor
-            </span>
-            <span
-              style={{ textAlign: "center" }}
-              className={`span m--in ${isSignUp ? "" : "m--up"}`}
-            >
-              Sign Up as a doctor
-            </span>
-          </div>
-        </div>
-        <div className="form sign-up">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          fontFamily: "'Roboto', sans-serif",
+        }}
+        className={`cont ${isSignUp ? "s--signup" : ""}`}
+      >
+        <div className="form sign-in ">
           <Form
-            {...formItemLayout}
-            form={form}
-            name="register"
-            onFinish={handleSignUp}
-            labelWrap
-            initialValues={{ prefix: "20" }}
-            style={{ maxWidth: 430, marginTop: 20 }}
-            scrollToFirstError
+            name="basic"
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 16 }}
+            style={{ maxWidth: 350, margin: 70 }}
+            initialValues={{ remember: true }}
+            onFinish={handleSignIn}
+            autoComplete="off"
           >
-            <h2 style={{ marginBottom: 20 }} className="h2">
-              Time to feel like home
+            <h2 style={{ margin: 30 }} className="h2">
+              Welcome Back
             </h2>
-
-            <Form.Item
-              name="name"
-              label="Name"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your Name!",
-                  whitespace: true,
-                },
-              ]}
-            >
-              <Input onChange={(e) => setName(e.target.value)} />
-            </Form.Item>
-            <Form.Item
-              name="username"
+            <br></br>
+            <Form.Item<FieldType>
               label="Username"
+              name="username"
               rules={[
-                {
-                  type: "string",
-                  message: "The input is not valid Username",
-                },
-                {
-                  required: true,
-                  message: "Please input your E-mail!",
-                },
+                { required: true, message: "Please input your username!" },
               ]}
             >
-              <Input onChange={(e) => setUsername(e.target.value)} />
-            </Form.Item>
-            <Form.Item
-              name="email"
-              label="E-mail"
-              rules={[
-                {
-                  type: "email",
-                  message: "The input is not valid E-mail!",
-                },
-                {
-                  required: true,
-                  message: "Please input your E-mail!",
-                },
-              ]}
-            >
-              <Input onChange={(e) => setEmail(e.target.value)} />
+              <Input />
             </Form.Item>
 
-            <Form.Item
-              name="password"
+            <Form.Item<FieldType>
               label="Password"
-              tooltip="Your password must be 8 character and contain: one capital letter, one small letter, one number"
+              name="password"
               rules={[
-                {
-                  required: true,
-                  message: "Please input your password!",
-                },
-                {
-                  validator: validatePassword,
-                },
-              ]}
-              hasFeedback
-            >
-              <Input.Password onChange={(e) => setPassword(e.target.value)} />
-            </Form.Item>
-
-            <Form.Item
-              name="dob"
-              label="Date of birth"
-              hasFeedback
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter you date of birth!",
-                },
+                { required: true, message: "Please input your password!" },
               ]}
             >
-              <DatePicker
-                value={Dob ? dayjs(Dob) : undefined}
-                onChange={(date, dateString) => {
-                  if (dateString) {
-                    setDob(dateString);
-                  }
-                }}
-                style={{ width: "100%" }}
-              />
+              <Input.Password />
             </Form.Item>
 
-            <Form.Item
-              name="mobile"
-              label="Mobile Number"
-              rules={[
-                { required: true, message: "Please input your phone number!" },
-                {
-                  validator: validatePhoneNumber,
-                },
-              ]}
+            <a
+              href="/forgotPassword"
+              className="forgot-pass text-right"
+              style={{
+                display: "block",
+                textAlign: "center",
+                marginBottom: 17,
+              }}
             >
-              <Input
-                addonBefore={prefixSelector}
-                style={{ width: "100%" }}
-                onChange={(e) => setMobile(e.target.value)}
-              />
-            </Form.Item>
+              Forgot Password?
+            </a>
 
-            <Form.Item
-              name="gender"
-              label="Gender"
-              rules={[{ required: true, message: "Please select gender!" }]}
-            >
-              <Select
-                onChange={(value) => setGender(value)}
-                placeholder="select your gender"
+            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+              <Button
+                style={{ margin: "auto" }}
+                type="primary"
+                htmlType="submit"
               >
-                <Option value="Male">Male</Option>
-                <Option value="Female">Female</Option>
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              name="EmergencyContactName"
-              label="Emergency Contact Name"
-              rules={[{ required: true, message: "Please input name" }]}
-            >
-              <Input
-                onChange={(e) => setEmergencyContactName(e.target.value)}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="EmergencyContactMobile"
-              label="Emergency Contact Mobile"
-              rules={[
-                { required: true, message: "Please input mobile number" },
-              ]}
-            >
-              <Input
-                onChange={(e) => setEmergencyContactMobile(e.target.value)}
-                addonBefore={prefixSelector}
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-
-            <Form.Item {...tailFormItemLayout}>
-              <Button type="primary" htmlType="submit">
-                Sign up
+                Sign in
               </Button>
             </Form.Item>
           </Form>
+        </div>
+
+        <div className="sub-cont">
+          <div className="img">
+            <div className={`img__text m--up ${isSignUp ? "" : ""}`}>
+              <h2 className="h2">New here?</h2>
+              <p>Sign up and discover a great amount of new opportunities!</p>
+            </div>
+            <div className={`img__text m--in ${isSignUp ? "" : "m--up"}`}>
+              <h2 className="h2">One of us?</h2>
+              <p className="p">
+                If you already have an account, just sign in. We've missed you!
+              </p>
+            </div>
+            <div className="img__btn" onClick={toggleSignUp}>
+              <span className={`span m--up ${isSignUp ? "m--in" : ""}`}>
+                Sign Up
+              </span>
+              <span className={`span m--in ${isSignUp ? "" : "m--up"}`}>
+                Sign In
+              </span>
+            </div>
+            <div
+              style={{ marginTop: 20, minWidth: 140, minHeight: 60 }}
+              className="img__btn"
+              onClick={handleRegAsDoctor}
+            >
+              <span
+                style={{ textAlign: "center" }}
+                className={`span m--up ${isSignUp ? "m--in" : ""}`}
+              >
+                Sign Up as a doctor
+              </span>
+              <span
+                style={{ textAlign: "center" }}
+                className={`span m--in ${isSignUp ? "" : "m--up"}`}
+              >
+                Sign Up as a doctor
+              </span>
+            </div>
+          </div>
+          <div className="form sign-up">
+            <Form
+              {...formItemLayout}
+              form={form}
+              name="register"
+              onFinish={handleSignUp}
+              labelWrap
+              initialValues={{ prefix: "20" }}
+              style={{ maxWidth: 430, marginTop: 20 }}
+              scrollToFirstError
+            >
+              <h2 style={{ marginBottom: 20 }} className="h2">
+                Time to feel like home
+              </h2>
+
+              <Form.Item
+                name="name"
+                label="Name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your Name!",
+                    whitespace: true,
+                  },
+                ]}
+              >
+                <Input onChange={(e) => setName(e.target.value)} />
+              </Form.Item>
+              <Form.Item
+                name="username"
+                label="Username"
+                rules={[
+                  {
+                    type: "string",
+                    message: "The input is not valid Username",
+                  },
+                  {
+                    required: true,
+                    message: "Please input your E-mail!",
+                  },
+                ]}
+              >
+                <Input onChange={(e) => setUsername(e.target.value)} />
+              </Form.Item>
+              <Form.Item
+                name="email"
+                label="E-mail"
+                rules={[
+                  {
+                    type: "email",
+                    message: "The input is not valid E-mail!",
+                  },
+                  {
+                    required: true,
+                    message: "Please input your E-mail!",
+                  },
+                ]}
+              >
+                <Input onChange={(e) => setEmail(e.target.value)} />
+              </Form.Item>
+
+              <Form.Item
+                name="password"
+                label="Password"
+                tooltip="Your password must be 8 character and contain: one capital letter, one small letter, one number"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your password!",
+                  },
+                  {
+                    validator: validatePassword,
+                  },
+                ]}
+                hasFeedback
+              >
+                <Input.Password onChange={(e) => setPassword(e.target.value)} />
+              </Form.Item>
+
+              <Form.Item
+                name="dob"
+                label="Date of birth"
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter you date of birth!",
+                  },
+                ]}
+              >
+                <DatePicker
+                  value={Dob ? dayjs(Dob) : undefined}
+                  onChange={(date, dateString) => {
+                    if (dateString) {
+                      setDob(dateString);
+                    }
+                  }}
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="mobile"
+                label="Mobile Number"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your phone number!",
+                  },
+                  {
+                    validator: validatePhoneNumber,
+                  },
+                ]}
+              >
+                <Input
+                  addonBefore={prefixSelector}
+                  style={{ width: "100%" }}
+                  onChange={(e) => setMobile(e.target.value)}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="gender"
+                label="Gender"
+                rules={[{ required: true, message: "Please select gender!" }]}
+              >
+                <Select
+                  onChange={(value) => setGender(value)}
+                  placeholder="select your gender"
+                >
+                  <Option value="Male">Male</Option>
+                  <Option value="Female">Female</Option>
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                name="EmergencyContactName"
+                label="Emergency Contact Name"
+                rules={[{ required: true, message: "Please input name" }]}
+              >
+                <Input
+                  onChange={(e) => setEmergencyContactName(e.target.value)}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="EmergencyContactMobile"
+                label="Emergency Contact Mobile"
+                rules={[
+                  { required: true, message: "Please input mobile number" },
+                ]}
+              >
+                <Input
+                  onChange={(e) => setEmergencyContactMobile(e.target.value)}
+                  addonBefore={prefixSelector}
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+
+              <Form.Item {...tailFormItemLayout}>
+                <Button type="primary" htmlType="submit">
+                  Sign up
+                </Button>
+              </Form.Item>
+            </Form>
+          </div>
         </div>
       </div>
     </div>

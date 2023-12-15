@@ -709,8 +709,9 @@ const getTimeSlotsOfDate = async (req, res) => {
     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const dayString = daysOfWeek[dayOfWeek];
     const timeSlots = await timeSlotModel.findOne({ Doctor: DoctorId, day: dayString });
+    console.log("timeSlots", timeSlots)
 
-    if (!timeSlots) {
+    if (!timeSlots.slots) {
       return res.status(404).json({ error: 'No time slots found for the specified day and doctor.' });
     }
 
