@@ -288,7 +288,9 @@ const viewPatients = async (req, res) => {
       .exec();
     const patients = [];
     for (const appointment of appointments) {
+      console.log("ele et7to", patients);
       const patient = appointment.Patient;
+
       if (!patients.includes(patient) && patient != null)
         patients.push(patient);
     }
@@ -701,6 +703,7 @@ const addPrescription = async (req, res) => {
     const prescriptionData = {
       ...req.body,
       Medicines: medicineNames.map((name, index) => ({
+        MedicineId: medicines[index].MedicineId,
         Name: name,
         Dosage: medicines[index].Dosage,
         Instructions: medicines[index].Instructions,

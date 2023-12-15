@@ -12,7 +12,7 @@ import { getAllPatientsPrescriptions } from "../../apis/Doctor/Prescriptions/get
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Prescription } from "../../types";
-import { Alert, Button, Input, message } from "antd";
+import { Alert, Button, Input, Tag, message } from "antd";
 import { useParams } from "react-router-dom";
 import { updateMedicineInPrescription } from "../../apis/Doctor/Prescriptions/UpdateMedicineInPrescription";
 
@@ -127,6 +127,16 @@ const PatientsPrescriptions = () => {
       message.error("An error has occured, please try again");
     }
   };
+  const tagStyle = {
+    fontSize: "12px",
+    marginRight: "1rem",
+    width: "50px",
+    height: "24px",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
@@ -144,9 +154,18 @@ const PatientsPrescriptions = () => {
                   aria-controls={`panel${index + 1}-content`}
                   id={`panel${index + 1}-header`}
                 >
-                  <Typography style={{ marginRight: "34rem" }}>
-                    {`Prescription #${index + 1}`}
-                  </Typography>
+                  <Typography
+                    style={{ marginRight: "29rem" }}
+                  >{`Prescription #${index + 1}`}</Typography>
+
+                  <Tag
+                    style={tagStyle}
+                    key={index}
+                    className="prescription-tag"
+                    color={prescription.Filled === "Filled" ? "green" : "red"}
+                  >
+                    {prescription.Filled}
+                  </Tag>
                   <Typography fontSize={"14px"} color={"#b9bbbe"}>
                     {new Date(prescription.Date + "").toDateString()}
                   </Typography>
@@ -177,17 +196,19 @@ const PatientsPrescriptions = () => {
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
-                        <IconButton
-                          style={{
-                            position: "absolute",
-                            top: "8px",
-                            right: "40px",
-                            color: "#555",
-                          }}
-                          onClick={handleEditClick}
-                        >
-                          <EditIcon />
-                        </IconButton>
+                        {prescription.Filled === "Unfilled" && (
+                          <IconButton
+                            style={{
+                              position: "absolute",
+                              top: "8px",
+                              right: "40px",
+                              color: "#555",
+                            }}
+                            onClick={handleEditClick}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        )}
                         <IconButton
                           style={{
                             position: "absolute",

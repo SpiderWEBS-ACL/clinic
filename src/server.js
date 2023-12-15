@@ -7,14 +7,9 @@ const http = require("http");
 const server = http.createServer(app);
 const cors = require("cors");
 const socketServerCreate = require("./socket/socketServer");
+
 app.use(cors());
-// const io = require("socket.io")(server, {
-//   cors: {
-//     origin: ["http://localhost:5173"],
-//     methods: ["GET", "POST"],
-//     credentials: true
-//   }
-// });
+
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 const port = process.env.PORT || "8000";
@@ -22,26 +17,6 @@ const MongoURI = process.env.ATLAS_MONGO_URI;
 
 socketServerCreate(server);
 
-// io.on("connection", (socket) => {
-// 	socket.emit("me", socket.id)
-//   console.log(socket.id)
-
-// 	socket.on("disconnect", () => {
-// 		socket.broadcast.emit("callEnded")
-// 	})
-
-// 	socket.on("callUser", (data) => {
-// 		io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
-// 	})
-
-// 	socket.on("answerCall", (data) => {
-// 		io.to(data.to).emit("callAccepted", data.signal)
-// 	})
-
-//   socket.on("sendMessage", (data) => {
-//     io.to(data.userToMessage).emit("sendMessage", {})
-//   })
-// })
 
 const {
   addPatient,
@@ -209,7 +184,10 @@ app.get("/admin/allDoctors", AdminProtect, getAllDoctors);
 app.delete("/admin/removeDoctor/:id", AdminProtect, removeDoctor);
 app.delete("/admin/removePatient/:id", AdminProtect, removePatient);
 app.delete("/admin/removeAdmin/:id", AdminProtect, removeAdmin);
-app.get("/admin/registrationRequests", AdminProtect, getAllDoctrsRegistrationReqs
+app.get(
+  "/admin/registrationRequests",
+  AdminProtect,
+  getAllDoctrsRegistrationReqs
 );
 app.get(
   "/admin/registrationRequest/:id",
@@ -354,7 +332,11 @@ app.get(
   PatientProtect,
   viewDoctorsWithPrices
 );
-app.put("/patient/rescheduleAppointment", PatientProtect,rescheduleAppointment)
+app.put(
+  "/patient/rescheduleAppointment",
+  PatientProtect,
+  rescheduleAppointment
+);
 app.get("/patient/allAppointments", PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors", PatientProtect, getAllDoctorsPatient);
 app.get("/patient/allPackages", PatientProtect, getAllPackagesPatient);
@@ -426,7 +408,7 @@ app.get(
   DoctorProtect,
   filterAppointmentDoctor
 );
-app.put("/appointment/cancelAppointment/:id", DoctorProtect, cancelAppointment)
+app.put("/appointment/cancelAppointment/:id", DoctorProtect, cancelAppointment);
 
 app.post("/appointment/appNotif", sendAppointmentNotification);   //testing
 app.post("/appointment/cancelNotif", sendCancellationNotif);   //testing
