@@ -825,5 +825,5 @@ module.exports = {
   updateMedicineInPrescription,
   deleteMedicineInPrescription,
   viewDoctorNotifications,
-  getAllPharmacists,
+  getAllPharmacists, 
 };
