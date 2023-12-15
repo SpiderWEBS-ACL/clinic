@@ -11,6 +11,7 @@ const fileModel = require("../Models/File");
 const fs = require("fs");
 const multer = require("multer");
 const Medicine = require("../Models/Medicine");
+const Notification = require("../Models/Notification");
 // FOR TESTING
 const addDoctor = async (req, res) => {
   try {
@@ -774,6 +775,24 @@ const getAllPharmacists = async (req, res) => {
   }
 };
 
+const viewDoctorNotifications = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+
+    const doctor = await doctorModel.findById(doctorId);
+
+    if (!doctor) {
+      return res.status(404).json({ error: "Doctor Not Found" });
+    }
+
+    const notifications = await Notification.find({ Doctor: doctor });
+
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   registerDoctor,
   searchPatientByName,
@@ -805,5 +824,6 @@ module.exports = {
   getAllPatientsPrescriptions,
   updateMedicineInPrescription,
   deleteMedicineInPrescription,
+  viewDoctorNotifications,
   getAllPharmacists,
 };

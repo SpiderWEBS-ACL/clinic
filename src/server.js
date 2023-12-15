@@ -79,6 +79,7 @@ const {
   getTimeSlotsOfDate,
   saveVideoSocketId,
   getMyDoctors,
+  viewPatientNotifications,
 } = require("./controllers/patientController");
 
 const {
@@ -113,6 +114,7 @@ const {
   updateMedicineInPrescription,
   deleteMedicineInPrescription,
   getAllPharmacists,
+  viewDoctorNotifications,
 } = require("./controllers/doctorController");
 
 const {
@@ -121,6 +123,7 @@ const {
   filterAppointmentDoctor,
   rescheduleAppointment,
   cancelAppointment,
+  sendAppointmentNotification,
 } = require("./controllers/appointmentController");
 
 const {
@@ -280,6 +283,9 @@ app.delete(
   deleteMedicineInPrescription
 );
 app.get("/doctor/allPharmacists", DoctorProtect, getAllPharmacists);
+
+app.get("/doctor/notifications", DoctorProtect, viewDoctorNotifications);
+
 //Patient Endpoints
 
 //Public Endpoints
@@ -394,6 +400,8 @@ app.put("/patient/saveVideoSocketId", PatientProtect, saveVideoSocketId);
 app.get("/patient/myDoctors", PatientProtect, getMyDoctors);
 app.get("/patient/allPharmacists", PatientProtect, getAllPharmacists);
 
+app.get("/patient/notifications", PatientProtect, viewPatientNotifications);
+
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
 app.get(
@@ -407,6 +415,9 @@ app.get(
   filterAppointmentDoctor
 );
 app.put("/appointment/cancelAppointment/:id", DoctorProtect, cancelAppointment)
+
+
+app.post("/appointment/appNotif", sendAppointmentNotification);   //testing
 
 //Subscription Endpoints
 app.post("/subscription/subscribeStripe/", PatientProtect, subscribeWithStripe);

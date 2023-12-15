@@ -18,6 +18,7 @@ const multer = require('multer');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const { generateAccessToken } = require("../middleware/authMiddleware");
+const Notification = require("../Models/Notification");
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
@@ -981,11 +982,32 @@ const getMyDoctors = async (req,res) => {
   }catch(error){
     return res.status(500).json({ error: error.message });
   }
-}
+};
+
+const viewPatientNotifications = async (req, res) => {
+
+  try{
+    const patientId = req.user.id;
+    
+    const patient = await patientModel.findById(patientId);
+
+    if (!patient) {
+      return res.status(404).json({ error: "Patient Not Found" });
+    }
+    
+    const notifications = await Notification.find({Patient: patient});
+
+    res.status(200).json(notifications);
+
+  }catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 
 module.exports = {getAllDoctorsPatient, viewAllPatientAppointments, getPatient, addPatient, addFamilyMember, selectDoctor, viewFamilyMembers, filterDoctors , searchForDoctor,
 filterPatientAppointments,  viewDoctorDetails, viewMyPrescriptions, uploadMedicalDocuments, deleteMedicalDocuments, viewMedicalDocuments, filterPrescriptions, selectPrescription,
 viewDoctorsWithPrices,login,filterDoctorsByNameSpecialtyAvailability, viewHealthRecords, subscribeToHealthPackage, getAllPackagesPatient, checkDoctorAvailablity,
-getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription,showSubscribedPackage,getTimeSlotsOfDate, saveVideoSocketId, getMyDoctors };
+getDoctorTimeSlots, getBalance,doctorDiscount, payAppointmentWithWallet, getSubscribedPackage, payAppointmentWithStripe, linkFamily, cancelSubscription,showSubscribedPackage,getTimeSlotsOfDate, saveVideoSocketId, getMyDoctors, viewPatientNotifications };
 

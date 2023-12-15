@@ -234,7 +234,7 @@ const rejectRegistrationRequest = async (req, res) => {
 const sendEmploymentContract = async(regReq) => {
   try {
 
-    const contractLink = `http://localhost:5173/employmentContract/${regReq._id}`
+    const contractLink = `http://localhost:5174/employmentContract/${regReq._id}`
 
     //set up source email
     const transporter = nodemailer.createTransport({
