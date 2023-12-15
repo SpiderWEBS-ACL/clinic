@@ -173,24 +173,21 @@ const viewDoctorDetails = async (req, res) => {
   }
 }
 
+
 const viewMyPrescriptions = async (req, res) => {
   try {
-    const  id  = req.user.id;
+    const PatientId = req.user.id;
     const prescriptions = await prescriptionModel
-    .find({ Patient: id }) 
-    .populate('Doctor')
-    .exec();   
-     if(!prescriptions){
-      return res.status(404).json({error: "You do not have any prescriptions yet"})
-    }
-    else{
-      return res.status(200).json(prescriptions);
-    }
+      .find({
+        Patient: PatientId,
+      })
+      .populate("Medicines.MedicineId", "Name")
+      .exec();
+    return res.status(200).json(prescriptions);
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(400).json({ error: error.message });
   }
-
-}
+};
 
 const filterPrescriptions = async (req, res) => {
   const  Doctor = req.query.Doctor;

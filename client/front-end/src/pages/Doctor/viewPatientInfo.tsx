@@ -377,6 +377,14 @@ const ViewPatientInfo = () => {
           </button>
           <button
             onClick={() => {
+              navigate(`/doctor/prescriptions/${id}`);
+            }}
+            className="btn btn-sm btn-primary"
+          >
+            View Prescriptions
+          </button>
+          <button
+            onClick={() => {
               navigate(`/doctor/addPrescription/${id}`);
             }}
             className="btn btn-sm btn-primary"

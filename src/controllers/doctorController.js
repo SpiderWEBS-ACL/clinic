@@ -700,6 +700,7 @@ const addPrescription = async (req, res) => {
     const prescriptionData = {
       ...req.body,
       Medicines: medicineNames.map((name, index) => ({
+        MedicineId: medicines[index].MedicineId,
         Name: name,
         Dosage: medicines[index].Dosage,
         Instructions: medicines[index].Instructions,
