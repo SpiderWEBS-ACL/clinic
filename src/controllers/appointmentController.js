@@ -30,7 +30,8 @@ const addAppointment = async (req, res, patient = null) => {
         return res.status(201).json("appointment reserved successfuly");
     }catch(error){
         return res.status(400).json({ error: error.message });
-
+    }
+}
 
 const cancelAppointment = async (req,res) =>{
     try{
@@ -61,7 +62,7 @@ const cancelAppointment = async (req,res) =>{
 }
 
       
-const filterAppointmentDoctor = async (req, res) => {
+const filterAppointmentPatient = async (req, res) => {
   try {
     const id = req.user.id;
     const doctor = await doctorModel.findById(id);

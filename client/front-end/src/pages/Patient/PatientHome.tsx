@@ -42,16 +42,16 @@ const PatientHome = () => {
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
-
+  const fetchBalance = async () => {
+    try {
+      const response = await getBalance();
+      setBalance(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
-    const fetchBalance = async () => {
-      try {
-        const response = await getBalance();
-        setBalance(response.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+   
     fetchBalance();
     const config = {
       headers: {
@@ -63,8 +63,7 @@ const PatientHome = () => {
     };
 
     const fetchData = async () => {
-      setLoading(false);
-      setLoadingCard(false);
+     
       try {
         const patient = await getPatient();
         setPatientInfo(patient);
@@ -86,8 +85,11 @@ const PatientHome = () => {
         }
         setLoading(false) 
         setLoadingCard(false)
-
-    };
+    }
+    catch{
+      
+    }
+  };
     fetchData();
   }, [id]);
 
