@@ -43,6 +43,7 @@
     "js-cookie": "^3.0.5",
     "jspdf": "^2.5.1",
     "jwt-decode": "^3.1.2",
+    "mdb-react-ui-kit": "^7.0.0",
     "moment": "^2.29.4",
     "randombytes": "^2.1.0",
     "react": "^18.2.0",
