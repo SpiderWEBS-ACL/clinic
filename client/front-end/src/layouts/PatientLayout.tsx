@@ -72,6 +72,10 @@ const PatientLayout: React.FC = () => {
     setMessageCount(MessageCount + 1);
   });
 
+  const handlePharmacy = () => {
+    window.location.href = 'http://localhost:5173/';
+  };
+
   const navigate = useNavigate();
   const items = [
     {
@@ -159,8 +163,7 @@ const PatientLayout: React.FC = () => {
             if (key === "/") {
               //TODO signout feature here
               localStorage.clear();
-              navigate(key);
-              window.location.reload();
+              handlePharmacy();
             }
             navigate(key);
           }}
