@@ -10,6 +10,7 @@ import {
   Spin,
   Modal,
   Avatar,
+  message,
 } from "antd";
 import { InfoCircleTwoTone, SettingOutlined } from "@ant-design/icons";
 import axios from "axios";
@@ -19,6 +20,7 @@ import "./StylePatient.css";
 import { getSubscription } from "../../apis/Patient/Packages/GetSubscription";
 import { getPatient } from "../../apis/Patient/GetPatient";
 import { getAllAppointmentsPatientApi } from "../../apis/Patient/Appointments/GetAllAppointments";
+import { filterAppointmentStatusDateApi } from "../../apis/Patient/Appointments/FilterAppointmentStatusDate";
 const { Content, Footer } = Layout;
 const { Title } = Typography;
 
@@ -57,20 +59,21 @@ const PatientHome = () => {
         const subscription = await getSubscription();
         if (subscription) setDateOf(subscription.Date + "");
 
-        await api
-          .get("patient/showSubscribedPackage", config)
-          .then((response) => {
-            if (response.data) setSubscription(response.data);
-          });
+      await api
+        .get("patient/showSubscribedPackage", config)
+        .then((response) => {
+          if (response.data) setSubscription(response.data);
+        });
+        try {
+          const response = await filterAppointmentStatusDateApi("Upcoming", "");
+          setAppointments(response.data);
+        } catch (error: any) {
+          if (error.response.data.error == "No appointments were found")
+            setAppointments([]);
+        }
+        setLoading(false) 
+        setLoadingCard(false)
 
-        const patientAppointments = await getAllAppointmentsPatientApi();
-        setAppointments(patientAppointments.data);
-        setLoading(false);
-        setLoadingCard(false);
-      } catch {
-        setLoading(false);
-        setLoadingCard(false);
-      }
     };
     fetchData();
   }, [id]);

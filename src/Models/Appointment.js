@@ -23,14 +23,15 @@ const appointmentSchema = new Schema(
     FollowUp: {
       type: Boolean,
     },
-    Status: {
-      type: String,
-      enum: ["Upcoming", "Completed", "Cancelled", "Rescheduled"],
-      default: "Upcoming",
+    Status:{
+      type : String ,  
+      enum:[ "Upcoming","Completed","Cancelled","Not-Attended"],
+      default: "Upcoming"
     },
-  },
-  { timestamps: true }
-);
+     
+    },{ timestamps: true });
+
+
 
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 module.exports = Appointment;

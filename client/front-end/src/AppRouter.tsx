@@ -56,10 +56,12 @@ import ChatDoctor from "./pages/Doctor/ChatDoctor";
 import ViewMyDoctors from "./pages/Patient/ViewMyDoctors";
 import AddPrescription from "./pages/Doctor/AddPrescription";
 import PatientsPrescriptions from "./pages/Doctor/PatientsPrescriptions";
+
 import ViewAllPharmacists from "./pages/Doctor/ViewAllPharmacists";
 import OrderConfirmation from "./pages/Patient/OrderConfirmation";
 import Success from "./pages/Patient/CartCheckoutSuccess";
 import OrderDetails from "./pages/Patient/ViewOrder";
+import FollowUpRequests from "./pages/Doctor/FollowUpRequests";
 import PatientNotifications from "./pages/Patient/Notifications";
 import DoctorNotifications from "./pages/Doctor/Notifications";
 
@@ -139,6 +141,7 @@ const AppRouter: React.FC = () => {
         <Route path="/doctor/notifications" element={<DoctorNotifications />} />
 
         <Route path="*" element={<NotFound />} />
+        <Route path="/doctor/followupRequests" element={<FollowUpRequests />} />
       </Routes>
     );
   } else if (role === "Patient") {

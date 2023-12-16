@@ -79,6 +79,18 @@ const DoctorLayout: React.FC = () => {
       label: "Appointments",
       key: "/doctor/allAppointments",
       icon: <CalendarOutlined />,
+      children: [
+        {
+          label: "My Appointments",
+          key: "/doctor/allAppointments",
+          
+        },
+        {
+          label: "FollowUp Requests",
+        key: "/doctor/followupRequests",
+          
+        }
+      ],
     },
     {
       label: "Update Info",
