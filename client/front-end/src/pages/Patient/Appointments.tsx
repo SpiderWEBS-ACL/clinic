@@ -27,6 +27,7 @@ import { getTimeSlotsDoctorDate } from "../../apis/Patient/Doctors/GetTimeSlotsD
 import { handleReschedule } from "../../apis/Patient/Appointments/RescheduleAppointment";
 import { cancelAppointmentDoctor } from "../../apis/Doctor/Appointments/cancelAppointment";
 import { s } from "@fullcalendar/core/internal-common";
+import { scheduleFollowUp } from "../../apis/Patient/Appointments/RequestFollowUp";
 
 const ViewPatientAppointments = () => {
   const { Option } = Select;
@@ -41,6 +42,7 @@ const ViewPatientAppointments = () => {
   const [showDateTimeModal, setShowDateTimeModal] = useState(false);
   const [ShowAppointmentModal, setShowAppointmentModal] = useState(false);
   const [ShowRescheduleModal, setShowRescheduleModal] = useState(false);
+  const [ShowFollowUpModal, setShowFollowUpModal] = useState(false);
   const [AppointmentDate, setAppointmentDate] = useState("");
   const [AppointmentTime, setAppointmentTime] = useState("");
   const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
@@ -147,6 +149,20 @@ const ViewPatientAppointments = () => {
   const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
     setAppointmentTime(selectedTimeSlot);
   };
+
+  const handleRequestClick = () => {
+    try {
+      const date = new Date(`${AppointmentDate}T${AppointmentTime}:00.000Z`);
+      scheduleFollowUp(date, appointment);
+      setShowFollowUpModal(false);
+      setAppointmentDate("");
+    setAppointmentTime("");
+      message.success("Request Sent");
+    } catch (error: any) {
+      message.error(`${error.response.data.error}`);
+    }
+  };
+
   const handleRescheduleClick = async () => {
     console.log(appointment.Status);
     if (appointment.Status == "Upcoming") {
@@ -185,6 +201,7 @@ const ViewPatientAppointments = () => {
       } else return false;
     }
   };
+
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">Appointments</h2>
@@ -273,6 +290,58 @@ const ViewPatientAppointments = () => {
         ///}}
         footer={
           <div>
+            <Button
+              style={{ justifySelf: "left" }}
+              type="primary"
+              hidden={!checkStatus()}
+              onClick={() => {
+                setShowFollowUpModal(true);
+              }}
+            >
+              Schedule FollowUp
+            </Button>
+            <Modal
+              title="Select FollowUp Time"
+              visible={ShowFollowUpModal}
+              onCancel={() => {
+                setShowFollowUpModal(false);
+                setAppointmentDate("");
+                setAppointmentTime("");
+              }}
+              footer={null}
+            >
+              <DatePicker
+                disabledDate={disabledDate}
+                onChange={onAppointmentDateChange}
+                style={{ width: 150, marginRight: 30 }}
+              />
+              <label style={{ marginRight: 8 }}></label>
+              <Select
+                disabled={AppointmentDate == ""}
+                value={AppointmentTime}
+                onChange={handleAppointmentTimeSlotChange}
+                style={{ width: 150, marginRight: 30 }}
+              >
+                <Option value="">Select slot</Option>
+                {timeSlotsDoctor.map((slot) => (
+                  <Option key={slot} value={slot}>
+                    {slot}
+                  </Option>
+                ))}
+              </Select>
+              <Button
+                style={{ justifySelf: "left" }}
+                type="primary"
+                hidden={!checkStatus()}
+                onClick={async () => {
+                  await handleRequestClick();
+                  setShowAppointmentModal(false);
+                }}
+              >
+                <span aria-hidden="true"></span>
+                Request
+              </Button>
+            </Modal>
             <Popconfirm
               title="ALERT"
               description="Are you sure you want to unsubscribe?"

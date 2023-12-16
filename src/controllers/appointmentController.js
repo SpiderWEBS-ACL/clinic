@@ -1,21 +1,33 @@
 const appointmentModel = require('../Models/Appointment')
 const doctorModel = require('../Models/Doctor');
 const patientModel = require('../Models/Patient');
+const followUpModel = require('../Models/FollowUpRequest');
 const { default: mongoose } = require('mongoose');
 const { upcomingAppointments } = require('./doctorController');
 
-const addAppointment = async (req, res) => {
+const addAppointment = async (req, res, patient = null) => {
+    if (patient){
+        req.user.id = patient
+    }
     try{
-        if(req.body.FamilyMember == null)
+        if(req.body.FamilyMember == null){
             req.body.Patient = req.user.id;
-        else{
-             const familyMember = await req.user.FamilyMembers.find(
-            (member) => member.Name === req.body.FamilyMember
-          );
-          req.body.Patient = familyMember._id;
+            const appointment = await appointmentModel.create(req.body);
         }
-        const appointment = await appointmentModel.create(req.body);
-        return res.status(201).json(appointment);
+        else{
+            const familyMember = await req.user.FamilyMembers.find(
+            (member) => member.Name === req.body.FamilyMember
+            );
+            if(familyMember.PatientID){
+                req.body.Patient = familyMember.PatientID;
+                const appointment = await appointmentModel.create(req.body);
+            }
+            else{
+                req.body.Patient = familyMember._id;
+                const appointment = await appointmentModel.create(req.body);
+            }
+        }
+        return res.status(201).json("appointment reserved successfuly");
     }catch(error){
         return res.status(400).json({ error: error.message });
     }
@@ -29,14 +41,14 @@ const cancelAppointment = async (req,res) =>{
         if(!appointment){
             return res.status(400).json("error finding app in cancel appointment")
         }
-        patient = await patientModel.findById(appointment.Patient);
-        if(!patient){
-            return res.status(400).json("error finding patient in cancel appointment")
-        }
-        doctor = await doctorModel.findById(appointment.Doctor);
-        if(!doctor){
-            return res.status(400).json("error finding doctor in cancel appointment")
-        }
+         patient = await patientModel.findById(appointment.Patient);
+        // if(!patient){
+        //     return res.status(400).json("error finding patient in cancel appointment")
+        // }
+         doctor = await doctorModel.findById(appointment.Doctor);
+        // if(!doctor){
+        //     return res.status(400).json("error finding doctor in cancel appointment")
+        // }
         patient.WalletBalance += doctor.HourlyRate;
         await patient.save();
 
@@ -108,12 +120,10 @@ const cancelAppointment = async (req,res) =>{
 const rescheduleAppointment = async (req, res) => {
     const id  = req.body.id;
     const appointmentDate = req.body.AppointmentDate+"";
-    const date = new Date(appointmentDate)
-    date.setHours(date.getHours() - 2);
-    const start = new Date(date);
-    date.setHours(date.getHours() - 1);
-    const end = new Date(date);
-    console.log(appointmentDate)
+    const start = new Date(appointmentDate)
+    const end = new Date(appointmentDate)
+    start.setHours(start.getHours() - 2);
+    end.setHours(end.getHours() - 1);
     try{
         const appointment = await appointmentModel.findByIdAndUpdate(id,{AppointmentDate:appointmentDate , start:start , end:end});
         return res.status(200).json("appointment rescheduled");
@@ -140,20 +150,28 @@ const filterAppointmentPatient = async (req, res) => {
                 }
                 }
                 else if(patient){
+
                     appointments = await appointmentModel.find({"Patient": patient}).populate("Doctor").populate("Patient").exec();
                         if(!appointments || appointments.length === 0){
                            return res.status(404).json({error: "no appointments were found"});
                         }
                         await Promise.all(
                             patient.FamilyMembers.map( async (member) => {
+                                if(member.PatientID){
+                                    var appointmentsMember =  await appointmentModel.find({Patient: member.PatientID}).populate("Patient").populate("Doctor").exec();
+                                    appointmentsMember.map((member2) => {
+                                      member2.title = member.Name + "'s Appointment"
+                                    })}
+                                else{
                             var appointmentsMember =  await appointmentModel.find({Patient: member._id}).populate("Patient").populate("Doctor").exec();
                             appointmentsMember.map((member2) => {
                               member2.title = member.Name + "'s Appointment"
-                            })
+                            })}
                             appointments.push(...appointmentsMember);
                             // appointments.map((appointment) => {
                             //   appointment.title += " with Dr. " + appointment.Doctor.Name;
-                            // })
+                         // })
+                        
                           }))
                         }
             }catch(error){
@@ -190,6 +208,48 @@ const filterAppointmentPatient = async (req, res) => {
     }
 };
 
+const requestFollowUp = async (req,res)=>{
+    try{
+        const followUp = await followUpModel.create(req.body);
+        return res.status(201).json("FollowUp is Requested");
+    }catch(error){
+        return res.status(400).json({ error: error.message });
+    }
 
+}
 
-module.exports = {addAppointment,filterAppointmentPatient, filterAppointmentDoctor, cancelAppointment,rescheduleAppointment};
+const getAllFollowUpRequests = async(req,res) =>{
+    try{
+        const id = req.user.id
+        const followUps = await followUpModel.find({Doctor: id}).populate("Patient",'Name').exec();
+        return res.status(200).json(followUps);
+    }catch(error){
+        return res.status(400).json({ error: error.message });
+    }
+}
+
+const rejectFollowUpRequest = async(req,res) =>{
+    try{
+        await followUpModel.findByIdAndDelete(req.params.id)
+        return res.status(200).json("FollowUp Rejected");
+    }catch(error){
+        return res.status(400).json({ error: error.message });
+    }
+}
+
+const acceptFollowUpRequest = async(req,res) =>{
+    try{
+        const followUp = await followUpModel.findById(req.params.id)
+        req.body = {
+            Doctor: followUp.Doctor,
+            AppointmentDate: followUp.AppointmentDate
+        }
+       const response =  await addAppointment(req,res,followUp.Patient);
+        await followUpModel.findByIdAndDelete(req.params.id)
+        console.log(response)
+        return response
+    }catch(error){
+        return res.status(400).json({ error: error.message });
+    }
+}
+module.exports = {addAppointment,filterAppointmentPatient, filterAppointmentDoctor, cancelAppointment,rescheduleAppointment,requestFollowUp,getAllFollowUpRequests,rejectFollowUpRequest,acceptFollowUpRequest};

@@ -119,7 +119,7 @@ const {
   filterAppointmentPatient,
   filterAppointmentDoctor,
   rescheduleAppointment,
-  cancelAppointment,
+  cancelAppointment,requestFollowUp,getAllFollowUpRequests,rejectFollowUpRequest,acceptFollowUpRequest
 } = require("./controllers/appointmentController");
 
 const {
@@ -394,17 +394,17 @@ app.get("/patient/myDoctors", PatientProtect, getMyDoctors);
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
 app.get(
-  "/appointment/filterAppointment",
-  PatientProtect,
-  filterAppointmentPatient
-);
+  "/appointment/filterAppointment", PatientProtect, filterAppointmentPatient);
 app.get(
   "/appointment/filterAppointmentDoctor",
   DoctorProtect,
   filterAppointmentDoctor
 );
+app.post("/appointment/requestFollowUp", requestFollowUp)
 app.put("/appointment/cancelAppointment/:id", DoctorProtect, cancelAppointment)
-
+app.get("/appointment/getAllFollowUpRequests/",DoctorProtect, getAllFollowUpRequests)
+app.delete("/appointment/rejectFollowUpRequest/:id",DoctorProtect,rejectFollowUpRequest)
+app.get("/appointment/acceptFollowUpRequest/:id",DoctorProtect,acceptFollowUpRequest)
 //Subscription Endpoints
 app.post("/subscription/subscribeStripe/", PatientProtect, subscribeWithStripe);
 app.post("/subscription/subscribeWallet/", PatientProtect, subscribeWithWallet);

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 
-const appointmentSchema = new Schema({
+const followUpRequestSchema = new Schema({
     title:{ type: String,
       default: "Appointment"
     },
@@ -33,11 +33,10 @@ const appointmentSchema = new Schema({
       type : String ,  
       enum:[ "Upcoming","Completed","Cancelled","Not-Attended"],
       default: "Upcoming"
-    },
-     
+    } 
     },{ timestamps: true });
 
 
-const Appointment = mongoose.model("Appointment", appointmentSchema);
-module.exports = Appointment;
+const FollowUpRequest = mongoose.model("FollowUpRequest", followUpRequestSchema);
+module.exports = FollowUpRequest;
 
