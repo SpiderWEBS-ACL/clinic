@@ -268,6 +268,7 @@ const sendAppointmentNotification = async (appointmentId) => {
     const notifDoctor = await notificationModel.create({
       Doctor: appointment.Doctor,
       Appoinment: appointment,
+      title: "New Appointment",
       message: `${
         appointment.Patient.Name
       } has scheduled an appointment with you on ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()}`,
@@ -277,6 +278,7 @@ const sendAppointmentNotification = async (appointmentId) => {
     const notifPatient = await notificationModel.create({
       Patient: appointment.Patient,
       Appoinment: appointment,
+      title: "Appointment Scheduled",
       message: `Your appointment with Dr. ${
         appointment.Doctor.Name
       } on ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()} has been scheduled successfully!`,
@@ -335,18 +337,16 @@ const sendCancellationNotif = async (appointmentId) => {
     const notifDoctor = await notificationModel.create({
       Doctor: appointment.Doctor,
       Appoinment: appointment,
-      message: `Your appointment with ${
-        appointment.Patient.Name
-      } on ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()} has been cancelled!`,
+      title: "Appointment Cancelled",
+      message: `Your appointment with ${appointment.Patient.Name} on ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()} has been cancelled!`,
       date: Date.now(),
     });
 
     const notifPatient = await notificationModel.create({
       Patient: appointment.Patient,
       Appoinment: appointment,
-      message: `Your appointment with Dr. ${
-        appointment.Doctor.Name
-      } on ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()} has been cancelled!`,
+      title: "Appointment Cancelled",
+      message: `Your appointment with Dr. ${appointment.Doctor.Name} on ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()} has been cancelled!`,
       date: Date.now(),
     });
 
@@ -396,34 +396,47 @@ const sendReschedulingNotif = async (appointmentId) => {
                   <p>Your appointment with <b>${appointment.Patient.Name}</b> 
                   has been rescheduled to 
                   <i>${appointment.AppointmentDate.toDateString()}</i> at <i>${appointment.start.toLocaleTimeString()}</i></p>`,
-    };
+      
+      };
+  
+      //send email
+      transporter.sendMail(mailOptionsDoctor);
+  
+      const notifDoctor = await notificationModel.create({
+        Doctor: appointment.Doctor,
+        Appoinment: appointment,
+        title: "Appointment Rescheduled",
+        message: `Your appointment with ${appointment.Patient.Name} has been rescheduled to ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()}`,
+        date: Date.now(),
+      });
+  
+      const notifPatient = await notificationModel.create({
+        Patient: appointment.Patient,
+        Appoinment: appointment,
+        title: "Appointment Rescheduled",
+        message: `Your appointment with Dr. ${appointment.Doctor.Name} has been rescheduled to ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()}`,
+        date: Date.now(),
+      });
+  
+      return [notifPatient, notifDoctor];
+  
+    } catch (err) {
+      throw err;
+    }
+  };
 
-    //send email
-    transporter.sendMail(mailOptionsDoctor);
 
-    const notifDoctor = await notificationModel.create({
-      Doctor: appointment.Doctor,
-      Appoinment: appointment,
-      message: `Your appointment with ${
-        appointment.Patient.Name
-      } has been rescheduled to ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()}`,
-      date: Date.now(),
-    });
+  const deleteNotifs = async(req, res) => {
 
-    const notifPatient = await notificationModel.create({
-      Patient: appointment.Patient,
-      Appoinment: appointment,
-      message: `Your appointment with Dr. ${
-        appointment.Doctor.Name
-      } has been rescheduled to ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()}`,
-      date: Date.now(),
-    });
-
-    return [notifPatient, notifDoctor];
-  } catch (err) {
-    throw err;
+    try{
+        // const {id} = req.user;
+        await notificationModel.deleteMany({});
+        res.status(200).json("Notifications Deleted");
+      }
+      catch(error){
+        res.status(400).json({error: error.message})
+      }
   }
-};
 
 module.exports = {
   addAppointment,
@@ -434,4 +447,5 @@ module.exports = {
   rescheduleAppointment,
   sendCancellationNotif,
   sendReschedulingNotif,
+  deleteNotifs,
 };

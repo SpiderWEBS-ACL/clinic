@@ -15,6 +15,8 @@ import {
 import AppRouter from "../AppRouter";
 import { socket } from "./PatientLayout";
 import { Chat, ChatBubbleOutline } from "@material-ui/icons";
+import axios from "axios";
+import { config } from "../Middleware/authMiddleware";
 
 const { Content, Sider } = Layout;
 const id = localStorage.getItem("id");
@@ -23,12 +25,28 @@ const DoctorLayout: React.FC = () => {
   const [VideoCount, setVideoCount] = useState(0);
   const [MessageCount, setMessageCount] = useState(0);
   const [AuthorId, setAuthorId] = useState("");
+  const [notificationCount, setNotificationCount] = useState(0);
+
+
+  const api = axios.create({
+    baseURL: "http://localhost:8000/",
+  });
 
   useEffect(() => {
     socket.emit("me");
     socket.on("me", (id: string) => {
       localStorage.setItem("socketId", id);
     });
+
+    api.get("/doctor/unreadNotifications", config)
+    .then((response) => {
+      console.log(response.data);
+      setNotificationCount(response.data.length);
+    })
+    .catch((error) => {
+      console.log("Error: " + error);
+    });
+
   }, []);
   socket.on("callUser", (data: any) => {
     console.log("data from: ", data.from, "data.name: ", data.Name);
@@ -133,10 +151,15 @@ const DoctorLayout: React.FC = () => {
             <AppRouter />
           </div>
           <FloatButton
+            onClick={() => {
+              navigate("/doctor/notifications");
+            }}
             style={{
               right: "4vh",
               bottom: "94vh",
+              top: "4vh",
             }}
+            badge={{ count: notificationCount }}
             icon={<BellOutlined />}
           />
           <FloatButton
@@ -147,6 +170,7 @@ const DoctorLayout: React.FC = () => {
             style={{
               right: "12vh",
               bottom: "94vh",
+              top: "4vh",
             }}
             badge={{ count: MessageCount }}
             icon={<CommentOutlined />}
@@ -159,6 +183,7 @@ const DoctorLayout: React.FC = () => {
             style={{
               right: "18vh",
               bottom: "94vh",
+              top: "4vh",
             }}
             badge={{ count: VideoCount }}
             icon={<VideoCameraOutlined />}

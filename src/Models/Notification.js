@@ -14,6 +14,10 @@ const notificationSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       refPath: "Appointment"
     },
+    title: {
+      type: String,
+      required: true,
+    },
     message: {
       type: String,
       required: true,
