@@ -45,6 +45,7 @@ const cancelAppointment = async (req, res) => {
     }
 
     patient.WalletBalance += doctor.HourlyRate;
+    patient.Wallet += doctor.HourlyRate;
 
     await patient.save();
 
@@ -326,7 +327,6 @@ const sendCancellationNotif = async (appointmentId) => {
       html: `   <p>Dear <b>Dr. ${appointment.Doctor.Name},</b></p>
                 <p>Your appointment with <b>${appointment.Patient.Name}</b> 
                 on <i>${appointment.AppointmentDate.toDateString()}</i> at <i>${appointment.start.toLocaleTimeString()}</i> has been cancelled!</p>`,
-    
     };
 
     //send email
@@ -335,91 +335,95 @@ const sendCancellationNotif = async (appointmentId) => {
     const notifDoctor = await notificationModel.create({
       Doctor: appointment.Doctor,
       Appoinment: appointment,
-      message: `Your appointment with ${appointment.Patient.Name} on ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()} has been cancelled!`,
+      message: `Your appointment with ${
+        appointment.Patient.Name
+      } on ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()} has been cancelled!`,
       date: Date.now(),
     });
 
     const notifPatient = await notificationModel.create({
       Patient: appointment.Patient,
       Appoinment: appointment,
-      message: `Your appointment with Dr. ${appointment.Doctor.Name} on ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()} has been cancelled!`,
+      message: `Your appointment with Dr. ${
+        appointment.Doctor.Name
+      } on ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()} has been cancelled!`,
       date: Date.now(),
     });
 
     return [notifPatient, notifDoctor];
-
   } catch (err) {
     throw err;
   }
 };
 
-
 const sendReschedulingNotif = async (appointmentId) => {
-    try {
-        const appointment = await appointmentModel
-        .findById(appointmentId)
-        .populate("Doctor")
-        .populate("Patient");
-  
-      //set up source email
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: "spiderwebsacl@gmail.com",
-          pass: "vngs gkzg otrz vzbg",
-        },
-      });
-  
-      //format email details
-      const mailOptionsPatient = {
-        from: "spiderwebsacl@gmail.com",
-        to: appointment.Patient.Email,
-        subject: "Appointment Rescheduled",
-        html: `   <p>Dear <b>${appointment.Patient.Name},</b></p>
+  try {
+    const appointment = await appointmentModel
+      .findById(appointmentId)
+      .populate("Doctor")
+      .populate("Patient");
+
+    //set up source email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "spiderwebsacl@gmail.com",
+        pass: "vngs gkzg otrz vzbg",
+      },
+    });
+
+    //format email details
+    const mailOptionsPatient = {
+      from: "spiderwebsacl@gmail.com",
+      to: appointment.Patient.Email,
+      subject: "Appointment Rescheduled",
+      html: `   <p>Dear <b>${appointment.Patient.Name},</b></p>
                         <p>Your appointment with 
                         <b>Dr. ${appointment.Doctor.Name}</b> 
                         has been rescheduled to 
                         <i>${appointment.AppointmentDate.toDateString()}</i> at <i>${appointment.start.toLocaleTimeString()}</i></p>`,
-      };
-  
-      //send email
-      transporter.sendMail(mailOptionsPatient);
-  
-      //format email details
-      const mailOptionsDoctor = {
-        from: "spiderwebsacl@gmail.com",
-        to: appointment.Doctor.Email,
-        subject: "Appointment Rescheduled",
-        html: `   <p>Dear <b>Dr. ${appointment.Doctor.Name},</b></p>
+    };
+
+    //send email
+    transporter.sendMail(mailOptionsPatient);
+
+    //format email details
+    const mailOptionsDoctor = {
+      from: "spiderwebsacl@gmail.com",
+      to: appointment.Doctor.Email,
+      subject: "Appointment Rescheduled",
+      html: `   <p>Dear <b>Dr. ${appointment.Doctor.Name},</b></p>
                   <p>Your appointment with <b>${appointment.Patient.Name}</b> 
                   has been rescheduled to 
                   <i>${appointment.AppointmentDate.toDateString()}</i> at <i>${appointment.start.toLocaleTimeString()}</i></p>`,
-      
-      };
-  
-      //send email
-      transporter.sendMail(mailOptionsDoctor);
-  
-      const notifDoctor = await notificationModel.create({
-        Doctor: appointment.Doctor,
-        Appoinment: appointment,
-        message: `Your appointment with ${appointment.Patient.Name} has been rescheduled to ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()}`,
-        date: Date.now(),
-      });
-  
-      const notifPatient = await notificationModel.create({
-        Patient: appointment.Patient,
-        Appoinment: appointment,
-        message: `Your appointment with Dr. ${appointment.Doctor.Name} has been rescheduled to ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()}`,
-        date: Date.now(),
-      });
-  
-      return [notifPatient, notifDoctor];
-  
-    } catch (err) {
-      throw err;
-    }
-  };
+    };
+
+    //send email
+    transporter.sendMail(mailOptionsDoctor);
+
+    const notifDoctor = await notificationModel.create({
+      Doctor: appointment.Doctor,
+      Appoinment: appointment,
+      message: `Your appointment with ${
+        appointment.Patient.Name
+      } has been rescheduled to ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()}`,
+      date: Date.now(),
+    });
+
+    const notifPatient = await notificationModel.create({
+      Patient: appointment.Patient,
+      Appoinment: appointment,
+      message: `Your appointment with Dr. ${
+        appointment.Doctor.Name
+      } has been rescheduled to ${appointment.AppointmentDate.toDateString()} at ${appointment.start.toLocaleTimeString()}`,
+      date: Date.now(),
+    });
+
+    return [notifPatient, notifDoctor];
+  } catch (err) {
+    throw err;
+  }
+};
 
 module.exports = {
   addAppointment,

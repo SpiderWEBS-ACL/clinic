@@ -48,22 +48,29 @@ const PatientHome = () => {
       },
     };
     const fetchData = async () => {
-      const patient = await getPatient();
-      setPatientInfo(patient);
-
-      const subscription = await getSubscription();
-      if (subscription) setDateOf(subscription.Date + "");
-
-      await api
-        .get("patient/showSubscribedPackage", config)
-        .then((response) => {
-          if (response.data) setSubscription(response.data);
-        });
-
-      const patientAppointments = await getAllAppointmentsPatientApi();
-      setAppointments(patientAppointments.data);
       setLoading(false);
       setLoadingCard(false);
+      try {
+        const patient = await getPatient();
+        setPatientInfo(patient);
+
+        const subscription = await getSubscription();
+        if (subscription) setDateOf(subscription.Date + "");
+
+        await api
+          .get("patient/showSubscribedPackage", config)
+          .then((response) => {
+            if (response.data) setSubscription(response.data);
+          });
+
+        const patientAppointments = await getAllAppointmentsPatientApi();
+        setAppointments(patientAppointments.data);
+        setLoading(false);
+        setLoadingCard(false);
+      } catch {
+        setLoading(false);
+        setLoadingCard(false);
+      }
     };
     fetchData();
   }, [id]);
