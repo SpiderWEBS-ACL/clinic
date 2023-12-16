@@ -12,10 +12,12 @@ import { getAllPatientsPrescriptions } from "../../apis/Doctor/Prescriptions/get
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Prescription } from "../../types";
-import { Alert, Tooltip, Input, Tag, message } from "antd";
-import { useParams } from "react-router-dom";
+import { Alert, Button, Input, Tag, message } from "antd";
+import { useNavigate, useParams } from "react-router-dom";
 import { updateMedicineInPrescription } from "../../apis/Doctor/Prescriptions/UpdateMedicineInPrescription";
 import { getMyPrescription } from "../../apis/Patient/Prescriptions/GetMyPrescription";
+import { payPrescription } from "../../apis/Patient/Prescriptions/PayPrescription";
+import { ReloadOutlined } from "@ant-design/icons";
 import { DownloadOutlined } from "@ant-design/icons";
 import jsPDF from "jspdf";
 
@@ -92,6 +94,11 @@ const PatientsPrescriptions = () => {
     justifyContent: "center",
   };
 
+  const pay = async (prescription: Prescription) => {
+    localStorage.setItem("PrescriptionId", prescription._id);
+    await payPrescription(prescription);
+    window.location.href = "http://localhost:5174/patient/orderConfirmation";
+  };
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
@@ -210,6 +217,24 @@ const PatientsPrescriptions = () => {
                       </Accordion>
                     )
                   )}{" "}
+                  {prescription.Filled === "Unfilled" && (
+                    <button
+                      style={{ marginTop: "1rem", marginLeft: "40rem" }}
+                      className="btn btn-sm btn-primary"
+                      onClick={() => pay(prescription)}
+                    >
+                      Buy Available Medicines
+                    </button>
+                  )}
+                  {prescription.Filled === "Filled" && (
+                    <button
+                      style={{ marginTop: "1rem", marginLeft: "44rem" }}
+                      className="btn btn-sm btn-primary"
+                      onClick={() => pay(prescription)}
+                    >
+                      Buy Again <ReloadOutlined />
+                    </button>
+                  )}
                 </AccordionDetails>
                 <div style={{ display: "flex" }}>
                   <Tooltip title="Download selected prescription as PDF">

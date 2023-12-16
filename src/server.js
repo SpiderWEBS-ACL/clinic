@@ -17,7 +17,6 @@ const MongoURI = process.env.ATLAS_MONGO_URI;
 
 socketServerCreate(server);
 
-
 const {
   addPatient,
   addFamilyMember,
@@ -55,6 +54,9 @@ const {
   saveVideoSocketId,
   getMyDoctors,
   viewPatientNotifications,
+  addPrescriptionMedicinesToCart,
+  payCartWithStripe,
+  fillPrescription,
   openNotification,
   getPatientUnreadNotifs,
 } = require("./controllers/patientController");
@@ -392,6 +394,13 @@ app.put("/patient/saveVideoSocketId", PatientProtect, saveVideoSocketId);
 app.get("/patient/myDoctors", PatientProtect, getMyDoctors);
 app.get("/patient/allPharmacists", PatientProtect, getAllPharmacists);
 app.get("/patient/notifications", PatientProtect, viewPatientNotifications);
+app.put("/patient/fillPrescription/:id", PatientProtect, fillPrescription);
+app.post(
+  "/patient/payPrescription",
+  PatientProtect,
+  addPrescriptionMedicinesToCart
+);
+app.post("/cart/payWithStripe/", PatientProtect, payCartWithStripe);
 app.put("/patient/openNotification/:id", openNotification); //TO FIX: patient protect causes unauthorized error
 app.get("/patient/unreadNotifications", PatientProtect, getPatientUnreadNotifs);
 
@@ -410,11 +419,9 @@ app.get(
 );
 app.put("/appointment/cancelAppointment/:id", DoctorProtect, cancelAppointment);
 
-app.post("/appointment/appNotif", sendAppointmentNotification);   //testing
-app.post("/appointment/cancelNotif", sendCancellationNotif);   //testing
-app.post("/appointment/rescheduleNotif", sendReschedulingNotif);   //testing
-
-
+app.post("/appointment/appNotif", sendAppointmentNotification); //testing
+app.post("/appointment/cancelNotif", sendCancellationNotif); //testing
+app.post("/appointment/rescheduleNotif", sendReschedulingNotif); //testing
 
 //Subscription Endpoints
 app.post("/subscription/subscribeStripe/", PatientProtect, subscribeWithStripe);

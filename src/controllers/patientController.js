@@ -12,6 +12,7 @@ const Medicine = require("../Models/Medicine");
 const prescriptionModel = require("../Models/Prescription");
 const timeSlotModel = require("../Models/TimeSlot");
 const subscriptionModel = require("../Models/Subscription");
+const cartModel = require("../Models/Cart");
 const { fileLoader } = require("ejs");
 const multer = require("multer");
 const fs = require("fs");
@@ -31,7 +32,25 @@ const addPatient = async (req, res) => {
     });
     if (!exists && !exists2) {
       req.body.Password = await bcrypt.hash(req.body.Password, 10);
-      var newPatient = await patientModel.create(req.body);
+      req.body.EmergencyContact = {
+        Name: req.body.EmergencyContactName,
+        Mobile: req.body.EmergencyContactMobile,
+      };
+      const newPatient = await patientModel.create(req.body);
+
+      // Create a new cart for the patient
+      const cart = new cartModel();
+      await cart.save();
+
+      // Associate the cart with the patient
+      newPatient.Cart = cart._id;
+      await newPatient.save();
+      // const patient = patientModel.findByIdAndUpdate(newPatient._id, {
+      //   EmergencyContact: {
+      //     Name: newPatient.EmergencyContactName,
+      //     Mobile: newPatient.EmergencyContactMobile,
+      //   },
+      // });
       return res.status(201).json(newPatient);
     } else if (exists) {
       return res.status(400).json({ error: "Username already taken!" });
@@ -272,11 +291,9 @@ const filterPrescriptions = async (req, res) => {
     // else{
     return res.status(200).json(presc);
   } catch (error) {
-    return res
-      .status(500)
-      .json({
-        error: "An error occurred while searching for this prescription",
-      });
+    return res.status(500).json({
+      error: "An error occurred while searching for this prescription",
+    });
   }
 };
 const selectPrescription = async (req, res) => {
@@ -738,11 +755,9 @@ const getTimeSlotsOfDate = async (req, res) => {
     console.log("timeSlots", timeSlots);
 
     if (!timeSlots.slots) {
-      return res
-        .status(404)
-        .json({
-          error: "No time slots found for the specified day and doctor.",
-        });
+      return res.status(404).json({
+        error: "No time slots found for the specified day and doctor.",
+      });
     }
 
     const timeSlotsUpdated = await Promise.all(
@@ -835,6 +850,7 @@ const payAppointmentWithWallet = async (req, res) => {
     if (WalletBalance >= hourlyRate) {
       const updatedPatient = await patientModel.findByIdAndUpdate(patientId, {
         WalletBalance: WalletBalance - hourlyRate,
+        Wallet: Wallet - hourlyRate,
       });
       message = "Appointment Booked Successfully!";
       return res.status(200).json(message);
@@ -1091,16 +1107,113 @@ const getPatientUnreadNotifs = async (req, res) => {
     if (!patient) {
       return res.status(404).json({ error: "Patient Not Found" });
     }
-    
     const notifications = await Notification.find({Patient: patient, opened: false});
 
-    res.status(200).json(notifications);
+    const notifications = await Notification.find({ Patient: patient });
 
-  }catch (error) {
+    res.status(200).json(notifications);
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
+
+const addPrescriptionMedicinesToCart = async (req, res) => {
+  try {
+    const id = req.user.id;
+    const { Medicines } = req.body;
+    console.log(Medicines);
+    const medicineIds = Medicines.map((medicine) => ({
+      medicine: medicine.MedicineId._id,
+      quantity: 1,
+    }));
+
+    console.log("Generated medicineIds:", medicineIds);
+    console.log("medicineIds: ", medicineIds);
+    const { Cart } = await patientModel.findById(id);
+    console.log(Cart);
+    const cartt = await cartModel.findById(Cart);
+    console.log("cartt", cartt);
+    const patientCart = await cartModel.findByIdAndUpdate(Cart, {
+      medicines: medicineIds,
+    });
+
+    return res.status(200).json(patientCart);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
+const getCartTotalHelper = async (req, res) => {
+  const patientId = req.user;
+  const patient = await patientModel.findById(patientId);
+  const cartId = patient.Cart;
+  const cart = await cartModel.findById(cartId).populate("medicines");
+
+  if (!cart) {
+    return 0;
+  }
+
+  let total = 0;
+
+  for (const item of cart.medicines) {
+    const medicineId = item.medicine;
+    const medicine = await Medicine.findById(medicineId);
+
+    if (!medicine) {
+      return 0;
+    }
+    total += item.quantity * medicine.Price;
+  }
+  return total;
+};
+
+const payCartWithStripe = async (req, res) => {
+  try {
+    const shipping = req.body.shipping;
+
+    const total = await getCartTotalHelper(req, res);
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment", //or subscription
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: { name: "Cart" },
+            unit_amount: total * 100, //In cents
+          },
+          quantity: 1,
+        },
+      ],
+      success_url: `${process.env.SERVER_URL}/patient/success?shipping=${shipping}`,
+      cancel_url: `${process.env.SERVER_URL}/patient/cancel`,
+      // metadata: {shipping}
+    });
+
+    res.json({ url: session.url });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const fillPrescription = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const prescription = await prescriptionModel.findById(id);
+    console.log("prescription", prescription);
+    const updatedPrescription = await prescriptionModel.findByIdAndUpdate(
+      id,
+      {
+        Filled: "Filled",
+      },
+      { new: true }
+    );
+    console.log(updatedPrescription);
+    return res.status(200).json(updatedPrescription);
+  } catch (error) {
+    return res.status(500).json({ error: error });
+  }
+  
 module.exports = {
   getAllDoctorsPatient,
   viewAllPatientAppointments,
@@ -1141,5 +1254,8 @@ module.exports = {
   viewPatientNotifications,
   openNotification, 
   getPatientUnreadNotifs, 
+  addPrescriptionMedicinesToCart,
+  payCartWithStripe,
+  fillPrescription,
 };
 

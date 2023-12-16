@@ -45,6 +45,7 @@ const cancelAppointment = async (req, res) => {
     }
 
     patient.WalletBalance += doctor.HourlyRate;
+    patient.Wallet += doctor.HourlyRate;
 
     await patient.save();
 
@@ -328,7 +329,6 @@ const sendCancellationNotif = async (appointmentId) => {
       html: `   <p>Dear <b>Dr. ${appointment.Doctor.Name},</b></p>
                 <p>Your appointment with <b>${appointment.Patient.Name}</b> 
                 on <i>${appointment.AppointmentDate.toDateString()}</i> at <i>${appointment.start.toLocaleTimeString()}</i> has been cancelled!</p>`,
-    
     };
 
     //send email
@@ -351,50 +351,48 @@ const sendCancellationNotif = async (appointmentId) => {
     });
 
     return [notifPatient, notifDoctor];
-
   } catch (err) {
     throw err;
   }
 };
 
-
 const sendReschedulingNotif = async (appointmentId) => {
-    try {
-        const appointment = await appointmentModel
-        .findById(appointmentId)
-        .populate("Doctor")
-        .populate("Patient");
-  
-      //set up source email
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: "spiderwebsacl@gmail.com",
-          pass: "vngs gkzg otrz vzbg",
-        },
-      });
-  
-      //format email details
-      const mailOptionsPatient = {
-        from: "spiderwebsacl@gmail.com",
-        to: appointment.Patient.Email,
-        subject: "Appointment Rescheduled",
-        html: `   <p>Dear <b>${appointment.Patient.Name},</b></p>
+  try {
+    const appointment = await appointmentModel
+      .findById(appointmentId)
+      .populate("Doctor")
+      .populate("Patient");
+
+    //set up source email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "spiderwebsacl@gmail.com",
+        pass: "vngs gkzg otrz vzbg",
+      },
+    });
+
+    //format email details
+    const mailOptionsPatient = {
+      from: "spiderwebsacl@gmail.com",
+      to: appointment.Patient.Email,
+      subject: "Appointment Rescheduled",
+      html: `   <p>Dear <b>${appointment.Patient.Name},</b></p>
                         <p>Your appointment with 
                         <b>Dr. ${appointment.Doctor.Name}</b> 
                         has been rescheduled to 
                         <i>${appointment.AppointmentDate.toDateString()}</i> at <i>${appointment.start.toLocaleTimeString()}</i></p>`,
-      };
-  
-      //send email
-      transporter.sendMail(mailOptionsPatient);
-  
-      //format email details
-      const mailOptionsDoctor = {
-        from: "spiderwebsacl@gmail.com",
-        to: appointment.Doctor.Email,
-        subject: "Appointment Rescheduled",
-        html: `   <p>Dear <b>Dr. ${appointment.Doctor.Name},</b></p>
+    };
+
+    //send email
+    transporter.sendMail(mailOptionsPatient);
+
+    //format email details
+    const mailOptionsDoctor = {
+      from: "spiderwebsacl@gmail.com",
+      to: appointment.Doctor.Email,
+      subject: "Appointment Rescheduled",
+      html: `   <p>Dear <b>Dr. ${appointment.Doctor.Name},</b></p>
                   <p>Your appointment with <b>${appointment.Patient.Name}</b> 
                   has been rescheduled to 
                   <i>${appointment.AppointmentDate.toDateString()}</i> at <i>${appointment.start.toLocaleTimeString()}</i></p>`,

@@ -28,6 +28,7 @@ interface MedicineApi {
 }
 
 export interface Prescription {
+  _id: string;
   Doctor: string;
   Patient: string;
   Medicines: MedicineApi[];
