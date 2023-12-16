@@ -56,7 +56,14 @@ import ChatDoctor from "./pages/Doctor/ChatDoctor";
 import ViewMyDoctors from "./pages/Patient/ViewMyDoctors";
 import AddPrescription from "./pages/Doctor/AddPrescription";
 import PatientsPrescriptions from "./pages/Doctor/PatientsPrescriptions";
+
+import ViewAllPharmacists from "./pages/Doctor/ViewAllPharmacists";
+import OrderConfirmation from "./pages/Patient/OrderConfirmation";
+import Success from "./pages/Patient/CartCheckoutSuccess";
+import OrderDetails from "./pages/Patient/ViewOrder";
 import FollowUpRequests from "./pages/Doctor/FollowUpRequests";
+import PatientNotifications from "./pages/Patient/Notifications";
+import DoctorNotifications from "./pages/Doctor/Notifications";
 
 export interface JwtPayload {
   id: string;
@@ -130,6 +137,9 @@ const AppRouter: React.FC = () => {
           path="/doctor/prescriptions/:id"
           element={<PatientsPrescriptions />}
         />
+        <Route path="/doctor/pharmacists/" element={<ViewAllPharmacists />} />
+        <Route path="/doctor/notifications" element={<DoctorNotifications />} />
+
         <Route path="*" element={<NotFound />} />
         <Route path="/doctor/followupRequests" element={<FollowUpRequests />} />
       </Routes>
@@ -174,6 +184,10 @@ const AppRouter: React.FC = () => {
         />
         <Route path="/patient/viewalldoctors" element={<ViewAllDoctors />} />
         <Route path="/patient/packages" element={<AllPackagesPatient />} />
+        <Route
+          path="/patient/orderConfirmation"
+          element={<OrderConfirmation />}
+        />
         <Route path="/checkout" element={<CheckoutButton />} />
         <Route path="/appointment/success" element={<AppointmentSuccess />} />
 
@@ -192,6 +206,9 @@ const AppRouter: React.FC = () => {
         <Route path="/patient/videoChat/" element={<VideoChat />} />
         <Route path="/patient/chat/:id" element={<Chat />} />
         <Route path="/patient/myDoctors" element={<ViewMyDoctors />} />
+        <Route path="/patient/success" element={<Success />} />
+        <Route path="/patient/viewOrder/:id" element={<OrderDetails />} />
+        <Route path="/patient/notifications" element={<PatientNotifications />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );

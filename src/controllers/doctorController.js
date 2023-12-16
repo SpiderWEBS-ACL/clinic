@@ -4,12 +4,14 @@ const doctorRegisterRequestModel = require("../Models/DoctorRegisterRequest");
 const appointmentModel = require("../Models/Appointment");
 const timeSlotModel = require("../Models/TimeSlot");
 const prescriptionModel = require("../Models/Prescription");
+const pharmacistModel = require("../Models/Pharmacist");
 const { default: mongoose } = require("mongoose");
 const bcrypt = require("bcrypt");
 const fileModel = require("../Models/File");
 const fs = require("fs");
 const multer = require("multer");
 const Medicine = require("../Models/Medicine");
+const Notification = require("../Models/Notification");
 // FOR TESTING
 const addDoctor = async (req, res) => {
   try {
@@ -286,7 +288,9 @@ const viewPatients = async (req, res) => {
       .exec();
     const patients = [];
     for (const appointment of appointments) {
+      console.log("ele et7to", patients);
       const patient = appointment.Patient;
+
       if (!patients.includes(patient) && patient != null)
         patients.push(patient);
     }
@@ -699,6 +703,7 @@ const addPrescription = async (req, res) => {
     const prescriptionData = {
       ...req.body,
       Medicines: medicineNames.map((name, index) => ({
+        MedicineId: medicines[index].MedicineId,
         Name: name,
         Dosage: medicines[index].Dosage,
         Instructions: medicines[index].Instructions,
@@ -764,6 +769,63 @@ const deleteMedicineInPrescription = async (req, res) => {
     return res.status(400).json({ error: error.message });
   }
 };
+const getAllPharmacists = async (req, res) => {
+  try {
+    const Doctors = await pharmacistModel.find({});
+    return res.status(200).json(Doctors);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+const viewDoctorNotifications = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+
+    const doctor = await doctorModel.findById(doctorId);
+
+    if (!doctor) {
+      return res.status(404).json({ error: "Doctor Not Found" });
+    }
+
+    const notifications = await Notification.find({ Doctor: doctor });
+
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const openNotificationDoctor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const notification = await Notification.findByIdAndUpdate(id, {
+      opened: true,
+    });
+    res.status(200).json(notification);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getDoctorUnreadNotifs = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+    const doctor = await doctorModel.findById(doctorId);
+
+    if (!doctor) {
+      return res.status(404).json({ error: "Doctor Not Found" });
+    }
+
+    const notifications = await Notification.find({
+      Doctor: doctor,
+      opened: false,
+    });
+
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 module.exports = {
   registerDoctor,
@@ -796,4 +858,8 @@ module.exports = {
   getAllPatientsPrescriptions,
   updateMedicineInPrescription,
   deleteMedicineInPrescription,
+  viewDoctorNotifications,
+  getAllPharmacists,
+  openNotificationDoctor,
+  getDoctorUnreadNotifs,
 };

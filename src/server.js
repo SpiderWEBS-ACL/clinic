@@ -7,41 +7,15 @@ const http = require("http");
 const server = http.createServer(app);
 const cors = require("cors");
 const socketServerCreate = require("./socket/socketServer");
+
 app.use(cors());
-// const io = require("socket.io")(server, {
-//   cors: {
-//     origin: ["http://localhost:5173"],
-//     methods: ["GET", "POST"],
-//     credentials: true
-//   }
-// });
+
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 const port = process.env.PORT || "8000";
 const MongoURI = process.env.ATLAS_MONGO_URI;
 
 socketServerCreate(server);
-
-// io.on("connection", (socket) => {
-// 	socket.emit("me", socket.id)
-//   console.log(socket.id)
-
-// 	socket.on("disconnect", () => {
-// 		socket.broadcast.emit("callEnded")
-// 	})
-
-// 	socket.on("callUser", (data) => {
-// 		io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
-// 	})
-
-// 	socket.on("answerCall", (data) => {
-// 		io.to(data.to).emit("callAccepted", data.signal)
-// 	})
-
-//   socket.on("sendMessage", (data) => {
-//     io.to(data.userToMessage).emit("sendMessage", {})
-//   })
-// })
 
 const {
   addPatient,
@@ -79,6 +53,12 @@ const {
   getTimeSlotsOfDate,
   saveVideoSocketId,
   getMyDoctors,
+  viewPatientNotifications,
+  addPrescriptionMedicinesToCart,
+  payCartWithStripe,
+  fillPrescription,
+  openNotification,
+  getPatientUnreadNotifs,
 } = require("./controllers/patientController");
 
 const {
@@ -112,6 +92,10 @@ const {
   getAllPatientsPrescriptions,
   updateMedicineInPrescription,
   deleteMedicineInPrescription,
+  getAllPharmacists,
+  viewDoctorNotifications,
+  openNotificationDoctor,
+  getDoctorUnreadNotifs,
 } = require("./controllers/doctorController");
 
 const {
@@ -119,7 +103,12 @@ const {
   filterAppointmentPatient,
   filterAppointmentDoctor,
   rescheduleAppointment,
-  cancelAppointment,requestFollowUp,getAllFollowUpRequests,rejectFollowUpRequest,acceptFollowUpRequest
+
+  cancelAppointment,
+  sendAppointmentNotification,
+  sendCancellationNotif,
+  sendReschedulingNotif,
+  deleteNotifs,requestFollowUp,getAllFollowUpRequests,rejectFollowUpRequest,acceptFollowUpRequest
 } = require("./controllers/appointmentController");
 
 const {
@@ -198,7 +187,10 @@ app.get("/admin/allDoctors", AdminProtect, getAllDoctors);
 app.delete("/admin/removeDoctor/:id", AdminProtect, removeDoctor);
 app.delete("/admin/removePatient/:id", AdminProtect, removePatient);
 app.delete("/admin/removeAdmin/:id", AdminProtect, removeAdmin);
-app.get("/admin/registrationRequests", AdminProtect, getAllDoctrsRegistrationReqs
+app.get(
+  "/admin/registrationRequests",
+  AdminProtect,
+  getAllDoctrsRegistrationReqs
 );
 app.get(
   "/admin/registrationRequest/:id",
@@ -278,6 +270,13 @@ app.delete(
   DoctorProtect,
   deleteMedicineInPrescription
 );
+app.get("/doctor/allPharmacists", DoctorProtect, getAllPharmacists);
+app.get("/doctor/notifications", DoctorProtect, viewDoctorNotifications);
+app.put("/doctor/openNotification/:id", openNotificationDoctor);      //TO FIX: doctor protect causes unauthorized error
+app.get("/doctor/unreadNotifications", DoctorProtect, getDoctorUnreadNotifs);
+
+
+
 //Patient Endpoints
 
 //Public Endpoints
@@ -336,7 +335,11 @@ app.get(
   PatientProtect,
   viewDoctorsWithPrices
 );
-app.put("/patient/rescheduleAppointment", PatientProtect,rescheduleAppointment)
+app.put(
+  "/patient/rescheduleAppointment",
+  PatientProtect,
+  rescheduleAppointment
+);
 app.get("/patient/allAppointments", PatientProtect, viewAllPatientAppointments);
 app.get("/patient/allDoctors", PatientProtect, getAllDoctorsPatient);
 app.get("/patient/allPackages", PatientProtect, getAllPackagesPatient);
@@ -390,6 +393,18 @@ app.get(
 app.post("/patient/getTimeSlotsDoctorDate", PatientProtect, getTimeSlotsOfDate);
 app.put("/patient/saveVideoSocketId", PatientProtect, saveVideoSocketId);
 app.get("/patient/myDoctors", PatientProtect, getMyDoctors);
+app.get("/patient/allPharmacists", PatientProtect, getAllPharmacists);
+app.get("/patient/notifications", PatientProtect, viewPatientNotifications);
+app.put("/patient/fillPrescription/:id", PatientProtect, fillPrescription);
+app.post(
+  "/patient/payPrescription",
+  PatientProtect,
+  addPrescriptionMedicinesToCart
+);
+app.post("/cart/payWithStripe/", PatientProtect, payCartWithStripe);
+app.put("/patient/openNotification/:id", openNotification); //TO FIX: patient protect causes unauthorized error
+app.get("/patient/unreadNotifications", PatientProtect, getPatientUnreadNotifs);
+
 
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
@@ -405,6 +420,11 @@ app.put("/appointment/cancelAppointment/:id", DoctorProtect, cancelAppointment)
 app.get("/appointment/getAllFollowUpRequests/",DoctorProtect, getAllFollowUpRequests)
 app.delete("/appointment/rejectFollowUpRequest/:id",DoctorProtect,rejectFollowUpRequest)
 app.get("/appointment/acceptFollowUpRequest/:id",DoctorProtect,acceptFollowUpRequest)
+
+app.post("/appointment/appNotif", sendAppointmentNotification); //testing
+app.post("/appointment/cancelNotif", sendCancellationNotif); //testing
+app.post("/appointment/rescheduleNotif", sendReschedulingNotif); //testing
+
 //Subscription Endpoints
 app.post("/subscription/subscribeStripe/", PatientProtect, subscribeWithStripe);
 app.post("/subscription/subscribeWallet/", PatientProtect, subscribeWithWallet);
@@ -419,3 +439,6 @@ app.get("/subscription/getSubscription", PatientProtect, getSubscription);
 
 //Prescription Endpoints
 app.post("/prescription/add", addPrescription);
+
+
+app.delete('/notifs/delete', deleteNotifs);

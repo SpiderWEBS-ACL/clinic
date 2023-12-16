@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, useNavigate } from "react-router-dom";
 import { FloatButton, Layout, Menu } from "antd";
+import ImportedHeader from "../layouts/header";
 import {
   HomeOutlined,
   UserOutlined,
@@ -13,6 +14,9 @@ import {
 } from "@ant-design/icons";
 import AppRouter from "../AppRouter";
 import { socket } from "./PatientLayout";
+import { Chat, ChatBubbleOutline } from "@material-ui/icons";
+import axios from "axios";
+import { config } from "../Middleware/authMiddleware";
 
 const { Content, Sider } = Layout;
 const id = localStorage.getItem("id");
@@ -21,12 +25,28 @@ const DoctorLayout: React.FC = () => {
   const [VideoCount, setVideoCount] = useState(0);
   const [MessageCount, setMessageCount] = useState(0);
   const [AuthorId, setAuthorId] = useState("");
+  const [notificationCount, setNotificationCount] = useState(0);
+
+
+  const api = axios.create({
+    baseURL: "http://localhost:8000/",
+  });
 
   useEffect(() => {
     socket.emit("me");
     socket.on("me", (id: string) => {
       localStorage.setItem("socketId", id);
     });
+
+    api.get("/doctor/unreadNotifications", config)
+    .then((response) => {
+      console.log(response.data);
+      setNotificationCount(response.data.length);
+    })
+    .catch((error) => {
+      console.log("Error: " + error);
+    });
+
   }, []);
   socket.on("callUser", (data: any) => {
     console.log("data from: ", data.from, "data.name: ", data.Name);
@@ -83,6 +103,21 @@ const DoctorLayout: React.FC = () => {
       icon: <ClockCircleOutlined />,
     },
     {
+      label: "Chat",
+      icon: <ChatBubbleOutline />,
+      key: "parentChat",
+      children: [
+        {
+          label: "Patients",
+          key: "/doctor/viewPatients",
+        },
+        {
+          label: "Pharmacists",
+          key: "/doctor/pharmacists",
+        },
+      ],
+    },
+    {
       label: "Logout",
       key: "/",
       icon: <PoweroffOutlined />,
@@ -116,15 +151,27 @@ const DoctorLayout: React.FC = () => {
         ></Menu>
       </Sider>
       <Layout>
+        <ImportedHeader />
         <Content style={{ margin: "0 16px", overflow: "hidden" }}>
-          <div style={{ overflowY: "auto", maxHeight: "100vh" }}>
+          <div
+            style={{
+              overflowY: "auto",
+              minHeight: "86.5vh",
+              maxHeight: "100vh",
+            }}
+          >
             <AppRouter />
           </div>
           <FloatButton
+            onClick={() => {
+              navigate("/doctor/notifications");
+            }}
             style={{
               right: "4vh",
               bottom: "94vh",
+              top: "4vh",
             }}
+            badge={{ count: notificationCount }}
             icon={<BellOutlined />}
           />
           <FloatButton
@@ -135,6 +182,7 @@ const DoctorLayout: React.FC = () => {
             style={{
               right: "12vh",
               bottom: "94vh",
+              top: "4vh",
             }}
             badge={{ count: MessageCount }}
             icon={<CommentOutlined />}
@@ -147,6 +195,7 @@ const DoctorLayout: React.FC = () => {
             style={{
               right: "18vh",
               bottom: "94vh",
+              top: "4vh",
             }}
             badge={{ count: VideoCount }}
             icon={<VideoCameraOutlined />}

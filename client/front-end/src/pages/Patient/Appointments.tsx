@@ -207,41 +207,50 @@ const ViewPatientAppointments = () => {
       <h2 className="text-center mt-4 mb-4">Appointments</h2>
 
       <span>
-        <label style={{ marginLeft: devicePixelRatio * 90, marginRight: 8 }}>
-          <strong>Status:</strong>
-        </label>
-        <Select
-          value={status}
-          style={{ width: 200, margin: "0 20px" }}
-          onChange={setStatus}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            justifyItems: "center",
+          }}
         >
-          <Option value="Upcoming">Upcoming</Option>
-          <Option value="Completed">Completed</Option>
-          <Option value="Cancelled">Cancelled</Option>
-          <Option value="Rescheduled">Rescheduled</Option>
-        </Select>
-        <label style={{ marginRight: 8 }}>
-          <strong>Date:</strong>
-        </label>
-        <DatePicker
-          onChange={onDateChange}
-          style={{ width: 150, marginRight: 80 }}
-        />
+          <label
+            style={{
+              marginRight: "1rem",
+              marginTop: "0.4rem",
+            }}
+          >
+            <strong>Status</strong>
+          </label>
+          <Select
+            value={status}
+            style={{ width: 150, marginRight: "1rem" }}
+            onChange={setStatus}
+          >
+            <Option value="Upcoming">Upcoming</Option>
+            <Option value="Completed">Completed</Option>
+            <Option value="Cancelled">Cancelled</Option>
+            <Option value="Rescheduled">Rescheduled</Option>
+          </Select>
+          <label style={{ marginRight: "1rem", marginTop: "0.4rem" }}>
+            <strong>Date</strong>
+          </label>
+          <DatePicker
+            onChange={onDateChange}
+            style={{ width: 150, marginRight: 20 }}
+          />
 
-        <button
-          onClick={handleFilter}
-          style={{ width: 80, marginRight: 20 }}
-          className="btn btn-sm btn-primary"
-        >
-          filter
-        </button>
-        <button
-          onClick={clearFilters}
-          style={{ width: 80 }}
-          className="btn btn-sm btn-primary"
-        >
-          clear
-        </button>
+          <Button
+            type="primary"
+            onClick={handleFilter}
+            style={{ width: 80, marginRight: 20 }}
+          >
+            filter
+          </Button>
+          <Button onClick={clearFilters} style={{ width: 80 }}>
+            clear
+          </Button>
+        </div>
       </span>
       <br></br>
       <br></br>
@@ -260,7 +269,7 @@ const ViewPatientAppointments = () => {
         <FullCalendar
           stickyHeaderDates
           aspectRatio={1}
-          height={"75vh"}
+          height={"70vh"}
           plugins={[
             dayGridPlugin,
             timeGridPlugin,
@@ -281,6 +290,17 @@ const ViewPatientAppointments = () => {
         />
       </div>
       <Modal
+
+        footer={
+          <Button
+            type="primary"
+            onClick={() => {
+              setShowRescheduleModal(true);
+            }}
+          >
+            Reschedule
+          </Button>
+        }
         visible={ShowAppointmentModal}
         onCancel={() => {
           setShowAppointmentModal(false);

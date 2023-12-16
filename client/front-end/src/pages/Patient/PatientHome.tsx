@@ -50,11 +50,14 @@ const PatientHome = () => {
       },
     };
     const fetchData = async () => {
-      const patient = await getPatient();
-      setPatientInfo(patient);
+      setLoading(false);
+      setLoadingCard(false);
+      try {
+        const patient = await getPatient();
+        setPatientInfo(patient);
 
-      const subscription = await getSubscription();
-      if (subscription) setDateOf(subscription.Date + "");
+        const subscription = await getSubscription();
+        if (subscription) setDateOf(subscription.Date + "");
 
       await api
         .get("patient/showSubscribedPackage", config)
@@ -70,6 +73,7 @@ const PatientHome = () => {
         }
         setLoading(false) 
         setLoadingCard(false)
+
     };
     fetchData();
   }, [id]);

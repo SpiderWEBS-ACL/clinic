@@ -65,6 +65,7 @@ const AddPrescription = () => {
   const [filteredMedicines, setfilteredMedicines] = useState<any[]>([]);
   const [medicineAdded, setMedicineAdded] = useState<boolean>(false);
   const navigate = useNavigate();
+
   const [Prescription, setPrescription] = useState<PrescriptionModel>({
     Doctor: "" + localStorage.getItem("id"),
     Patient: "" + id,

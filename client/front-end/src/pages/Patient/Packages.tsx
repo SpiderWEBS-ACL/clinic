@@ -9,6 +9,7 @@ import {
   Modal,
   message,
   Badge,
+  Spin,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 
@@ -27,17 +28,16 @@ import { getSubscribedPackage } from "../../apis/Patient/Packages/GetSubscribedP
 import { getSubscription } from "../../apis/Patient/Packages/GetSubscription";
 import { getBalance } from "../../apis/Patient/GetBalance";
 import { cancelSubscription } from "../../apis/Patient/Packages/CancelSubscription";
+import Package from "../../components/Package";
 
 const AllPackagesPatient = () => {
   const [Packages, setPackages] = useState<any[]>([]);
   const [SubscribedPackageId, setSubscribedPackageId] = useState("");
   const [SubscriptionPrice, setSubscriptionPrice] = useState(0);
   const [balance, setBalance] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [PackageId, setPackageId] = useState("");
-  const [open, setOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { Meta } = Card;
   const [subscribedPackage, setSubscribedPackage] = useState<any>([]);
 
@@ -84,15 +84,18 @@ const AllPackagesPatient = () => {
 
       const subscribedPackage = await getSubscribedPackage();
       setSubscribedPackageId(subscribedPackage);
+      console.log(subscribedPackage);
       setLoading(false);
-
-      const subscription = await getSubscription();
-      setSubscribedPackage(subscription);
+      
+    const subscription = await getSubscription();
+    setSubscribedPackage(subscription);
 
       const currentBalance = await getBalance();
       setBalance(currentBalance.data);
       setLoading(false);
+      console.log("PACKAGES", Packages);
     };
+
     fetchData();
   }, []);
 
@@ -104,162 +107,95 @@ const AllPackagesPatient = () => {
     setPackageId(id);
     setSubscriptionPrice(SubscriptionPrice);
   };
-  const showPopconfirm = () => {
-    setOpen(true);
-  };
-
-  const handleOk = () => {
-    setConfirmLoading(true);
-
-    setTimeout(() => {
-      setOpen(false);
-      setConfirmLoading(false);
-      handleUnsubscribe();
-    }, 2000);
-  };
-
-  const handleCancel = () => {
-    setOpen(false);
-  };
-
   const handleUnsubscribe = async () => {
     await cancelSubscription();
     setLoading(true);
     window.location.reload();
   };
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">Health Package</h2>
 
-      <tbody>
+      <tbody
+        style={{ display: "flex", justifyContent: "center", marginTop: 60 }}
+      >
         {Packages.map(
           (request, index) =>
             index % 4 === 0 && (
               <Row gutter={16} key={index}>
                 {Packages.slice(index, index + 4).map((request, subIndex) => (
                   <Col span={8} key={subIndex}>
-                    <div>
-                      {/* <Badge.Ribbon  text = "Best Value" color="red"> */}
-                      <Card
-                        style={{
-                          height: "23rem",
-                          width: "24rem",
-                          marginTop: 16,
-                          marginLeft:16
+                    <div style={{ marginRight: 50 }}>
+                      <Package
+                        packageName={request.Name}
+                        packageDescription={
+                          "This plan is for those who have a team already and running a large business."
+                        }
+                        subscriptionPrice={request?.SubscriptionPrice + "$"}
+                        doctorDiscount={`${request.DoctorDiscount}%`}
+                        pharmacyDiscount={`${request.PharmacyDiscount}%`}
+                        familyDiscount={`${request.FamilyDiscount}%`}
+                        status={
+                          request._id == SubscribedPackageId
+                            ? `
+                            ${subscribedPackage.Status}`
+                            : "Unsubscribed"
+                        }
+                        btnSubscribeText={
+                          request._id == SubscribedPackageId &&
+                          subscribedPackage.Status == "Subscribed" ? (
+                            <CheckCircleOutlined />
+                          ) : (
+                            "Subscribe"
+                          )
+                        }
+                        statusColor={
+                          request._id == SubscribedPackageId
+                            ? "#008000"
+                            : "#ff0000"
+                        }
+                        onClickBtn={function (): void {
+                          handleSubscribe(
+                            request._id,
+                            request.SubscriptionPrice
+                          );
                         }}
-                        loading={loading}
-                        hoverable
-                        className="hover-card"
-                      >
-                        <Meta
-                          avatar={
-                            <Avatar
-                              sx={{
-                                width: 50,
-                                height: 50,
-                                bgcolor: green[500]
-                              }}
-                            >
-                              {" "}
-                              <AssignmentIcon />
-                            </Avatar>
-                          }
-                          title={
-                            <div style={{ fontSize: "20px" }}>
-                              {request.Name}
-                            </div>
-                          }
-                          description={
-                            <div>
-                              <strong>Subscription Price:</strong>{" "}
-                              {request.SubscriptionPrice}
-                              <br></br>
-                              <br></br>
-                              <strong>Doctor Discount:</strong>{" "}
-                              {request.DoctorDiscount}%<br></br>
-                              <br></br>
-                              <strong>Pharmacy Discount:</strong>{" "}
-                              {request.PharmacyDiscount}%<br></br>
-                              <br></br>
-                              <strong>Family Discount:</strong>{" "}
-                              {request.FamilyDiscount}%<br></br>
-                              <br></br>
-                              {request._id == SubscribedPackageId
-                                ? `Status:
-                                  ${subscribedPackage.Status}`
-                                : "Status: Unsubscribed"}
-                              <br></br>
-                              <br></br>
-                              {request._id == SubscribedPackageId &&
-                              subscribedPackage.Status == "Subscribed"
-                                ? `Renewal Date:${
-                                    subscribedPackage.Date.split("T")[0]
-                                  }`
-                                : request._id == SubscribedPackageId &&
-                                  subscribedPackage.Status == "Cancelled"
-                                ? `End Date:${
-                                    subscribedPackage.Date.split("T")[0]
-                                  }`
-                                : ""}
-                            </div>
-                          }
-                        />
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            marginTop: "10px",
-                          }}
-                        >
-                          <button
-                            className={
-                              (request._id === SubscribedPackageId &&
-                                subscribedPackage.Status == "Subscribed") ||
-                              SubscribedPackageId === ""
-                                ? "btn btn-sm btn-success"
-                                : "btn btn-sm btn-secondary"
-                            }
-                            disabled={
-                              SubscribedPackageId != "" ||
-                              (subscribedPackage.Status == "Cancelled" &&
-                                request._id == SubscribedPackageId)
-                            }
-                            onClick={() =>
-                              handleSubscribe(
-                                request._id,
-                                request.SubscriptionPrice
-                              )
-                            }
-                          >
-                            {request._id == SubscribedPackageId &&
-                            subscribedPackage.Status == "Subscribed" ? (
-                              <CheckCircleOutlined />
-                            ) : (
-                              "Subscribe"
-                            )}
-                          </button>
+                        disabledBtn={
+                          SubscribedPackageId != "" ||
+                          (subscribedPackage.Status == "Cancelled" &&
+                            request._id == SubscribedPackageId)
+                        }
+                        onClickCancel={handleUnsubscribe}
+                        extraInfo={
+                          request._id == SubscribedPackageId &&
+                          subscribedPackage.Status == "Subscribed"
+                            ? `Renewal Date:${
+                                subscribedPackage.Date.split("T")[0]
+                              }`
+                            : request._id == SubscribedPackageId &&
+                              subscribedPackage.Status == "Cancelled"
+                            ? `End Date: ${
+                                subscribedPackage.Date.split("T")[0]
+                              }`
+                            : ""
+                        }
+                      ></Package>
 
-                          <Popconfirm
-                            title="ALERT"
-                            description="Are you sure you want to unsubscribe?"
-                            open={open}
-                            onConfirm={handleOk}
-                            okButtonProps={{ loading: confirmLoading }}
-                            onCancel={handleCancel}
-                          >
-                            <button
-                              className="btn btn-sm btn-danger"
-                              hidden={
-                                request._id != SubscribedPackageId ||
-                                subscribedPackage.Status == "Cancelled"
-                              }
-                              onClick={showPopconfirm}
-                            >
-                              Cancel Subscription
-                            </button>
-                          </Popconfirm>
-                        </div>
-                      </Card>
+
                       {/* </Badge.Ribbon>  */}
                     </div>
                   </Col>

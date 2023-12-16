@@ -11,3 +11,8 @@ export const config = {
 export const headers = {
   Authorization: `Bearer ${accessToken}`,
 };
+
+export interface JwtPayload {
+  id: string;
+  role: string;
+}
