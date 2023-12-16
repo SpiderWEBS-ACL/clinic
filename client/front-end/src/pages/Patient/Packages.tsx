@@ -9,6 +9,7 @@ import {
   Modal,
   message,
   Badge,
+  Spin,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 
@@ -34,11 +35,9 @@ const AllPackagesPatient = () => {
   const [SubscribedPackageId, setSubscribedPackageId] = useState("");
   const [SubscriptionPrice, setSubscriptionPrice] = useState(0);
   const [balance, setBalance] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [PackageId, setPackageId] = useState("");
-  const [open, setOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { Meta } = Card;
   const [subscribedPackage, setSubscribedPackage] = useState<any>([]);
 
@@ -107,29 +106,25 @@ const AllPackagesPatient = () => {
     setPackageId(id);
     setSubscriptionPrice(SubscriptionPrice);
   };
-  const showPopconfirm = () => {
-    setOpen(true);
-  };
-
-  const handleOk = () => {
-    setConfirmLoading(true);
-
-    setTimeout(() => {
-      setOpen(false);
-      setConfirmLoading(false);
-      handleUnsubscribe();
-    }, 2000);
-  };
-
-  const handleCancel = () => {
-    setOpen(false);
-  };
-
   const handleUnsubscribe = async () => {
     await cancelSubscription();
     setLoading(true);
     window.location.reload();
   };
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">Health Package</h2>
