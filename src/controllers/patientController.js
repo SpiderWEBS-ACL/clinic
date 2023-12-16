@@ -1089,6 +1089,7 @@ const openNotification = async (req, res) => {
     notification.opened = true;
     notification.save();
 
+
     res.status(200).json(notification);
   } catch (error) {
     res.status(500).json({ error: error.message });

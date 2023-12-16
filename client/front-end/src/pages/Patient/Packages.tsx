@@ -86,15 +86,16 @@ const AllPackagesPatient = () => {
       setSubscribedPackageId(subscribedPackage);
       console.log(subscribedPackage);
       setLoading(false);
-
-      const subscription = await getSubscription();
-      setSubscribedPackage(subscription);
+      
+    const subscription = await getSubscription();
+    setSubscribedPackage(subscription);
 
       const currentBalance = await getBalance();
       setBalance(currentBalance.data);
       setLoading(false);
       console.log("PACKAGES", Packages);
     };
+
     fetchData();
   }, []);
 
@@ -193,6 +194,7 @@ const AllPackagesPatient = () => {
                             : ""
                         }
                       ></Package>
+
 
                       {/* </Badge.Ribbon>  */}
                     </div>
