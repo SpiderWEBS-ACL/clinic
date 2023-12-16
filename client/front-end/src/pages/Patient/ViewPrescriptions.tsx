@@ -12,7 +12,7 @@ import { getAllPatientsPrescriptions } from "../../apis/Doctor/Prescriptions/get
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Prescription } from "../../types";
-import { Alert, Button, Input, Tag, message } from "antd";
+import { Alert, Button, Tooltip, Input, Tag, message } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { updateMedicineInPrescription } from "../../apis/Doctor/Prescriptions/UpdateMedicineInPrescription";
 import { getMyPrescription } from "../../apis/Patient/Prescriptions/GetMyPrescription";
@@ -237,6 +237,7 @@ const PatientsPrescriptions = () => {
                   )}
                 </AccordionDetails>
                 <div style={{ display: "flex" }}>
+                  {" "}
                   <Tooltip title="Download selected prescription as PDF">
                     <DownloadOutlined
                       onClick={() => handleDownloadClick(prescription)}
@@ -244,6 +245,7 @@ const PatientsPrescriptions = () => {
                         fontSize: 20,
                         marginLeft: "auto",
                         marginRight: 20,
+                        marginTop: 5,
                         marginBottom: 10,
                       }}
                     />

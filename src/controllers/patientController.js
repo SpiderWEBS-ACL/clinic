@@ -1109,8 +1109,6 @@ const getPatientUnreadNotifs = async (req, res) => {
     }
     const notifications = await Notification.find({Patient: patient, opened: false});
 
-    const notifications = await Notification.find({ Patient: patient });
-
     res.status(200).json(notifications);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -1214,6 +1212,8 @@ const fillPrescription = async (req, res) => {
     return res.status(500).json({ error: error });
   }
   
+}
+
 module.exports = {
   getAllDoctorsPatient,
   viewAllPatientAppointments,
