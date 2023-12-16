@@ -20,9 +20,11 @@ import "./StylePatient.css";
 import { getSubscription } from "../../apis/Patient/Packages/GetSubscription";
 import { getPatient } from "../../apis/Patient/GetPatient";
 import { getAllAppointmentsPatientApi } from "../../apis/Patient/Appointments/GetAllAppointments";
+import Wallet from "../../components/Wallet";
 import { filterAppointmentStatusDateApi } from "../../apis/Patient/Appointments/FilterAppointmentStatusDate";
 const { Content, Footer } = Layout;
 const { Title } = Typography;
+import { getBalance } from "../../apis/Patient/GetBalance";
 
 const PatientHome = () => {
   const accessToken = localStorage.getItem("accessToken");
@@ -34,6 +36,7 @@ const PatientHome = () => {
   const [subscription, setSubscription] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
+  const [balance, setBalance] = useState<number>(0);
   const [dateOf, setDateOf] = useState(String);
   const navigate = useNavigate();
   const api = axios.create({
@@ -41,6 +44,15 @@ const PatientHome = () => {
   });
 
   useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const response = await getBalance();
+        setBalance(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchBalance();
     const config = {
       headers: {
         Authorization: "Bearer " + accessToken,
@@ -49,6 +61,7 @@ const PatientHome = () => {
         Status: "Upcoming",
       },
     };
+
     const fetchData = async () => {
       setLoading(false);
       setLoadingCard(false);
@@ -193,7 +206,7 @@ const PatientHome = () => {
                 loading={loadingCard}
                 extra={
                   <SettingOutlined
-                    style={{ width: 50, height: 50, marginLeft: 300 }}
+                    style={{ width: 50, height: 50, justifyContent: "right" }}
                     onClick={openModal}
                   />
                 }
@@ -213,6 +226,16 @@ const PatientHome = () => {
                     </Title>
                     <Title level={4}>{patientInfo.Gender}</Title>
                   </Col>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "end",
+                      marginLeft: "auto",
+                      marginTop: "25px",
+                    }}
+                  >
+                    <Wallet walletBalance={balance}></Wallet>
+                  </div>
                 </Row>
               </Card>
             </Col>
