@@ -59,6 +59,7 @@ const {
   fillPrescription,
   openNotification,
   getPatientUnreadNotifs,
+  cancelAppointmentForMyselfOrFamily,
 } = require("./controllers/patientController");
 
 const {
@@ -96,6 +97,7 @@ const {
   viewDoctorNotifications,
   openNotificationDoctor,
   getDoctorUnreadNotifs,
+  cancelAppointment,
 } = require("./controllers/doctorController");
 
 const {
@@ -273,8 +275,8 @@ app.get("/doctor/allPharmacists", DoctorProtect, getAllPharmacists);
 app.get("/doctor/notifications", DoctorProtect, viewDoctorNotifications);
 app.put("/doctor/openNotification/:id", openNotificationDoctor);      //TO FIX: doctor protect causes unauthorized error
 app.get("/doctor/unreadNotifications", DoctorProtect, getDoctorUnreadNotifs);
-
-
+app.post("/doctor/cancelAppointment", DoctorProtect , cancelAppointment);
+app.get("/doctor/viewAllFilledUnfilledPrescriptions" , DoctorProtect ,viewAllFilledUnfilledPrescriptions);
 
 //Patient Endpoints
 
@@ -403,7 +405,8 @@ app.post(
 app.post("/cart/payWithStripe/", PatientProtect, payCartWithStripe);
 app.put("/patient/openNotification/:id", openNotification); //TO FIX: patient protect causes unauthorized error
 app.get("/patient/unreadNotifications", PatientProtect, getPatientUnreadNotifs);
-
+app.get("/patient/viewAllFilledUnfilledPrescriptions" , PatientProtect ,viewAllFilledUnfilledPrescriptions);
+app.post("/patient/cancelAppointmentForMyselfOrFamily" , PatientProtect , cancelAppointmentForMyselfOrFamily);
 
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);

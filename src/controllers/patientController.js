@@ -1214,6 +1214,46 @@ const fillPrescription = async (req, res) => {
   
 }
 
+const cancelAppointmentForMyselfOrFamily = async (req,res) =>{
+  const id = req.user.id;
+  const forfamilyid = req.body.FamilyMemberId;
+  const date=req.body.Date;
+  try{
+    const appointment1 = await appointmentModel.find({Patient: id , AppointmentDate: date}); 
+    if(!forfamilyid){ 
+      if(!appointment1){
+        return res.status(404).json({ error: "Appointment Not Found" });
+      }
+      else if(appointment1.status=="Upcoming"){
+        appointment1.status="Cancelled";
+        appointment1.save();
+        res.status(200).json("Appointment is cancelled");
+      }
+      else {
+        return res.status(404).json({ error: "No Upcoming Appointment" });
+      }
+    }
+    else {
+      const appointment2 = await appointmentModel.find({Patient: forfamilyid , AppointmentDate: date}); 
+      if(!appointment2){
+        return res.status(404).json({ error: "Appointment Not Found" });
+      }
+      else if(appointment2.status=="Upcoming"){
+        appointment2.status="Cancelled";
+        appointment2.save();
+        res.status(200).json("Appointment is cancelled");
+      }
+      else {
+        return res.status(404).json({ error: "No Upcoming Appointment" });
+
+      }
+    }
+  }
+  catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   getAllDoctorsPatient,
   viewAllPatientAppointments,
@@ -1257,5 +1297,6 @@ module.exports = {
   addPrescriptionMedicinesToCart,
   payCartWithStripe,
   fillPrescription,
+  cancelAppointmentForMyselfOrFamily,
 };
 

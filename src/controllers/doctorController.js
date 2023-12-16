@@ -836,6 +836,25 @@ const getDoctorUnreadNotifs = async (req, res) => {
   }
 };
 
+const cancelAppointment = async (req,res) =>{
+  const id = req.user.id;
+  const date=req.body.Date;
+  try{
+    const appointment = await appointmentModel.find({Doctor: id , AppointmentDate: date});  
+   if(!appointment){
+      return res.status(404).json({ error: "Appointment Not Found" });
+    }
+    else if(appointment.status=="Upcoming"){
+      appointment.status="Cancelled";
+      appointment.save();
+      res.status(200).json("Appointment is cancelled");
+    }
+  }
+  catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 
 module.exports = {
   registerDoctor,
@@ -872,4 +891,5 @@ module.exports = {
   getAllPharmacists, 
   openNotificationDoctor,
   getDoctorUnreadNotifs,
+  cancelAppointment,
 };
