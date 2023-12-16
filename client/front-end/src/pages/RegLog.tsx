@@ -64,7 +64,7 @@ const RegLog: React.FC = () => {
     navigate("/register");
     window.location.reload();
   };
-  
+
   const handleRegAsDoctor = () => {
     navigate("/doctor/register");
     window.location.reload();
@@ -116,6 +116,7 @@ const RegLog: React.FC = () => {
                 className="mb-4 w-100"
                 onClick={handleSignIn}
                 type="primary"
+                style= {{color:"white"}}
               >
                 Sign in
               </Button>
