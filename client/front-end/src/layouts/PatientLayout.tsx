@@ -138,12 +138,6 @@ const PatientLayout: React.FC = () => {
       ],
     },
     {
-      label: "Wallet",
-      key: "/patient/wallet",
-      icon: <WalletOutlined />,
-    },
-
-    {
       label: "Logout",
       key: "/",
       icon: <PoweroffOutlined />,
