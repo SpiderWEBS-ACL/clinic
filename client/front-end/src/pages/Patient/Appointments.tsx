@@ -350,7 +350,7 @@ const ViewPatientAppointments = () => {
             </Modal>
             <Popconfirm
               title="ALERT"
-              description="Are you sure you want to unsubscribe?"
+              description="Are you sure you want to Cancel?"
               open={open}
               onConfirm={handleOk}
               okButtonProps={{ loading: confirmLoading }}

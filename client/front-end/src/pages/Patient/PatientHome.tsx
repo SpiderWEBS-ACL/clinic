@@ -10,7 +10,7 @@ import {
   Spin,
   Modal,
   Avatar,
-  message,
+  message,Table,
 } from "antd";
 import { InfoCircleTwoTone, SettingOutlined } from "@ant-design/icons";
 import axios from "axios";
@@ -87,7 +87,7 @@ const PatientHome = () => {
         setLoadingCard(false)
     }
     catch{
-      
+
     }
   };
     fetchData();
@@ -137,7 +137,67 @@ const PatientHome = () => {
   const subscriptionsRedirect = () => {
     navigate("/patient/packages", { replace: true });
   };
+  const columns = [
+    {
+      title: "Doctor Name",
+      dataIndex: "Doctor",
+      key: "Doctor",
+      render: (Doctor: any) => (<span>{Doctor.Name}</span>)
 
+    },
+    {
+      title: "Appointment Date",
+      dataIndex: "AppointmentDate",
+      key: "AppointmentDate",
+      render: (AppointmentDate: any) => (
+        <span>{new Date(AppointmentDate).toDateString()}</span>
+      ),
+    },
+    {
+      title: "Start Time",
+      dataIndex: "start",
+      key: "start",
+      render: (start: any) => <span>{start.split("T")[1].split(".")[0]}</span>,
+    },
+
+  ];
+  const columns2 = [
+    {
+      title: "Package Name",
+      dataIndex: "Name",
+      key: "Name",
+    },
+    {
+      title: "Expiry Date",
+      dataIndex: "AppointmentDate",
+      key: "AppointmentDate",
+      render: () => (
+        <span>{dateOf.split("T")[0]}</span>
+      ),
+    },
+   
+    
+  ];
+  const columns3 = [
+    {
+      title: "Medication",
+      dataIndex: "Medication",
+      key: "Medication",
+    },
+    {
+      title: "Dose",
+      dataIndex: "Dosage",
+      key: "Dosage",
+      
+    },
+    {
+      title: "Instruction",
+      dataIndex: "Instruction",
+      key: "Instruction",
+    },
+   
+    
+  ];
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Layout className="site-layout">
@@ -200,8 +260,8 @@ const PatientHome = () => {
             </Card>
           </Modal>
 
-          <Row gutter={35}>
-            <Col xs={25} sm={30} md={24} lg={30} xl={30}>
+          <Row >
+            <Col md={24} >
               <Card
                 hoverable
                 title="My Details"
@@ -212,12 +272,12 @@ const PatientHome = () => {
                     onClick={openModal}
                   />
                 }
-                style={{ marginBottom: 16 }}
+                style={{ marginBottom: 16,height: "37vh"  }}
               >
                 <Row>
                   <Avatar
                     src="https://xsgames.co/randomusers/avatar.php?g=pixel"
-                    style={{ width: 160, height: 160 }}
+                    style={{ width: 150, height: 150 }}
                   />
                   <Col>
                     <Title level={4}>
@@ -242,136 +302,58 @@ const PatientHome = () => {
               </Card>
             </Col>
           </Row>
-          <Row gutter={30}>
-            <Col xl={9}>
+          <Row style={{ height:"45vh" }} gutter={30}>
+            <Col md={9}>
               <Card
                 hoverable
                 title="Upcoming Appointments"
                 loading={loadingCard}
-                style={{ marginBottom: 16, minHeight: 335 }}
+                style={{ height:"45vh" }}
               >
                 <Row>
-                  <Col>
-                    <List
-                      header={<Title level={5}>Doctor </Title>}
-                      dataSource={appointments}
-                      renderItem={(item: any) => (
-                        <List.Item>
-                          <Title level={5}>{item.Doctor.Name}</Title>
-                        </List.Item>
-                      )}
-                    />
-                  </Col>
-                  <Col style={{ marginLeft: 30 }}>
-                    <List
-                      header={<Title level={5}>Date </Title>}
-                      dataSource={appointments}
-                      renderItem={(item: any) => (
-                        <List.Item>
-                          <Title level={5}>
-                            {item.AppointmentDate.split("T")[0]}
-                          </Title>
-                        </List.Item>
-                      )}
-                    />
-                  </Col>
-                  <Col style={{ marginLeft: 30 }}>
-                    <List
-                      header={<Title level={5}>Time </Title>}
-                      dataSource={appointments}
-                      renderItem={(item: any) => (
-                        <List.Item>
-                          <Title level={5}>
-                            {item.AppointmentDate.split("T")[1].split(".")[0]}
-                          </Title>
-                        </List.Item>
-                      )}
-                    />
-                  </Col>
+                <Table
+          style={{ width: "55vw", height:"30vh"}}
+          columns={columns}
+          dataSource={appointments}
+          size="middle"
+        />
                 </Row>
               </Card>
             </Col>
-            <Col xl={6}>
+            <Col md={6}>
               <Card
                 hoverable
                 title="My Subscriptions"
                 loading={loadingCard}
-                style={{ marginBottom: 16, minHeight: 335 }}
-              >
+                style={{  height:"45vh" }}              >
                 <Row>
-                  <Col>
-                    <List
-                      header={<Title level={5}>Name </Title>}
-                      dataSource={subscription}
-                      renderItem={(item: any) => (
-                        <List.Item>
-                          <Title level={5}>{item.Name}</Title>
-                        </List.Item>
-                      )}
-                    />
-                  </Col>
-
-                  <Col style={{ marginLeft: 0 }}>
-                    <List header={<Title level={5}>Expiry </Title>}>
-                      <List.Item>
-                        <Title level={5}>{dateOf.split("T")[0]}</Title>
-                      </List.Item>
-                    </List>
-                  </Col>
+                <Table
+          style={{ width: "55vw", height:"30vh"}}
+          columns={columns2}
+          dataSource={subscription}
+          size="middle"
+        />
                 </Row>
               </Card>
             </Col>
-            <Col xl={9}>
+            <Col md={9}>
               <Card
                 hoverable
                 title="My Prescriptions"
                 loading={loadingCard}
-                style={{ marginBottom: 16 }}
-              >
+                style={{  height:"45vh" }}              >
                 <Row>
-                  <Col>
-                    <List
-                      dataSource={prescriptions}
-                      header={<Title level={5}>Medication </Title>}
-                      renderItem={(item: any) => (
-                        <List.Item>
-                          <Title level={5}>{item.Medication}</Title>
-                        </List.Item>
-                      )}
-                    />
-                  </Col>
-                  <Col style={{ marginLeft: 10 }}>
-                    <List
-                      dataSource={prescriptions}
-                      header={
-                        <Title style={{ marginLeft: 15 }} level={5}>
-                          Dose{" "}
-                        </Title>
-                      }
-                      renderItem={(item: any) => (
-                        <List.Item>
-                          <Title level={5}>{item.Dosage}</Title>
-                        </List.Item>
-                      )}
-                    />
-                  </Col>
-                  <Col style={{ marginLeft: 10 }}>
-                    <List
-                      header={<Title level={5}>Instruction </Title>}
-                      dataSource={prescriptions}
-                      renderItem={(item: any) => (
-                        <List.Item>
-                          <Title level={5}>{item.Instruction}</Title>
-                        </List.Item>
-                      )}
-                    />
-                  </Col>
+                <Table
+          style={{ width: "55vw", height:"30vh"}}
+          columns={columns3}
+          dataSource={prescriptions}
+          size="middle"
+        />
                 </Row>
               </Card>
             </Col>
           </Row>
         </Content>
-        <Footer style={{ textAlign: "center" }}>spiderWEBS ©2023</Footer>
       </Layout>
     </Layout>
   );
