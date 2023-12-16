@@ -19,7 +19,38 @@ const RegLog: React.FC = () => {
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); // Prevents the default form submission
 
+    if (!Username || !Password) {
+      message.warning("Please Fill In All Fields");
+      return;
+    }
+
+    try {
+      const data = {
+        Username,
+        Password,
+      };
+      const response = await api.post(`/login`, data);
+      console.log(response.data);
+      localStorage.setItem("id", response.data.id);
+      localStorage.setItem("type", response.data.type);
+      Cookies.set("accessToken", response.data.accessToken);
+
+      handleRedirection(response.data);
+      window.location.reload();
+    } catch (error: any) {
+      console.error("Error:", error);
+      message.error(`${error.response.data.error}`);
+    }
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSubmit(event as any); // Manually trigger the form submission
+    }
+  };
 
   const handleSignIn = async () => {
     if (!Password || !Username) {
@@ -108,6 +139,7 @@ const RegLog: React.FC = () => {
                 type="password"
                 onChange={handlePasswordChange}
                 value={Password}
+                onKeyPress={handleKeyPress}
               />
             </div>
 
