@@ -1,19 +1,27 @@
 import { useState, useEffect } from "react";
-import {
-  ChakraProvider,
-  Container,
-  Heading,
-  VStack,
-  HStack,
-  Divider,
-  Flex,
-} from "@chakra-ui/react";
+
 import { useNavigate, useParams } from "react-router-dom";
 import "./StyleDoctor.css";
 import { getDoctor } from "../../apis/Doctor/GetDoctor";
+import { Avatar, Breadcrumb,Divider, Card, Col, Layout, List, Modal, Row, Spin, Typography, Table, Button, Space, Tag } from "antd";
+import { SettingOutlined } from "@ant-design/icons";
+import { differenceInYears } from "date-fns";
+import { Content, Footer } from "antd/es/layout/layout";
+import { filterAppointmentsDoctor } from "../../apis/Doctor/Appointments/FilterAppointmentsDoctor";
+const { Title } = Typography;
 const DoctorHome = () => {
+
+
   const { id } = useParams<{ id: string }>();
   const [doctorInfo, setDoctorInfo] = useState<any>({});
+  const [loadingCard, setLoadingCard] = useState(true);
+  const [patientInfo, setPatientInfo] = useState<any>({});
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [subscription, setSubscription] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showPopup, setShowPopup] = useState(false);
+  const [dateOf, setDateOf] = useState(String);
 
   const fetchDoctor = async () => {
     await getDoctor()
@@ -24,10 +32,22 @@ const DoctorHome = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
+
+      try {
+        const response = await filterAppointmentsDoctor("Upcoming", "");
+        setAppointments(response.data);
+      } catch (error: any) {
+        if (error.response.data.error == "No appointments were found")
+          setAppointments([]);
+      }
+
+      setLoading(false) 
+      setLoadingCard(false)
   };
   useEffect(() => {
     fetchDoctor();
     localStorage.setItem("Name", doctorInfo.Name);
+    
   }, [id]);
 
   const [patientData, setPatientData] = useState({
@@ -48,79 +68,203 @@ const DoctorHome = () => {
     ],
   });
   const navigate = useNavigate();
-  const appoint = async () => {
-    navigate(`/doctor/allAppointments`);
+
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  const openModal = () => {
+    setShowPopup(true);
   };
-  const viewpatients = async () => {
-    navigate(`/doctor/viewPatients`);
+  const closeModal = () => {
+    setShowPopup(false);
   };
+
+  let dob = doctorInfo.Dob + "";
+  let date = dob.split("T")[0];
+
+  const calculateAge = (birthDate: string) => {
+    const today = new Date();
+    const dob = new Date(birthDate);
+    return differenceInYears(today, dob);
+  };
+
+  const columns = [
+    {
+      title: "Patient Name",
+      dataIndex: "Patient",
+      key: "Patient",
+    },
+    {
+      title: "Appointment Date",
+      dataIndex: "AppointmentDate",
+      key: "AppointmentDate",
+      render: (AppointmentDate: any) => (
+        <span>{new Date(AppointmentDate).toDateString()}</span>
+      ),
+    },
+    {
+      title: "Start",
+      dataIndex: "start",
+      key: "start",
+      render: (start: any) => <span>{start.split("T")[1].split(".")[0]}</span>,
+    },
+    {
+      title: "End",
+      dataIndex: "end",
+      key: "end",
+      render: (end: any) => <span>{end.split("T")[1].split(".")[0]}</span>,
+    },
+    
+  ];
 
   return (
-    <div>
-      <ChakraProvider cssVarsRoot={undefined}>
-        <Container
-          marginTop="5"
-          boxShadow="lg"
-          borderRadius="lg"
-          border="3px solid #052c65"
-          p={6}
-          maxW="container.xl"
-        >
-          <Heading as="h1" size="xl" mt={0}>
-            Welcome Dr. {doctorInfo.Name}!<br></br>
-            <Divider borderColor="#052c65" borderWidth="2px" />
-          </Heading>
-          <HStack w="350px" align="start" spacing={2}></HStack>
+    <Layout style={{ minHeight: "100vh" }}>
+      <Layout className="site-layout">
+        <Content style={{ margin: "0  16px" }}>
+          <Breadcrumb style={{ margin: "16px 0" }}>
+            <Breadcrumb.Item>Doctor</Breadcrumb.Item>
+            <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
+          </Breadcrumb>
 
-          <div style={{ display: "flex" }}>
-            <button
-              style={{ marginLeft: "auto", marginRight: "20px" }}
-              className="btn btn-danger"
-              type="button"
-              onClick={() => {
-                navigate("/doctor/changePassword");
-              }}
-            >
-              Change Password
-            </button>
-          </div>
+          <Modal
+            style={{ top: 10}}
+            open={showPopup}
+            footer={null}
+            onCancel={closeModal}
+          >
+            <Card title="My Details" >
+              <List>
+                <List.Item >
+                  <Title level={5}>Name: &nbsp;{doctorInfo.Name}</Title>
+                </List.Item>
+                <List.Item>
+                  <Title level={5}>Username: &nbsp;{doctorInfo.Username}</Title>
+                </List.Item>
+                <List.Item>
+                  <Title level={5}>Password: &nbsp;***********</Title>
+                  <Button
+                    danger
+                    type="primary"
+                    onClick={() => {
+                      navigate("/doctor/changePassword");
+                    }}
+                  >
+                    Change Password
+                  </Button>
+                </List.Item>
+                <List.Item>
+                  <Title level={5}>Date of birth: &nbsp;{date}</Title>
+                </List.Item>
+                <List.Item>
+                  <Title level={5}>Email: &nbsp;{doctorInfo.Email}</Title>
+                </List.Item>
+                <List.Item>
+                  <Title level={5}>
+                  Affiliation: &nbsp;{doctorInfo.Affiliation}
+                  </Title>
+                </List.Item>
+                <List.Item>
+                  <Title level={5}>
+                  EducationalBackground: &nbsp;
+                    {doctorInfo.EducationalBackground}
+                  </Title>
+                </List.Item>
+                <List.Item>
+                  <Title level={5}>
+                  HourlyRate: &nbsp;
+                    {doctorInfo.HourlyRate}
+                  </Title>
+                </List.Item>
+                <List.Item>
+                  <Title level={5}>
+                  Specialty: &nbsp;
+                    {doctorInfo.Specialty}
+                  </Title>
+                </List.Item>
+              </List>
+            </Card>
+          </Modal>
 
-          <br></br>
-          <br></br>
-          <Flex mt={8} justify="space-between">
-            <VStack w="30%" align="start" spacing={4}>
-              <Heading as="h2" size="md">
-                Upcoming Appointments
-              </Heading>
-              <Divider borderColor="#052c65" borderWidth="1px" />
-              <button
-                style={{ width: 150 }}
-                className="btn btn-sm btn-primary"
-                onClick={appoint}
+          <Row gutter={2} style={{height: "86vh",minWidth:800}}>
+
+              <Card
+                hoverable
+                title={"My Details"}
+                loading={loadingCard}
+                extra={
+                  <SettingOutlined
+                    style={{ justifyContent:"right",width: 50, height: 50 }}
+                    onClick={openModal}
+                  />
+                }
+                style={{marginRight:"2rem",height:"100%",width:"20vw"}}
+                
               >
-                View Details
-              </button>
-            </VStack>
+                <div style={{display:"flex",justifyContent:"center"}}>
+              <Avatar
+                    src="https://xsgames.co/randomusers/avatar.php?g=pixel"
+                    style={{width: 200, height: 200 }}
+                  />
+                  </div>
+                   <Divider><h3><b>Dr. {doctorInfo.Name}</b></h3> </Divider>
+                  <Col>
+                    
+                    <Title style={{textAlign:"center"}} level={4}>
+                    <h4>Affiliation: <h6>{doctorInfo.Affiliation}</h6> </h4>
+                      
+                    </Title>
+                    <Title level={4}>{doctorInfo.Gender}</Title>
+                    <Row style={{display:"flex", justifyContent:"center",justifyItems:"center"}}>
+                      <Tag color="processing">Patients: </Tag>
+                      <Tag color="processing">Appointments: </Tag>
+                    </Row>
+                  </Col>
+              </Card>
+          
+      <Col md={30} >
+        <Row style={ {height:" 13vh"}}>
+          <Card style={{border:"none" ,backgroundColor:"transparent",marginBottom: "2rem"}}>
 
-            <VStack w="30%" align="start" spacing={4}>
-              <Heading as="h2" size="md">
-                View Patients
-              </Heading>
-              <Divider borderColor="#052c65" borderWidth="1px" />
-              <button
-                style={{ width: 150 }}
-                className="btn btn-sm btn-primary"
-                onClick={viewpatients}
+          </Card>
+          </Row>
+
+          <Row >
+              <Card
+                hoverable
+                title="Upcoming Appointments"
+                loading={loadingCard}
+                style={{ height: "60vh"  }}
+                
               >
-                View Details
-              </button>
-            </VStack>
-          </Flex>
-        </Container>
-      </ChakraProvider>
+               
+               <Table
+          style={{ width: "55vw" }}
+          columns={columns}
+          dataSource={appointments}
+          size="middle"
+        />
 
-      <br />
-    </div>
+              </Card>
+              </Row>
+              </Col>
+
+          </Row>
+        </Content>
+      </Layout>
+    </Layout>
   );
 };
 
