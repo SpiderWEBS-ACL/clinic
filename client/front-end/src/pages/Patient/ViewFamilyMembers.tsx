@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Modal, Input, Select, message, Card, Avatar } from "antd";
+import { Modal, Input, Select, message, Card, Avatar, Spin } from "antd";
 import { getPatientFamilyMembers } from "../../apis/Patient/Family Members/getFamilyMembers";
 import { linkFamilyMember } from "../../apis/Patient/Family Members/LinkFamilyMember";
 import { Col, Row } from "react-bootstrap";
@@ -18,6 +18,7 @@ const ViewFamilyMembers = () => {
   const [RelationToPatient, setRelationToPatient] = useState("Relation");
   const { Meta } = Card;
   const [loadingList, setLoadingList] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const fetchFamilyMembers = async () => {
     const response = await getPatientFamilyMembers();
@@ -28,11 +29,26 @@ const ViewFamilyMembers = () => {
     try {
       fetchFamilyMembers();
       setLoadingList(false);
+      setLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
   }, [id]);
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
   const openModal = () => {
     setShowPopup(true);
   };

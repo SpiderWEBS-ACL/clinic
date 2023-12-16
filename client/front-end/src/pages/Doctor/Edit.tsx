@@ -12,7 +12,7 @@ const EditDoctor = () => {
   const [Username, setUsername] = useState<string>("");
   const [Email, setEmail] = useState<string>("");
   const [Name, setName] = useState<string>("");
-  const [Dob, setDob] = useState(new Date());
+  const [Dob, setDob] = useState("");
   const [HourlyRate, setHourlyRate] = useState<number>(0);
   const [Affiliation, setAffiliation] = useState<string>("");
   const [EducationalBackground, setEducationalBackground] =
@@ -25,14 +25,16 @@ const EditDoctor = () => {
         setUsername(response.data.Username);
         setName(response.data.Name);
         setEmail(response.data.Email);
-        setDob(new Date(response.data.Dob));
+        setDob(new Date(response.data.Dob + "").toDateString());
         setHourlyRate(response.data.HourlyRate);
         setAffiliation(response.data.Affiliation);
         setEducationalBackground(response.data.EducationalBackground);
         setSpecialty(response.data.Specialty);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error:", error);
+        setLoading(false);
       });
   };
   useEffect(() => {
@@ -40,6 +42,20 @@ const EditDoctor = () => {
     setLoading(false);
   }, [id]);
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
@@ -103,7 +119,7 @@ const EditDoctor = () => {
             ></InputField>
             <InputField
               id="Dob"
-              label="Dob"
+              label="Date of Birth"
               type="Text"
               value={Dob}
               onChange={setDob}

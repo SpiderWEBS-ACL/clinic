@@ -9,6 +9,7 @@ import {
   Modal,
   message,
   Badge,
+  Spin,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 
@@ -76,23 +77,20 @@ const AllPackagesPatient = () => {
     setShowPaymentModal(false);
   };
 
+  const fetchData = async () => {
+    const packages = await getAllPackages();
+    setPackages(packages);
+    const subscribedPackage = await getSubscribedPackage();
+    setSubscribedPackageId(subscribedPackage);
+
+    const subscription = await getSubscription();
+    setSubscribedPackage(subscription);
+
+    const currentBalance = await getBalance();
+    setBalance(currentBalance.data);
+    setLoading(false);
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      const packages = await getAllPackages();
-      setPackages(packages);
-      setLoading(false);
-
-      const subscribedPackage = await getSubscribedPackage();
-      setSubscribedPackageId(subscribedPackage);
-      setLoading(false);
-
-      const subscription = await getSubscription();
-      setSubscribedPackage(subscription);
-
-      const currentBalance = await getBalance();
-      setBalance(currentBalance.data);
-      setLoading(false);
-    };
     fetchData();
   }, []);
 
@@ -145,7 +143,7 @@ const AllPackagesPatient = () => {
                           height: "23rem",
                           width: "24rem",
                           marginTop: 16,
-                          marginLeft:16
+                          marginLeft: 16,
                         }}
                         loading={loading}
                         hoverable
@@ -157,7 +155,7 @@ const AllPackagesPatient = () => {
                               sx={{
                                 width: 50,
                                 height: 50,
-                                bgcolor: green[500]
+                                bgcolor: green[500],
                               }}
                             >
                               {" "}

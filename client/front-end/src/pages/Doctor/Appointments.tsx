@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../../components/Alert";
-import { Button, DatePicker, DatePickerProps, Modal, Select } from "antd";
+import { Button, DatePicker, DatePickerProps, Modal, Select, Spin } from "antd";
 import { message } from "antd";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -26,6 +26,8 @@ const ViewPatientAppointments = () => {
   const [date, setDate] = useState("");
   const accessToken = localStorage.getItem("accessToken");
   const [ShowAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
   const clearFilters = async () => {
     setAppointments(allAppointments);
@@ -48,8 +50,10 @@ const ViewPatientAppointments = () => {
       await allAppoimtmentsDoctor().then((response) => {
         setAppointments(response.data);
         setAllAppointments(response.data);
+        setLoading(false);
       });
     } catch (error: any) {
+      setLoading(false);
       message.error(`${error.response.data.error}`);
     }
   };
@@ -57,15 +61,30 @@ const ViewPatientAppointments = () => {
   const handleCancelAppointment = async (id: string) => {
     try {
       await cancelAppointmentDoctor(id);
-    }catch(error: any){
+    } catch (error: any) {
       message.error(`${error.response.data.error}`);
     }
-  }
+  };
 
   useEffect(() => {
     sessionStorage.clear();
     fetchAppointments();
   }, [id]);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   const onDateChange: DatePickerProps["onChange"] = (
     selectedDate,
@@ -82,41 +101,50 @@ const ViewPatientAppointments = () => {
     <div className="container">
       <h2 className="text-center mt-4 mb-4">Appointments</h2>
       <span>
-        <label style={{ marginLeft: devicePixelRatio * 90, marginRight: 8 }}>
-          <strong>Status:</strong>
-        </label>
-        <Select
-          value={status}
-          style={{ width: 200, margin: "0 20px" }}
-          onChange={setStatus}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            justifyItems: "center",
+          }}
         >
-          <Option value="Upcoming">Upcoming</Option>
-          <Option value="Attended">Attended</Option>
-          <Option value="Cancelled">Cancelled</Option>
-          <Option value="Not-Attended">Not-Attended</Option>
-        </Select>
-        <label style={{ marginRight: 8 }}>
-          <strong>Date:</strong>
-        </label>
-        <DatePicker
-          onChange={onDateChange}
-          style={{ width: 150, marginRight: 80 }}
-        />
+          <label
+            style={{
+              marginRight: "1rem",
+              marginTop: "0.4rem",
+            }}
+          >
+            <strong>Status</strong>
+          </label>
+          <Select
+            value={status}
+            style={{ width: 150, marginRight: "1rem" }}
+            onChange={setStatus}
+          >
+            <Option value="Upcoming">Upcoming</Option>
+            <Option value="Completed">Completed</Option>
+            <Option value="Cancelled">Cancelled</Option>
+            <Option value="Rescheduled">Rescheduled</Option>
+          </Select>
+          <label style={{ marginRight: "1rem", marginTop: "0.4rem" }}>
+            <strong>Date</strong>
+          </label>
+          <DatePicker
+            onChange={onDateChange}
+            style={{ width: 150, marginRight: 20 }}
+          />
 
-        <button
-          onClick={handleFilter}
-          style={{ width: 80, marginRight: 20 }}
-          className="btn btn-sm btn-primary"
-        >
-          filter
-        </button>
-        <button
-          onClick={clearFilters}
-          style={{ width: 80 }}
-          className="btn btn-sm btn-primary"
-        >
-          clear
-        </button>
+          <Button
+            type="primary"
+            onClick={handleFilter}
+            style={{ width: 80, marginRight: 20 }}
+          >
+            filter
+          </Button>
+          <Button onClick={clearFilters} style={{ width: 80 }}>
+            clear
+          </Button>
+        </div>
       </span>
       <br></br>
       <br></br>
@@ -160,20 +188,31 @@ const ViewPatientAppointments = () => {
           setShowAppointmentModal(false);
         }}
         //onOk={() => {
-         // setShowAppointmentModal(false);
+        // setShowAppointmentModal(false);
         ///}}
-        footer ={
+        footer={
           <div>
-          <Button type="primary" danger onClick={() => {
-            handleCancelAppointment(appointment._id)
-            setShowAppointmentModal(false);
-          }}>Cancel Appointment</Button> 
-          <Button type="primary" onClick={() => {
-            //RESCHEDULE FUNCTIONALITY YA HAYSOOM
-          }}>Reschedule</Button> 
-          </div>
-     }
-    
+            <Button
+              type="primary"
+              danger
+              onClick={() => {
+                handleCancelAppointment(appointment._id);
+                setShowAppointmentModal(false);
+              }}
+            >
+              Cancel Appointment
+            </Button>
+            <Button
+              type="primary"
+              onClick={() => {
+                //RESCHEDULE FUNCTIONALITY YA HAYSOOM
+              }}
+            >
+              Reschedule
+            </Button>
+                 
+          </div>
+        }
       >
         <table className="table">
           <thead>

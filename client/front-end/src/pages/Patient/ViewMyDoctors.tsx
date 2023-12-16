@@ -11,6 +11,7 @@ import {
   Col,
   Card,
   Avatar,
+  Spin,
 } from "antd";
 
 import {
@@ -56,6 +57,7 @@ const ViewMyDoctors = () => {
   const [SessionPrice, setSessionPrice] = useState("");
   const navigate = useNavigate();
   const [loadingList, setLoadingList] = useState(true);
+  const [loading, setLoading] = useState(true);
   const { Meta } = Card;
 
   const timeSlots = [];
@@ -111,11 +113,26 @@ const ViewMyDoctors = () => {
       getFamilyMembers();
       getAllDoctors();
       doctorDiscount();
+      setLoadingList(false);
+      setLoading(false);
     };
     fetchData();
-    setLoadingList(false);
   }, []);
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
   const redirectToStripe = async () => {
     try {
       try {
@@ -245,60 +262,64 @@ const ViewMyDoctors = () => {
       <h2 className="text-center mt-4 mb-4">My Doctors</h2>
       <div className="mb-3">
         <span>
-          <label style={{ marginRight: 8, marginLeft: 10 }}>
-            <strong>Name:</strong>
-          </label>
-          <Input
-            type="text"
-            value={Name}
-            onChange={onNameChange}
-            style={{ width: 150, marginRight: 30 }}
-          />
-          <label style={{ marginRight: 8 }}>
-            <strong>Specialty:</strong>
-          </label>
-          <Input
-            type="text"
-            value={Specialty}
-            onChange={onSpecialtyChange}
-            style={{ width: 150, marginRight: 30 }}
-          />
-          <label style={{ marginRight: 8 }}>
-            <strong>Date:</strong>
-          </label>
-          <DatePicker
-            onChange={onDateChange}
-            style={{ width: 150, marginRight: 30 }}
-          />
-          <label style={{ marginRight: 8 }}>
-            <strong>Time:</strong>
-          </label>
-          <Select
-            value={Time}
-            onChange={handleTimeSlotChange}
-            style={{ width: 150, marginRight: 30 }}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              justifyItems: "center",
+            }}
           >
-            <Option value="">Select a time slot</Option>
-            {timeSlots.map((slot) => (
-              <Option key={slot} value={slot}>
-                {slot}
-              </Option>
-            ))}
-          </Select>
-          <button
-            onClick={handleFilter}
-            style={{ width: 100, marginRight: 10 }}
-            className="btn btn-sm btn-primary"
-          >
-            Apply filters
-          </button>
-          <button
-            onClick={handleClearFilters}
-            style={{ width: 100 }}
-            className="btn btn-sm btn-primary"
-          >
-            Clear filters
-          </button>
+            <label style={{ marginRight: "1rem", marginTop: "0.4rem" }}>
+              <strong>Name</strong>
+            </label>
+            <Input
+              type="text"
+              value={Name}
+              onChange={onNameChange}
+              style={{ width: 150, marginRight: 20 }}
+            />
+            <label style={{ marginRight: "1rem", marginTop: "0.4rem" }}>
+              <strong>Specialty</strong>
+            </label>
+            <Input
+              type="text"
+              value={Specialty}
+              onChange={onSpecialtyChange}
+              style={{ width: 150, marginRight: 20 }}
+            />
+            <label style={{ marginRight: "1rem", marginTop: "0.4rem" }}>
+              <strong>Date</strong>
+            </label>
+            <DatePicker
+              onChange={onDateChange}
+              style={{ width: 150, marginRight: 20 }}
+            />
+            <label style={{ marginRight: "1rem", marginTop: "0.4rem" }}>
+              <strong>Time</strong>
+            </label>
+            <Select
+              value={Time}
+              onChange={handleTimeSlotChange}
+              style={{ width: 150, marginRight: 20 }}
+            >
+              <Option value="">Select a time slot</Option>
+              {timeSlots.map((slot) => (
+                <Option key={slot} value={slot}>
+                  {slot}
+                </Option>
+              ))}
+            </Select>
+            <Button
+              type="primary"
+              onClick={handleFilter}
+              style={{ width: 100, marginRight: 20 }}
+            >
+              filter
+            </Button>
+            <Button onClick={handleClearFilters} style={{ width: 100 }}>
+              clear
+            </Button>
+          </div>
         </span>
       </div>
       <tbody>
