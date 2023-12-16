@@ -156,7 +156,7 @@ const ViewPatientAppointments = () => {
       scheduleFollowUp(date, appointment);
       setShowFollowUpModal(false);
       setAppointmentDate("");
-    setAppointmentTime("");
+      setAppointmentTime("");
       message.success("Request Sent");
     } catch (error: any) {
       message.error(`${error.response.data.error}`);
@@ -290,24 +290,10 @@ const ViewPatientAppointments = () => {
         />
       </div>
       <Modal
-
-        footer={
-          <Button
-            type="primary"
-            onClick={() => {
-              setShowRescheduleModal(true);
-            }}
-          >
-            Reschedule
-          </Button>
-        }
         visible={ShowAppointmentModal}
         onCancel={() => {
           setShowAppointmentModal(false);
         }}
-        //onOk={() => {
-        // setShowAppointmentModal(false);
-        ///}}
         footer={
           <div>
             <Button
@@ -390,7 +376,6 @@ const ViewPatientAppointments = () => {
             >
               Reschedule
             </Button>
-                 
           </div>
         }
       >
