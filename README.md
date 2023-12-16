@@ -138,7 +138,9 @@ You must install Node JS and React to be able to run this app.
 
 Additionally write the following commands in the terminal to install dependancies
 
-            npm i
+        npm i --legacy -peer -dependancies
+        npm i
+        npm i cors
 
 # API Refrences
 
