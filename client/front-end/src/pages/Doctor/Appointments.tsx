@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../../components/Alert";
 import { Button, DatePicker, DatePickerProps, Modal, Select, Spin } from "antd";
 import { message } from "antd";
+import dayjs from "dayjs";
+import { RangePickerProps } from "antd/es/date-picker";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -13,6 +15,8 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { allAppoimtmentsDoctor } from "../../apis/Doctor/Appointments/AllAppointmentsDoctor";
 import { filterAppointmentsDoctor } from "../../apis/Doctor/Appointments/FilterAppointmentsDoctor";
 import { cancelAppointmentDoctor } from "../../apis/Doctor/Appointments/cancelAppointment";
+import { getTimeSlotsDoctorDate } from "../../apis/Patient/Doctors/GetTimeSlotsDoctorDate";
+import { handleReschedule } from "../../apis/Patient/Appointments/RescheduleAppointment";
 
 const ViewPatientAppointments = () => {
   const { Option } = Select;
@@ -26,6 +30,10 @@ const ViewPatientAppointments = () => {
   const [date, setDate] = useState("");
   const accessToken = localStorage.getItem("accessToken");
   const [ShowAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [ShowRescheduleModal, setShowRescheduleModal] = useState(false);
+  const [AppointmentDate, setAppointmentDate] = useState("");
+  const [AppointmentTime, setAppointmentTime] = useState("");
+  const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -45,6 +53,7 @@ const ViewPatientAppointments = () => {
       message.error(error.response.data.error);
     }
   };
+
   const fetchAppointments = async () => {
     try {
       await allAppoimtmentsDoctor().then((response) => {
@@ -55,12 +64,16 @@ const ViewPatientAppointments = () => {
     } catch (error: any) {
       setLoading(false);
       message.error(`${error.response.data.error}`);
+      setLoading(false);
     }
   };
 
   const handleCancelAppointment = async (id: string) => {
     try {
-      await cancelAppointmentDoctor(id);
+      await cancelAppointmentDoctor(id).then((response) => {
+        message.success(response.data);
+      });
+
     } catch (error: any) {
       message.error(`${error.response.data.error}`);
     }
@@ -97,6 +110,57 @@ const ViewPatientAppointments = () => {
     setShowAppointmentModal(true);
     setAppointment(info.event._def.extendedProps);
   };
+  const disabledDate: RangePickerProps["disabledDate"] = (current) => {
+    return current && current < dayjs().startOf("day");
+  };
+  const onAppointmentDateChange: DatePickerProps["onChange"] = (
+    date,
+    dateString
+  ) => {
+    setAppointmentDate(dateString);
+    setAppointmentTime("");
+    setTimeSlotsApi(dateString);
+  };
+  const setTimeSlotsApi = async (date: string) => {
+    try {
+      const response = await getTimeSlotsDoctorDate(appointment.Doctor, date);
+      if (response.data.length == 0)
+        message.warning("No slots available on this date");
+      setTimeSlotsDoctor(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleAppointmentTimeSlotChange = (selectedTimeSlot: string) => {
+    setAppointmentTime(selectedTimeSlot);
+  };
+  const handleRescheduleClick = async () => {
+    console.log(appointment.Status);
+    if (appointment.Status == "Upcoming") {
+      await handleReschedule(
+        appointment._id,
+        `${AppointmentDate}T${AppointmentTime}:00.000Z`
+      );
+      setLoading(true);
+      await fetchAppointments();
+      setShowAppointmentModal(false);
+      message.success("appointment rescheduled");
+    } else {
+      message.error("this appointment can not be rescheduled");
+    }
+    setAppointmentDate("");
+    setAppointmentTime("");
+    setShowRescheduleModal(false);
+  }
+  const checkStatus = ()=>{
+    if(appointment){
+    if(appointment.Status != "Upcoming"){
+      return true
+    }
+    else
+    return false
+  }
+  }
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">Appointments</h2>
@@ -195,6 +259,7 @@ const ViewPatientAppointments = () => {
             <Button
               type="primary"
               danger
+              disabled = {checkStatus()}
               onClick={() => {
                 handleCancelAppointment(appointment._id);
                 setShowAppointmentModal(false);
@@ -204,8 +269,10 @@ const ViewPatientAppointments = () => {
             </Button>
             <Button
               type="primary"
+              disabled = {checkStatus()}
               onClick={() => {
-                //RESCHEDULE FUNCTIONALITY YA HAYSOOM
+                setShowRescheduleModal(true);
+
               }}
             >
               Reschedule
@@ -214,6 +281,53 @@ const ViewPatientAppointments = () => {
           </div>
         }
       >
+        <Modal
+          title="Select Appointment Time"
+          visible={ShowRescheduleModal}
+          onCancel={() => {
+            setShowRescheduleModal(false);
+            setAppointmentDate("");
+            setAppointmentTime("");
+          }}
+          footer={null}
+        >
+          <DatePicker
+            disabledDate={disabledDate}
+            onChange={onAppointmentDateChange}
+            style={{ width: 150, marginRight: 30 }}
+          />
+          <label style={{ marginRight: 8 }}></label>
+          <Select
+            disabled={AppointmentDate == ""}
+            value={AppointmentTime}
+            onChange={handleAppointmentTimeSlotChange}
+            style={{ width: 150, marginRight: 30 }}
+          >
+            <Option value="">Select slot</Option>
+            {timeSlotsDoctor.map((slot) => (
+              <Option key={slot} value={slot}>
+                {slot}
+              </Option>
+            ))}
+          </Select>
+          <button
+            disabled={AppointmentDate == "" || AppointmentTime == ""}
+            className="btn btn-sm btn-success"
+            style={{
+              marginLeft: "1rem",
+              marginBlock: "1rem",
+              padding: "4px 8px",
+              fontSize: "12px",
+              borderRadius: "5px",
+            }}
+            onClick={() => {
+              handleRescheduleClick();
+            }}
+          >
+            <span aria-hidden="true"></span>
+            Reschedule
+          </button>
+        </Modal>
         <table className="table">
           <thead>
             <tr>

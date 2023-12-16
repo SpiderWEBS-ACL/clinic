@@ -558,31 +558,39 @@ const viewAllPatientAppointments = async (req, res) => {
   const id = req.user.id;
   const patient = await patientModel.findById(id);
 
-  try {
-    if (patient) {
-      var appointments = await appointmentModel
-        .find({ Patient: patient })
-        .populate("Doctor");
-      await Promise.all(
-        patient.FamilyMembers.map(async (member) => {
-          var appointmentsMember = await appointmentModel
-            .find({ Patient: member._id })
-            .populate("Doctor");
-          appointmentsMember.map((member2) => {
-            member2.title = member.Name + "'s Appointment";
-          });
-          appointments.push(...appointmentsMember);
-          // appointments.map((appointment) => {
-          //   appointment.title += " with Dr. " + appointment.Doctor.Name;
-          // })
-        })
-      );
-      if (!appointments || appointments.length === 0) {
-        return res.status(404).json({ error: "no appointments were found" });
-      } else return res.status(200).json(appointments);
-    }
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+  try{
+          if(patient){
+          
+              var appointments = await appointmentModel.find({Patient: patient}).populate("Doctor");
+              await Promise.all(
+                patient.FamilyMembers.map( async (member) => {
+                  if(member.PatientID){
+                    var appointmentsMember =  await appointmentModel.find({Patient: member.PatientID}).populate("Doctor");
+                    appointmentsMember.map((member2) => {
+                      member2.title = member.Name + "'s Appointment"
+                    })
+                    appointments.push(...appointmentsMember);
+                  }
+                  else{
+                    var appointmentsMember =  await appointmentModel.find({Patient: member._id}).populate("Doctor");
+                    appointmentsMember.map((member2) => {
+                      member2.title = member.Name + "'s Appointment"
+                    })
+                    appointments.push(...appointmentsMember);
+                // appointments.map((appointment) => {
+                //   appointment.title += " with Dr. " + appointment.Doctor.Name;
+                // })
+              }
+              }))
+                  if(!appointments || appointments.length === 0){
+                    return res.status(404).json({error: "no appointments were found"});
+                  }
+                  else
+                      return res.status(200).json(appointments);
+                  }
+      }catch(error){
+      return res.status(500).json({ error: error.message });
+
   }
 };
 

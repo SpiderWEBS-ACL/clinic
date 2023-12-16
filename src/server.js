@@ -103,11 +103,12 @@ const {
   filterAppointmentPatient,
   filterAppointmentDoctor,
   rescheduleAppointment,
+
   cancelAppointment,
   sendAppointmentNotification,
   sendCancellationNotif,
   sendReschedulingNotif,
-  deleteNotifs,
+  deleteNotifs,requestFollowUp,getAllFollowUpRequests,rejectFollowUpRequest,acceptFollowUpRequest
 } = require("./controllers/appointmentController");
 
 const {
@@ -408,16 +409,17 @@ app.get("/patient/unreadNotifications", PatientProtect, getPatientUnreadNotifs);
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
 app.get(
-  "/appointment/filterAppointment",
-  PatientProtect,
-  filterAppointmentPatient
-);
+  "/appointment/filterAppointment", PatientProtect, filterAppointmentPatient);
 app.get(
   "/appointment/filterAppointmentDoctor",
   DoctorProtect,
   filterAppointmentDoctor
 );
-app.put("/appointment/cancelAppointment/:id", DoctorProtect, cancelAppointment);
+app.post("/appointment/requestFollowUp", requestFollowUp)
+app.put("/appointment/cancelAppointment/:id", DoctorProtect, cancelAppointment)
+app.get("/appointment/getAllFollowUpRequests/",DoctorProtect, getAllFollowUpRequests)
+app.delete("/appointment/rejectFollowUpRequest/:id",DoctorProtect,rejectFollowUpRequest)
+app.get("/appointment/acceptFollowUpRequest/:id",DoctorProtect,acceptFollowUpRequest)
 
 app.post("/appointment/appNotif", sendAppointmentNotification); //testing
 app.post("/appointment/cancelNotif", sendCancellationNotif); //testing

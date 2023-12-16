@@ -11,12 +11,12 @@ const callResponseHandler = require("../socketControllers/callResponseHandler");
 const socket = require("socket.io");
 
 const socketServerCreate = (server) => {
-  const io = socket(server, {
-    cors: {
-      origin: ["http://localhost:5173", "http://localhost:5174"],
-      methods: ["GET", "POST"],
-    },
-  });
+    const io = socket(server, {
+        cors: {
+            origin: ["http://127.0.0.1:5173","http://127.0.0.1:5174","http://localhost:5173","http://localhost:5174","http://localhost:8000 "],
+            methods: ["GET", "POST"],
+        },
+    });
 
   setServerSocketInstance(io);
 
