@@ -1214,6 +1214,23 @@ const fillPrescription = async (req, res) => {
   
 }
 
+const viewAllFilledUnfilledPrescriptions = async (req, res) => {
+  try {
+    const PatientId = req.user.id;
+    const prescriptions = await prescriptionModel.find({Patient: PatientId,});
+    const prescriptionsinfo = {
+      DocName : prescriptions.Doctor.Name,
+      Medicines : prescriptions.Medicines,
+      UnavailableMed : prescriptions.UnavailableMedicines,
+      Date : prescriptions.Date,
+      Status : prescriptions.Filled,
+    };
+    return res.status(200).json(prescriptionsinfo);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getAllDoctorsPatient,
   viewAllPatientAppointments,
@@ -1257,5 +1274,6 @@ module.exports = {
   addPrescriptionMedicinesToCart,
   payCartWithStripe,
   fillPrescription,
+  viewAllFilledUnfilledPrescriptions,
 };
 

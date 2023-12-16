@@ -59,6 +59,7 @@ const {
   fillPrescription,
   openNotification,
   getPatientUnreadNotifs,
+  viewAllFilledUnfilledPrescriptions,
 } = require("./controllers/patientController");
 
 const {
@@ -96,6 +97,7 @@ const {
   viewDoctorNotifications,
   openNotificationDoctor,
   getDoctorUnreadNotifs,
+  viewAllFilledUnfilledPrescriptions,
 } = require("./controllers/doctorController");
 
 const {

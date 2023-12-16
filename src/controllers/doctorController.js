@@ -835,6 +835,22 @@ const getDoctorUnreadNotifs = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const viewAllFilledUnfilledPrescriptions = async (req, res) => {
+  try {
+    const DoctorId = req.user.id;
+    const prescriptions = await prescriptionModel.find({Doctor: DoctorId,});
+    const prescriptionsinfo = {
+      DocName : prescriptions.Doctor.Name,
+      Medicines : prescriptions.Medicines,
+      UnavailableMed : prescriptions.UnavailableMedicines,
+      Date : prescriptions.Date,
+      Status : prescriptions.Filled,
+    };
+    return res.status(200).json(prescriptionsinfo);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
 
 
 module.exports = {
@@ -872,4 +888,5 @@ module.exports = {
   getAllPharmacists, 
   openNotificationDoctor,
   getDoctorUnreadNotifs,
+  viewAllFilledUnfilledPrescriptions,
 };
