@@ -60,6 +60,7 @@ const Chat = () => {
           })
         );
         setMessages(transformedMessages);
+        setLoading(false);
       }
     });
     socket.on("direct-message", (data: any) => {

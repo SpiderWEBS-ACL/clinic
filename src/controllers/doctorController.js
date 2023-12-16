@@ -796,46 +796,36 @@ const viewDoctorNotifications = async (req, res) => {
   }
 };
 
-const openNotificationDoctor = async(req, res) => {
-
-  try{
+const openNotificationDoctor = async (req, res) => {
+  try {
     const { id } = req.params;
-    const notification = await Notification.findById(id);
-
-    if (!notification) {
-      return res.status(404).json({ error: "Notification Not Found" });
-    }
-    
-    notification.opened = true;
-    notification.save();
-
+    const notification = await Notification.findByIdAndUpdate(id, {
+      opened: true,
+    });
     res.status(200).json(notification);
-
-  }catch (error) {
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
-
-}
-
+};
 const getDoctorUnreadNotifs = async (req, res) => {
-
-  try{
+  try {
     const doctorId = req.user.id;
     const doctor = await doctorModel.findById(doctorId);
 
     if (!doctor) {
       return res.status(404).json({ error: "Doctor Not Found" });
     }
-    
-    const notifications = await Notification.find({Doctor: doctor, opened: false});
+
+    const notifications = await Notification.find({
+      Doctor: doctor,
+      opened: false,
+    });
 
     res.status(200).json(notifications);
-
-  }catch (error) {
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 module.exports = {
   registerDoctor,
@@ -869,7 +859,7 @@ module.exports = {
   updateMedicineInPrescription,
   deleteMedicineInPrescription,
   viewDoctorNotifications,
-  getAllPharmacists, 
+  getAllPharmacists,
   openNotificationDoctor,
   getDoctorUnreadNotifs,
 };

@@ -12,7 +12,7 @@ import { getAllPatientsPrescriptions } from "../../apis/Doctor/Prescriptions/get
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Prescription } from "../../types";
-import { Alert, Button, Tooltip, Input, Tag, message } from "antd";
+import { Alert, Button, Tooltip, Input, Tag, message, Spin } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { updateMedicineInPrescription } from "../../apis/Doctor/Prescriptions/UpdateMedicineInPrescription";
 import { getMyPrescription } from "../../apis/Patient/Prescriptions/GetMyPrescription";
@@ -27,6 +27,7 @@ const PatientsPrescriptions = () => {
   const [UpdatedPrescription, setUpdatedPrescription] =
     useState<Prescription>();
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchPrescriptions = async () => {
     try {
@@ -40,8 +41,23 @@ const PatientsPrescriptions = () => {
 
   useEffect(() => {
     fetchPrescriptions();
+    setLoading(false);
   }, []);
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
   const handleDownloadClick = (currPresc: Prescription) => {
     const pdfDoc = new jsPDF();
 
@@ -232,7 +248,8 @@ const PatientsPrescriptions = () => {
                       className="btn btn-sm btn-primary"
                       onClick={() => pay(prescription)}
                     >
-                      Buy Again <ReloadOutlined />
+                      <ReloadOutlined style={{ marginRight: "0.3rem" }} /> Buy
+                      Again
                     </button>
                   )}
                 </AccordionDetails>

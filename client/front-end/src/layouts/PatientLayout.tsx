@@ -50,17 +50,17 @@ const PatientLayout: React.FC = () => {
       saveVideoSocketId(id);
     });
 
-    api.get("/patient/unreadNotifications", config)
-    .then((response) => {
-      console.log(response.data);
-      setNotificationCount(response.data.length);
-    })
-    .catch((error) => {
-      console.log("Error: " + error);
-    });
-
+    api
+      .get("/patient/unreadNotifications", config)
+      .then((response) => {
+        console.log(response.data);
+        setNotificationCount(response.data.length);
+      })
+      .catch((error) => {
+        console.log("Error: " + error);
+      });
   }, [notificationCount]);
-  
+
   socket.on("callUser", (data: any) => {
     console.log("data from: ", data.from, "data.name: ", data.Name);
     localStorage.setItem("videoCallerSocket", data.from);
@@ -71,7 +71,6 @@ const PatientLayout: React.FC = () => {
     setAuthorId(data.newMessage.author._id);
     setMessageCount(MessageCount + 1);
   });
-  
 
   const navigate = useNavigate();
   const items = [

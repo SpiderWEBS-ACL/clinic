@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Input, Select, message } from "antd";
+import { Button, Input, Select, message } from "antd";
 import { Col, Row } from "react-bootstrap";
 import { Card, Avatar } from "antd";
 import { getMyPatients } from "../../apis/Doctor/Patients/GetMyPatients";
@@ -20,11 +20,12 @@ const ViewAllPatients = () => {
     await getMyPatients()
       .then((response) => {
         setPatients(response.data);
-        setLoadingList(false);
         setAllPatients(response.data);
+        setLoadingList(false);
       })
       .catch((error) => {
         console.error("Error:", error);
+        setLoadingList(false);
       });
   };
   useEffect(() => {
@@ -99,7 +100,7 @@ const ViewAllPatients = () => {
         if (error.response && error.response.status === 404) {
           setLoadingList(false);
           setPatients([]);
-          message.error("No data found!");
+          message.error("No patients found!");
         } else {
           console.error("Error:", error);
         }
@@ -118,45 +119,61 @@ const ViewAllPatients = () => {
       <h2 className="text-center mt-4 mb-4">Patients</h2>
       <div>
         <span>
-          <label style={{ marginRight: 8, marginLeft: 250 }}>
-            <strong>Appointments:</strong>
-          </label>
-          <Select
-            defaultValue="All"
-            value={selectedOption}
-            style={{ width: 150 }}
-            onChange={handleChange}
-            options={[
-              { value: "All", label: "All" },
-              { value: "Upcoming", label: "Upcoming" },
-            ]}
-          />
-          <label style={{ marginRight: 8, marginLeft: 10 }}>
-            <strong>Name:</strong>
-          </label>
-          <Input
-            type="text"
-            placeholder="Search"
-            value={name}
-            onChange={handleInputChange}
-            style={{ width: 150, marginRight: 30 }}
-          />
-          <button
-            style={{ width: 80, marginRight: 10 }}
-            className="btn btn-sm btn-primary"
-            type="button"
-            onClick={handleSearch}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              justifyItems: "center",
+            }}
           >
-            Search
-          </button>
+            <label
+              style={{
+                marginRight: "1rem",
+                marginTop: "0.4rem",
+              }}
+            >
+              <strong>Appointments</strong>
+            </label>
+            <Select
+              defaultValue="All"
+              value={selectedOption}
+              style={{ width: 150, marginRight: 20 }}
+              onChange={handleChange}
+              options={[
+                { value: "All", label: "All" },
+                { value: "Upcoming", label: "Upcoming" },
+              ]}
+            />
+            <label
+              style={{
+                marginRight: "1rem",
+                marginTop: "0.4rem",
+              }}
+            >
+              <strong>Name</strong>
+            </label>
+            <Input
+              type="text"
+              placeholder="Search"
+              value={name}
+              onChange={handleInputChange}
+              style={{ width: 150, marginRight: 20 }}
+            />
+            <Button
+              style={{ width: 80, marginRight: 20 }}
+              type="primary"
+              onClick={handleSearch}
+            >
+              filter
+            </Button>
 
-          <button
-            onClick={handleClearFilters}
-            style={{ width: 100 }}
-            className="btn btn-sm btn-primary"
-          >
-            Clear filters
-          </button>
+            <Button
+              onClick={handleClearFilters}
+              style={{ width: 100, marginRight: 20 }}
+            >
+              clear
+            </Button>
+          </div>
         </span>
       </div>
       <br />
@@ -195,7 +212,7 @@ const ViewAllPatients = () => {
                             <br></br>
                             <br></br>
                             <strong>Date of birth:</strong>{" "}
-                            {patient.Dob.substring(0, 10)}
+                            {new Date(patient.Dob).toDateString()}
                             <br></br>
                             <br></br>
                             <strong>Gender:</strong> {patient.Gender}
