@@ -20,6 +20,13 @@ The present build (spiderwebs 3.0) is the final build and our final submission, 
 
 We've tried to follow a pretty standard code style for a Node JS and React TS web app.
 
+Code architecture needs working on, we used typescript but rarely used any type definitions.
+
+# Screenshots
+
+If you'd like to see screenshots and previews of our system please visit 
+
+https://drive.google.com/drive/folders/1RElUs1EUiSDKRJqqgJ8rNsa5bvsFa5cN?usp=sharing
 
 # Tech/Framework Used
 
@@ -67,6 +74,63 @@ Bootstrap
         • Update health packages
 
 # Code Examples
+Here's how we worked our video chat
+
+        const express = require("express");
+        const mongoose = require('mongoose');
+        require('dotenv').config();
+        const app = express();
+        const http = require("http");
+        const server = http.createServer(app);
+        const cors = require('cors');
+        const port = 7000;
+        const MongoURI = process.env.ATLAS_MONGO_URI;
+        var i = 1;
+        var patient;
+        app.use(cors());
+
+        const io = require("socket.io")(server, {
+        cors: {
+        origin: ["http://localhost:5173", "http://localhost:8000"],
+        methods: ["GET", "POST"],
+        credentials: true 
+        }
+        });
+
+        io.on("connection", (socket) => {
+                socket.on("patient", (data) => {
+                patient = data;
+                })
+                socket.emit("me", i++)
+                if(i > 2) i =1
+                socket.on("disconnect", () => {
+                socket.broadcast.emit("callEnded")
+                })
+        
+                socket.on("callUser", (data) => {
+                io.to(2).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
+                })
+        
+                socket.on("answerCall", (data) => {
+                io.to(1).emit("callAccepted", data.signal)
+                })
+        })
+
+
+        mongoose.set("strictQuery", false);
+        // configurations
+        // Mongo DB
+        mongoose
+        .connect(MongoURI, { useNewUrlParser: true })
+        .then(() => {
+        console.log("MongoDB is now connected!");
+        // Starting server
+        server.listen(port, () => {
+        console.log(`video chat web socket server Listening to requests on http://localhost:${port}`);
+        });
+        })
+        .catch((err) => console.log(err));
+
 
 # Installation
 
@@ -78,6 +142,162 @@ Additionally write the following commands in the terminal to install dependancie
 
 # API Refrences
 
+## Login Endpoints
+- **POST** `/login`: User login.
+- **POST** `/forgotPassword`: Request to reset the password.
+- **POST** `/verifyOTP`: Verify OTP during the password reset process.
+- **PUT** `/resetPassword`: Reset the user password.
+
+## Admin Endpoints
+- **GET** `/admin/me`: Get admin profile details.
+- **PUT** `/admin/changePassword`: Change admin password.
+- **POST** `/admin/add`: Add a new admin.
+- **GET** `/admin/allPackages`: Get all health packages.
+- **GET** `/admin/allAdmins`: Get all admin profiles.
+- **GET** `/admin/allPatients`: Get all patient profiles.
+- **GET** `/admin/allDoctors`: Get all doctor profiles.
+- **DELETE** `/admin/removeDoctor/:id`: Remove a doctor by ID.
+- **DELETE** `/admin/removePatient/:id`: Remove a patient by ID.
+- **DELETE** `/admin/removeAdmin/:id`: Remove an admin by ID.
+- **GET** `/admin/registrationRequests`: Get all doctor registration requests.
+- **GET** `/admin/registrationRequest/:id`: Get details of a specific registration request.
+- **GET** `/admin/package/:id`: Get details of a health package by ID.
+- **GET** `/admin/getPersonalID/:id`: Get personal ID of a doctor by ID.
+- **GET** `/admin/getDegree/:id`: Get medical degree of a doctor by ID.
+- **GET** `/admin/getLicenses/:id`: Get licenses of a doctor by ID.
+- **POST** `/admin/addPackage`: Add a new health package.
+- **PUT** `/admin/updatePackage/:id`: Update health package details by ID.
+- **DELETE** `/admin/deletePackage/:id`: Delete a health package by ID.
+- **POST** `/admin/acceptRequest/:id`: Accept a doctor registration request.
+- **DELETE** `/admin/rejectRequest/:id`: Reject a doctor registration request.
+
+## Doctor Endpoints
+### Public Endpoints
+- **POST** `/doctor/add`: Add a new doctor.
+- **POST** `/doctor/register`: Register a doctor.
+- **POST** `/doctor/acceptContract/:id`: Accept a doctor's contract by ID.
+- **POST** `/doctor/rejectContract/:id`: Reject a doctor's contract by ID.
+- **POST** `/doctor/uploadPersonalID`: Upload personal ID for verification.
+- **POST** `/doctor/uploadMedicalDegree`: Upload medical degree for verification.
+- **POST** `/doctor/uploadLicense`: Upload licenses for verification.
+- **GET** `/doctor/registrationRequest/:id`: Get details of a specific doctor registration request.
+
+### Private Endpoints
+- **GET** `/doctor/getDoctor/`: Get doctor profile details.
+- **PUT** `/doctor/changePassword`: Change doctor password.
+- **GET** `/doctor/searchPatient/:Name`: Search for a patient by name.
+- **GET** `/doctor/selectPatient/:id`: Select a patient by ID.
+- **PUT** `/doctor/update/`: Update doctor profile details.
+- **GET** `/doctor/upcomingAppointments/`: Get upcoming appointments for a doctor.
+- **GET** `/doctor/viewPatients/`: View all patients for a doctor.
+- **GET** `/doctor/viewPatientInfo/:id`: View details of a specific patient.
+- **GET** `/doctor/filterAppointments/`: Filter appointments for a doctor.
+- **GET** `/doctor/allAppointments/`: View all appointments for a doctor.
+- **PUT** `/doctor/addTimeSlots`: Add available time slots for a doctor.
+- **POST** `/doctor/checkDoctor`: Check doctor availability for a specific date and time.
+- **GET** `/doctor/viewHealthRecords/:id`: View health records for a doctor.
+- **POST** `/doctor/addHealthRecordForPatient/:id`: Add health record for a patient.
+- **POST** `/doctor/scheduleFollowup/`: Schedule a follow-up appointment.
+- **PUT** `/doctor/loggedInFirstTime`: Log in for the first time after registration.
+- **GET** `/doctor/viewPatientFiles/:id`: View patient medical records.
+- **POST** `/doctor/getTimeSlotDate`: Get time slots for a specific date.
+- **GET** `/doctor/getAvailableTimeSlots`: Get available time slots for a doctor.
+- **POST** `/doctor/addPrescription`: Add a prescription for a patient.
+- **GET** `/doctor/getAllMedicines`: Get all medicines.
+- **GET** `/doctor/getAllPatientsPrescriptionsAddedByDoctor/:id`: Get all prescriptions added by a doctor.
+- **PUT** `/doctor/updateMedicineInPrescription`: Update medicine in a prescription.
+- **DELETE** `/doctor/deleteMedicineInPrescription`: Delete medicine from a prescription.
+- **GET** `/doctor/allPharmacists`: Get all pharmacists.
+- **GET** `/doctor/notifications`: View notifications for a doctor.
+- **PUT** `/doctor/openNotification/:id`: Open a notification for a doctor.
+- **GET** `/doctor/unreadNotifications`: Get unread notifications for a doctor.
+
+## Patient Endpoints
+### Public Endpoints
+- **POST** `/patient/register`: Register a new patient.
+
+### Private Endpoints
+- **GET** `/patient/getPatient/`: Get patient profile details.
+- **PUT** `/patient/changePassword`: Change patient password.
+- **POST** `/patient/addFamilyMember`: Add a family member for a patient.
+- **GET** `/patient/selectDoctor/:id`: Select a doctor by ID.
+- **GET** `/patient/searchForDoctor`: Search for a doctor.
+- **GET** `/patient/filterDoctorsCriteria`: Filter doctors by name, specialty, and availability.
+- **GET** `/patient/viewFamilyMembers`: View family members for a patient.
+- **GET** `/patient/viewHealthRecords`: View health records for a patient.
+- **GET** `/patient/filterDoctors`: Filter doctors for a patient.
+- **POST** `/patient/subscribeToHealthPackage/:id`: Subscribe to a health package by ID.
+- **GET** `/patient/filterAppointments`: Filter appointments for a patient.
+- **GET** `/patient/viewSelectedDoctor/:id`: View details of a selected doctor.
+- **POST** `/patient/uploadMedicalDocuments`: Upload medical documents for a patient.
+- **DELETE** `/patient/removeMedicalDocument`: Remove a medical document for a patient.
+- **POST** `/patient/subscribeToHealthPackage/:id`: Subscribe to a health package by ID.
+- **GET** `/patient/viewMyMedicalDocument`: View medical documents for a patient.
+- **GET** `/patient/viewMyPrescriptions`: View prescriptions for a patient.
+- **GET** `/patient/filterPrescriptions`: Filter prescriptions for a patient.
+- **GET** `/patient/selectPrescription/:id`: Select a prescription by ID.
+- **GET** `/patient/viewDoctorsWithPrices`: View doctors with their prices.
+- **PUT** `/patient/rescheduleAppointment`: Reschedule an appointment for a patient.
+- **GET** `/patient/allAppointments`: View all appointments for a patient.
+- **GET** `/patient/allDoctors`: View all doctors for a patient.
+- **GET** `/patient/allPackages`: View all health packages for a patient.
+- **POST** `/patient/checkDoctor`: Check doctor availability for a patient.
+- **GET** `/patient/doctorTimeSlots/:id`: Get time slots for a specific doctor.
+- **POST** `/patient/payAppointmentStripe`: Pay for an appointment with Stripe.
+- **POST** `/patient/payAppointmentWallet`: Pay for an appointment with wallet balance.
+- **GET** `/patient/subscribedPackage`: Get subscribed health package for a patient.
+- **POST** `/patient/addFamilyMember`: Add a family member for a patient.
+- **GET** `/patient/selectDoctor/:id`: Select a doctor by ID.
+- **GET** `/patient/searchForDoctor`: Search for a doctor.
+- **GET** `/patient/filterDoctorsCriteria`: Filter doctors by name, specialty, and availability.
+- **GET** `/patient/viewFamilyMembers`: View family members for a patient.
+- **GET** `/patient/filterDoctors`: Filter doctors for a patient.
+- **GET** `/patient/filterAppointments`: Filter appointments for a patient.
+- **GET** `/patient/viewSelectedDoctor/:id`: View details of a selected doctor.
+- **GET** `/patient/viewDoctorsWithPrices`: View doctors with their prices.
+- **GET** `/patient/allAppointments`: View all appointments for a patient.
+- **GET** `/patient/allDoctors`: View all doctors for a patient.
+- **GET** `/patient/allPackages`: View all health packages for a patient.
+- **GET** `/patient/getBalance`: Get wallet balance for a patient.
+- **GET** `/patient/getDoctorDiscount`: Get discount information for a patient.
+- **POST** `/patient/linkfamily`: Link family members for a patient.
+- **PUT** `/patient/cancelSubscription`: Cancel subscription for a patient.
+- **GET** `/patient/showSubscribedPackage`: Show subscribed health package for a patient.
+- **POST** `/patient/getTimeSlotsDoctorDate`: Get time slots for a specific doctor on a date.
+- **PUT** `/patient/saveVideoSocketId`: Save video socket ID for a patient.
+- **GET** `/patient/myDoctors`: Get doctors linked to a patient.
+- **GET** `/patient/allPharmacists`: Get all pharmacists.
+- **GET** `/patient/notifications`: View notifications for a patient.
+- **PUT** `/patient/fillPrescription/:id`: Fill a prescription for a patient.
+- **POST** `/patient/payPrescription`: Add prescription medicines to the cart for payment.
+- **POST** `/cart/payWithStripe/`: Pay for the cart items with Stripe.
+- **PUT** `/patient/openNotification/:id`: Open a notification for a patient.
+- **GET** `/patient/unreadNotifications`: Get unread notifications for a patient.
+
+## Appointment Endpoints
+- **POST** `/appointment/add`: Add a new appointment for a patient.
+- **GET** `/appointment/filterAppointment`: Filter appointments for a patient.
+- **GET** `/appointment/filterAppointmentDoctor`: Filter appointments for a doctor.
+- **PUT** `/appointment/cancelAppointment/:id`: Cancel an appointment by ID.
+- **POST** `/appointment/appNotif`: Testing - send appointment notification.
+- **POST** `/appointment/cancelNotif`: Testing - send cancellation notification.
+- **POST** `/appointment/rescheduleNotif`: Testing - send rescheduling notification.
+
+## Subscription Endpoints
+- **POST** `/subscription/subscribeStripe/`: Subscribe to a health package with Stripe.
+- **POST** `/subscription/subscribeWallet/`: Subscribe to a health package with wallet balance.
+- **POST** `/subscription/add`: Add a new subscription for a patient.
+- **DELETE** `/subscription/deleteDuplicate/`: Delete duplicate subscriptions for a patient.
+- **GET** `/subscription/getSubscription`: Get subscribed health package for a patient.
+
+## Prescription Endpoints
+- **POST** `/prescription/add`: Add a new prescription.
+
+## Other Endpoints
+- **DELETE** `/notifs/delete`: Delete notifications for a user.
+
+
+        
 
 
 # Tests
@@ -140,6 +360,10 @@ We would love to hear feedback and/or any comments you have about the project st
 Feel free to reach out at:
 
         marwan.moustafa@student.guc.edu.eg
+        zeina.hezzah@student.guc.edu.eg
+        hassan.aly@student.guc.edu.eg
+        mohamed.mahran220@gmail.com
+        ahmed.ibrahim@student.guc.edu.eg
 
 # Credits
 
