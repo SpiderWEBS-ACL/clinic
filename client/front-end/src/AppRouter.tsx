@@ -221,6 +221,7 @@ const AppRouter: React.FC = () => {
           element={<EmploymentContract />}
         />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/" element={<RegLog />} />
       </Routes>
     );
