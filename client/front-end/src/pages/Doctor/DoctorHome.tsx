@@ -235,7 +235,7 @@ const DoctorHome = () => {
               <Col>
                 <Title style={{ textAlign: "center" }} level={4}>
                   <h4>
-                    Affiliation: <h6>{doctorInfo.Affiliation}</h6>{" "}
+                    Affiliation <h6>{doctorInfo.Affiliation}</h6>{" "}
                   </h4>
                 </Title>
                 <Title level={4}>{doctorInfo.Gender}</Title>
@@ -245,7 +245,7 @@ const DoctorHome = () => {
                     justifyContent: "center",
                     justifyItems: "center",
                   }}
-                >
+                > 
                   <Tag color="cyan">{patientsCount} Patients</Tag>
                   <Tag color="magenta">{appointmentsCount} Appointments</Tag>
                 </Row>
