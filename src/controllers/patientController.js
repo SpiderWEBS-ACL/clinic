@@ -921,12 +921,18 @@ const getSubscribedPackage = async (req, res) => {
 };
 
 const showSubscribedPackage = async (req, res) => {
+  try{
   const patientId = req.user.id;
+  console.log(patientId+"-----------")
   const subscription = await subscriptionModel.find({ Patient: patientId });
   if (subscription.length == 0) return res.status(200).json([]);
   if (subscription) {
     const package = await packageModel.find({ _id: subscription[0].Package });
     return res.status(200).json(package);
+  }}
+  catch(error){
+    return res.status(400).json({error:error.message});
+
   }
 };
 function calculateAge(date) {
@@ -1055,6 +1061,7 @@ const saveVideoSocketId = async (req, res) => {
   }
 };
 
+
 const getMyDoctors = async (req, res) => {
   const id = req.user.id;
   try {
@@ -1062,10 +1069,20 @@ const getMyDoctors = async (req, res) => {
       .find({ Patient: id })
       .populate("Doctor")
       .select("Doctor");
-    const doctors = appointments.map((appointment) => {
-      return appointment.Doctor;
-    });
-    return res.status(200).json(doctors);
+    const doctors =[]
+
+    for (const appointment of appointments) {
+      const doctor = appointment.Doctor;
+  
+      if (!doctors.includes(doctor) && doctor != null)
+        doctors.push(doctor);
+    }
+    if (!doctors) {
+      return res.status(400).json({ error: "You have no patients" });
+    }
+    if (doctors) {
+      return res.status(200).json(doctors);
+    }
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

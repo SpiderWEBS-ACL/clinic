@@ -40,6 +40,9 @@ const AllPackagesPatient = () => {
   const [loading, setLoading] = useState(true);
   const { Meta } = Card;
   const [subscribedPackage, setSubscribedPackage] = useState<any>([]);
+  const [open, setOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
 
   const redirectToStripe = async (id: string) => {
     try {
@@ -112,6 +115,23 @@ const AllPackagesPatient = () => {
     setLoading(true);
     window.location.reload();
   };
+  const showPopconfirm = () => {
+    setOpen(true);
+  };
+
+  const handleOk = () => {
+    setConfirmLoading(true);
+
+    setTimeout(() => {
+      setOpen(false);
+      setConfirmLoading(false);
+      handleUnsubscribe();
+    }, 2000);
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+  };
   if (loading) {
     return (
       <div
@@ -179,11 +199,11 @@ const AllPackagesPatient = () => {
                           (subscribedPackage.Status == "Cancelled" &&
                             request._id == SubscribedPackageId)
                         }
-                        onClickCancel={handleUnsubscribe}
+                        onClickCancel={showPopconfirm}
                         extraInfo={
                           request._id == SubscribedPackageId &&
                           subscribedPackage.Status == "Subscribed"
-                            ? `Renewal Date:${
+                            ? `Renewal Date: ${
                                 subscribedPackage.Date.split("T")[0]
                               }`
                             : request._id == SubscribedPackageId &&
@@ -204,7 +224,27 @@ const AllPackagesPatient = () => {
             )
         )}
       </tbody>
-
+      <Modal
+              title="ALERT"
+              open={open}
+              okButtonProps={{ loading: confirmLoading }}
+              onCancel={handleCancel}
+              footer = {
+                <div>
+                  <Button
+                  
+                  type="primary"
+                  onClick={()=>{handleOk}
+                }
+                  >
+                    Confirm
+                  </Button>
+                 
+                </div>
+              }
+            >
+             <h4> Are you sure you want to Cancel?</h4>
+            </Modal>
       <Modal
         title="Select Payment Method"
         open={showPaymentModal}

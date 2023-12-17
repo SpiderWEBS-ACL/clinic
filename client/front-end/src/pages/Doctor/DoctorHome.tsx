@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./StyleDoctor.css";
 import { getDoctor } from "../../apis/Doctor/GetDoctor";
-import { Avatar, Breadcrumb,Divider, Card, Col, Layout, List, Modal, Row, Spin, Typography, Table, Button, Space, Tag } from "antd";
+import { Avatar, Breadcrumb,Divider, Card, Col, Layout, List, Modal, Row, Spin, Typography, Table, Button, Space, Tag, message } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
 import { differenceInYears } from "date-fns";
 import { Content, Footer } from "antd/es/layout/layout";
 import { filterAppointmentsDoctor } from "../../apis/Doctor/Appointments/FilterAppointmentsDoctor";
+import { getMyPatients } from "../../apis/Doctor/Patients/GetMyPatients";
+import { allAppoimtmentsDoctor } from "../../apis/Doctor/Appointments/AllAppointmentsDoctor";
 const { Title } = Typography;
 const DoctorHome = () => {
 
@@ -22,6 +24,8 @@ const DoctorHome = () => {
   const [loading, setLoading] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
   const [dateOf, setDateOf] = useState(String);
+  const [patientsCount,setPatientsCount] = useState(0);
+  const [appointmentsCount,setAppointmentsCount] = useState(0);
 
   const fetchDoctor = async () => {
     await getDoctor()
@@ -32,7 +36,27 @@ const DoctorHome = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
-
+      
+      try{
+      await getMyPatients()
+      .then((response) => {
+        if(response.data)
+        setPatientsCount(response.data.length)
+      })}
+      catch(error:any){
+        message.error(error.response.data.error)
+      }
+      
+      try{
+        await allAppoimtmentsDoctor().then((response) => {
+          if(response.data)
+          setAppointmentsCount(response.data.length)
+        })
+      }
+      catch(error:any){
+        message.error(error.response.data.error)
+      }
+      
       try {
         const response = await filterAppointmentsDoctor("Upcoming", "");
         setAppointments(response.data);
@@ -50,23 +74,7 @@ const DoctorHome = () => {
     
   }, [id]);
 
-  const [patientData, setPatientData] = useState({
-    name: "John Doe",
-    email: "johndoe@example.com",
-    appointments: [
-      { date: "2023-10-20", time: "09:00 AM", doctor: "Dr. Smith" },
-      { date: "2023-10-25", time: "02:30 PM", doctor: "Dr. Johnson" },
-    ],
-    medicalHistory: ["Flu", "Cold", "Annual checkup"],
-    prescriptions: [
-      {
-        medication: "Aspirin",
-        dosage: "500mg",
-        instructions: "Take with food",
-      },
-      { medication: "Antibiotics", dosage: "1 tablet every 12 hours" },
-    ],
-  });
+
   const navigate = useNavigate();
 
 
@@ -106,6 +114,8 @@ const DoctorHome = () => {
       title: "Patient Name",
       dataIndex: "Patient",
       key: "Patient",
+    //  render: (Patient: any) => (<span>{Patient.Name}</span>)
+
     },
     {
       title: "Appointment Date",
@@ -228,8 +238,8 @@ const DoctorHome = () => {
                     </Title>
                     <Title level={4}>{doctorInfo.Gender}</Title>
                     <Row style={{display:"flex", justifyContent:"center",justifyItems:"center"}}>
-                      <Tag color="processing">Patients: </Tag>
-                      <Tag color="processing">Appointments: </Tag>
+                      <Tag color="cyan">{patientsCount}  Patients</Tag>
+                      <Tag color="magenta">{appointmentsCount} Appointments</Tag>
                     </Row>
                   </Col>
               </Card>
