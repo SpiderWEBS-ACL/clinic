@@ -143,7 +143,8 @@ const Register: React.FC = () => {
   };
 
   const prefixSelector = (
-    <Select style={{ width: 70 }}>
+    <Select style={{ width: 70 }}
+    defaultValue={"+20"}>
       <Option value="20">+20</Option>
     </Select>
   );
@@ -317,12 +318,16 @@ const Register: React.FC = () => {
                 >
                   Emergency Contact Relation
                 </label>
-                <Input
-                  id="emergencyContactRelation"
-                  type="text"
-                  onBlur={() => handleBlur("emergencyContactRelation")}
-                  onChange={(e) => setEmergencyContactRelation(e.target.value)}
-                />
+                <Select
+                  style={{ width: "12.8rem" }}
+                  onChange={(value) => setGender(value)}
+                  placeholder="select your gender"
+                >
+                  <Option value="Male">Husband</Option>
+                  <Option value="Female">Wife</Option>
+                  <Option value="Male">Son</Option>
+                  <Option value="Female">Daughter</Option>
+                </Select>
               </div>
             </div>
 
