@@ -4,8 +4,18 @@ import { BASE_URL } from "../../BaseUrl";
 
 export const cancelAppointmentDoctor = async (id: string) => {
   const response = await axios.put(
-    `${BASE_URL}/appointment/cancelAppointment/${id}`,{},
-    {headers: headers}
+    `${BASE_URL}/appointment/cancelAppointment/${id}`,
+    {},
+    { headers: headers }
+  );
+  return response;
+};
+
+export const cancelAppointmentPatient = async (id: string) => {
+  const response = await axios.put(
+    `${BASE_URL}/appointment/cancelAppointmentPatient/${id}`,
+    {},
+    { headers: headers }
   );
   return response;
 };

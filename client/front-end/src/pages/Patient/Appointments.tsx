@@ -25,7 +25,7 @@ import { filterAppointmentStatusDateApi } from "../../apis/Patient/Appointments/
 import { getAllAppointmentsPatientApi } from "../../apis/Patient/Appointments/GetAllAppointments";
 import { getTimeSlotsDoctorDate } from "../../apis/Patient/Doctors/GetTimeSlotsDoctorDate";
 import { handleReschedule } from "../../apis/Patient/Appointments/RescheduleAppointment";
-import { cancelAppointmentDoctor } from "../../apis/Doctor/Appointments/cancelAppointment";
+import { cancelAppointmentDoctor, cancelAppointmentPatient } from "../../apis/Doctor/Appointments/cancelAppointment";
 import { s } from "@fullcalendar/core/internal-common";
 import { scheduleFollowUp } from "../../apis/Patient/Appointments/RequestFollowUp";
 
@@ -183,7 +183,7 @@ const ViewPatientAppointments = () => {
   };
   const handleCancelAppointment = async (id: string) => {
     try {
-      await cancelAppointmentDoctor(id).then((response) => {
+      await cancelAppointmentPatient(id).then((response) => {
         setLoading(true);
         fetchAppointments();
         setShowAppointmentModal(false);
@@ -230,7 +230,6 @@ const ViewPatientAppointments = () => {
             <Option value="Upcoming">Upcoming</Option>
             <Option value="Completed">Completed</Option>
             <Option value="Cancelled">Cancelled</Option>
-            <Option value="Rescheduled">Rescheduled</Option>
           </Select>
           <label style={{ marginRight: "1rem", marginTop: "0.4rem" }}>
             <strong>Date</strong>
@@ -350,7 +349,7 @@ const ViewPatientAppointments = () => {
             </Modal>
             <Popconfirm
               title="ALERT"
-              description="Are you sure you want to unsubscribe?"
+              description="Are you sure you want to cancel appointment?"
               open={open}
               onConfirm={handleOk}
               okButtonProps={{ loading: confirmLoading }}

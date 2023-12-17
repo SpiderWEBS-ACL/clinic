@@ -46,10 +46,10 @@ const AddFamilyMember = () => {
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-3">
       <div className="row justify-content-center">
         <div className="col-md-6">
-          <h1 className="mb-4">Add Family Member</h1>
+          <h2 className="text-center mb-4">Add Family Member</h2>
           <form>
             <InputField
               id="Name"
