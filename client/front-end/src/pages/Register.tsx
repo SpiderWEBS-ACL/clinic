@@ -32,6 +32,39 @@ const Register: React.FC = () => {
     baseURL: "http://localhost:8000/",
   });
 
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email)) {
+      message.error("Invalid email address");
+      return false;
+    }
+    return true;
+  };
+
+  const validatePassword = (password: string): boolean => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+    if (!passwordRegex.test(password)) {
+      message.error("Password should contain at least 1 capital letter, 1 small letter, 1 number, and be at least 6 characters long");
+      return false;
+    }
+    return true;
+  };
+
+  const validateDOB = (dob: string): boolean => {
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    if (age < 16) {
+      message.error("You must be at least 16 years old");
+      return false;
+    }
+    return true;
+  };
   const handleSignUp = async () => {
     // Placeholder validation, replace with your actual validation logic
     if (
@@ -46,6 +79,10 @@ const Register: React.FC = () => {
       message.error("Please Fill In All Requirements");
       return;
     }
+    if (
+      validateEmail(Email) &&
+      validatePassword(Password) &&
+      validateDOB(Dob)){
 
     try {
       // Your sign-up logic here
@@ -73,6 +110,7 @@ const Register: React.FC = () => {
       console.error("Error:", error);
       message.error(`${error.response.data.error}`);
     }
+  }
   };
 
   const handleRegisterDoctor = () => {
@@ -105,7 +143,8 @@ const Register: React.FC = () => {
   };
 
   const prefixSelector = (
-    <Select style={{ width: 70 }}>
+    <Select style={{ width: 70 }}
+    defaultValue={"+20"}>
       <Option value="20">+20</Option>
     </Select>
   );
@@ -279,12 +318,16 @@ const Register: React.FC = () => {
                 >
                   Emergency Contact Relation
                 </label>
-                <Input
-                  id="emergencyContactRelation"
-                  type="text"
-                  onBlur={() => handleBlur("emergencyContactRelation")}
-                  onChange={(e) => setEmergencyContactRelation(e.target.value)}
-                />
+                <Select
+                  style={{ width: "12.8rem" }}
+                  onChange={(value) => setGender(value)}
+                  placeholder="select your gender"
+                >
+                  <Option value="Male">Husband</Option>
+                  <Option value="Female">Wife</Option>
+                  <Option value="Male">Son</Option>
+                  <Option value="Female">Daughter</Option>
+                </Select>
               </div>
             </div>
 
