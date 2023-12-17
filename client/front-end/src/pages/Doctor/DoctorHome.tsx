@@ -3,27 +3,15 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./StyleDoctor.css";
 import { getDoctor } from "../../apis/Doctor/GetDoctor";
-import {
-  Avatar,
-  Breadcrumb,
-  Divider,
-  Card,
-  Col,
-  Layout,
-  List,
-  Modal,
-  Row,
-  Spin,
-  Typography,
-  Table,
-  Button,
-  Space,
-  Tag,
-} from "antd";
+
+import { Avatar, Breadcrumb,Divider, Card, Col, Layout, List, Modal, Row, Spin, Typography, Table, Button, Space, Tag, message } from "antd";
+
 import { SettingOutlined } from "@ant-design/icons";
 import { differenceInYears } from "date-fns";
 import { Content } from "antd/es/layout/layout";
 import { filterAppointmentsDoctor } from "../../apis/Doctor/Appointments/FilterAppointmentsDoctor";
+import { getMyPatients } from "../../apis/Doctor/Patients/GetMyPatients";
+import { allAppoimtmentsDoctor } from "../../apis/Doctor/Appointments/AllAppointmentsDoctor";
 const { Title } = Typography;
 const DoctorHome = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,6 +20,11 @@ const DoctorHome = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
+
+  const [dateOf, setDateOf] = useState(String);
+  const [patientsCount,setPatientsCount] = useState(0);
+  const [appointmentsCount,setAppointmentsCount] = useState(0);
+
 
   const fetchDoctor = async () => {
     await getDoctor()
@@ -42,14 +35,34 @@ const DoctorHome = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
-
-    try {
-      const response = await filterAppointmentsDoctor("Upcoming", "");
-      setAppointments(response.data);
-    } catch (error: any) {
-      if (error.response.data.error == "No appointments were found")
-        setAppointments([]);
-    }
+      
+      try{
+      await getMyPatients()
+      .then((response) => {
+        if(response.data)
+        setPatientsCount(response.data.length)
+      })}
+      catch(error:any){
+        message.error(error.response.data.error)
+      }
+      
+      try{
+        await allAppoimtmentsDoctor().then((response) => {
+          if(response.data)
+          setAppointmentsCount(response.data.length)
+        })
+      }
+      catch(error:any){
+        message.error(error.response.data.error)
+      }
+      
+      try {
+        const response = await filterAppointmentsDoctor("Upcoming", "");
+        setAppointments(response.data);
+      } catch (error: any) {
+        if (error.response.data.error == "No appointments were found")
+          setAppointments([]);
+      }
 
     setLoading(false);
     setLoadingCard(false);
@@ -91,6 +104,8 @@ const DoctorHome = () => {
       title: "Patient Name",
       dataIndex: "Patient",
       key: "Patient",
+    //  render: (Patient: any) => (<span>{Patient.Name}</span>)
+
     },
     {
       title: "Appointment Date",
@@ -182,49 +197,64 @@ const DoctorHome = () => {
             </Card>
           </Modal>
 
-          <Row gutter={2} style={{ height: "80vh", minWidth: 800 }}>
-            <Card
-              hoverable
-              title={"My Details"}
-              loading={loadingCard}
-              extra={
-                <SettingOutlined
-                  style={{ justifyContent: "right", width: 50, height: 50 }}
-                  onClick={openModal}
-                />
-              }
-              style={{ marginRight: "2rem", height: "100%", width: "20vw" }}
-            >
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <Avatar
-                  src="https://xsgames.co/randomusers/avatar.php?g=pixel"
-                  style={{ width: 200, height: 200 }}
-                />
-              </div>
-              <Divider>
-                <h3>
-                  <b>Dr. {doctorInfo.Name}</b>
-                </h3>{" "}
-              </Divider>
-              <Col>
-                <Title style={{ textAlign: "center" }} level={4}>
-                  <h4>
-                    Affiliation: <h6>{doctorInfo.Affiliation}</h6>{" "}
-                  </h4>
-                </Title>
-                <Title level={4}>{doctorInfo.Gender}</Title>
-                <Row
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    justifyItems: "center",
-                  }}
-                >
-                  <Tag color="processing">Patients: </Tag>
-                  <Tag color="processing">Appointments: </Tag>
-                </Row>
-              </Col>
-            </Card>
+          <Row gutter={2} style={{height: "86vh",minWidth:800}}>
+
+              <Card
+                hoverable
+                title={"My Details"}
+                loading={loadingCard}
+                extra={
+                  <SettingOutlined
+                    style={{ justifyContent:"right",width: 50, height: 50 }}
+                    onClick={openModal}
+                  />
+                }
+                style={{marginRight:"2rem",height:"100%",width:"20vw"}}
+                
+              >
+                <div style={{display:"flex",justifyContent:"center"}}>
+              <Avatar
+                    src="https://xsgames.co/randomusers/avatar.php?g=pixel"
+                    style={{width: 200, height: 200 }}
+                  />
+                  </div>
+                   <Divider><h3><b>Dr. {doctorInfo.Name}</b></h3> </Divider>
+                  <Col>
+                    
+                    <Title style={{textAlign:"center"}} level={4}>
+                    <h4>Affiliation: <h6>{doctorInfo.Affiliation}</h6> </h4>
+                      
+                    </Title>
+                    <Title level={4}>{doctorInfo.Gender}</Title>
+                    <Row style={{display:"flex", justifyContent:"center",justifyItems:"center"}}>
+                      <Tag color="cyan">{patientsCount}  Patients</Tag>
+                      <Tag color="magenta">{appointmentsCount} Appointments</Tag>
+                    </Row>
+                  </Col>
+              </Card>
+          
+      <Col md={30} >
+        <Row style={ {height:" 13vh"}}>
+          <Card style={{border:"none" ,backgroundColor:"transparent",marginBottom: "2rem"}}>
+
+          </Card>
+          </Row>
+
+          <Row >
+              <Card
+                hoverable
+                title="Upcoming Appointments"
+                loading={loadingCard}
+                style={{ height: "60vh"  }}
+                
+              >
+               
+               <Table
+          style={{ width: "55vw" }}
+          columns={columns}
+          dataSource={appointments}
+          size="middle"
+        />
 
             <Col md={30}>
               <Row style={{ height: " 13vh" }}>
