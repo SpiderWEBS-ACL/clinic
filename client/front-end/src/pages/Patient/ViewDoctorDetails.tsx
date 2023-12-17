@@ -229,26 +229,23 @@ const ViewDoctorDetails = () => {
               {docInfo.Email}
               <br></br>
               <br></br>
-
               <strong>Username: </strong>
               {docInfo.Username}
               <br></br>
               <br></br>
-
               <strong>Date of birth: </strong>
               {String(docInfo.Dob).substring(0, 10)}
               <br></br>
               <br></br>
-
               <strong>Affiliation: </strong>
               {docInfo.Affiliation}
               <br></br>
               <br></br>
-
               <strong>Education: </strong>
               {docInfo.EducationalBackground}
               <br></br>
               <br></br>
+              <strong>Session Price: </strong>${docInfo.HourlyRate}
             </div>
           </div>
         </div>

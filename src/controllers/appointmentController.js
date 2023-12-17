@@ -17,6 +17,7 @@ const addAppointment = async (req, res, patient = null) => {
     if (req.body.FamilyMember == null) {
       req.body.Patient = req.user.id;
       const appointment = await appointmentModel.create(req.body);
+      await sendAppointmentNotification(appointment._id);
     } else {
       const familyMember = await req.user.FamilyMembers.find(
         (member) => member.Name === req.body.FamilyMember
@@ -24,9 +25,13 @@ const addAppointment = async (req, res, patient = null) => {
       if (familyMember.PatientID) {
         req.body.Patient = familyMember.PatientID;
         const appointment = await appointmentModel.create(req.body);
+        await sendAppointmentNotification(appointment._id);
+        return;
       } else {
         req.body.Patient = familyMember._id;
         const appointment = await appointmentModel.create(req.body);
+        await sendAppointmentNotification(appointment._id, req.user.id);
+        return;
       }
     }
     return res.status(201).json("appointment reserved successfuly");
@@ -150,8 +155,8 @@ const rescheduleAppointment = async (req, res) => {
       start: start,
       end: end,
     });
-    return res.status(200).json("appointment rescheduled");
     await sendReschedulingNotif(appointment._id);
+    return res.status(200).json("appointment rescheduled");
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -218,13 +223,16 @@ const filterAppointmentDoctor = async (req, res) => {
   }
 };
 
-const sendAppointmentNotification = async (appointmentId) => {
+const sendAppointmentNotification = async (appointmentId, patient = null) => {
   try {
     const appointment = await appointmentModel
       .findById(appointmentId)
       .populate("Doctor")
       .populate("Patient");
 
+    if (patient) {
+      appointment.Patient = patient;
+    }
     //set up source email
     const transporter = nodemailer.createTransport({
       service: "gmail",

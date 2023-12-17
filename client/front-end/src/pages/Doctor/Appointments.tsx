@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../../components/Alert";
-import { Button, DatePicker, Popconfirm,  DatePickerProps, Modal, Select, Spin } from "antd";
+import {
+  Button,
+  DatePicker,
+  Popconfirm,
+  DatePickerProps,
+  Modal,
+  Select,
+  Spin,
+} from "antd";
 import { message } from "antd";
 import dayjs from "dayjs";
 import { RangePickerProps } from "antd/es/date-picker";
@@ -162,12 +170,8 @@ const ViewPatientAppointments = () => {
       if (appointment.Status != "Upcoming") {
         return true;
       } else return false;
-    }
-
-    else
-    return false
-  }
-  }
+    } else return false;
+  };
 
   const showPopconfirm = () => {
     setOpen(true);
@@ -282,16 +286,7 @@ const ViewPatientAppointments = () => {
         ///}}
         footer={
           <div>
-            <Button
-              type="primary"
-              danger
-              disabled={checkStatus()}
-              onClick={() => {
-                handleCancelAppointment(appointment._id);
-                setShowAppointmentModal(false);
-              }}>
-
-<Popconfirm
+            <Popconfirm
               title="ALERT"
               description="Are you sure you want to Cancel?"
               open={open}
@@ -310,7 +305,6 @@ const ViewPatientAppointments = () => {
                 Cancel Appointment
               </Button>
             </Popconfirm>
-
             <Button
               type="primary"
               disabled={checkStatus()}

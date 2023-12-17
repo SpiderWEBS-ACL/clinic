@@ -73,7 +73,7 @@ const PatientLayout: React.FC = () => {
   });
 
   const handlePharmacy = () => {
-    window.location.href = 'http://localhost:5173/';
+    window.location.href = "http://localhost:5173/";
   };
 
   const navigate = useNavigate();
@@ -192,7 +192,7 @@ const PatientLayout: React.FC = () => {
             style={{
               right: "4vh",
               bottom: "94vh",
-              top: "4vh",
+              top: "2vh",
             }}
             badge={{ count: notificationCount }}
             icon={<BellOutlined />}
@@ -203,9 +203,9 @@ const PatientLayout: React.FC = () => {
               setMessageCount(0);
             }}
             style={{
-              right: "12vh",
+              right: "10vh",
               bottom: "94vh",
-              top: "4vh",
+              top: "2vh",
             }}
             badge={{ count: MessageCount }}
             icon={<CommentOutlined />}
@@ -216,9 +216,9 @@ const PatientLayout: React.FC = () => {
               setVideoCount(0);
             }}
             style={{
-              right: "18vh",
+              right: "16vh",
               bottom: "94vh",
-              top: "4vh",
+              top: "2vh",
             }}
             badge={{ count: VideoCount }}
             icon={<VideoCameraOutlined />}

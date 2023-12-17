@@ -82,6 +82,9 @@ const ViewMyDoctors = () => {
   const handleRedirection = (item: any) => {
     navigate(`/patient/chat/${item}`);
   };
+  const handleRedirectionDetails = (item: any) => {
+    navigate(`/patient/doctordetails/${item}`);
+  };
 
   const doctorDiscount = async () => {
     try {
@@ -334,13 +337,13 @@ const ViewMyDoctors = () => {
                         style={{
                           width: "25rem",
                           marginTop: "3rem",
-                          height: "12rem",
+                          height: "14rem",
                         }}
                         loading={loadingList}
                         hoverable
                         className="hover-card"
                         onClick={() => {
-                          handleRedirection(request._id);
+                          handleRedirectionDetails(request._id);
                         }}
                       >
                         <Meta
@@ -357,17 +360,24 @@ const ViewMyDoctors = () => {
                           }
                           description={
                             <div>
+                              <strong>Session Price: </strong>$
+                              {request.HourlyRate}
+                              <br></br>
+                              <br></br>
                               <strong>Specialty: </strong> {request.Specialty}
                               <br></br>
                               <br></br>
                               <strong>Affiliation: </strong>{" "}
                               {request.Affiliation}
-                              <br></br>
-                              <br></br>
                               <button
-                                style={{ marginLeft: "14rem" }}
+                                style={{
+                                  marginLeft: "14rem",
+                                }}
                                 className="btn btn-sm btn-success"
-                                onClick={() => handleRedirection(request._id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRedirection(request._id);
+                                }}
                               >
                                 <IoChatbox />
                               </button>

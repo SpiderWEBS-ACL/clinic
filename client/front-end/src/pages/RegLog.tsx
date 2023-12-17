@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  message,
-  Button,
-  Input
-} from "antd";
+import { message, Button, Input } from "antd";
 
 import { MDBContainer, MDBCol, MDBRow, MDBInput } from "mdb-react-ui-kit";
 
@@ -61,8 +57,8 @@ const RegLog: React.FC = () => {
 
     try {
       const data = {
-        Password: Password, 
-        Username: Username, 
+        Password: Password,
+        Username: Username,
       };
 
       const response = await api.post(`/login`, data);
@@ -149,7 +145,7 @@ const RegLog: React.FC = () => {
                 className="mb-4 w-100"
                 onClick={handleSignIn}
                 type="primary"
-                style= {{color:"white"}}
+                style={{ color: "white" }}
               >
                 Sign in
               </Button>
