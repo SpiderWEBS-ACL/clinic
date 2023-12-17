@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../../components/Alert";
-import { Button, DatePicker, DatePickerProps, Modal, Select, Spin } from "antd";
+import { Button, DatePicker, Popconfirm,  DatePickerProps, Modal, Select, Spin } from "antd";
 import { message } from "antd";
 import dayjs from "dayjs";
 import { RangePickerProps } from "antd/es/date-picker";
@@ -35,6 +35,8 @@ const ViewPatientAppointments = () => {
   const [AppointmentTime, setAppointmentTime] = useState("");
   const [timeSlotsDoctor, setTimeSlotsDoctor] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const navigate = useNavigate();
   const clearFilters = async () => {
@@ -161,7 +163,30 @@ const ViewPatientAppointments = () => {
         return true;
       } else return false;
     }
+
+    else
+    return false
+  }
+  }
+
+  const showPopconfirm = () => {
+    setOpen(true);
   };
+
+  const handleOk = () => {
+    setConfirmLoading(true);
+
+    setTimeout(() => {
+      setOpen(false);
+      setConfirmLoading(false);
+      handleCancelAppointment(appointment._id);
+    }, 2000);
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+  };
+
   return (
     <div className="container">
       <h2 className="text-center mt-4 mb-4">Appointments</h2>
@@ -264,10 +289,28 @@ const ViewPatientAppointments = () => {
               onClick={() => {
                 handleCancelAppointment(appointment._id);
                 setShowAppointmentModal(false);
-              }}
+              }}>
+
+<Popconfirm
+              title="ALERT"
+              description="Are you sure you want to Cancel?"
+              open={open}
+              onConfirm={handleOk}
+              okButtonProps={{ loading: confirmLoading }}
+              onCancel={handleCancel}
             >
-              Cancel Appointment
-            </Button>
+              <Button
+                type="primary"
+                danger
+                disabled={checkStatus()}
+                onClick={() => {
+                  showPopconfirm();
+                }}
+              >
+                Cancel Appointment
+              </Button>
+            </Popconfirm>
+
             <Button
               type="primary"
               disabled={checkStatus()}
