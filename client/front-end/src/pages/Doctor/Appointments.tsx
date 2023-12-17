@@ -73,10 +73,13 @@ const ViewPatientAppointments = () => {
   const handleCancelAppointment = async (id: string) => {
     try {
       await cancelAppointmentDoctor(id).then((response) => {
+        setLoading(true);
+        fetchAppointments();
+        setShowAppointmentModal(false);
         message.success(response.data);
       });
-
     } catch (error: any) {
+      setLoading(false);
       message.error(`${error.response.data.error}`);
     }
   };
@@ -153,12 +156,14 @@ const ViewPatientAppointments = () => {
     setAppointmentDate("");
     setAppointmentTime("");
     setShowRescheduleModal(false);
-  }
-  const checkStatus = ()=>{
-    if(appointment){
-    if(appointment.Status != "Upcoming"){
-      return true
+  };
+  const checkStatus = () => {
+    if (appointment) {
+      if (appointment.Status != "Upcoming") {
+        return true;
+      } else return false;
     }
+
     else
     return false
   }
@@ -277,6 +282,14 @@ const ViewPatientAppointments = () => {
         ///}}
         footer={
           <div>
+            <Button
+              type="primary"
+              danger
+              disabled={checkStatus()}
+              onClick={() => {
+                handleCancelAppointment(appointment._id);
+                setShowAppointmentModal(false);
+              }}>
 
 <Popconfirm
               title="ALERT"
@@ -300,10 +313,9 @@ const ViewPatientAppointments = () => {
 
             <Button
               type="primary"
-              disabled = {checkStatus()}
+              disabled={checkStatus()}
               onClick={() => {
                 setShowRescheduleModal(true);
-
               }}
             >
               Reschedule

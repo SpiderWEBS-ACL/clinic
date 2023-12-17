@@ -108,7 +108,11 @@ const {
   sendAppointmentNotification,
   sendCancellationNotif,
   sendReschedulingNotif,
-  deleteNotifs,requestFollowUp,getAllFollowUpRequests,rejectFollowUpRequest,acceptFollowUpRequest
+  deleteNotifs,
+  requestFollowUp,
+  getAllFollowUpRequests,
+  rejectFollowUpRequest,
+  acceptFollowUpRequest,
 } = require("./controllers/appointmentController");
 
 const {
@@ -272,10 +276,8 @@ app.delete(
 );
 app.get("/doctor/allPharmacists", DoctorProtect, getAllPharmacists);
 app.get("/doctor/notifications", DoctorProtect, viewDoctorNotifications);
-app.put("/doctor/openNotification/:id", openNotificationDoctor);      //TO FIX: doctor protect causes unauthorized error
+app.put("/doctor/openNotification/:id", openNotificationDoctor); //TO FIX: doctor protect causes unauthorized error
 app.get("/doctor/unreadNotifications", DoctorProtect, getDoctorUnreadNotifs);
-
-
 
 //Patient Endpoints
 
@@ -405,21 +407,40 @@ app.post("/cart/payWithStripe/", PatientProtect, payCartWithStripe);
 app.put("/patient/openNotification/:id", openNotification); //TO FIX: patient protect causes unauthorized error
 app.get("/patient/unreadNotifications", PatientProtect, getPatientUnreadNotifs);
 
-
 //Appointment Endpoints
 app.post("/appointment/add", PatientProtect, addAppointment);
 app.get(
-  "/appointment/filterAppointment", PatientProtect, filterAppointmentPatient);
+  "/appointment/filterAppointment",
+  PatientProtect,
+  filterAppointmentPatient
+);
 app.get(
   "/appointment/filterAppointmentDoctor",
   DoctorProtect,
   filterAppointmentDoctor
 );
-app.post("/appointment/requestFollowUp", requestFollowUp)
-app.put("/appointment/cancelAppointment/:id", DoctorProtect, cancelAppointment)
-app.get("/appointment/getAllFollowUpRequests/",DoctorProtect, getAllFollowUpRequests)
-app.delete("/appointment/rejectFollowUpRequest/:id",DoctorProtect,rejectFollowUpRequest)
-app.get("/appointment/acceptFollowUpRequest/:id",DoctorProtect,acceptFollowUpRequest)
+app.post("/appointment/requestFollowUp", requestFollowUp);
+app.put("/appointment/cancelAppointment/:id", DoctorProtect, cancelAppointment);
+app.put(
+  "/appointment/cancelAppointmentPatient/:id",
+  PatientProtect,
+  cancelAppointment
+);
+app.get(
+  "/appointment/getAllFollowUpRequests/",
+  DoctorProtect,
+  getAllFollowUpRequests
+);
+app.delete(
+  "/appointment/rejectFollowUpRequest/:id",
+  DoctorProtect,
+  rejectFollowUpRequest
+);
+app.get(
+  "/appointment/acceptFollowUpRequest/:id",
+  DoctorProtect,
+  acceptFollowUpRequest
+);
 
 app.post("/appointment/appNotif", sendAppointmentNotification); //testing
 app.post("/appointment/cancelNotif", sendCancellationNotif); //testing
@@ -440,5 +461,4 @@ app.get("/subscription/getSubscription", PatientProtect, getSubscription);
 //Prescription Endpoints
 app.post("/prescription/add", addPrescription);
 
-
-app.delete('/notifs/delete', deleteNotifs);
+app.delete("/notifs/delete", deleteNotifs);
