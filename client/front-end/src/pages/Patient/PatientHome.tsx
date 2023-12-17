@@ -10,7 +10,8 @@ import {
   Spin,
   Modal,
   Avatar,
-  message,Table,
+  message,
+  Table,
 } from "antd";
 import { InfoCircleTwoTone, SettingOutlined } from "@ant-design/icons";
 import axios from "axios";
@@ -51,7 +52,6 @@ const PatientHome = () => {
     }
   };
   useEffect(() => {
-   
     fetchBalance();
     const config = {
       headers: {
@@ -63,7 +63,6 @@ const PatientHome = () => {
     };
 
     const fetchData = async () => {
-     
       try {
         const patient = await getPatient();
         setPatientInfo(patient);
@@ -72,27 +71,24 @@ const PatientHome = () => {
         if (subscription) setDateOf(subscription.Date + "");
 
         await api
-        .get("patient/showSubscribedPackage", config)   
-        .then((response) => {
-          if (response.data) setSubscription(response.data);
-        });
-        
+          .get("patient/showSubscribedPackage", config)
+          .then((response) => {
+            if (response.data) setSubscription(response.data);
+          });
+
         try {
-
-
           const response = await filterAppointmentStatusDateApi("Upcoming", "");
           setAppointments(response.data);
         } catch (error: any) {
           if (error.response.data.error == "No appointments were found")
             setAppointments([]);
         }
-        setLoading(false) 
-        setLoadingCard(false)
-    }
-    catch(error:any){
-      message.error(`${error.response.data.error}`)
-    }
-  };
+        setLoading(false);
+        setLoadingCard(false);
+      } catch (error: any) {
+        message.error(`${error.response.data.error}`);
+      }
+    };
     fetchData();
   }, [id]);
 
@@ -145,8 +141,7 @@ const PatientHome = () => {
       title: "Doctor Name",
       dataIndex: "Doctor",
       key: "Doctor",
-      render: (Doctor: any) => (<span>{Doctor.Name}</span>)
-
+      render: (Doctor: any) => <span>{Doctor.Name}</span>,
     },
     {
       title: "Appointment Date",
@@ -162,7 +157,6 @@ const PatientHome = () => {
       key: "start",
       render: (start: any) => <span>{start.split("T")[1].split(".")[0]}</span>,
     },
-
   ];
   const columns2 = [
     {
@@ -174,12 +168,8 @@ const PatientHome = () => {
       title: "Expiry Date",
       dataIndex: "AppointmentDate",
       key: "AppointmentDate",
-      render: () => (
-        <span>{dateOf.split("T")[0]}</span>
-      ),
+      render: () => <span>{dateOf.split("T")[0]}</span>,
     },
-   
-    
   ];
   const columns3 = [
     {
@@ -191,18 +181,15 @@ const PatientHome = () => {
       title: "Dose",
       dataIndex: "Dosage",
       key: "Dosage",
-      
     },
     {
       title: "Instruction",
       dataIndex: "Instruction",
       key: "Instruction",
     },
-   
-    
   ];
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout style={{ maxHeight: "86vh" }}>
       <Layout className="site-layout">
         <Content style={{ margin: "0 16px" }}>
           <Breadcrumb style={{ margin: "16px 0" }}>
@@ -263,8 +250,8 @@ const PatientHome = () => {
             </Card>
           </Modal>
 
-          <Row >
-            <Col md={24} >
+          <Row>
+            <Col md={24}>
               <Card
                 hoverable
                 title="My Details"
@@ -275,7 +262,7 @@ const PatientHome = () => {
                     onClick={openModal}
                   />
                 }
-                style={{ marginBottom: 16,height: "37vh"  }}
+                style={{ marginBottom: 16, height: "33vh" }}
               >
                 <Row>
                   <Avatar
@@ -305,21 +292,21 @@ const PatientHome = () => {
               </Card>
             </Col>
           </Row>
-          <Row style={{ height:"45vh" }} gutter={30}>
+          <Row style={{ height: "45vh" }} gutter={30}>
             <Col md={9}>
               <Card
                 hoverable
                 title="Upcoming Appointments"
                 loading={loadingCard}
-                style={{ height:"45vh" }}
+                style={{ height: "45vh" }}
               >
                 <Row>
-                <Table
-          style={{ width: "55vw", height:"30vh"}}
-          columns={columns}
-          dataSource={appointments}
-          size="middle"
-        />
+                  <Table
+                    style={{ width: "55vw", height: "30vh" }}
+                    columns={columns}
+                    dataSource={appointments}
+                    size="middle"
+                  />
                 </Row>
               </Card>
             </Col>
@@ -328,14 +315,15 @@ const PatientHome = () => {
                 hoverable
                 title="My Subscriptions"
                 loading={loadingCard}
-                style={{  height:"45vh" }}              >
+                style={{ height: "45vh" }}
+              >
                 <Row>
-                <Table
-          style={{ width: "55vw", height:"30vh"}}
-          columns={columns2}
-          dataSource={subscription}
-          size="middle"
-        />
+                  <Table
+                    style={{ width: "55vw", height: "30vh" }}
+                    columns={columns2}
+                    dataSource={subscription}
+                    size="middle"
+                  />
                 </Row>
               </Card>
             </Col>
@@ -344,14 +332,15 @@ const PatientHome = () => {
                 hoverable
                 title="My Prescriptions"
                 loading={loadingCard}
-                style={{  height:"45vh" }}              >
+                style={{ height: "45vh" }}
+              >
                 <Row>
-                <Table
-          style={{ width: "55vw", height:"30vh"}}
-          columns={columns3}
-          dataSource={prescriptions}
-          size="middle"
-        />
+                  <Table
+                    style={{ width: "55vw", height: "30vh" }}
+                    columns={columns3}
+                    dataSource={prescriptions}
+                    size="middle"
+                  />
                 </Row>
               </Card>
             </Col>
