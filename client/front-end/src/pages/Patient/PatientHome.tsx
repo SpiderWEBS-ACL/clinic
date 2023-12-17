@@ -71,12 +71,15 @@ const PatientHome = () => {
         const subscription = await getSubscription();
         if (subscription) setDateOf(subscription.Date + "");
 
-      await api
-        .get("patient/showSubscribedPackage", config)
+        await api
+        .get("patient/showSubscribedPackage", config)   
         .then((response) => {
           if (response.data) setSubscription(response.data);
         });
+        
         try {
+
+
           const response = await filterAppointmentStatusDateApi("Upcoming", "");
           setAppointments(response.data);
         } catch (error: any) {
@@ -86,8 +89,8 @@ const PatientHome = () => {
         setLoading(false) 
         setLoadingCard(false)
     }
-    catch{
-
+    catch(error:any){
+      message.error(`${error.response.data.error}`)
     }
   };
     fetchData();

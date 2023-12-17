@@ -36,6 +36,7 @@ const RegLog: React.FC = () => {
       console.log(response.data);
       localStorage.setItem("id", response.data.id);
       localStorage.setItem("type", response.data.type);
+      localStorage.setItem("accessToken", response.data.accessToken);
       Cookies.set("accessToken", response.data.accessToken);
 
       handleRedirection(response.data);
