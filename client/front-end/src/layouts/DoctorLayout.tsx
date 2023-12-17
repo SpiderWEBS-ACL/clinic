@@ -27,7 +27,6 @@ const DoctorLayout: React.FC = () => {
   const [AuthorId, setAuthorId] = useState("");
   const [notificationCount, setNotificationCount] = useState(0);
 
-
   const api = axios.create({
     baseURL: "http://localhost:8000/",
   });
@@ -38,15 +37,15 @@ const DoctorLayout: React.FC = () => {
       localStorage.setItem("socketId", id);
     });
 
-    api.get("/doctor/unreadNotifications", config)
-    .then((response) => {
-      console.log(response.data);
-      setNotificationCount(response.data.length);
-    })
-    .catch((error) => {
-      console.log("Error: " + error);
-    });
-
+    api
+      .get("/doctor/unreadNotifications", config)
+      .then((response) => {
+        console.log(response.data);
+        setNotificationCount(response.data.length);
+      })
+      .catch((error) => {
+        console.log("Error: " + error);
+      });
   }, []);
   socket.on("callUser", (data: any) => {
     console.log("data from: ", data.from, "data.name: ", data.Name);
@@ -83,13 +82,11 @@ const DoctorLayout: React.FC = () => {
         {
           label: "My Appointments",
           key: "/doctor/allAppointments",
-          
         },
         {
           label: "FollowUp Requests",
-        key: "/doctor/followupRequests",
-          
-        }
+          key: "/doctor/followupRequests",
+        },
       ],
     },
     {
@@ -169,7 +166,7 @@ const DoctorLayout: React.FC = () => {
             style={{
               right: "4vh",
               bottom: "94vh",
-              top: "4vh",
+              top: "2vh",
             }}
             badge={{ count: notificationCount }}
             icon={<BellOutlined />}
@@ -180,9 +177,9 @@ const DoctorLayout: React.FC = () => {
               setMessageCount(0);
             }}
             style={{
-              right: "12vh",
+              right: "10vh",
               bottom: "94vh",
-              top: "4vh",
+              top: "2vh",
             }}
             badge={{ count: MessageCount }}
             icon={<CommentOutlined />}
@@ -193,9 +190,9 @@ const DoctorLayout: React.FC = () => {
               setVideoCount(0);
             }}
             style={{
-              right: "18vh",
+              right: "16vh",
               bottom: "94vh",
-              top: "4vh",
+              top: "2vh",
             }}
             badge={{ count: VideoCount }}
             icon={<VideoCameraOutlined />}

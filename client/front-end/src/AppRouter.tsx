@@ -208,7 +208,10 @@ const AppRouter: React.FC = () => {
         <Route path="/patient/myDoctors" element={<ViewMyDoctors />} />
         <Route path="/patient/success" element={<Success />} />
         <Route path="/patient/viewOrder/:id" element={<OrderDetails />} />
-        <Route path="/patient/notifications" element={<PatientNotifications />} />
+        <Route
+          path="/patient/notifications"
+          element={<PatientNotifications />}
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     );

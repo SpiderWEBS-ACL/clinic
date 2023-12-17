@@ -346,7 +346,7 @@ const ViewAllDoctors = () => {
                         style={{
                           width: "25rem",
                           marginTop: "3rem",
-                          height: "12rem",
+                          height: "14rem",
                         }}
                         loading={loadingList}
                         hoverable
@@ -367,6 +367,10 @@ const ViewAllDoctors = () => {
                           }
                           description={
                             <div>
+                              <strong>Session Price: </strong>$
+                              {request.HourlyRate}
+                              <br></br>
+                              <br></br>
                               <strong>Specialty: </strong> {request.Specialty}
                               <br></br>
                               <br></br>
@@ -375,7 +379,7 @@ const ViewAllDoctors = () => {
                               <br></br>
                               <br></br>
                               <ArrowRightOutlined
-                                style={{ marginLeft: "13rem" }}
+                                style={{ marginLeft: "15rem" }}
                               ></ArrowRightOutlined>
                             </div>
                           }

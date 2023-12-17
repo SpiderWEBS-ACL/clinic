@@ -5,11 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Layout, message, Button, Input, Select, DatePicker } from "antd";
 
 import Cookies from "js-cookie";
-import {
-  MDBContainer,
-  MDBCol,
-  MDBRow
-} from "mdb-react-ui-kit";
+import { MDBContainer, MDBCol, MDBRow } from "mdb-react-ui-kit";
 import dayjs from "dayjs";
 
 const Register: React.FC = () => {
@@ -78,8 +74,6 @@ const Register: React.FC = () => {
       message.error(`${error.response.data.error}`);
     }
   };
-
-  
 
   const handleRegisterDoctor = () => {
     navigate("/doctor/register");
@@ -315,6 +309,10 @@ const Register: React.FC = () => {
               >
                 Register as Doctor
               </Button>
+            </div>
+            <div className="d-flex flex-row align-items-center justify-content-center pb-3 mb-3">
+              <label style={{ marginRight: 5 }}>Already Registered? </label>
+              <a href="/"> Login</a>
             </div>
           </div>
         </MDBCol>

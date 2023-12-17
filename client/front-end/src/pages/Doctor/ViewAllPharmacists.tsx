@@ -111,7 +111,7 @@ const ViewAllPharmacists = () => {
 
   return (
     <div className="container">
-      {/* <h2 className="text-center mt-4 mb-4">Pharmacists</h2> */}
+      <h2 className="text-center mt-4 mb-4">Pharmacists</h2>
       <div className="mb-3">
         <span></span>
       </div>
@@ -156,7 +156,10 @@ const ViewAllPharmacists = () => {
                                 <br></br>
                                 <br></br>
                                 <button
-                                  style={{ marginLeft: "14rem" }}
+                                  style={{
+                                    marginLeft: "14rem",
+                                    marginTop: "2rem",
+                                  }}
                                   className="btn btn-sm btn-success"
                                   onClick={() => handleRedirection(request._id)}
                                 >
